@@ -19,6 +19,24 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
   const [wishAuthor, setWishAuthor] = useState('');
   const [wishContent, setWishContent] = useState('');
   const [isSubmittingWish, setIsSubmittingWish] = useState(false);
+  const [isAnimationComplete, setIsAnimationComplete] = useState(false);
+
+  // Cinematic film-reveal entrance animation coordinator
+  useEffect(() => {
+    // Skip motion if user prefers reduced motion
+    const prefersReducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion) {
+      setIsAnimationComplete(true);
+      return;
+    }
+
+    // Automatically transition to clean stable state after reveal sequence finishes (2.2s)
+    const timer = setTimeout(() => {
+      setIsAnimationComplete(true);
+    }, 2200);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   // Lightbox keyboard navigation & body scroll lock
   const handlePrev = useCallback(() => {
@@ -104,9 +122,13 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
 
         {/* 1. TIGHT PAIRING: Collaborative workspace and vertical camera sitting closely */}
         <div className="flex items-start gap-6 lg:gap-8 max-w-5xl">
+          {/* Workspace photo (62%) */}
           <div
             onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.workspace)}
-            className="w-[62%] cursor-pointer transition-opacity duration-300 hover:opacity-90 shadow-md"
+            className={`w-[62%] cursor-pointer transition-opacity duration-300 hover:opacity-90 shadow-md ${
+              !isAnimationComplete ? 'film-reveal-item' : ''
+            }`}
+            style={{ animationDelay: '100ms' }}
           >
             <img
               src={PHOTOBOOK_IMAGES.workspace.src}
@@ -115,9 +137,13 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
             />
           </div>
 
+          {/* Vertical camera photo (28%, offset down 48px) */}
           <div
             onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.camera)}
-            className="w-[28%] pt-12 cursor-pointer transition-opacity duration-300 hover:opacity-90 shadow-md"
+            className={`w-[28%] pt-12 cursor-pointer transition-opacity duration-300 hover:opacity-90 shadow-md ${
+              !isAnimationComplete ? 'film-reveal-item' : ''
+            }`}
+            style={{ animationDelay: '220ms' }}
           >
             <img
               src={PHOTOBOOK_IMAGES.camera.src}
@@ -132,9 +158,13 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
 
         {/* 2. MASSIVE RIGHT ANCHOR WITH OVERLAPPING CANDID SNAPSHOT */}
         <div className="relative ml-auto w-[74%] max-w-4xl">
+          {/* Cover banquet photo (74%) */}
           <div
             onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.cover)}
-            className="w-full cursor-pointer transition-opacity duration-300 hover:opacity-90 shadow-lg"
+            className={`w-full cursor-pointer transition-opacity duration-300 hover:opacity-90 shadow-lg ${
+              !isAnimationComplete ? 'film-reveal-item' : ''
+            }`}
+            style={{ animationDelay: '360ms' }}
           >
             <img
               src={PHOTOBOOK_IMAGES.cover.src}
@@ -146,7 +176,10 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
           {/* Overlapping candid snapshot (Offset onto the top-left area of the cover photo) */}
           <div
             onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.coverOffset)}
-            className="absolute -top-10 -left-12 w-[34%] z-10 cursor-pointer transition-transform duration-300 hover:scale-[1.02] shadow-2xl -rotate-2 bg-white p-2 pb-4"
+            className={`absolute -top-10 -left-12 w-[34%] z-10 cursor-pointer transition-transform duration-300 hover:scale-[1.02] shadow-2xl -rotate-2 bg-white p-2 pb-4 ${
+              !isAnimationComplete ? 'film-reveal-item' : ''
+            }`}
+            style={{ animationDelay: '500ms' }}
           >
             <img
               src={PHOTOBOOK_IMAGES.coverOffset.src}
@@ -158,9 +191,13 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
 
         {/* 3. ASYMMETRIC RIGHT-SIDE MICRO DISCOVERY (Breaks alternating pattern!) */}
         <div className="pt-16 pb-8 flex justify-end pr-16 lg:pr-28">
+          {/* Bonfire square photo (26%) */}
           <div
             onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.bonfire)}
-            className="w-[26%] max-w-[280px] cursor-pointer transition-opacity duration-300 hover:opacity-90 shadow-md"
+            className={`w-[26%] max-w-[280px] cursor-pointer transition-opacity duration-300 hover:opacity-90 shadow-md ${
+              !isAnimationComplete ? 'film-reveal-item' : ''
+            }`}
+            style={{ animationDelay: '640ms' }}
           >
             <img
               src={PHOTOBOOK_IMAGES.bonfire.src}
@@ -175,9 +212,13 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
 
         {/* 4. EXPANSIVE CINEMATIC HORIZON (PULLED TO LEFT) */}
         <div className="w-[94%] mr-auto">
+          {/* Beach panoramic photo (94%) */}
           <div
             onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.beachPanoramic)}
-            className="w-full cursor-pointer transition-opacity duration-300 hover:opacity-90 shadow-lg"
+            className={`w-full cursor-pointer transition-opacity duration-300 hover:opacity-90 shadow-lg ${
+              !isAnimationComplete ? 'film-reveal-item' : ''
+            }`}
+            style={{ animationDelay: '780ms' }}
           >
             <img
               src={PHOTOBOOK_IMAGES.beachPanoramic.src}
@@ -190,11 +231,15 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
         {/* --- INTENTIONAL WHITESPACE VOID (140px) --- */}
         <div className="h-28 lg:h-36" aria-hidden="true" />
 
-        {/* 5. OVERLAPPING DIAGONAL DIALOGUE (Stage & Toast overlapping by 40px) */}
-        <div className="relative pl-6 lg:pl-12 max-w-5xl">
+        {/* 5. CÓC STAGE PHOTOGRAPH & CELEBRATION MOMENT (Prominent, Uncovered & Visually Striking) */}
+        <div className="flex flex-col lg:flex-row items-start gap-8 lg:gap-14 max-w-6xl">
+          {/* PROMINENT CÓC STAGE PHOTO (68% width - fully visible, stage lights & crowd celebration) */}
           <div
             onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.stage)}
-            className="w-[56%] cursor-pointer transition-opacity duration-300 hover:opacity-90 shadow-md"
+            className={`w-full lg:w-[68%] cursor-pointer transition-opacity duration-300 hover:opacity-90 shadow-xl ${
+              !isAnimationComplete ? 'film-reveal-item' : ''
+            }`}
+            style={{ animationDelay: '920ms' }}
           >
             <img
               src={PHOTOBOOK_IMAGES.stage.src}
@@ -203,9 +248,13 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
             />
           </div>
 
+          {/* Celebration toast photo (Placed alongside/below without obscuring the stage photo) */}
           <div
             onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.celebrationToast)}
-            className="absolute top-20 left-[48%] w-[42%] z-10 cursor-pointer transition-opacity duration-300 hover:opacity-90 shadow-xl"
+            className={`w-full lg:w-[32%] lg:pt-20 cursor-pointer transition-opacity duration-300 hover:opacity-90 shadow-md ${
+              !isAnimationComplete ? 'film-reveal-item' : ''
+            }`}
+            style={{ animationDelay: '1060ms' }}
           >
             <img
               src={PHOTOBOOK_IMAGES.celebrationToast.src}
@@ -220,9 +269,13 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
 
         {/* 6. SOLITARY CLIMAX MONUMENT */}
         <div className="w-[78%] mx-auto">
+          {/* Gathering crowd photo (78%) */}
           <div
             onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.gatheringCrowd)}
-            className="w-full cursor-pointer transition-opacity duration-300 hover:opacity-90 shadow-2xl"
+            className={`w-full cursor-pointer transition-opacity duration-300 hover:opacity-90 shadow-2xl ${
+              !isAnimationComplete ? 'film-reveal-item' : ''
+            }`}
+            style={{ animationDelay: '1200ms' }}
           >
             <img
               src={PHOTOBOOK_IMAGES.gatheringCrowd.src}
@@ -244,7 +297,10 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
         <div className="relative pb-6">
           <div
             onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.workspace)}
-            className="w-[84%] cursor-pointer shadow-md"
+            className={`w-[84%] cursor-pointer shadow-md ${
+              !isAnimationComplete ? 'film-reveal-item' : ''
+            }`}
+            style={{ animationDelay: '100ms' }}
           >
             <img
               src={PHOTOBOOK_IMAGES.workspace.src}
@@ -255,7 +311,10 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
 
           <div
             onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.camera)}
-            className="absolute -bottom-2 right-0 w-[46%] z-10 cursor-pointer shadow-xl"
+            className={`absolute -bottom-2 right-0 w-[46%] z-10 cursor-pointer shadow-xl ${
+              !isAnimationComplete ? 'film-reveal-item' : ''
+            }`}
+            style={{ animationDelay: '220ms' }}
           >
             <img
               src={PHOTOBOOK_IMAGES.camera.src}
@@ -269,7 +328,10 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
         <div className="w-[88%] ml-auto pt-4">
           <div
             onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.cover)}
-            className="w-full cursor-pointer shadow-md"
+            className={`w-full cursor-pointer shadow-md ${
+              !isAnimationComplete ? 'film-reveal-item' : ''
+            }`}
+            style={{ animationDelay: '360ms' }}
           >
             <img
               src={PHOTOBOOK_IMAGES.cover.src}
@@ -283,7 +345,10 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
         <div className="w-[58%] -rotate-2">
           <div
             onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.coverOffset)}
-            className="w-full cursor-pointer shadow-md bg-white p-1 pb-3"
+            className={`w-full cursor-pointer shadow-md bg-white p-1 pb-3 ${
+              !isAnimationComplete ? 'film-reveal-item' : ''
+            }`}
+            style={{ animationDelay: '500ms' }}
           >
             <img
               src={PHOTOBOOK_IMAGES.coverOffset.src}
@@ -297,7 +362,10 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
         <div className="w-[42%] ml-auto">
           <div
             onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.bonfire)}
-            className="w-full cursor-pointer shadow-sm"
+            className={`w-full cursor-pointer shadow-sm ${
+              !isAnimationComplete ? 'film-reveal-item' : ''
+            }`}
+            style={{ animationDelay: '640ms' }}
           >
             <img
               src={PHOTOBOOK_IMAGES.bonfire.src}
@@ -311,7 +379,10 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
         <div className="-mx-4 py-2">
           <div
             onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.beachPanoramic)}
-            className="w-full cursor-pointer shadow-sm"
+            className={`w-full cursor-pointer shadow-sm ${
+              !isAnimationComplete ? 'film-reveal-item' : ''
+            }`}
+            style={{ animationDelay: '780ms' }}
           >
             <img
               src={PHOTOBOOK_IMAGES.beachPanoramic.src}
@@ -321,36 +392,48 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
           </div>
         </div>
 
-        {/* 6. Staggered Duo (Stage + Toast) */}
-        <div className="flex items-start gap-3 pt-2">
+        {/* 6. PROMINENT CÓC STAGE PHOTO (Full width on mobile, memorable concert energy) */}
+        <div className="w-full pt-2">
           <div
             onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.stage)}
-            className="w-[52%] cursor-pointer shadow-sm"
+            className={`w-full cursor-pointer shadow-lg ${
+              !isAnimationComplete ? 'film-reveal-item' : ''
+            }`}
+            style={{ animationDelay: '920ms' }}
           >
             <img
               src={PHOTOBOOK_IMAGES.stage.src}
               alt={PHOTOBOOK_IMAGES.stage.alt}
-              className="w-full aspect-[4/3] object-cover"
-            />
-          </div>
-
-          <div
-            onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.celebrationToast)}
-            className="w-[44%] pt-8 cursor-pointer shadow-sm"
-          >
-            <img
-              src={PHOTOBOOK_IMAGES.celebrationToast.src}
-              alt={PHOTOBOOK_IMAGES.celebrationToast.alt}
-              className="w-full aspect-square object-cover"
+              className="w-full aspect-[16/10] object-cover"
             />
           </div>
         </div>
 
-        {/* 7. Climax Gathering */}
+        {/* 7. Celebration Toast Photo */}
+        <div className="w-[60%] mx-auto pt-2">
+          <div
+            onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.celebrationToast)}
+            className={`w-full cursor-pointer shadow-md ${
+              !isAnimationComplete ? 'film-reveal-item' : ''
+            }`}
+            style={{ animationDelay: '1060ms' }}
+          >
+            <img
+              src={PHOTOBOOK_IMAGES.celebrationToast.src}
+              alt={PHOTOBOOK_IMAGES.celebrationToast.alt}
+              className="w-full aspect-[4/3] object-cover"
+            />
+          </div>
+        </div>
+
+        {/* 8. Climax Gathering */}
         <div className="w-full pt-4">
           <div
             onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.gatheringCrowd)}
-            className="w-full cursor-pointer shadow-lg"
+            className={`w-full cursor-pointer shadow-lg ${
+              !isAnimationComplete ? 'film-reveal-item' : ''
+            }`}
+            style={{ animationDelay: '1200ms' }}
           >
             <img
               src={PHOTOBOOK_IMAGES.gatheringCrowd.src}
