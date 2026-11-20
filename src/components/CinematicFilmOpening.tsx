@@ -35,15 +35,7 @@ export const CinematicFilmOpening: React.FC<CinematicFilmOpeningProps> = ({ onCo
       return;
     }
 
-    // 2. Preload Gala hero photo and archival frames
-    const heroImg = new Image();
-    heroImg.src = 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=1200&q=80';
-    const fCampImg = new Image();
-    fCampImg.src = 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=1000&q=80';
-    const vtImg = new Image();
-    vtImg.src = 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1000&q=80';
-
-    // 3. Escape key listener
+    // 2. Escape key listener
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         handleSkip();
@@ -51,13 +43,13 @@ export const CinematicFilmOpening: React.FC<CinematicFilmOpeningProps> = ({ onCo
     };
     window.addEventListener('keydown', onKeyDown);
 
-    // 4. Cinematic Timeline
+    // 3. Cinematic Timeline
     // Phase 1: Rolling reel slows down and settles on the Gala photo at 1.8s
     const t1 = window.setTimeout(() => {
       setStage('settled');
     }, 1800);
 
-    // Phase 2: Frame expands outward to reveal website at 2.8s
+    // Phase 2: Frame expands outward to reveal photobook at 2.8s
     const t2 = window.setTimeout(() => {
       setStage('expanding');
     }, 2800);
@@ -108,7 +100,7 @@ export const CinematicFilmOpening: React.FC<CinematicFilmOpeningProps> = ({ onCo
         <div
           className={`relative flex items-center transition-all ease-out ${
             stage === 'rolling'
-              ? 'translate-x-[40%] sm:translate-x-[35%] duration-[1800ms]'
+              ? 'translate-x-[48%] sm:translate-x-[42%] duration-[1800ms]'
               : 'translate-x-0 duration-700'
           }`}
           style={{
@@ -116,33 +108,45 @@ export const CinematicFilmOpening: React.FC<CinematicFilmOpeningProps> = ({ onCo
           }}
         >
           {/* Continuous Film Negative Background */}
-          <div className="flex items-center gap-6 sm:gap-12 py-8 sm:py-12 px-8 bg-[#181613] border-y-[6px] border-[#2A2722] shadow-[0_20px_60px_rgba(0,0,0,0.8)]">
+          <div className="flex items-center gap-6 sm:gap-10 py-8 sm:py-12 px-8 bg-[#181613] border-y-[6px] border-[#2A2722] shadow-[0_20px_60px_rgba(0,0,0,0.8)]">
             
-            {/* FRAME 01: F-CAMP 2009 */}
-            <div className="relative shrink-0 w-[260px] sm:w-[380px] aspect-[4/3] bg-[#0E0D0B] overflow-hidden">
+            {/* FRAME 01: F-CAMP KHỞI ĐẦU */}
+            <div className="relative shrink-0 w-[240px] sm:w-[340px] aspect-[4/3] bg-[#0E0D0B] overflow-hidden">
               <img
                 src="https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=1000&q=80"
-                alt="2009 Khởi đầu tác nghiệp"
+                alt="Khởi đầu tác nghiệp"
                 className="w-full h-full object-cover filter contrast-105 brightness-90 grayscale-[15%]"
               />
               <div className="absolute bottom-2 left-3 font-mono text-[10px] text-[#DCD5C4]/80 tracking-widest uppercase">
-                EXP. 01 • F-CAMP 2009
+                EXP. 01 • KHỞI ĐẦU TÁC NGHIỆP
               </div>
             </div>
 
-            {/* FRAME 02: TEAMBUILDING VŨNG TÀU 2017 */}
-            <div className="relative shrink-0 w-[260px] sm:w-[380px] aspect-[4/3] bg-[#0E0D0B] overflow-hidden">
+            {/* FRAME 02: TEAMBUILDING */}
+            <div className="relative shrink-0 w-[240px] sm:w-[340px] aspect-[4/3] bg-[#0E0D0B] overflow-hidden">
               <img
                 src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1000&q=80"
-                alt="2017 Thanh xuân rực rỡ"
+                alt="Thanh xuân rực rỡ"
                 className="w-full h-full object-cover filter contrast-105 brightness-90"
               />
               <div className="absolute bottom-2 left-3 font-mono text-[10px] text-[#DCD5C4]/80 tracking-widest uppercase">
-                EXP. 09 • SẮC ÁO VÀNG 2017
+                EXP. 09 • SẮC ÁO VÀNG
               </div>
             </div>
 
-            {/* FRAME 03: GALA NIGHT 16Y / 17Y (THE HERO PHOTO) */}
+            {/* FRAME 03: SÂN KHẤU CÓC SÀI GÒN (STAGE PHOTO) */}
+            <div className="relative shrink-0 w-[240px] sm:w-[340px] aspect-[4/3] bg-[#0E0D0B] overflow-hidden">
+              <img
+                src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1000&q=80"
+                alt="Sân khấu Cóc Sài Gòn"
+                className="w-full h-full object-cover filter contrast-105 brightness-90"
+              />
+              <div className="absolute bottom-2 left-3 font-mono text-[10px] text-[#F4C542] tracking-widest uppercase font-bold">
+                EXP. 16 • SÂN KHẤU CÓC
+              </div>
+            </div>
+
+            {/* FRAME 04: GALA NIGHT 17Y (THE SETTLED HERO PHOTO) */}
             <div
               className={`relative shrink-0 w-[300px] sm:w-[460px] md:w-[540px] aspect-[4/3] bg-[#0E0D0B] overflow-hidden transition-all duration-700 ${
                 stage === 'settled' || stage === 'expanding'
@@ -163,7 +167,7 @@ export const CinematicFilmOpening: React.FC<CinematicFilmOpeningProps> = ({ onCo
 
           {/* Top Continuous Sprocket Perforations */}
           <div className="absolute -top-3 left-0 right-0 flex justify-around pointer-events-none opacity-70">
-            {[...Array(24)].map((_, i) => (
+            {[...Array(28)].map((_, i) => (
               <div
                 key={`sprocket-top-${i}`}
                 className="w-3 sm:w-4 h-5 sm:h-6 bg-[#0E0D0B] border border-[#2A2722] rounded-[2px]"
@@ -173,7 +177,7 @@ export const CinematicFilmOpening: React.FC<CinematicFilmOpeningProps> = ({ onCo
 
           {/* Bottom Continuous Sprocket Perforations */}
           <div className="absolute -bottom-3 left-0 right-0 flex justify-around pointer-events-none opacity-70">
-            {[...Array(24)].map((_, i) => (
+            {[...Array(28)].map((_, i) => (
               <div
                 key={`sprocket-bot-${i}`}
                 className="w-3 sm:w-4 h-5 sm:h-6 bg-[#0E0D0B] border border-[#2A2722] rounded-[2px]"

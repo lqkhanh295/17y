@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ShieldCheck } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { AudioPlayerToggle } from './components/AudioPlayerToggle';
+import { CinematicFilmOpening } from './components/CinematicFilmOpening';
 import { PhotobookFlow } from './components/PhotobookFlow';
 import { RegistrationModal } from './components/RegistrationModal';
 import { PaymentLookupModal } from './components/PaymentLookupModal';
@@ -93,6 +94,19 @@ const INITIAL_REGISTRATIONS: RegistrationRecord[] = [
 ];
 
 export const App: React.FC = () => {
+  // Cinematic Film Opening intro state
+  const [showCinematicIntro, setShowCinematicIntro] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      return false;
+    }
+    const path = window.location.pathname;
+    if (path === '/register' || path === '/portal' || path === '/admin' || window.location.hash) {
+      return false;
+    }
+    return true;
+  });
+
   // Modal states
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
   const [isLookupOpen, setIsLookupOpen] = useState(false);
@@ -217,6 +231,11 @@ export const App: React.FC = () => {
   return (
     <div className="relative min-h-screen bg-csg-paper bg-paper-texture text-csg-black flex flex-col selection:bg-csg-yellow selection:text-csg-black font-body">
       
+      {/* Cinematic 35mm Analog Film Opening */}
+      {showCinematicIntro && (
+        <CinematicFilmOpening onComplete={() => setShowCinematicIntro(false)} />
+      )}
+
       {/* Floating Audio Controller */}
       <AudioPlayerToggle />
 
@@ -235,6 +254,13 @@ export const App: React.FC = () => {
 
           {/* Minimal Quick Actions */}
           <nav className="flex items-center gap-5 sm:gap-7 font-mono text-xs uppercase tracking-wider text-csg-black/80 font-medium">
+            <button
+              onClick={() => setShowCinematicIntro(true)}
+              className="hover:text-csg-red transition-colors hidden sm:inline"
+              title="Xem lại thước phim cuộn 35mm"
+            >
+              THƯỚC PHIM 17Y
+            </button>
             <button
               onClick={openLookup}
               className="hover:text-csg-red transition-colors"
