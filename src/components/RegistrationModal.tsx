@@ -483,25 +483,65 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                     </button>
                   </div>
 
-                  {/* Receipt Upload Area */}
+                  {/* Receipt Upload Area with Preview & Remove/Replace */}
                   <div>
-                    <label className="block text-[11px] font-bold uppercase text-[#111111] mb-1">
-                      TẢI LÊN BIÊN LAI CHUYỂN KHOẢN *
+                    <label className="block text-[11px] font-bold uppercase text-[#20231F] mb-1">
+                      TẢI LÊN BIÊN LAI CHUYỂN KHOẢN (ẢNH CHỤP / HÓA ĐƠN) *
                     </label>
-                    <label className="border-2 border-dashed border-[#111111] rounded-xl p-3 bg-white flex items-center justify-center gap-2 cursor-pointer hover:bg-[#F4F0E6] transition-colors">
-                      <Upload className="w-4 h-4 text-[#111111]" />
-                      <span className="text-xs font-bold text-[#111111]">
-                        {receiptImage ? '✓ Đã chọn ảnh biên lai (Nhấp để đổi)' : 'Chọn ảnh biên lai giao dịch'}
-                      </span>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleReceiptUpload}
-                        className="hidden"
-                      />
-                    </label>
+
+                    {receiptImage ? (
+                      <div className="p-3 bg-white border-2 border-[#20231F] flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-3">
+                          <img
+                            src={receiptImage}
+                            alt="Biên lai đã chọn"
+                            className="w-14 h-14 object-cover border border-[#20231F]"
+                          />
+                          <div>
+                            <span className="text-xs font-bold text-emerald-800 block">✓ Đã đính kèm ảnh biên lai</span>
+                            <span className="text-[10px] font-mono text-[#20231F]/60">Sẵn sàng để BTC đối soát</span>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <label className="px-2.5 py-1.5 bg-[#EAE4D6] hover:bg-[#F4EEDF] border border-[#20231F] text-xs font-bold cursor-pointer transition-colors">
+                            <span>Thay ảnh</span>
+                            <input
+                              type="file"
+                              accept="image/png,image/jpeg,image/webp"
+                              onChange={handleReceiptUpload}
+                              className="hidden"
+                            />
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => setReceiptImage('')}
+                            className="px-2.5 py-1.5 bg-red-100 hover:bg-red-200 text-[#B94D35] border border-[#B94D35] text-xs font-bold transition-colors"
+                          >
+                            Xóa
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <label className="border-2 border-dashed border-[#20231F] p-4 bg-white flex flex-col items-center justify-center gap-1.5 cursor-pointer hover:bg-[#F4EEDF] transition-colors">
+                        <Upload className="w-5 h-5 text-[#20231F]" />
+                        <span className="text-xs font-bold text-[#20231F]">
+                          Nhấp để tải lên ảnh chụp màn hình chuyển khoản
+                        </span>
+                        <span className="text-[10px] font-mono text-[#20231F]/60">
+                          Hỗ trợ định dạng JPG, PNG, WEBP (Tối đa 10MB)
+                        </span>
+                        <input
+                          type="file"
+                          accept="image/png,image/jpeg,image/webp"
+                          onChange={handleReceiptUpload}
+                          className="hidden"
+                        />
+                      </label>
+                    )}
+
                     {paymentErrors.receipt && (
-                      <p className="text-[11px] text-[#D94C2B] font-bold mt-1">{paymentErrors.receipt}</p>
+                      <p className="text-[11px] text-[#B94D35] font-bold mt-1">{paymentErrors.receipt}</p>
                     )}
                   </div>
                 </div>

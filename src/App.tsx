@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { 
   Sparkles, Calendar, MapPin, Clock, ArrowRight, ShieldCheck, 
   Search, Heart, Music, ChevronRight, CheckCircle2, Users, Award,
-  PartyPopper, MessageSquare, Quote, Shirt, Wine, Gift, Compass, Menu, X
+  PartyPopper, MessageSquare, Quote, Shirt, Wine, Gift, Compass, Menu, X,
+  Bookmark, Ticket, Image as ImageIcon
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { AudioPlayerToggle } from './components/AudioPlayerToggle';
@@ -14,6 +15,19 @@ import { CelebrationStage } from './components/CelebrationStage';
 import { MascotFrog, RegistrationRecord } from './types';
 import { apiClient } from './services/apiClient';
 import { audioService } from './services/audioService';
+
+// Target Event Timestamp: Saturday, December 19, 2026 at 18:00 (GMT+7)
+const EVENT_TIMESTAMP = new Date('2026-12-19T18:00:00+07:00').getTime();
+
+function calculateTimeLeft() {
+  const now = Date.now();
+  const diff = Math.max(0, EVENT_TIMESTAMP - now);
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+  const minutes = Math.floor((diff / 1000 / 60) % 60);
+  const seconds = Math.floor((diff / 1000) % 60);
+  return { days, hours, minutes, seconds };
+}
 
 // Default initial fallback registrations
 const INITIAL_REGISTRATIONS: RegistrationRecord[] = [
@@ -144,13 +158,15 @@ export const App: React.FC = () => {
   // Public wishes highlight
   const [wishesList, setWishesList] = useState<any[]>([]);
 
-  // Countdown timer to Event Day (15/12/2026)
-  const [timeLeft, setTimeLeft] = useState({
-    days: 30,
-    hours: 5,
-    minutes: 42,
-    seconds: 18
-  });
+  // Real Dynamic Countdown Timer
+  const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTimeLeft(calculateTimeLeft());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   // URL-based routing handlers
   const openRegister = () => {
@@ -245,20 +261,6 @@ export const App: React.FC = () => {
     fetchData();
   }, []);
 
-  // Countdown tick
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeLeft(prev => {
-        if (prev.seconds > 0) return { ...prev, seconds: prev.seconds - 1 };
-        if (prev.minutes > 0) return { ...prev, minutes: 59, seconds: 59 };
-        if (prev.hours > 0) return { ...prev, hours: prev.hours - 1, minutes: 59, seconds: 59 };
-        if (prev.days > 0) return { ...prev, days: prev.days - 1, hours: 23, minutes: 59, seconds: 59 };
-        return prev;
-      });
-    }, 1000);
-    return () => clearInterval(timer);
-  }, []);
-
   // Handle new registration completed
   const handleRegistrationComplete = (newRecord: RegistrationRecord) => {
     setRegistrations(prev => [newRecord, ...prev]);
@@ -292,7 +294,7 @@ export const App: React.FC = () => {
       particleCount: 80,
       spread: 80,
       origin: { y: 0.6 },
-      colors: ['#F5C400', '#D94C2B', '#111111', '#10B981', '#F4F0E6']
+      colors: ['#F4C542', '#B94D35', '#20231F', '#10B981', '#F4EEDF']
     });
   };
 
@@ -313,7 +315,7 @@ export const App: React.FC = () => {
   };
 
   return (
-    <div className="relative min-h-screen bg-csg-paper bg-paper-texture text-csg-black flex flex-col selection:bg-csg-yellow selection:text-csg-black">
+    <div className="relative min-h-screen bg-csg-paper bg-paper-texture text-csg-black flex flex-col selection:bg-csg-yellow selection:text-csg-black font-body">
       {/* Floating Audio Controller */}
       <AudioPlayerToggle />
 
@@ -322,17 +324,17 @@ export const App: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between">
           {/* Logo & Brand */}
           <a href="/" onClick={(e) => { e.preventDefault(); closeModals(); }} className="flex items-center gap-3 group">
-            <div className="relative w-11 h-11 rounded-xl bg-csg-yellow border-2 border-csg-black flex items-center justify-center text-csg-black font-black text-2xl shadow-paper-sm transition-transform group-hover:scale-105">
+            <div className="relative w-11 h-11 bg-csg-yellow border-2 border-csg-black flex items-center justify-center text-csg-black font-extrabold text-2xl shadow-poster-sm transition-transform group-hover:scale-105">
               <span>🐸</span>
-              <span className="absolute -bottom-2 -right-1 px-1 rounded bg-csg-black text-[9px] font-mono font-bold text-csg-yellow">
+              <span className="absolute -bottom-2 -right-1 px-1 bg-csg-black text-[9px] font-mono font-bold text-csg-yellow">
                 17Y
               </span>
             </div>
             <div>
-              <span className="font-display font-black text-lg sm:text-xl uppercase tracking-wider text-csg-black block leading-none">
+              <span className="font-display font-extrabold text-lg sm:text-xl uppercase tracking-tight text-csg-black block leading-none">
                 CÓC SÀI GÒN <span className="text-csg-red">17Y</span>
               </span>
-              <span className="text-[11px] font-mono tracking-widest text-csg-black/70 uppercase">
+              <span className="text-[10px] font-mono tracking-widest text-csg-black/70 uppercase">
                 CLB Truyền Thông • 2009 - 2026
               </span>
             </div>
@@ -344,7 +346,7 @@ export const App: React.FC = () => {
               The Party
             </a>
             <a href="#ky-niem" className="hover:text-csg-red hover:underline decoration-csg-yellow decoration-2 transition-colors">
-              Memories
+              Photobook Kỷ Niệm
             </a>
             <a href="#wishes" className="hover:text-csg-red hover:underline decoration-csg-yellow decoration-2 transition-colors">
               Wish Gate
@@ -358,8 +360,8 @@ export const App: React.FC = () => {
           <div className="flex items-center gap-2 sm:gap-3">
             <button
               onClick={openLookup}
-              className="px-3.5 py-2.5 rounded-xl bg-csg-surface hover:bg-csg-muted text-csg-black border-2 border-csg-black text-xs font-bold transition-all flex items-center gap-1.5 shadow-paper-sm"
-              title="Tra cứu số tiền còn thiếu, đóng số dư & xem vé QR"
+              className="px-3.5 py-2.5 bg-csg-surface hover:bg-csg-muted text-csg-black border-2 border-csg-black text-xs font-bold font-mono transition-all flex items-center gap-1.5 shadow-poster-sm"
+              title="Tra cứu hồ sơ & đóng số dư"
             >
               <Search className="w-3.5 h-3.5 text-csg-red" />
               <span className="hidden sm:inline">Tra cứu vé & số dư</span>
@@ -368,7 +370,7 @@ export const App: React.FC = () => {
 
             <button
               onClick={openRegister}
-              className="btn-editorial-primary px-4 sm:px-5 py-2.5 rounded-xl font-display font-black text-xs sm:text-sm uppercase tracking-wide shadow-paper-sm flex items-center gap-2"
+              className="btn-editorial-primary px-4 sm:px-5 py-2.5 font-display font-bold text-xs sm:text-sm uppercase tracking-wide flex items-center gap-2"
             >
               <span>Đăng Ký Tham Gia</span>
               <ArrowRight className="w-4 h-4" />
@@ -378,7 +380,7 @@ export const App: React.FC = () => {
             <button
               type="button"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="lg:hidden p-2 rounded-xl bg-csg-surface border-2 border-csg-black text-csg-black hover:bg-csg-muted transition-colors ml-1"
+              className="lg:hidden p-2 bg-csg-surface border-2 border-csg-black text-csg-black hover:bg-csg-muted transition-colors ml-1"
               aria-label="Mở menu di động"
             >
               {isMobileMenuOpen ? <X className="w-5 h-5 text-csg-red" /> : <Menu className="w-5 h-5" />}
@@ -388,12 +390,12 @@ export const App: React.FC = () => {
 
         {/* Mobile Navigation Drawer */}
         {isMobileMenuOpen && (
-          <div className="lg:hidden bg-csg-paper border-t-2 border-b-2 border-csg-black px-4 py-4 space-y-3 animate-fadeIn shadow-paper-md">
+          <div className="lg:hidden bg-csg-paper border-t-2 border-b-2 border-csg-black px-4 py-4 space-y-3 animate-fadeIn shadow-poster">
             <div className="flex flex-col space-y-2 text-xs font-bold uppercase tracking-wider font-mono">
               <a 
                 href="#the-party" 
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="p-2.5 rounded-lg hover:bg-csg-surface text-csg-black hover:text-csg-red transition-colors flex items-center justify-between"
+                className="p-2.5 hover:bg-csg-surface text-csg-black hover:text-csg-red transition-colors flex items-center justify-between border-b border-csg-muted"
               >
                 <span>The Party (Đêm tiệc 17Y)</span>
                 <ChevronRight className="w-4 h-4 text-csg-black/40" />
@@ -401,15 +403,15 @@ export const App: React.FC = () => {
               <a 
                 href="#ky-niem" 
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="p-2.5 rounded-lg hover:bg-csg-surface text-csg-black hover:text-csg-red transition-colors flex items-center justify-between"
+                className="p-2.5 hover:bg-csg-surface text-csg-black hover:text-csg-red transition-colors flex items-center justify-between border-b border-csg-muted"
               >
-                <span>Memories (Photobook Tư Liệu)</span>
+                <span>Photobook Tư Liệu (Kỷ Niệm)</span>
                 <ChevronRight className="w-4 h-4 text-csg-black/40" />
               </a>
               <a 
                 href="#wishes" 
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="p-2.5 rounded-lg hover:bg-csg-surface text-csg-black hover:text-csg-red transition-colors flex items-center justify-between"
+                className="p-2.5 hover:bg-csg-surface text-csg-black hover:text-csg-red transition-colors flex items-center justify-between border-b border-csg-muted"
               >
                 <span>Wish Gate (Lưu bút 17Y)</span>
                 <ChevronRight className="w-4 h-4 text-csg-black/40" />
@@ -417,7 +419,7 @@ export const App: React.FC = () => {
               <a 
                 href="#san-khau" 
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="p-2.5 rounded-lg hover:bg-csg-surface text-csg-black hover:text-csg-red transition-colors flex items-center justify-between"
+                className="p-2.5 hover:bg-csg-surface text-csg-black hover:text-csg-red transition-colors flex items-center justify-between"
               >
                 <span>Stage 17Y (Sân khấu Cóc Vàng)</span>
                 <ChevronRight className="w-4 h-4 text-csg-black/40" />
@@ -427,14 +429,14 @@ export const App: React.FC = () => {
             <div className="pt-3 border-t border-csg-black/15 flex flex-col gap-2">
               <button
                 onClick={openRegister}
-                className="btn-editorial-primary w-full py-3 rounded-xl font-display font-black text-sm uppercase tracking-wide flex items-center justify-center gap-2 shadow-paper-sm"
+                className="btn-editorial-primary w-full py-3 font-display font-bold text-sm uppercase tracking-wide flex items-center justify-center gap-2"
               >
                 <span>Đăng Ký Tham Gia Ngay</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
               <button
                 onClick={openLookup}
-                className="w-full py-2.5 rounded-xl bg-csg-surface text-csg-black border-2 border-csg-black text-xs font-bold font-mono flex items-center justify-center gap-2"
+                className="w-full py-2.5 bg-csg-surface text-csg-black border-2 border-csg-black text-xs font-bold font-mono flex items-center justify-center gap-2"
               >
                 <Search className="w-4 h-4 text-csg-red" />
                 <span>Tra cứu vé & đóng số dư</span>
@@ -446,84 +448,167 @@ export const App: React.FC = () => {
 
       {/* Main Content Area */}
       <main className="relative z-10 flex-1">
-        {/* ================= HERO SECTION (SCENE 02 PREVIEW) ================= */}
-        <section className="pt-16 pb-20 px-4 sm:px-6 max-w-6xl mx-auto text-center">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-csg-surface border-2 border-csg-black text-csg-black text-xs sm:text-sm font-mono font-bold mb-6 shadow-paper-sm">
-            <Sparkles className="w-4 h-4 text-csg-yellow fill-csg-yellow" />
-            <span>ĐẠI TIỆC GALA KỶ NIỆM 17 NĂM THÀNH LẬP CLB</span>
-          </div>
+        {/* ================= HERO SECTION (ASYMMETRICAL EDITORIAL POSTER COMPOSITION) ================= */}
+        <section className="pt-8 pb-16 px-4 sm:px-6 max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+            {/* Left Column: Dominant Typographic Poster Composition (7 Columns) */}
+            <div className="lg:col-span-7 space-y-6">
+              {/* Masthead Eyebrow */}
+              <div className="flex flex-wrap items-center gap-2 text-xs font-mono uppercase tracking-widest text-csg-black/70 border-b border-csg-black/20 pb-2">
+                <span>VOL. 17 / CHƯƠNG KỶ YẾU</span>
+                <span>•</span>
+                <span>TP. HỒ CHÍ MINH</span>
+                <span>•</span>
+                <span className="text-csg-red font-bold">2009 - 2026</span>
+              </div>
 
-          {/* Massive Display Title */}
-          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-display font-black tracking-tight uppercase text-csg-black mb-6 leading-[0.98]">
-            Những Năm Tháng Mình Đã Cùng Nhau.
-            <br />
-            <span className="text-csg-red underline decoration-csg-yellow decoration-8 underline-offset-8">
-              17 Năm Sắc Áo Vàng
-            </span>
-          </h1>
-
-          <p className="max-w-2xl mx-auto text-csg-black/80 font-sans text-base sm:text-xl leading-relaxed mb-10">
-            Dành riêng cho các thế hệ Cựu thành viên và Thành viên đương nhiệm CLB Truyền thông Cóc Sài Gòn. Cùng ngồi lại bên nhau, thổi nến sinh nhật và đốt cháy sân khấu 17 tuổi!
-          </p>
-
-          {/* Event Quick Meta (Date & Venue) */}
-          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-xs sm:text-sm text-csg-black font-mono mb-12">
-            <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-csg-surface border-2 border-csg-black shadow-paper-sm">
-              <Calendar className="w-4 h-4 text-csg-red" />
-              <span>18:00 • Thứ Bảy, 15/12/2026</span>
-            </div>
-            <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-csg-surface border-2 border-csg-black shadow-paper-sm">
-              <MapPin className="w-4 h-4 text-csg-red" />
-              <span>Asiana Plaza Tân Phú, TP. HCM</span>
-            </div>
-            <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-csg-surface border-2 border-csg-black shadow-paper-sm">
-              <Users className="w-4 h-4 text-csg-red" />
-              <span>Dự kiến: 200+ Cóc Vàng</span>
-            </div>
-          </div>
-
-          {/* Countdown Clock with Editorial Paper Cards */}
-          <div className="grid grid-cols-4 gap-3 sm:gap-6 max-w-lg mx-auto mb-12">
-            {[
-              { label: 'NGÀY', value: timeLeft.days },
-              { label: 'GIỜ', value: timeLeft.hours },
-              { label: 'PHÚT', value: timeLeft.minutes },
-              { label: 'GIÂY', value: timeLeft.seconds },
-            ].map((unit, i) => (
-              <div key={i} className="p-3 sm:p-4 rounded-xl bg-csg-surface border-2 border-csg-black shadow-paper-sm">
-                <span className="text-2xl sm:text-4xl font-display font-black text-csg-black font-mono block">
-                  {String(unit.value).padStart(2, '0')}
-                </span>
-                <span className="text-[10px] sm:text-xs font-mono font-bold text-csg-black/60 tracking-wider">
-                  {unit.label}
+              {/* Tag Stamp */}
+              <div className="inline-block">
+                <span className="stamp-seal text-xs font-mono">
+                  ★ ĐẠI TIỆC GALA KỶ NIỆM 17 NĂM THÀNH LẬP
                 </span>
               </div>
-            ))}
+
+              {/* Massive Display Title */}
+              <div className="space-y-2">
+                <h1 className="text-4xl sm:text-6xl xl:text-7xl font-display font-extrabold uppercase tracking-[-0.02em] text-csg-black leading-[0.93]">
+                  NHỮNG NĂM THÁNG <br />
+                  <span className="text-csg-red underline decoration-csg-yellow decoration-4 underline-offset-4">
+                    MÌNH ĐÃ
+                  </span> CÙNG NHAU.
+                </h1>
+                <p className="font-editorial italic text-2xl sm:text-3xl text-csg-black/85 leading-snug">
+                  "17 năm sắc áo vàng — Nơi thanh xuân tụ hội và câu chuyện chưa bao giờ kết thúc."
+                </p>
+              </div>
+
+              <p className="text-csg-black/80 font-sans text-sm sm:text-base leading-relaxed max-w-xl">
+                Dành riêng cho các thế hệ Cựu thành viên và Thành viên đương nhiệm CLB Truyền thông Cóc Sài Gòn. Cùng ngồi lại bên nhau, mở cuốn kỷ yếu sống, thổi nến sinh nhật và đốt cháy sân khấu 17 tuổi!
+              </p>
+
+              {/* Editorial Event Metadata Table (Printed Ticket Strip) */}
+              <div className="p-4 bg-csg-surface border-2 border-csg-black space-y-2 font-mono text-xs">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 border-b border-csg-black/15 pb-2">
+                  <div className="flex items-center gap-2">
+                    <Calendar className="w-4 h-4 text-csg-red shrink-0" />
+                    <span><strong>THỜI GIAN:</strong> 18:00 • Thứ Bảy, 19/12/2026</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <MapPin className="w-4 h-4 text-csg-red shrink-0" />
+                    <span><strong>ĐỊA ĐIỂM:</strong> Asiana Plaza Tân Phú, TP. HCM</span>
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-csg-black/80">
+                  <div className="flex items-center gap-2">
+                    <Shirt className="w-4 h-4 text-csg-red shrink-0" />
+                    <span><strong>TRANG PHỤC:</strong> Sắc Áo Vàng hoặc Vàng - Đen - Trắng</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Users className="w-4 h-4 text-csg-red shrink-0" />
+                    <span><strong>QUY MÔ:</strong> 200 Ghế Ngồi Cho Các Thế Hệ Cóc</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Real Countdown Clock (Ticking from actual event date) */}
+              <div className="space-y-1.5">
+                <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-csg-black/60 block">
+                  ĐẾM NGƯỢC ĐẾN THỜI KHẮC KHAI TIỆC:
+                </span>
+                <div className="flex items-center gap-2 max-w-md">
+                  {[
+                    { label: 'NGÀY', value: timeLeft.days },
+                    { label: 'GIỜ', value: timeLeft.hours },
+                    { label: 'PHÚT', value: timeLeft.minutes },
+                    { label: 'GIÂY', value: timeLeft.seconds },
+                  ].map((unit, i) => (
+                    <div key={i} className="flex-1 py-2 px-1 text-center bg-csg-paper border-2 border-csg-black shadow-poster-sm">
+                      <span className="text-xl sm:text-2xl font-mono font-extrabold text-csg-black block leading-none">
+                        {String(unit.value).padStart(2, '0')}
+                      </span>
+                      <span className="text-[9px] font-mono font-bold text-csg-black/60 tracking-wider">
+                        {unit.label}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Primary Call To Action Off-Center */}
+              <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+                <button
+                  onClick={openRegister}
+                  className="btn-editorial-primary px-8 py-4 font-display font-extrabold text-base sm:text-lg uppercase tracking-wider flex items-center justify-center gap-2 shadow-poster"
+                >
+                  <span>BƯỚC VÀO ĐĂNG KÝ THAM GIA ↗</span>
+                </button>
+
+                <button
+                  onClick={openLookup}
+                  className="btn-editorial-secondary px-5 py-4 font-mono font-bold text-xs sm:text-sm uppercase flex items-center justify-center gap-2"
+                >
+                  <Search className="w-4 h-4 text-csg-red" />
+                  <span>Tra cứu hồ sơ & vé cá nhân →</span>
+                </button>
+              </div>
+
+              {/* Secret Pricing Guarantee (No prices revealed publicly) */}
+              <p className="text-[11px] font-mono text-csg-black/60 italic">
+                * Quy chế tham dự và hỗ trợ chia đợt đóng phí sẽ được tự động cá nhân hóa theo vai trò (Cựu thành viên / Thành viên đương nhiệm) sau bước định danh.
+              </p>
+            </div>
+
+            {/* Right Column: Featured Archive Hero Photobook (5 Columns) */}
+            <div className="lg:col-span-5 relative">
+              <div className="polaroid-tape paper-sheet p-4 bg-csg-surface border-2 border-csg-black rotate-1 hover:rotate-0 transition-all duration-300 shadow-poster-lg">
+                {/* Big Archive Image */}
+                <div className="relative aspect-[4/5] bg-csg-muted border border-csg-black/30 overflow-hidden mb-3">
+                  <img
+                    src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=1200&q=80"
+                    alt="Khoảnh khắc Cóc Sài Gòn"
+                    className="w-full h-full object-cover filter grayscale-[10%] hover:grayscale-0 transition-all duration-500"
+                  />
+                  
+                  {/* Archive Identification Badge */}
+                  <div className="absolute top-3 left-3 bg-csg-paper/95 border border-csg-black px-2 py-0.5 text-[10px] font-mono font-bold uppercase shadow-sm">
+                    TƯ LIỆU CSG • MÙA 16Y
+                  </div>
+
+                  <div className="absolute bottom-3 right-3 bg-csg-black text-csg-yellow px-2.5 py-1 text-[11px] font-mono font-bold shadow-sm">
+                    ASIANA PLAZA • 2026
+                  </div>
+                </div>
+
+                {/* Hand-written Note Overlay in Caveat */}
+                <div className="space-y-1.5 px-1 border-t border-csg-muted pt-2.5">
+                  <div className="flex items-center justify-between text-xs font-mono text-csg-black/70">
+                    <span className="text-csg-red font-bold">LƯU TRỮ TRUYỀN THỐNG</span>
+                    <span>KHÓA K12 - K20</span>
+                  </div>
+                  <p className="font-editorial italic text-base text-csg-black leading-tight">
+                    "Có những nơi dù đã đi qua bao lâu, vẫn luôn có một chỗ để trở về."
+                  </p>
+                  <p className="font-handwriting text-lg text-csg-red leading-none pt-1">
+                    * Hẹn gặp lại các anh chị tiền bối và các em khóa mới!
+                  </p>
+                </div>
+              </div>
+
+              {/* Decorative Physical Ticket Badge Floating */}
+              <div className="absolute -bottom-6 -left-6 hidden sm:block p-3 bg-csg-yellow border-2 border-csg-black shadow-poster rotate-[-4deg] max-w-[200px]">
+                <div className="flex items-center gap-1.5 text-[10px] font-mono font-extrabold uppercase border-b border-csg-black pb-1 mb-1">
+                  <Ticket className="w-3.5 h-3.5 text-csg-black" />
+                  <span>VIP ADMIT ONE</span>
+                </div>
+                <p className="text-[11px] font-mono leading-tight font-bold text-csg-black">
+                  CSG-17Y GALA NIGHT
+                </p>
+                <span className="text-[9px] font-mono text-csg-black/80 block">
+                  Limited seats: 200 PAX
+                </span>
+              </div>
+            </div>
           </div>
-
-          {/* Primary CTA with Tactile Feedback */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <button
-              onClick={openRegister}
-              className="btn-editorial-primary w-full sm:w-auto px-10 py-5 rounded-2xl font-display font-black text-lg sm:text-xl uppercase tracking-wider shadow-paper-md flex items-center justify-center gap-3"
-            >
-              <span>ĐĂNG KÝ THAM GIA TIỆC ↗</span>
-            </button>
-
-            <button
-              onClick={openLookup}
-              className="w-full sm:w-auto px-7 py-5 rounded-2xl bg-csg-surface hover:bg-csg-muted text-csg-black font-bold text-sm sm:text-base border-2 border-csg-black transition-all flex items-center justify-center gap-2 shadow-paper-sm"
-            >
-              <Search className="w-4 h-4 text-csg-red" />
-              <span>Đã đặt cọc? Đóng nốt số dư tại đây</span>
-            </button>
-          </div>
-
-          {/* Confidential Ticket Pricing Note */}
-          <p className="text-xs text-csg-black/60 mt-6 font-mono italic">
-            🔒 Mức phí tham dự (349.000đ Thành viên / 449.000đ Cựu thành viên) được bảo mật và tự động hiển thị sau bước định danh.
-          </p>
         </section>
 
         {/* ================= SECTION: THE PARTY (VỀ ĐÊM TIỆC 17Y) ================= */}
@@ -535,24 +620,24 @@ export const App: React.FC = () => {
                 <span>THE PARTY • GALA 17Y</span>
                 <span className="w-1.5 h-1.5 rounded-full bg-csg-red" />
               </div>
-              <h2 className="text-3xl sm:text-5xl font-display font-black uppercase text-csg-black tracking-tight leading-tight">
+              <h2 className="text-3xl sm:text-5xl font-display font-extrabold uppercase text-csg-black tracking-tight leading-tight">
                 Không Chỉ Là Một Buổi Tiệc. <br />
                 <span className="text-csg-red">Là Nơi Trở Về.</span>
               </h2>
               <p className="text-csg-black/80 font-sans text-base leading-relaxed">
-                17 năm thành lập CLB Truyền thông Cóc Sài Gòn (2009 - 2026) đánh dấu hành trình của hàng trăm bạn trẻ mang trong mình ngọn lửa truyền thông, nhiếp ảnh, thiết kế và tổ chức sự kiện.
+                17 năm thành lập CLB Truyền thông Cóc Sài Gòn (2009 - 2026) đánh dấu hành trình của hàng trăm bạn trẻ mang trong mình ngọn lửa truyền thông, nhiếp ảnh, thiết kế và tổ chức sự kiện tại ĐH FPT TP.HCM.
               </p>
               <p className="text-csg-black/80 font-sans text-base leading-relaxed">
                 Đêm tiệc sinh nhật 17 tuổi là khoảnh khắc đặc biệt để những người anh, người chị đã ra trường cùng các bạn thành viên thế hệ mới hội ngộ, hàn huyên và nâng ly vì một thanh xuân rực rỡ sắc vàng.
               </p>
 
-              {/* Secret Pricing Banner */}
-              <div className="p-4 rounded-xl bg-csg-yellow/20 border-2 border-csg-black space-y-1">
+              {/* Policy Note (No secret prices revealed publicly) */}
+              <div className="p-4 bg-csg-surface border-2 border-csg-black space-y-1">
                 <span className="text-xs font-mono font-bold text-csg-black uppercase block">
                   ✨ Cơ chế tài chính công bằng & đồng hành:
                 </span>
                 <p className="text-xs text-csg-black/80 font-sans">
-                  Hệ thống hỗ trợ <strong>đặt cọc trước (100k / 150k)</strong> để giữ chỗ và đóng nốt số dư trước ngày sự kiện. Vé QR check-in VIP tự động cấp khi hoàn tất 100%.
+                  Hệ thống hỗ trợ cơ chế thanh toán linh hoạt (đóng trọn gói hoặc đặt cọc giữ chỗ trước) phù hợp cho từng bạn. Vé QR check-in VIP tự động cấp khi hoàn tất xác thực.
                 </p>
               </div>
             </div>
@@ -560,8 +645,8 @@ export const App: React.FC = () => {
             {/* Right Column: Metadata & Schedule Flow */}
             <div className="lg:col-span-7 space-y-6">
               {/* Event Specification Box */}
-              <div className="p-6 sm:p-8 rounded-2xl bg-csg-surface border-2 border-csg-black shadow-paper-md space-y-6">
-                <h3 className="text-xl font-display font-black uppercase text-csg-black border-b border-csg-black/15 pb-3">
+              <div className="p-6 sm:p-8 bg-csg-surface border-2 border-csg-black shadow-poster space-y-6">
+                <h3 className="text-xl font-display font-extrabold uppercase text-csg-black border-b border-csg-black/15 pb-3">
                   Thông Tin Chi Tiết Buổi Tiệc
                 </h3>
 
@@ -570,7 +655,7 @@ export const App: React.FC = () => {
                     <span className="text-xs font-mono text-csg-black/60 uppercase block">Thời Gian</span>
                     <div className="flex items-center gap-2 font-bold text-csg-black">
                       <Clock className="w-4 h-4 text-csg-red" />
-                      <span>18:00 - 22:00 • Thứ Bảy, 15/12/2026</span>
+                      <span>18:00 - 22:00 • Thứ Bảy, 19/12/2026</span>
                     </div>
                   </div>
 
@@ -603,19 +688,19 @@ export const App: React.FC = () => {
                 <div className="pt-4 border-t border-csg-black/15 space-y-3">
                   <span className="text-xs font-mono text-csg-black/60 uppercase block">Lịch Trình Đêm Tiệc</span>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs font-mono">
-                    <div className="p-2.5 rounded-lg bg-csg-paper border border-csg-black/20">
+                    <div className="p-3 bg-csg-paper border border-csg-black/20">
                       <span className="text-csg-red font-bold">18:00 - 18:45</span>
                       <p className="font-bold text-csg-black font-sans mt-0.5">Check-in thảm đỏ & Chụp ảnh Polaroid</p>
                     </div>
-                    <div className="p-2.5 rounded-lg bg-csg-paper border border-csg-black/20">
+                    <div className="p-3 bg-csg-paper border border-csg-black/20">
                       <span className="text-csg-red font-bold">18:45 - 19:30</span>
                       <p className="font-bold text-csg-black font-sans mt-0.5">Khai mạc, Video 17Y & Thổi nến sinh nhật</p>
                     </div>
-                    <div className="p-2.5 rounded-lg bg-csg-paper border border-csg-black/20">
+                    <div className="p-3 bg-csg-paper border border-csg-black/20">
                       <span className="text-csg-red font-bold">19:30 - 20:30</span>
                       <p className="font-bold text-csg-black font-sans mt-0.5">Khai tiệc Gala Dinner & Giao lưu kết nối</p>
                     </div>
-                    <div className="p-2.5 rounded-lg bg-csg-paper border border-csg-black/20">
+                    <div className="p-3 bg-csg-paper border border-csg-black/20">
                       <span className="text-csg-red font-bold">20:30 - 22:00</span>
                       <p className="font-bold text-csg-black font-sans mt-0.5">Sân khấu âm nhạc bùng nổ & Lucky Draw</p>
                     </div>
@@ -626,7 +711,7 @@ export const App: React.FC = () => {
           </div>
         </section>
 
-        {/* ================= SCENE 01: MEMORY WALL ================= */}
+        {/* ================= SCENE 01: PHOTOBOOK KỶ NIỆM (MEMORY WALL) ================= */}
         <section id="ky-niem">
           <MemoryWall />
         </section>
@@ -639,8 +724,8 @@ export const App: React.FC = () => {
                 <span>SCENE 04 • WISH GATE</span>
                 <span className="w-1.5 h-1.5 rounded-full bg-csg-red" />
               </div>
-              <h2 className="text-3xl sm:text-5xl font-display font-black uppercase text-csg-black tracking-tight">
-                Lời Chúc Mừng 17Y
+              <h2 className="text-3xl sm:text-5xl font-display font-extrabold uppercase text-csg-black tracking-tight">
+                Lưu Bút & Lời Chúc 17Y
               </h2>
               <p className="text-sm sm:text-base text-csg-black/70 font-sans mt-1">
                 Những dòng lưu bút và lời chúc chân thành từ các thế hệ Cóc Vàng gửi về mái nhà chung.
@@ -677,7 +762,7 @@ export const App: React.FC = () => {
                 content: 'Hẹn gặp lại các em tại đêm tiệc 17Y hoành tráng! ✨'
               }
             ]).map((w) => (
-              <div key={w.id} className="p-6 rounded-2xl bg-csg-surface border-2 border-csg-black shadow-paper-sm relative flex flex-col justify-between">
+              <div key={w.id} className="p-6 bg-csg-surface border-2 border-csg-black shadow-poster-sm relative flex flex-col justify-between">
                 <Quote className="w-8 h-8 text-csg-yellow/60 absolute top-4 right-4" />
                 <div className="mb-4">
                   <div className="flex items-center gap-2 mb-2">
@@ -685,12 +770,12 @@ export const App: React.FC = () => {
                       {w.role === 'ALUMNI' ? 'CỰU THÀNH VIÊN' : 'THÀNH VIÊN'}
                     </span>
                   </div>
-                  <p className="font-serif italic text-base text-csg-black leading-relaxed">
+                  <p className="font-editorial italic text-base text-csg-black leading-relaxed">
                     "{w.content}"
                   </p>
                 </div>
                 <div className="pt-3 border-t border-csg-muted flex items-center justify-between">
-                  <span className="font-display font-black text-sm text-csg-black">
+                  <span className="font-display font-bold text-sm text-csg-black">
                     {w.authorName}
                   </span>
                   <span className="text-[10px] font-mono text-csg-black/60">
@@ -708,13 +793,13 @@ export const App: React.FC = () => {
           onOpenRegister={openRegister}
         />
 
-        {/* ================= SECTION 4.6: REGISTRATION CTA BANNER ================= */}
+        {/* ================= SECTION 4.6: REGISTRATION CTA BANNER (NO SECRET PRICING) ================= */}
         <section className="py-20 px-4 sm:px-6 bg-csg-yellow border-t-2 border-b-2 border-csg-black">
           <div className="max-w-5xl mx-auto text-center space-y-6">
-            <span className="inline-block px-3.5 py-1 rounded-full bg-csg-black text-csg-yellow text-xs font-mono font-bold uppercase tracking-widest shadow-sm">
+            <span className="inline-block px-3 py-1 bg-csg-black text-csg-yellow text-xs font-mono font-bold uppercase tracking-widest shadow-sm">
               MÙA TIỆC KỶ NIỆM 17 NĂM
             </span>
-            <h2 className="text-3xl sm:text-5xl lg:text-6xl font-display font-black uppercase text-csg-black tracking-tight leading-none">
+            <h2 className="text-3xl sm:text-5xl lg:text-6xl font-display font-extrabold uppercase text-csg-black tracking-tight leading-none">
               BẠN LÀ MỘT PHẦN CỦA CÂU CHUYỆN NÀY. <br />
               GIỜ LÀ LÚC CÙNG NHAU VIẾT TIẾP MÙA 17.
             </h2>
@@ -724,13 +809,13 @@ export const App: React.FC = () => {
             <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
               <button
                 onClick={openRegister}
-                className="w-full sm:w-auto px-10 py-5 rounded-2xl bg-csg-black text-csg-yellow hover:bg-csg-black/90 font-display font-black text-lg sm:text-xl uppercase tracking-wider shadow-paper-lg transition-all flex items-center justify-center gap-3"
+                className="w-full sm:w-auto px-10 py-5 bg-csg-black text-csg-yellow hover:bg-csg-black/90 font-display font-extrabold text-base sm:text-lg uppercase tracking-wider shadow-poster transition-all flex items-center justify-center gap-3"
               >
                 <span>ĐĂNG KÝ THAM GIA TIỆC NGAY ↗</span>
               </button>
               <button
                 onClick={openLookup}
-                className="w-full sm:w-auto px-7 py-5 rounded-2xl bg-csg-paper hover:bg-csg-surface text-csg-black font-bold text-sm sm:text-base border-2 border-csg-black transition-all flex items-center justify-center gap-2 shadow-paper-sm"
+                className="w-full sm:w-auto px-7 py-5 bg-csg-paper hover:bg-csg-surface text-csg-black font-bold text-sm border-2 border-csg-black transition-all flex items-center justify-center gap-2 shadow-poster-sm font-mono"
               >
                 <Search className="w-4 h-4 text-csg-red" />
                 <span>Tra cứu vé & số dư đã cọc</span>
@@ -746,7 +831,7 @@ export const App: React.FC = () => {
           <div className="flex items-center gap-3">
             <span className="text-3xl">🐸</span>
             <div>
-              <span className="font-display font-black uppercase tracking-wider text-csg-black block text-sm">
+              <span className="font-display font-extrabold uppercase tracking-wider text-csg-black block text-sm">
                 CLB TRUYỀN THÔNG CÓC SÀI GÒN
               </span>
               <span className="text-xs text-csg-black/60 font-mono">
@@ -764,7 +849,7 @@ export const App: React.FC = () => {
           <div>
             <button
               onClick={openAdmin}
-              className="px-4 py-2 rounded-xl bg-csg-paper hover:bg-csg-muted text-csg-black text-xs font-bold border-2 border-csg-black transition-colors flex items-center gap-1.5 mx-auto md:mx-0 shadow-paper-sm"
+              className="px-4 py-2 bg-csg-paper hover:bg-csg-muted text-csg-black text-xs font-bold border-2 border-csg-black transition-colors flex items-center gap-1.5 mx-auto md:mx-0 shadow-poster-sm"
             >
               <ShieldCheck className="w-3.5 h-3.5 text-csg-red" />
               <span>Cổng Quản Trị BTC</span>

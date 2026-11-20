@@ -8,26 +8,26 @@ export default {
     extend: {
       colors: {
         csg: {
-          // Brand palette
-          ink: '#111111',
-          black: '#111111',
-          yellow: '#F5C400',
-          'yellow-light': '#F8D879',
-          'yellow-dark': '#D9A722',
-          paper: '#F4F0E6',
-          red: '#D94C2B',
-          'red-light': '#E66547',
+          // Brand Tactile Editorial Palette (DESIGN.md strict specification)
+          yellow: '#F4C542',       // Primary accent / Cóc Yellow
+          'yellow-light': '#F8D56A',
+          'yellow-dark': '#E0B025',
+          ink: '#20231F',          // Foreground / Ink Black (13.5:1 contrast)
+          black: '#20231F',        // Alias for ink
+          paper: '#F4EEDF',        // Background / Paper Cream
+          red: '#B94D35',          // Secondary accent / Brick Red
+          'red-light': '#D05A40',
+          muted: '#DCD5C4',        // Muted Stone dividers and borders
+          surface: '#EAE4D6',      // Warm Parchment cards and surfaces
           white: '#FFFFFF',
-          muted: '#DCD5C4',
-          surface: '#EAE4D6',
-          
-          // Functional
+
+          // Functional system feedback
           success: '#3D6B45',
           warning: '#D99B26',
           error: '#B7352A',
           info: '#315D91',
 
-          // Admin dark workspace
+          // Admin operational workspace
           'admin-bg': '#111111',
           'admin-sidebar': '#181818',
           'admin-surface': '#222222',
@@ -37,26 +37,27 @@ export default {
         }
       },
       fontFamily: {
-        display: ['"Bebas Neue"', 'sans-serif'],
-        body: ['"Space Grotesk"', '"Be Vietnam Pro"', 'sans-serif'],
-        handwriting: ['"Caveat"', 'cursive'],
+        // DESIGN.md specification
+        display: ['"Be Vietnam Pro"', '-apple-system', 'sans-serif'],
+        body: ['"Be Vietnam Pro"', '-apple-system', 'sans-serif'],
         editorial: ['"Playfair Display"', 'Georgia', 'serif'],
-        mono: ['"Space Grotesk"', 'monospace'],
+        mono: ['"IBM Plex Mono"', 'monospace'],
+        handwriting: ['"Caveat"', 'cursive'],
       },
       boxShadow: {
-        'poster': '4px 4px 0px #111111',
-        'poster-sm': '2px 2px 0px #111111',
-        'poster-lg': '6px 6px 0px #111111',
-        'paper-sm': '0 1px 3px rgba(17, 17, 17, 0.08), 0 1px 2px rgba(17, 17, 17, 0.05)',
-        'paper-md': '0 4px 12px -2px rgba(17, 17, 17, 0.12), 0 2px 6px -1px rgba(17, 17, 17, 0.08)',
-        'paper-lg': '0 12px 32px -4px rgba(17, 17, 17, 0.16), 0 4px 12px -2px rgba(17, 17, 17, 0.10)',
-        'polaroid': '0 8px 24px -4px rgba(17, 17, 17, 0.15), 0 2px 6px -1px rgba(17, 17, 17, 0.08)',
+        'poster': '4px 4px 0px #20231F',
+        'poster-sm': '2px 2px 0px #20231F',
+        'poster-lg': '6px 6px 0px #20231F',
+        'paper-sm': '0 1px 3px rgba(32, 35, 31, 0.08), 0 1px 2px rgba(32, 35, 31, 0.05)',
+        'paper-md': '0 4px 12px -2px rgba(32, 35, 31, 0.12), 0 2px 6px -1px rgba(32, 35, 31, 0.08)',
+        'paper-lg': '0 12px 32px -4px rgba(32, 35, 31, 0.16), 0 4px 12px -2px rgba(32, 35, 31, 0.10)',
+        'polaroid': '0 8px 24px -4px rgba(32, 35, 31, 0.15), 0 2px 6px -1px rgba(32, 35, 31, 0.08)',
       },
       borderRadius: {
-        'sm': '4px',
-        'md': '8px',
-        'lg': '12px',
-        'xl': '16px',
+        'sm': '2px',
+        'md': '4px',
+        'lg': '8px',
+        'xl': '12px',
       },
       animation: {
         'paper-unfold': 'paperUnfold 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards',
@@ -69,7 +70,7 @@ export default {
           '100%': { transform: 'scaleY(1) translateY(0)', opacity: '1' },
         },
         stampIn: {
-          '0%': { transform: 'scale(1.4) rotate(-8deg)', opacity: '0' },
+          '0%': { transform: 'scale(1.3) rotate(-8deg)', opacity: '0' },
           '100%': { transform: 'scale(1) rotate(-3deg)', opacity: '1' },
         },
         floatGentle: {

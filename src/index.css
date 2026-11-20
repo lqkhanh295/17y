@@ -4,11 +4,13 @@
 
 @layer base {
   :root {
-    /* Brand Colors */
-    --color-ink: #111111;
-    --color-yellow: #F5C400;
-    --color-paper: #F4F0E6;
-    --color-red: #D94C2B;
+    /* Brand Tactile Editorial Palette (DESIGN.md specification) */
+    --color-primary: #F4C542;       /* Cóc Yellow */
+    --color-background: #F4EEDF;    /* Paper Cream */
+    --color-foreground: #20231F;    /* Ink Black */
+    --color-secondary: #B94D35;     /* Brick Red */
+    --color-muted: #DCD5C4;         /* Muted Stone */
+    --color-surface: #EAE4D6;       /* Warm Parchment */
     --color-white: #FFFFFF;
 
     /* Admin surfaces */
@@ -26,49 +28,51 @@
     --color-info: #315D91;
 
     /* Typography */
-    --font-display: "Bebas Neue", sans-serif;
-    --font-body: "Space Grotesk", sans-serif;
+    --font-display: "Be Vietnam Pro", -apple-system, sans-serif;
+    --font-body: "Be Vietnam Pro", -apple-system, sans-serif;
+    --font-editorial: "Playfair Display", Georgia, serif;
+    --font-label: "IBM Plex Mono", monospace;
     --font-handwriting: "Caveat", cursive;
 
     /* Shadows */
-    --shadow-poster: 4px 4px 0px var(--color-ink);
+    --shadow-poster: 4px 4px 0px var(--color-foreground);
   }
 
   body {
-    background-color: var(--color-paper);
-    color: var(--color-ink);
+    background-color: var(--color-background);
+    color: var(--color-foreground);
     font-family: var(--font-body);
   }
 
   /* Custom subtle paper scrollbar */
   ::-webkit-scrollbar {
-    width: 7px;
-    height: 7px;
+    width: 6px;
+    height: 6px;
   }
   ::-webkit-scrollbar-track {
     background: #EAE4D6;
   }
   ::-webkit-scrollbar-thumb {
     background: #DCD5C4;
-    border-radius: 4px;
+    border-radius: 2px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: #F5C400;
+    background: #F4C542;
   }
 }
 
 /* Subtle analog paper texture simulation */
 .bg-paper-texture {
-  background-color: #F4F0E6;
-  background-image: radial-gradient(#1111110a 1px, transparent 1px);
+  background-color: #F4EEDF;
+  background-image: radial-gradient(#20231F0a 1px, transparent 1px);
   background-size: 24px 24px;
 }
 
 /* Editorial Photobook Paper Sheet */
 .paper-sheet {
   background: #FFFFFF;
-  border: 1.5px solid #111111;
-  box-shadow: 4px 4px 0px #111111;
+  border: 1.5px solid #20231F;
+  box-shadow: 4px 4px 0px #20231F;
 }
 
 /* Retro Vintage Stamp */
@@ -76,12 +80,12 @@
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
-  padding: 0.2rem 0.6rem;
-  border: 1.5px dashed #D94C2B;
-  color: #D94C2B;
-  font-family: 'Space Grotesk', monospace;
+  padding: 0.2rem 0.5rem;
+  border: 1.5px dashed #B94D35;
+  color: #B94D35;
+  font-family: 'IBM Plex Mono', monospace;
   font-weight: 700;
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   letter-spacing: 0.05em;
   transform: rotate(-2deg);
 }
@@ -93,52 +97,61 @@
 .polaroid-tape::before {
   content: '';
   position: absolute;
-  top: -12px;
+  top: -10px;
   left: 50%;
   transform: translateX(-50%) rotate(1deg);
-  width: 70px;
-  height: 22px;
-  background: rgba(244, 240, 230, 0.75);
-  border: 1px solid rgba(220, 213, 196, 0.8);
-  backdrop-filter: blur(2px);
+  width: 65px;
+  height: 20px;
+  background: rgba(220, 213, 196, 0.75);
+  backdrop-filter: blur(1px);
+  border: 1px solid rgba(32, 35, 31, 0.15);
+  box-shadow: 0 1px 2px rgba(32, 35, 31, 0.08);
   z-index: 10;
-  border-radius: 2px;
+  pointer-events: none;
 }
 
-/* Anti-Slop Tactile Button */
+/* Editorial tactile buttons */
 .btn-editorial-primary {
-  background-color: #F5C400;
-  color: #111111;
-  border: 2px solid #111111;
-  font-weight: 700;
-  box-shadow: 3px 3px 0px #111111;
+  background-color: #F4C542;
+  color: #20231F;
+  border: 2px solid #20231F;
+  box-shadow: 3px 3px 0px #20231F;
   transition: all 0.15s ease-out;
 }
 .btn-editorial-primary:hover {
-  background-color: #F8D879;
   transform: translate(-1px, -1px);
-  box-shadow: 4px 4px 0px #111111;
+  box-shadow: 5px 5px 0px #20231F;
 }
 .btn-editorial-primary:active {
   transform: translate(2px, 2px);
-  box-shadow: 1px 1px 0px #111111;
+  box-shadow: 1px 1px 0px #20231F;
 }
 
-/* Secondary Button */
 .btn-editorial-secondary {
-  background-color: #FFFFFF;
-  color: #111111;
-  border: 2px solid #111111;
-  font-weight: 700;
-  box-shadow: 3px 3px 0px #111111;
+  background-color: #EAE4D6;
+  color: #20231F;
+  border: 2px solid #20231F;
+  box-shadow: 3px 3px 0px #20231F;
   transition: all 0.15s ease-out;
 }
 .btn-editorial-secondary:hover {
-  background-color: #F4F0E6;
+  background-color: #F4EEDF;
   transform: translate(-1px, -1px);
-  box-shadow: 4px 4px 0px #111111;
+  box-shadow: 5px 5px 0px #20231F;
 }
 .btn-editorial-secondary:active {
   transform: translate(2px, 2px);
-  box-shadow: 1px 1px 0px #111111;
+  box-shadow: 1px 1px 0px #20231F;
+}
+
+/* Analog film grain overlay */
+.film-grain {
+  position: relative;
+}
+.film-grain::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
 }

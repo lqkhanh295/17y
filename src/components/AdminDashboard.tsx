@@ -95,13 +95,27 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
   if (!isOpen) return null;
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (pin.toLowerCase() === 'csg17y' || pin === '1717' || pin.toLowerCase() === 'btc') {
-      setIsAuthenticated(true);
-      setAuthError('');
-    } else {
-      setAuthError('Mã PIN không đúng (Gợi ý mã BTC: csg17y)');
+    if (!pin.trim()) {
+      setAuthError('Vui lòng nhập mã PIN xác thực Ban Tổ Chức.');
+      return;
+    }
+    setAuthError('');
+    setIsLoading(true);
+    try {
+      const res = await apiClient.adminLogin(pin.trim());
+      if (res && res.success) {
+        setIsAuthenticated(true);
+        setAuthError('');
+      } else {
+        setAuthError(res.message || 'Mã PIN xác thực không chính xác.');
+      }
+    } catch (err: unknown) {
+      const error = err as Error;
+      setAuthError(error.message || 'Mã PIN xác thực không chính xác.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
