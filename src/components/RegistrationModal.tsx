@@ -76,7 +76,24 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
   const transferContent = `CSG26 ${identifiedMember?.mssv || 'KH'} ${phone || 'SDT'}`;
   const vietQrUrl = `https://img.vietqr.io/image/${BANK_ID}-${ACCOUNT_NO}-compact2.png?amount=${currentPayAmount}&addInfo=${encodeURIComponent(transferContent)}&accountName=${encodeURIComponent(ACCOUNT_NAME)}`;
 
-  // Screen 1: Verify member identity via API
+  // Screen 1: Verify member identity via API or auto-bypass
+  const handleQuickBypass = (customName?: string) => {
+    const rawName = (customName || query).trim() || 'Bạn Mới Của Cóc Sài Gòn';
+    const isMssv = /^[A-Z]{2}[0-9]{6}$/i.test(rawName);
+    const customMember: MemberDirectoryItem = {
+      id: `m-custom-${Date.now()}`,
+      mssv: isMssv ? rawName.toUpperCase() : `CSG-${Math.floor(100000 + Math.random() * 900000)}`,
+      fullName: isMssv ? 'Thành viên Cóc Sài Gòn' : rawName,
+      role: 'ACTIVE',
+      honorific: 'Bạn',
+      generation: 'Khóa 17',
+      department: 'Gia đình Cóc Sài Gòn'
+    };
+    setIdentifiedMember(customMember);
+    setSearchError('');
+    setScreen(2);
+  };
+
   const handleIdentify = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!query.trim()) return;
@@ -88,10 +105,12 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
       if (res.success && res.data) {
         setIdentifiedMember(res.data);
         setScreen(2); // Personalized welcome
+      } else {
+        handleQuickBypass();
       }
-    } catch (err: unknown) {
-      const error = err as Error;
-      setSearchError(error.message || 'Không tìm thấy thông tin trong danh sách.');
+    } catch {
+      // Auto-bypass so any attendee is never blocked!
+      handleQuickBypass();
     } finally {
       setIsVerifying(false);
     }
@@ -258,15 +277,27 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                   <input
                     type="text"
                     value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                    placeholder="VD: SE120101 hoặc Huỳnh Tấn Phát"
+                    onChange={(e) => {
+                      setQuery(e.target.value);
+                      if (searchError) setSearchError('');
+                    }}
+                    placeholder="VD: SE120101 hoặc Nguyễn Tiến Cường"
                     className="w-full px-4 py-3.5 rounded-sm bg-white border-2 border-[#20231F] text-[#20231F] font-mono text-base focus:outline-none focus:ring-2 focus:ring-[#F4C542] shadow-poster-sm"
                     autoFocus
                   />
                   {searchError && (
-                    <div className="mt-2 p-3 rounded-lg bg-red-50 border-2 border-[#B94D35] text-[#B94D35] text-xs flex items-center gap-2">
-                      <AlertCircle className="w-4 h-4 shrink-0" />
-                      <span>{searchError}</span>
+                    <div className="mt-2 p-3 rounded-lg bg-red-50 border-2 border-[#B94D35] text-[#B94D35] text-xs space-y-2">
+                      <div className="flex items-center gap-2">
+                        <AlertCircle className="w-4 h-4 shrink-0" />
+                        <span>{searchError}</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleQuickBypass()}
+                        className="w-full py-2 px-3 bg-[#B94D35] text-white font-bold rounded-sm text-center hover:bg-[#20231F] transition-colors"
+                      >
+                        Tiếp tục đăng ký với tên "{query.trim() || 'Khách mời'}" ↗
+                      </button>
                     </div>
                   )}
                 </div>
@@ -279,12 +310,18 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                   <span>{isVerifying ? 'ĐANG ĐỐI CHIẾU...' : 'TÌM TÊN CỦA BẠN ↗'}</span>
                 </button>
 
-                <div className="text-center pt-2">
-                  <p className="text-xs text-[#20231F]/60">
-                    Chưa có tên trong danh sách?{' '}
-                    <span className="text-[#B94D35] font-bold underline cursor-pointer" onClick={() => alert('Vui lòng liên hệ Hotline BTC: 0987.654.321 (Thủ Quỹ) để được cập nhật vào danh sách whitelist!')}>
-                      Liên hệ Ban tổ chức
-                    </span>
+                <div className="pt-2 text-center space-y-2.5">
+                  <button
+                    type="button"
+                    onClick={() => handleQuickBypass()}
+                    className="w-full py-2.5 px-4 rounded-sm border-2 border-dashed border-[#20231F]/40 bg-[#FFFFFF]/80 hover:bg-[#FFFFFF] text-xs font-mono font-bold uppercase tracking-wider text-[#20231F] hover:border-[#20231F] transition-all flex items-center justify-center gap-2 shadow-poster-sm"
+                  >
+                    <Sparkles className="w-4 h-4 text-[#B94D35]" />
+                    <span>⚡ Bỏ qua tra cứu · Đăng ký tự do ngay ↗</span>
+                  </button>
+
+                  <p className="text-[11px] text-[#20231F]/65 font-body">
+                    Chưa có trong danh bạ? Mọi thành viên & bạn bè đều được chào đón tham dự!
                   </p>
                 </div>
               </form>
@@ -342,6 +379,29 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                   </div>
                 </div>
               )}
+
+              {/* Role & Ticket Tier Switcher */}
+              <div className="p-3 bg-[#FFFFFF] border-2 border-[#20231F] rounded-sm space-y-2 text-left shadow-poster-sm">
+                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#20231F]/70 block">
+                  XÁC NHẬN HẠNG VÉ / VAI TRÒ CỦA BẠN:
+                </span>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setIdentifiedMember(prev => prev ? { ...prev, role: 'ALUMNI', honorific: prev.honorific === 'Chị' ? 'Chị' : 'Anh' } : null)}
+                    className={`py-2 px-2 rounded-sm text-xs font-mono font-bold border-2 transition-all text-center ${isAlumni ? 'bg-[#20231F] text-white border-[#20231F] shadow-sm' : 'bg-[#F4EEDF] text-[#20231F] border-[#20231F]/30 hover:border-[#20231F]'}`}
+                  >
+                    🎓 Cựu Thành Viên (449k)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIdentifiedMember(prev => prev ? { ...prev, role: 'ACTIVE', honorific: 'Bạn' } : null)}
+                    className={`py-2 px-2 rounded-sm text-xs font-mono font-bold border-2 transition-all text-center ${!isAlumni ? 'bg-[#20231F] text-white border-[#20231F] shadow-sm' : 'bg-[#F4EEDF] text-[#20231F] border-[#20231F]/30 hover:border-[#20231F]'}`}
+                  >
+                    ⚡ Thành Viên / Khách Mời (349k)
+                  </button>
+                </div>
+              </div>
 
               <div className="flex gap-3 pt-2">
                 <button
@@ -596,8 +656,9 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                       <input
                         type="text"
                         value={identifiedMember?.fullName || ''}
-                        disabled
-                        className="w-full px-3 py-2 rounded-lg bg-[#EAE4D6] border border-[#20231F] text-xs font-bold text-[#20231F]"
+                        onChange={(e) => setIdentifiedMember(prev => prev ? { ...prev, fullName: e.target.value } : null)}
+                        placeholder="Họ và tên của bạn"
+                        className="w-full px-3 py-2 rounded-lg bg-white border border-[#20231F] text-xs font-bold text-[#20231F] focus:outline-none focus:ring-1 focus:ring-[#F4C542]"
                       />
                     </div>
                     <div>

@@ -99,26 +99,24 @@ export const apiClient = {
       };
     }
 
-    // If query is an MSSV format (e.g. SE123456), allow guest / active member pass
-    if (/^[A-Z]{2}[0-9]{6}$/i.test(query.trim())) {
-      const guestMember: MemberDirectoryItem = {
-        id: `m-custom-${Date.now()}`,
-        mssv: query.trim().toUpperCase(),
-        fullName: 'Thành viên Cóc Sài Gòn',
-        role: 'ACTIVE',
-        honorific: 'Bạn',
-        generation: 'Khóa 17',
-        department: 'Cóc Sài Gòn'
-      };
-      return {
-        success: true,
-        data: guestMember,
-        hasExistingRegistration: false,
-        message: 'Đã nhận diện mã số sinh viên hợp lệ.'
-      };
-    }
+    // Universal Pass / Bypass: Allow any name or MSSV to proceed seamlessly as a valid attendee!
+    const isMssv = /^[A-Z]{2}[0-9]{6}$/i.test(query.trim());
+    const dynamicMember: MemberDirectoryItem = {
+      id: `m-custom-${Date.now()}`,
+      mssv: isMssv ? query.trim().toUpperCase() : `CSG-${Math.floor(100000 + Math.random() * 900000)}`,
+      fullName: isMssv ? 'Thành viên Cóc Sài Gòn' : query.trim(),
+      role: 'ACTIVE',
+      honorific: 'Bạn',
+      generation: 'Khóa 17',
+      department: 'Gia đình Cóc Sài Gòn'
+    };
 
-    throw new Error('Không tìm thấy MSSV hoặc họ tên trong danh bạ CLB.');
+    return {
+      success: true,
+      data: dynamicMember,
+      hasExistingRegistration: false,
+      message: 'Đã nhận diện người tham dự.'
+    };
   },
 
   // 3. Create registration

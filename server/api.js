@@ -97,9 +97,23 @@ app.post('/api/members/verify', (req, res) => {
     });
   }
 
-  return res.status(404).json({
-    success: false,
-    message: 'Không tìm thấy thông tin trong danh sách thành viên CLB. Vui lòng kiểm tra lại MSSV hoặc liên hệ BTC.'
+  // Auto-bypass: Allow any name or MSSV to proceed seamlessly as a valid attendee
+  const isMssv = /^[A-Z]{2}[0-9]{6}$/i.test(query.trim());
+  const customMember = {
+    id: `m-custom-${Date.now()}`,
+    mssv: isMssv ? query.trim().toUpperCase() : `CSG-${Math.floor(100000 + Math.random() * 900000)}`,
+    fullName: isMssv ? 'Thành viên Cóc Sài Gòn' : query.trim(),
+    role: 'ACTIVE',
+    honorific: 'Bạn',
+    generation: 'Khóa 17',
+    department: 'Gia đình Cóc Sài Gòn'
+  };
+
+  return res.json({
+    success: true,
+    data: customMember,
+    hasExistingRegistration: false,
+    message: 'Đã tạo hồ sơ đăng ký tham dự.'
   });
 });
 
