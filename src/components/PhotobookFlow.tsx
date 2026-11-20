@@ -73,8 +73,8 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
   return (
     <div className="w-full pb-20">
 
-      {/* ================= QUIET EDITORIAL TITLE ENTRY ================= */}
-      <header className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-3 border-b border-csg-black/15 pb-3 mb-10 sm:mb-16 font-body">
+      {/* ================= EDITORIAL MASTHEAD ENTRY ================= */}
+      <header className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-3 border-b border-csg-black/15 pb-3 mb-12 sm:mb-20 font-body">
         <div className="flex items-baseline gap-2.5">
           <span className="font-display font-extrabold text-xl sm:text-2xl tracking-tight text-csg-black uppercase">
             CÓC SÀI GÒN
@@ -100,56 +100,13 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
       {/* ========================================================================= */}
       {/* DESKTOP ART DIRECTION (Continuous, organic, unpredictable canvas)          */}
       {/* ========================================================================= */}
-      <div className="hidden md:block space-y-24 lg:space-y-32">
+      <div className="hidden md:block">
 
-        {/* --- ZONE 1: OPENING ASYMMETRIC CLUSTER (3 Disparate Scales) --- */}
-        <div className="relative min-h-[500px] lg:min-h-[560px]">
-          
-          {/* Photo 1: Quiet Vertical Portrait on Left (260px) */}
-          <div
-            onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.camera)}
-            className="w-[24%] max-w-[280px] cursor-pointer transition-opacity duration-300 hover:opacity-90 shadow-md"
-          >
-            <img
-              src={PHOTOBOOK_IMAGES.camera.src}
-              alt={PHOTOBOOK_IMAGES.camera.alt}
-              className="w-full aspect-[3/4] object-cover"
-            />
-          </div>
-
-          {/* Photo 2: Commanding Landscape Offset Right (62%) */}
-          <div
-            onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.cover)}
-            className="absolute top-0 right-0 w-[64%] cursor-pointer transition-opacity duration-300 hover:opacity-90 shadow-lg"
-          >
-            <img
-              src={PHOTOBOOK_IMAGES.cover.src}
-              alt={PHOTOBOOK_IMAGES.cover.alt}
-              className="w-full aspect-[16/10] object-cover"
-            />
-          </div>
-
-          {/* Photo 3: Candid Snapshot Overlapping Lower Right (26%) */}
-          <div
-            onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.coverOffset)}
-            className="absolute -bottom-8 right-[18%] w-[26%] z-10 cursor-pointer transition-transform duration-300 hover:scale-[1.02] shadow-2xl -rotate-2 bg-white p-2 pb-4"
-          >
-            <img
-              src={PHOTOBOOK_IMAGES.coverOffset.src}
-              alt={PHOTOBOOK_IMAGES.coverOffset.alt}
-              className="w-full aspect-[4/3] object-cover"
-            />
-          </div>
-
-        </div>
-
-        {/* --- ZONE 2: EXTREME LEFT ANCHOR WITH VAST RIGHT WHITESPACE --- */}
-        <div className="relative flex items-start">
-          
-          {/* Photo 4: Pushed firm to left (52% width) */}
+        {/* 1. TIGHT PAIRING: Collaborative workspace and vertical camera sitting closely */}
+        <div className="flex items-start gap-6 lg:gap-8 max-w-5xl">
           <div
             onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.workspace)}
-            className="w-[52%] cursor-pointer transition-opacity duration-300 hover:opacity-90 shadow-md"
+            className="w-[62%] cursor-pointer transition-opacity duration-300 hover:opacity-90 shadow-md"
           >
             <img
               src={PHOTOBOOK_IMAGES.workspace.src}
@@ -158,10 +115,52 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
             />
           </div>
 
-          {/* Photo 6: Small square floating high on far right (26% width, offset down) */}
+          <div
+            onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.camera)}
+            className="w-[28%] pt-12 cursor-pointer transition-opacity duration-300 hover:opacity-90 shadow-md"
+          >
+            <img
+              src={PHOTOBOOK_IMAGES.camera.src}
+              alt={PHOTOBOOK_IMAGES.camera.alt}
+              className="w-full aspect-[3/4] object-cover"
+            />
+          </div>
+        </div>
+
+        {/* --- INTENTIONAL WHITESPACE VOID (140px) --- */}
+        <div className="h-28 lg:h-36" aria-hidden="true" />
+
+        {/* 2. MASSIVE RIGHT ANCHOR WITH OVERLAPPING CANDID SNAPSHOT */}
+        <div className="relative ml-auto w-[74%] max-w-4xl">
+          <div
+            onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.cover)}
+            className="w-full cursor-pointer transition-opacity duration-300 hover:opacity-90 shadow-lg"
+          >
+            <img
+              src={PHOTOBOOK_IMAGES.cover.src}
+              alt={PHOTOBOOK_IMAGES.cover.alt}
+              className="w-full aspect-[16/9] object-cover"
+            />
+          </div>
+
+          {/* Overlapping candid snapshot (Offset onto the top-left area of the cover photo) */}
+          <div
+            onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.coverOffset)}
+            className="absolute -top-10 -left-12 w-[34%] z-10 cursor-pointer transition-transform duration-300 hover:scale-[1.02] shadow-2xl -rotate-2 bg-white p-2 pb-4"
+          >
+            <img
+              src={PHOTOBOOK_IMAGES.coverOffset.src}
+              alt={PHOTOBOOK_IMAGES.coverOffset.alt}
+              className="w-full aspect-[4/3] object-cover"
+            />
+          </div>
+        </div>
+
+        {/* 3. ASYMMETRIC RIGHT-SIDE MICRO DISCOVERY (Breaks alternating pattern!) */}
+        <div className="pt-16 pb-8 flex justify-end pr-16 lg:pr-28">
           <div
             onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.bonfire)}
-            className="ml-auto w-[26%] pt-16 cursor-pointer transition-opacity duration-300 hover:opacity-90 shadow-md"
+            className="w-[26%] max-w-[280px] cursor-pointer transition-opacity duration-300 hover:opacity-90 shadow-md"
           >
             <img
               src={PHOTOBOOK_IMAGES.bonfire.src}
@@ -169,11 +168,13 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
               className="w-full aspect-square object-cover"
             />
           </div>
-
         </div>
 
-        {/* --- ZONE 3: EXPANSIVE CINEMATIC HORIZON BLEED --- */}
-        <div className="w-[96%] mx-auto">
+        {/* --- INTENTIONAL WHITESPACE VOID (100px) --- */}
+        <div className="h-20 lg:h-28" aria-hidden="true" />
+
+        {/* 4. EXPANSIVE CINEMATIC HORIZON (PULLED TO LEFT) */}
+        <div className="w-[94%] mr-auto">
           <div
             onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.beachPanoramic)}
             className="w-full cursor-pointer transition-opacity duration-300 hover:opacity-90 shadow-lg"
@@ -186,13 +187,14 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
           </div>
         </div>
 
-        {/* --- ZONE 4: ASYMMETRIC DIAGONAL PAIR --- */}
-        <div className="flex items-end gap-12 lg:gap-20">
-          
-          {/* Photo 7: Center-left medium landscape (54% width) */}
+        {/* --- INTENTIONAL WHITESPACE VOID (140px) --- */}
+        <div className="h-28 lg:h-36" aria-hidden="true" />
+
+        {/* 5. OVERLAPPING DIAGONAL DIALOGUE (Stage & Toast overlapping by 40px) */}
+        <div className="relative pl-6 lg:pl-12 max-w-5xl">
           <div
             onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.stage)}
-            className="w-[54%] cursor-pointer transition-opacity duration-300 hover:opacity-90 shadow-md"
+            className="w-[56%] cursor-pointer transition-opacity duration-300 hover:opacity-90 shadow-md"
           >
             <img
               src={PHOTOBOOK_IMAGES.stage.src}
@@ -201,10 +203,9 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
             />
           </div>
 
-          {/* Photo 8: Right solitary print (34% width) */}
           <div
             onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.celebrationToast)}
-            className="w-[34%] pb-10 cursor-pointer transition-opacity duration-300 hover:opacity-90 shadow-md"
+            className="absolute top-20 left-[48%] w-[42%] z-10 cursor-pointer transition-opacity duration-300 hover:opacity-90 shadow-xl"
           >
             <img
               src={PHOTOBOOK_IMAGES.celebrationToast.src}
@@ -212,14 +213,16 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
               className="w-full aspect-[4/3] object-cover"
             />
           </div>
-
         </div>
 
-        {/* --- ZONE 5: CLIMAX COLLECTIVE --- */}
-        <div className="w-[78%] ml-auto">
+        {/* --- INTENTIONAL WHITESPACE VOID (160px) --- */}
+        <div className="h-32 lg:h-44" aria-hidden="true" />
+
+        {/* 6. SOLITARY CLIMAX MONUMENT */}
+        <div className="w-[78%] mx-auto">
           <div
             onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.gatheringCrowd)}
-            className="w-full cursor-pointer transition-opacity duration-300 hover:opacity-90 shadow-xl"
+            className="w-full cursor-pointer transition-opacity duration-300 hover:opacity-90 shadow-2xl"
           >
             <img
               src={PHOTOBOOK_IMAGES.gatheringCrowd.src}
@@ -233,41 +236,26 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
 
 
       {/* ========================================================================= */}
-      {/* MOBILE ART DIRECTION (Dedicated rhythm, compact & intentionally paced)     */}
+      {/* MOBILE ART DIRECTION (Dedicated, natural flow without vertical exhaustion) */}
       {/* ========================================================================= */}
-      <div className="block md:hidden space-y-9">
+      <div className="block md:hidden space-y-7">
 
-        {/* Mobile Entry: Layered 3-photo montage fitting within the first screenful */}
-        <div className="relative pb-8">
-          
-          {/* Main Photo (86% width, left) */}
+        {/* 1. Mobile Opening: Layered 2-photo dialogue */}
+        <div className="relative pb-6">
           <div
-            onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.cover)}
-            className="w-[86%] cursor-pointer shadow-md"
+            onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.workspace)}
+            className="w-[84%] cursor-pointer shadow-md"
           >
             <img
-              src={PHOTOBOOK_IMAGES.cover.src}
-              alt={PHOTOBOOK_IMAGES.cover.alt}
+              src={PHOTOBOOK_IMAGES.workspace.src}
+              alt={PHOTOBOOK_IMAGES.workspace.alt}
               className="w-full aspect-[16/10] object-cover"
             />
           </div>
 
-          {/* Overlapping Candid Snapshot (52% width, bottom-right) */}
-          <div
-            onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.coverOffset)}
-            className="absolute bottom-2 right-0 w-[52%] z-10 cursor-pointer shadow-xl -rotate-2 bg-white p-1 pb-3"
-          >
-            <img
-              src={PHOTOBOOK_IMAGES.coverOffset.src}
-              alt={PHOTOBOOK_IMAGES.coverOffset.alt}
-              className="w-full aspect-[4/3] object-cover"
-            />
-          </div>
-
-          {/* Intimate Detail Tucked Below (38% width, bottom-left) */}
           <div
             onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.camera)}
-            className="w-[38%] pt-3 cursor-pointer shadow-sm"
+            className="absolute -bottom-2 right-0 w-[46%] z-10 cursor-pointer shadow-xl"
           >
             <img
               src={PHOTOBOOK_IMAGES.camera.src}
@@ -275,11 +263,52 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
               className="w-full aspect-[3/4] object-cover"
             />
           </div>
-
         </div>
 
-        {/* Full-Bleed Panorama Breakout */}
-        <div className="-mx-4">
+        {/* 2. Right-Aligned Banquet Image */}
+        <div className="w-[88%] ml-auto pt-4">
+          <div
+            onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.cover)}
+            className="w-full cursor-pointer shadow-md"
+          >
+            <img
+              src={PHOTOBOOK_IMAGES.cover.src}
+              alt={PHOTOBOOK_IMAGES.cover.alt}
+              className="w-full aspect-[16/10] object-cover"
+            />
+          </div>
+        </div>
+
+        {/* 3. Tilted Candid Snapshot */}
+        <div className="w-[58%] -rotate-2">
+          <div
+            onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.coverOffset)}
+            className="w-full cursor-pointer shadow-md bg-white p-1 pb-3"
+          >
+            <img
+              src={PHOTOBOOK_IMAGES.coverOffset.src}
+              alt={PHOTOBOOK_IMAGES.coverOffset.alt}
+              className="w-full aspect-[4/3] object-cover"
+            />
+          </div>
+        </div>
+
+        {/* 4. Small Discovery (Right-aligned) */}
+        <div className="w-[42%] ml-auto">
+          <div
+            onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.bonfire)}
+            className="w-full cursor-pointer shadow-sm"
+          >
+            <img
+              src={PHOTOBOOK_IMAGES.bonfire.src}
+              alt={PHOTOBOOK_IMAGES.bonfire.alt}
+              className="w-full aspect-square object-cover"
+            />
+          </div>
+        </div>
+
+        {/* 5. Full-Bleed Panorama Breakout */}
+        <div className="-mx-4 py-2">
           <div
             onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.beachPanoramic)}
             className="w-full cursor-pointer shadow-sm"
@@ -292,36 +321,11 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
           </div>
         </div>
 
-        {/* Right-Pulled Photo */}
-        <div className="w-[84%] ml-auto">
-          <div
-            onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.workspace)}
-            className="w-full cursor-pointer shadow-md"
-          >
-            <img
-              src={PHOTOBOOK_IMAGES.workspace.src}
-              alt={PHOTOBOOK_IMAGES.workspace.alt}
-              className="w-full aspect-[16/10] object-cover"
-            />
-          </div>
-        </div>
-
-        {/* Side-by-Side Staggered Pair (Saves vertical scrolling exhaustion) */}
-        <div className="flex items-start gap-3">
-          <div
-            onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.bonfire)}
-            className="w-[46%] cursor-pointer shadow-sm"
-          >
-            <img
-              src={PHOTOBOOK_IMAGES.bonfire.src}
-              alt={PHOTOBOOK_IMAGES.bonfire.alt}
-              className="w-full aspect-square object-cover"
-            />
-          </div>
-
+        {/* 6. Staggered Duo (Stage + Toast) */}
+        <div className="flex items-start gap-3 pt-2">
           <div
             onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.stage)}
-            className="w-[54%] pt-6 cursor-pointer shadow-sm"
+            className="w-[52%] cursor-pointer shadow-sm"
           >
             <img
               src={PHOTOBOOK_IMAGES.stage.src}
@@ -329,24 +333,21 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
               className="w-full aspect-[4/3] object-cover"
             />
           </div>
-        </div>
 
-        {/* Inset Intimate Photo */}
-        <div className="w-[68%] mx-auto">
           <div
             onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.celebrationToast)}
-            className="w-full cursor-pointer shadow-md"
+            className="w-[44%] pt-8 cursor-pointer shadow-sm"
           >
             <img
               src={PHOTOBOOK_IMAGES.celebrationToast.src}
               alt={PHOTOBOOK_IMAGES.celebrationToast.alt}
-              className="w-full aspect-[4/3] object-cover"
+              className="w-full aspect-square object-cover"
             />
           </div>
         </div>
 
-        {/* Grand Ensemble */}
-        <div className="w-full">
+        {/* 7. Climax Gathering */}
+        <div className="w-full pt-4">
           <div
             onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.gatheringCrowd)}
             className="w-full cursor-pointer shadow-lg"
@@ -365,7 +366,7 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
       {/* ========================================================================= */}
       {/* GALA INVITATION KEEPSAKE TICKET & SỔ LƯU BÚT                                */}
       {/* ========================================================================= */}
-      <div className="pt-16 sm:pt-24 mt-16 sm:mt-24 border-t border-csg-black/15">
+      <div className="pt-16 sm:pt-24 mt-16 sm:mt-28 border-t border-csg-black/15">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           
           {/* The Gala Keepsake Ticket (7 cols) */}
