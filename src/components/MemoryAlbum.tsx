@@ -5,74 +5,83 @@ interface MemoryPhoto {
   id: string;
   url: string;
   alt: string;
-  rotation?: string;
-  aspect?: string;
+  caption?: string;
+  handwrittenNote?: string;
+  tape?: boolean;
 }
 
-const ALBUM_PHOTOS: MemoryPhoto[] = [
+export const ALBUM_PHOTOS: MemoryPhoto[] = [
   // 1. Gala Banquet - The main gathering
   {
     id: 'alb-1',
     url: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=1800&q=85',
     alt: 'Bàn tiệc hội ngộ dưới ánh đèn vàng',
-    rotation: 'rotate-0',
-    aspect: 'aspect-[16/9]'
+    caption: 'Bàn tiệc hội ngộ dưới ánh đèn vàng',
+    handwrittenNote: 'Đêm hoàng kim — 19.12.2026',
+    tape: true
   },
-  // 2. Early camera lens / F-Camp
+  // 2. Early camera lens / Campus field work
   {
     id: 'alb-2',
     url: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=1000&q=85',
-    alt: 'Ống kính máy ảnh tác nghiệp',
-    rotation: '-rotate-1',
-    aspect: 'aspect-[3/4]'
+    alt: 'Góc máy tác nghiệp sân trường',
+    caption: 'Góc máy tác nghiệp sân trường',
+    handwrittenNote: 'Chiếc máy ảnh mượn và những ngày rong ruổi',
+    tape: true
   },
-  // 3. Birthday cake toast
+  // 3. Creative table
   {
     id: 'alb-3',
-    url: 'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?auto=format&fit=crop&w=1200&q=85',
-    alt: 'Thổi nến sinh nhật và nâng ly',
-    rotation: 'rotate-1',
-    aspect: 'aspect-[4/3]'
+    url: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=1200&q=85',
+    alt: 'Bàn tròn ý tưởng và dựng bài',
+    caption: 'Bàn tròn ý tưởng và dựng bài',
+    handwrittenNote: 'Những đêm thức trắng bên nhau',
+    tape: false
   },
   // 4. Yellow shirts by the beach
   {
     id: 'alb-4',
     url: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1800&q=85',
     alt: 'Những chuyến đi sắc áo vàng bên bờ biển',
-    rotation: 'rotate-0',
-    aspect: 'aspect-[21/9]'
+    caption: 'Những chuyến đi sắc áo vàng bên bờ biển',
+    handwrittenNote: 'Sóng biển, nắng vàng và tuổi trẻ',
+    tape: true
   },
   // 5. Bonfire night
   {
     id: 'alb-5',
     url: 'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&w=1200&q=85',
     alt: 'Đêm lửa trại và những câu chuyện',
-    rotation: '-rotate-1.5',
-    aspect: 'aspect-square'
+    caption: 'Đêm lửa trại và những câu chuyện',
+    handwrittenNote: 'Tàn tro bay nhưng lòng vẫn ấm',
+    tape: false
   },
   // 6. Live stage
   {
     id: 'alb-6',
     url: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1400&q=85',
     alt: 'Sân khấu âm nhạc và ánh sáng',
-    rotation: 'rotate-1',
-    aspect: 'aspect-[16/10]'
+    caption: 'Sân khấu âm nhạc và ánh sáng',
+    handwrittenNote: 'Hát khan cả cổ nhưng chẳng ai chịu về',
+    tape: true
   },
-  // 7. Creative studio table
+  // 7. Toast & cake
   {
     id: 'alb-7',
-    url: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=1200&q=85',
-    alt: 'Bàn tròn ý tưởng và dựng bài',
-    rotation: '-rotate-0.5',
-    aspect: 'aspect-[4/3]'
+    url: 'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?auto=format&fit=crop&w=1200&q=85',
+    alt: 'Khoảnh khắc nâng ly và thổi nến',
+    caption: 'Khoảnh khắc nâng ly và thổi nến',
+    handwrittenNote: 'Mừng tuổi mới Cóc Sài Gòn',
+    tape: false
   },
   // 8. Celebration crowd
   {
     id: 'alb-8',
     url: 'https://images.unsplash.com/photo-1528605248644-14dd04022da1?auto=format&fit=crop&w=1600&q=85',
     alt: 'Những nụ cười thanh xuân',
-    rotation: 'rotate-0',
-    aspect: 'aspect-[16/9]'
+    caption: 'Những nụ cười thanh xuân',
+    handwrittenNote: 'Nơi những người xa lạ thành anh em',
+    tape: true
   }
 ];
 
@@ -113,49 +122,29 @@ export const MemoryAlbum: React.FC = () => {
   }, [selectedIndex, handlePrev, handleNext]);
 
   return (
-    <section id="memories" className="py-20 sm:py-36 px-4 sm:px-8 max-w-[1400px] mx-auto">
+    <div id="memories" className="space-y-24 sm:space-y-36">
       
-      {/* Scrapbook Section Divider */}
-      <div className="border-b-2 border-csg-black/30 pb-4 mb-16 sm:mb-28 flex items-baseline justify-between">
-        <span className="font-mono text-xs sm:text-sm font-bold tracking-[0.2em] uppercase text-csg-black/60">
-          CUỐN KỶ YẾU // PHOTO ALBUM
-        </span>
-        <span className="font-editorial italic text-sm sm:text-base text-csg-black/70">
-          "Có những nơi dù đã đi bao lâu, vẫn luôn có chỗ để trở về."
-        </span>
-      </div>
-
-      {/* ================= THE ALBUM SPREADS ================= */}
-      <div className="space-y-24 sm:space-y-44">
-        
-        {/* SPREAD 1: The Monumental Table - Full Spread Print */}
-        <div className="relative">
-          <div 
-            onClick={() => setSelectedIndex(0)}
-            className="group cursor-pointer bg-white p-2 sm:p-4 pb-6 sm:pb-8 shadow-poster-lg border border-csg-black/30 transition-transform duration-500 hover:-translate-y-1.5"
-          >
-            <div className="relative overflow-hidden bg-csg-muted">
-              <img
-                src={ALBUM_PHOTOS[0].url}
-                alt={ALBUM_PHOTOS[0].alt}
-                className="w-full aspect-[16/9] sm:aspect-[21/9] object-cover transition-transform duration-700 group-hover:scale-[1.01]"
-                loading="lazy"
-              />
-              <div className="absolute bottom-3 right-3 bg-csg-paper/90 border border-csg-black px-2.5 py-1 font-mono text-[11px] font-bold text-csg-black opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 shadow-sm">
-                <ZoomIn className="w-3.5 h-3.5 text-csg-red" />
-                <span>PHÓNG TO</span>
-              </div>
-            </div>
-          </div>
+      {/* ================= PAGE SPREAD 01: SÂN TRƯỜNG & NHỮNG NGÀY ĐẦU ================= */}
+      <div className="relative">
+        <div className="flex items-center gap-3 border-b border-csg-black/15 pb-2 mb-8 sm:mb-12">
+          <span className="font-mono text-xs uppercase tracking-widest text-csg-black/60 font-semibold">
+            TRANG 01 // NHỮNG BƯỚC CHÂN ĐẦU TIÊN
+          </span>
+          <span className="text-csg-black/30">•</span>
+          <span className="font-handwriting text-xl text-csg-red">
+            "Máy ảnh mượn và ngòi bút tuổi đôi mươi"
+          </span>
         </div>
 
-        {/* SPREAD 2: Asymmetric Hand-Placed Duo (Overlapping & Breathing Room) */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-16 items-center">
-          {/* Vertical Print (Slight tilt -1.5deg) */}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-14 items-center">
+          {/* Vertical Print with Tape */}
           <div 
             onClick={() => setSelectedIndex(1)}
-            className="md:col-span-5 group cursor-pointer bg-white p-2 sm:p-3 pb-6 sm:pb-8 shadow-poster border border-csg-black/30 -rotate-1 hover:rotate-0 transition-transform duration-500 hover:-translate-y-1.5"
+            className="md:col-span-5 group cursor-pointer bg-white p-2.5 sm:p-3.5 pb-7 sm:pb-9 shadow-paper-lg border border-csg-black/25 -rotate-1 hover:rotate-0 transition-transform duration-500 hover:-translate-y-1 relative"
           >
+            {/* Washi Tape Strip */}
+            <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 w-20 h-6 bg-[#E5DEC9]/85 border border-csg-black/10 backdrop-blur-[1px] rotate-1 shadow-sm pointer-events-none" />
+            
             <div className="overflow-hidden bg-csg-muted">
               <img
                 src={ALBUM_PHOTOS[1].url}
@@ -164,17 +153,20 @@ export const MemoryAlbum: React.FC = () => {
                 loading="lazy"
               />
             </div>
+            <p className="font-handwriting text-xl sm:text-2xl text-csg-black/80 pt-3 text-center">
+              {ALBUM_PHOTOS[1].handwrittenNote}
+            </p>
           </div>
 
-          {/* Landscape Print Placed Off-Center with Editorial Air */}
-          <div className="md:col-span-7 space-y-8 md:pl-6">
-            <p className="font-editorial italic text-2xl sm:text-4xl text-csg-black/85 leading-snug max-w-md">
-              "Những ngày đầu lăn xả sân trường, máy ảnh mượn và ngòi bút tuổi đôi mươi."
+          {/* Right Editorial Note & Desk Photo */}
+          <div className="md:col-span-7 space-y-6 md:pl-4">
+            <p className="font-editorial italic text-2xl sm:text-3xl text-csg-black/80 leading-snug">
+              "Có những buổi chiều tan học không ai về, cả bọn túm tụm quanh chiếc laptop dựng tin bài cho kịp giờ lên sóng."
             </p>
 
             <div 
               onClick={() => setSelectedIndex(2)}
-              className="group cursor-pointer bg-white p-2 sm:p-3 pb-6 sm:pb-8 shadow-poster border border-csg-black/30 rotate-1 hover:rotate-0 transition-transform duration-500 hover:-translate-y-1.5"
+              className="group cursor-pointer bg-white p-2.5 sm:p-3.5 pb-6 sm:pb-8 shadow-paper-lg border border-csg-black/25 rotate-1 hover:rotate-0 transition-transform duration-500 hover:-translate-y-1"
             >
               <div className="overflow-hidden bg-csg-muted">
                 <img
@@ -184,36 +176,74 @@ export const MemoryAlbum: React.FC = () => {
                   loading="lazy"
                 />
               </div>
+              <p className="font-handwriting text-lg sm:text-xl text-csg-black/75 pt-2 text-right pr-2">
+                {ALBUM_PHOTOS[2].handwrittenNote}
+              </p>
             </div>
           </div>
         </div>
+      </div>
 
-        {/* SPREAD 3: The Ocean Horizon & Sắc Áo Vàng (Wide Panoramic Print) */}
-        <div className="relative">
-          <div 
-            onClick={() => setSelectedIndex(3)}
-            className="group cursor-pointer bg-white p-2 sm:p-4 pb-6 sm:pb-8 shadow-poster-lg border border-csg-black/30 transition-transform duration-500 hover:-translate-y-1.5"
-          >
-            <div className="relative overflow-hidden bg-csg-muted">
-              <img
-                src={ALBUM_PHOTOS[3].url}
-                alt={ALBUM_PHOTOS[3].alt}
-                className="w-full aspect-[16/8] sm:aspect-[21/8] object-cover transition-transform duration-700 group-hover:scale-[1.01]"
-                loading="lazy"
-              />
-              <div className="absolute bottom-3 right-3 bg-csg-paper/90 border border-csg-black px-2.5 py-1 font-mono text-[11px] font-bold text-csg-black opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 shadow-sm">
-                <ZoomIn className="w-3.5 h-3.5 text-csg-red" />
-                <span>PHÓNG TO</span>
-              </div>
-            </div>
-          </div>
+      {/* ================= PAGE SPREAD 02: BỜ BIỂN & SẮC ÁO VÀNG ================= */}
+      <div className="relative">
+        <div className="flex items-center justify-between border-b border-csg-black/15 pb-2 mb-8 sm:mb-12">
+          <span className="font-mono text-xs uppercase tracking-widest text-csg-black/60 font-semibold">
+            TRANG 02 // SẮC ÁO VÀNG QUA NHỮNG MIỀN ĐẤT
+          </span>
+          <span className="px-2.5 py-0.5 bg-csg-yellow text-csg-black border border-csg-black font-mono text-[11px] font-bold uppercase -rotate-1">
+            ★ TEAMBUILDING
+          </span>
         </div>
 
-        {/* SPREAD 4: Organic Staggered Pair (Campfire & Stage Lights) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 lg:gap-16 items-start">
+        {/* Panoramic Print Laid Out Across The Page */}
+        <div 
+          onClick={() => setSelectedIndex(3)}
+          className="group cursor-pointer bg-white p-3 sm:p-4 pb-7 sm:pb-10 shadow-paper-lg border border-csg-black/25 transition-transform duration-500 hover:-translate-y-1 relative"
+        >
+          {/* Subtle corner tape */}
+          <div className="absolute -top-3 left-8 w-16 h-5 bg-[#E5DEC9]/80 border border-csg-black/10 -rotate-3 pointer-events-none" />
+          <div className="absolute -top-3 right-8 w-16 h-5 bg-[#E5DEC9]/80 border border-csg-black/10 rotate-2 pointer-events-none" />
+
+          <div className="relative overflow-hidden bg-csg-muted">
+            <img
+              src={ALBUM_PHOTOS[3].url}
+              alt={ALBUM_PHOTOS[3].alt}
+              className="w-full aspect-[16/8] sm:aspect-[21/8] object-cover transition-transform duration-700 group-hover:scale-[1.01]"
+              loading="lazy"
+            />
+            <div className="absolute bottom-3 right-3 bg-csg-paper/90 border border-csg-black px-2.5 py-1 font-mono text-[11px] font-bold text-csg-black opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 shadow-sm">
+              <ZoomIn className="w-3.5 h-3.5 text-csg-red" />
+              <span>XEM RÕ HƠN</span>
+            </div>
+          </div>
+          <div className="flex flex-col sm:flex-row items-center justify-between pt-3 px-1 gap-1">
+            <p className="font-editorial italic text-base text-csg-black/80">
+              "Những chuyến xe nối dài tình anh em..."
+            </p>
+            <p className="font-handwriting text-xl text-csg-red">
+              {ALBUM_PHOTOS[3].handwrittenNote}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* ================= PAGE SPREAD 03: LỬA TRẠI & SÂN KHẤU ================= */}
+      <div className="relative">
+        <div className="flex items-center gap-3 border-b border-csg-black/15 pb-2 mb-8 sm:mb-12">
+          <span className="font-mono text-xs uppercase tracking-widest text-csg-black/60 font-semibold">
+            TRANG 03 // NHỮNG ĐÊM CHÁY HẾT MÌNH
+          </span>
+          <span className="text-csg-black/30">•</span>
+          <span className="font-handwriting text-xl text-csg-black/75">
+            "Âm nhạc, ánh lửa và những bài ca"
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 lg:gap-14 items-start">
+          {/* Campfire Square Print */}
           <div 
             onClick={() => setSelectedIndex(4)}
-            className="group cursor-pointer bg-white p-2 sm:p-3 pb-6 sm:pb-8 shadow-poster border border-csg-black/30 -rotate-1 hover:rotate-0 transition-transform duration-500 hover:-translate-y-1.5"
+            className="group cursor-pointer bg-white p-3 sm:p-4 pb-7 sm:pb-9 shadow-paper-lg border border-csg-black/25 -rotate-1 hover:rotate-0 transition-transform duration-500 hover:-translate-y-1 relative"
           >
             <div className="overflow-hidden bg-csg-muted">
               <img
@@ -223,28 +253,50 @@ export const MemoryAlbum: React.FC = () => {
                 loading="lazy"
               />
             </div>
+            <p className="font-handwriting text-xl sm:text-2xl text-csg-black/80 pt-3 text-center">
+              {ALBUM_PHOTOS[4].handwrittenNote}
+            </p>
           </div>
 
+          {/* Stage Lights Print */}
           <div 
             onClick={() => setSelectedIndex(5)}
-            className="group cursor-pointer bg-white p-2 sm:p-3 pb-6 sm:pb-8 shadow-poster border border-csg-black/30 rotate-1 hover:rotate-0 transition-transform duration-500 hover:-translate-y-1.5 sm:mt-16"
+            className="group cursor-pointer bg-white p-3 sm:p-4 pb-7 sm:pb-9 shadow-paper-lg border border-csg-black/25 rotate-1 hover:rotate-0 transition-transform duration-500 hover:-translate-y-1 sm:mt-12 relative"
           >
+            {/* Washi Tape */}
+            <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 w-20 h-6 bg-[#E5DEC9]/85 border border-csg-black/10 backdrop-blur-[1px] -rotate-1 shadow-sm pointer-events-none" />
+
             <div className="overflow-hidden bg-csg-muted">
               <img
                 src={ALBUM_PHOTOS[5].url}
                 alt={ALBUM_PHOTOS[5].alt}
-                className="w-full aspect-[4/5] sm:aspect-square object-cover transition-transform duration-700 group-hover:scale-[1.01]"
+                className="w-full aspect-[4/3] sm:aspect-square object-cover transition-transform duration-700 group-hover:scale-[1.01]"
                 loading="lazy"
               />
             </div>
+            <p className="font-handwriting text-xl sm:text-2xl text-csg-black/80 pt-3 text-center">
+              {ALBUM_PHOTOS[5].handwrittenNote}
+            </p>
           </div>
         </div>
+      </div>
 
-        {/* SPREAD 5: Studio Desk & Final Celebration Crowd */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-14 items-end">
+      {/* ================= PAGE SPREAD 04: CẢM ƠN VÀ HỘI NGỘ ================= */}
+      <div className="relative">
+        <div className="flex items-center justify-between border-b border-csg-black/15 pb-2 mb-8 sm:mb-12">
+          <span className="font-mono text-xs uppercase tracking-widest text-csg-black/60 font-semibold">
+            TRANG 04 // 17 NĂM MỘT MÁI NHÀ
+          </span>
+          <span className="font-editorial italic text-sm text-csg-black/60 hidden sm:inline">
+            "Những người xa lạ hoá người nhà"
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-14 items-center">
+          {/* Cake & Toast */}
           <div 
             onClick={() => setSelectedIndex(6)}
-            className="md:col-span-5 group cursor-pointer bg-white p-2 sm:p-3 pb-6 sm:pb-8 shadow-poster border border-csg-black/30 -rotate-0.5 hover:rotate-0 transition-transform duration-500 hover:-translate-y-1.5"
+            className="md:col-span-5 group cursor-pointer bg-white p-3 sm:p-4 pb-7 sm:pb-9 shadow-paper-lg border border-csg-black/25 -rotate-1 hover:rotate-0 transition-transform duration-500 hover:-translate-y-1"
           >
             <div className="overflow-hidden bg-csg-muted">
               <img
@@ -254,11 +306,15 @@ export const MemoryAlbum: React.FC = () => {
                 loading="lazy"
               />
             </div>
+            <p className="font-handwriting text-xl text-csg-black/80 pt-2 text-center">
+              {ALBUM_PHOTOS[6].handwrittenNote}
+            </p>
           </div>
 
+          {/* Big Group Hug */}
           <div 
             onClick={() => setSelectedIndex(7)}
-            className="md:col-span-7 group cursor-pointer bg-white p-2 sm:p-3 pb-6 sm:pb-8 shadow-poster-lg border border-csg-black/30 transition-transform duration-500 hover:-translate-y-1.5"
+            className="md:col-span-7 group cursor-pointer bg-white p-3 sm:p-4 pb-7 sm:pb-9 shadow-paper-lg border border-csg-black/25 rotate-1 hover:rotate-0 transition-transform duration-500 hover:-translate-y-1 relative"
           >
             <div className="overflow-hidden bg-csg-muted">
               <img
@@ -268,9 +324,11 @@ export const MemoryAlbum: React.FC = () => {
                 loading="lazy"
               />
             </div>
+            <p className="font-handwriting text-2xl text-csg-red pt-3 text-center">
+              {ALBUM_PHOTOS[7].handwrittenNote}
+            </p>
           </div>
         </div>
-
       </div>
 
       {/* ================= IMMERSIVE DARKROOM LIGHTBOX ================= */}
@@ -312,7 +370,7 @@ export const MemoryAlbum: React.FC = () => {
                 <span>TRƯỚC</span>
               </button>
 
-              <span className="text-[#DCD5C4]/60">
+              <span className="text-[#DCD5C4]/70">
                 {selectedIndex + 1} / {ALBUM_PHOTOS.length}
               </span>
 
@@ -328,6 +386,7 @@ export const MemoryAlbum: React.FC = () => {
           </div>
         </div>
       )}
-    </section>
+
+    </div>
   );
 };

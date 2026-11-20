@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ArrowRight, ShieldCheck, Check } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { AudioPlayerToggle } from './components/AudioPlayerToggle';
-import { MemoryAlbum } from './components/MemoryAlbum';
+import { MemoryAlbum, ALBUM_PHOTOS } from './components/MemoryAlbum';
 import { RegistrationModal } from './components/RegistrationModal';
 import { PaymentLookupModal } from './components/PaymentLookupModal';
 import { AdminDashboard } from './components/AdminDashboard';
@@ -227,33 +227,30 @@ export const App: React.FC = () => {
       {/* Floating Audio Controller */}
       <AudioPlayerToggle />
 
-      {/* ================= MINIMAL NAVIGATION ================= */}
-      <header className="sticky top-0 z-40 bg-csg-paper/95 backdrop-blur-md border-b-2 border-csg-black">
-        <div className="max-w-[1400px] mx-auto px-4 sm:px-8 h-16 flex items-center justify-between">
+      {/* ================= ULTRA-MINIMAL MASTHEAD ================= */}
+      <header className="sticky top-0 z-40 bg-csg-paper/95 backdrop-blur-md border-b border-csg-black/30">
+        <div className="max-w-[1360px] mx-auto px-4 sm:px-8 h-14 flex items-center justify-between">
           {/* Identity */}
           <a href="/" onClick={(e) => { e.preventDefault(); closeModals(); }} className="flex items-center gap-2 group">
-            <span className="font-display font-extrabold text-lg sm:text-xl uppercase tracking-tight text-csg-black">
-              CÓC SÀI GÒN <span className="text-csg-red">17Y</span>
+            <span className="font-display font-extrabold text-base tracking-tight text-csg-black uppercase">
+              CÓC SÀI GÒN <span className="font-editorial italic font-normal text-csg-red lowercase text-lg">17 năm</span>
             </span>
           </a>
 
           {/* Minimal Links */}
-          <nav className="flex items-center gap-6 sm:gap-8 font-mono text-xs font-bold uppercase tracking-wider text-csg-black/80">
-            <a href="#memories" className="hover:text-csg-red transition-colors">
-              KỶ NIỆM
-            </a>
-            <a href="#event" className="hover:text-csg-red transition-colors">
-              SỰ KIỆN
+          <nav className="flex items-center gap-5 sm:gap-7 font-mono text-xs uppercase tracking-wider text-csg-black/80 font-medium">
+            <a href="#memories" className="hover:text-csg-red transition-colors hidden sm:inline">
+              SỔ KỶ NIỆM
             </a>
             <button
               onClick={openLookup}
-              className="hover:text-csg-red transition-colors hidden sm:inline"
+              className="hover:text-csg-red transition-colors"
             >
               TRA CỨU VÉ
             </button>
             <button
               onClick={openRegister}
-              className="btn-editorial-primary px-3.5 sm:px-4 py-1.5 font-display font-bold text-xs uppercase flex items-center gap-1.5 shadow-sm"
+              className="btn-editorial-primary px-3.5 py-1.5 font-display font-bold text-xs uppercase flex items-center gap-1 shadow-sm"
             >
               <span>ĐĂNG KÝ ↗</span>
             </button>
@@ -261,190 +258,212 @@ export const App: React.FC = () => {
         </div>
       </header>
 
-      {/* Main Content Area */}
-      <main className="relative z-10 flex-1">
+      {/* Main Memory Album Canvas */}
+      <main className="relative z-10 flex-1 max-w-[1360px] mx-auto px-4 sm:px-8 w-full py-8 sm:py-12 space-y-20 sm:space-y-32">
         
-        {/* ================= 01. THE NEW HERO: A SCRAPBOOK OF MEMORIES ================= */}
-        <section className="pt-8 sm:pt-14 pb-16 sm:pb-24 px-4 sm:px-8 max-w-[1400px] mx-auto">
-          <div className="space-y-8 sm:space-y-12">
+        {/* ================= OPENING SPREAD: THE MEMORY DESK & GALA INVITATION ================= */}
+        <section className="relative">
+          
+          {/* Subtle Archival Running Head */}
+          <div className="flex items-center justify-between border-b border-csg-black/20 pb-2.5 mb-6 sm:mb-8 font-mono text-xs text-csg-black/60">
+            <div className="flex items-center gap-2 font-semibold">
+              <span className="text-csg-black">CUỐN KỶ YẾU 17 NĂM</span>
+              <span>•</span>
+              <span className="text-csg-red uppercase">GALA 19.12.2026</span>
+            </div>
+            <span className="hidden sm:inline italic font-editorial text-csg-black/70">
+              "Some memories never leave."
+            </span>
+          </div>
+
+          {/* The Asymmetric Scrapbook Spread */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
             
-            {/* Minimal Header Imprint */}
-            <div className="flex items-baseline justify-between border-b-2 border-csg-black/20 pb-3 font-mono text-xs text-csg-black/70">
-              <span className="font-bold tracking-[0.2em] uppercase text-csg-black">
-                17 YEARS OF CÓC SÀI GÒN
-              </span>
-              <span className="font-bold text-csg-red tracking-widest uppercase">
-                19.12.2026
-              </span>
-            </div>
-
-            {/* Organic Collage of Physical Prints */}
-            <div className="relative pt-4 pb-8 sm:pb-14">
+            {/* LEFT: Living Memory Photograph (7 cols) */}
+            <div className="lg:col-span-7 space-y-4">
               
-              {/* Primary Anchor Print (Bàn tiệc hội ngộ) */}
-              <div className="max-w-4xl mx-auto bg-white p-2 sm:p-4 pb-6 sm:pb-8 shadow-poster-lg border border-csg-black/40">
+              {/* Dominant Framed Photo Print */}
+              <div className="bg-white p-3 sm:p-4 pb-7 sm:pb-9 shadow-paper-lg border border-csg-black/25 relative group">
+                {/* Washi Tape Strip at Center */}
+                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 w-24 h-6 bg-[#E5DEC9]/85 border border-csg-black/10 backdrop-blur-[1px] -rotate-1 shadow-sm pointer-events-none" />
+                
+                {/* 17Y Anniversary Stamp */}
+                <div className="absolute top-5 left-5 z-10 px-2.5 py-1 bg-csg-yellow text-csg-black border border-csg-black font-mono text-[11px] font-extrabold uppercase -rotate-2 shadow-sm pointer-events-none">
+                  ★ 17 NĂM SẮC ÁO VÀNG
+                </div>
+
                 <div className="overflow-hidden bg-csg-muted">
                   <img
-                    src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=1800&q=85"
-                    alt="Đại tiệc kỷ niệm Cóc Sài Gòn"
-                    className="w-full aspect-[16/9] sm:aspect-[21/9] object-cover filter contrast-[102%] saturate-[105%]"
+                    src={ALBUM_PHOTOS[0].url}
+                    alt={ALBUM_PHOTOS[0].alt}
+                    className="w-full aspect-[16/10] sm:aspect-[16/9] object-cover transition-transform duration-700 group-hover:scale-[1.01]"
                   />
+                </div>
+
+                <div className="pt-3 px-1 flex items-baseline justify-between">
+                  <p className="font-handwriting text-2xl sm:text-3xl text-csg-black/85 -rotate-1">
+                    "Những năm tháng mình đã cùng nhau..."
+                  </p>
+                  <span className="font-mono text-[11px] text-csg-black/50 uppercase tracking-wider hidden sm:inline">
+                    Đêm Gala Hội Ngộ
+                  </span>
                 </div>
               </div>
 
-              {/* Overlapping Candid Snapshot (Slight tilt -2deg) */}
-              <div className="hidden sm:block absolute -bottom-4 right-8 lg:right-16 w-56 md:w-64 bg-white p-2.5 pb-7 shadow-poster-lg border border-csg-black/40 -rotate-2 hover:rotate-0 transition-transform duration-300">
-                <div className="overflow-hidden bg-csg-muted">
-                  <img
-                    src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=800&q=85"
-                    alt="Những nụ cười đồng đội"
-                    className="w-full aspect-[4/3] object-cover"
-                  />
-                </div>
-                <p className="font-editorial italic text-xs text-csg-black/80 pt-2 text-center">
-                  "Nơi thanh xuân tụ hội."
-                </p>
-              </div>
-
-              {/* 17Y Anniversary Stamp */}
-              <div className="hidden sm:block absolute top-0 left-6 sm:left-12 px-3 py-1 bg-csg-yellow border-2 border-csg-black shadow-poster-sm rotate-[-3deg] font-mono text-xs font-extrabold uppercase">
-                ★ 17 NĂM SẮC ÁO VÀNG
-              </div>
+              {/* Minimal Organic Editorial Note */}
+              <p className="font-editorial italic text-base sm:text-lg text-csg-black/75 px-1 leading-relaxed">
+                17 năm trôi qua, từng thế hệ đã đến, đã trưởng thành và mang theo sắc áo vàng đi khắp muôn phương. Đêm nay, chiếc bàn tiệc ấy lại được thắp sáng để đón bạn trở về.
+              </p>
             </div>
 
-            {/* Minimalist Narrative & Single Clear CTA */}
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pt-2">
-              <div className="space-y-2 max-w-2xl">
-                <h1 className="text-4xl sm:text-6xl lg:text-7xl font-display font-extrabold uppercase tracking-tight text-csg-black leading-[0.92]">
-                  NHỮNG NĂM THÁNG <br />
-                  <span className="font-editorial italic font-normal text-csg-red text-5xl sm:text-7xl lg:text-8xl">
-                    Mình Đã Cùng Nhau.
+            {/* RIGHT: Pinned Keepsake Gala Invitation (5 cols) */}
+            <div className="lg:col-span-5 space-y-6">
+              
+              {/* Physical Invitation Ticket Stub */}
+              <div className="bg-[#FFFDF8] border-2 border-csg-black p-6 sm:p-8 shadow-poster relative space-y-6">
+                
+                {/* Perforated Top Seal */}
+                <div className="flex items-center justify-between border-b-2 border-dashed border-csg-black/25 pb-4">
+                  <span className="font-mono text-[11px] font-bold uppercase tracking-widest text-csg-red">
+                    THƯ MỜI HỘI NGỘ • SỐ 17
                   </span>
-                </h1>
-                <p className="font-editorial italic text-lg sm:text-2xl text-csg-black/75 pt-1">
-                  "Some memories never leave."
-                </p>
+                  <span className="font-mono text-[11px] text-csg-black/50">
+                    NĂM 2009 — 2026
+                  </span>
+                </div>
+
+                {/* Event Heading */}
+                <div className="space-y-1">
+                  <h1 className="text-3xl sm:text-4xl font-display font-extrabold uppercase text-csg-black leading-[1.05] tracking-tight">
+                    ĐẠI TIỆC GALA 17Y
+                  </h1>
+                  <p className="font-editorial italic text-base text-csg-black/70">
+                    Cóc Sài Gòn — Mười Bảy Năm Một Mái Nhà
+                  </p>
+                </div>
+
+                {/* Event Particulars */}
+                <div className="font-mono text-xs divide-y divide-csg-black/15 py-1">
+                  <div className="flex justify-between py-2.5">
+                    <span className="text-csg-black/60 uppercase">THỜI GIAN:</span>
+                    <span className="font-bold text-csg-black">18:00 • Thứ Bảy, 19.12.2026</span>
+                  </div>
+                  <div className="flex justify-between py-2.5">
+                    <span className="text-csg-black/60 uppercase">ĐỊA ĐIỂM:</span>
+                    <span className="font-bold text-csg-black text-right">Asiana Plaza Tân Phú, TP. HCM</span>
+                  </div>
+                  <div className="flex justify-between py-2.5">
+                    <span className="text-csg-black/60 uppercase">TRANG PHỤC:</span>
+                    <span className="font-bold text-csg-black">Sắc Áo Vàng Truyền Thống</span>
+                  </div>
+                </div>
+
+                {/* Primary RSVP Action Right on Ticket */}
+                <div className="space-y-3 pt-2">
+                  <button
+                    onClick={openRegister}
+                    className="btn-editorial-primary w-full py-4 font-display font-extrabold text-sm sm:text-base uppercase tracking-wider flex items-center justify-center gap-2 shadow-poster"
+                  >
+                    <span>ĐĂNG KÝ THAM GIA</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+
+                  <div className="flex items-center justify-between font-mono text-xs pt-1">
+                    <button
+                      onClick={openLookup}
+                      className="text-csg-black/65 hover:text-csg-red underline decoration-1 underline-offset-4 transition-colors"
+                    >
+                      Tra cứu vé đã đặt →
+                    </button>
+                    <span className="text-csg-black/40 text-[11px]">
+                      Hạn chót: 15.12.2026
+                    </span>
+                  </div>
+                </div>
+
               </div>
 
-              {/* Single Clear Primary CTA */}
-              <div className="shrink-0">
-                <button
-                  onClick={openRegister}
-                  className="btn-editorial-primary w-full sm:w-auto px-8 py-4 font-display font-extrabold text-base sm:text-lg uppercase tracking-wider flex items-center justify-center gap-2 shadow-poster"
-                >
-                  <span>ĐĂNG KÝ THAM GIA</span>
-                  <ArrowRight className="w-5 h-5" />
-                </button>
+              {/* Overlapping Candid Polaroid Pinned to Corner */}
+              <div className="hidden sm:flex items-center gap-4 bg-white p-3 shadow-paper-md border border-csg-black/20 -rotate-1 hover:rotate-0 transition-transform duration-300">
+                <div className="w-16 h-16 shrink-0 overflow-hidden bg-csg-muted">
+                  <img
+                    src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=300&q=80"
+                    alt="Nụ cười đồng đội"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div>
+                  <p className="font-handwriting text-xl text-csg-black/85 leading-snug">
+                    "Gặp lại những người anh, người chị, người bạn từng cùng mình trải qua thời sinh viên rực rỡ nhất."
+                  </p>
+                </div>
               </div>
+
             </div>
 
           </div>
+
         </section>
 
-        {/* ================= 02. MEMORY ALBUM: FLUID PHOTO JOURNEY ================= */}
+        {/* ================= THE LIVING PHOTO ALBUM SPREADS ================= */}
         <MemoryAlbum />
 
-        {/* ================= 03. COMPACT EVENT INVITATION CARD ================= */}
-        <section id="event" className="py-20 sm:py-28 px-4 sm:px-8 max-w-[1400px] mx-auto border-t-2 border-csg-black">
-          <div className="max-w-4xl mx-auto bg-csg-surface border-2 border-csg-black shadow-poster p-6 sm:p-10">
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
-              
-              {/* Event Title */}
-              <div className="md:col-span-5 space-y-1">
-                <span className="font-mono text-xs font-bold text-csg-red tracking-widest uppercase">
-                  THƯ MỜI HỘI NGỘ
-                </span>
-                <h2 className="text-3xl sm:text-4xl font-display font-extrabold uppercase text-csg-black leading-tight">
-                  Đại Tiệc Gala 17Y
-                </h2>
-                <p className="font-editorial italic text-sm text-csg-black/70">
-                  "Một đêm ngồi lại bên nhau."
-                </p>
-              </div>
+        {/* ================= SỔ LƯU BÚT: MEMO CARD IN SCRAPBOOK ================= */}
+        <section className="max-w-xl mx-auto pt-8">
+          <div className="bg-[#FFFDF8] border-2 border-csg-black p-6 sm:p-8 shadow-poster relative space-y-4">
+            
+            {/* Memo Tape */}
+            <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 w-24 h-6 bg-[#E5DEC9]/85 border border-csg-black/10 backdrop-blur-[1px] rotate-1 shadow-sm pointer-events-none" />
 
-              {/* Essential Event Metadata */}
-              <div className="md:col-span-4 font-mono text-xs divide-y divide-csg-black/15 py-1">
-                <div className="flex justify-between py-2">
-                  <span className="text-csg-black/60 uppercase">THỜI GIAN:</span>
-                  <span className="font-bold text-csg-black">18:00 • 19.12.2026</span>
-                </div>
-                <div className="flex justify-between py-2">
-                  <span className="text-csg-black/60 uppercase">ĐỊA ĐIỂM:</span>
-                  <span className="font-bold text-csg-black">Asiana Plaza Tân Phú</span>
-                </div>
-                <div className="flex justify-between py-2">
-                  <span className="text-csg-black/60 uppercase">TRANG PHỤC:</span>
-                  <span className="font-bold text-csg-black">Sắc Áo Vàng</span>
-                </div>
-              </div>
-
-              {/* Action Column */}
-              <div className="md:col-span-3 flex flex-col items-stretch md:items-end gap-2.5">
-                <button
-                  onClick={openRegister}
-                  className="btn-editorial-primary px-6 py-3.5 font-display font-extrabold text-sm uppercase tracking-wider shadow-poster flex items-center justify-center gap-1.5"
-                >
-                  <span>ĐĂNG KÝ VÉ ↗</span>
-                </button>
-                <button
-                  onClick={openLookup}
-                  className="font-mono text-xs text-csg-black/70 hover:text-csg-red underline decoration-1 underline-offset-4 text-center md:text-right"
-                >
-                  Tra cứu vé đã đặt →
-                </button>
-              </div>
-
+            <div className="text-center space-y-1">
+              <span className="font-mono text-[11px] font-bold text-csg-red uppercase tracking-widest">
+                SỔ LƯU BÚT 17 NĂM
+              </span>
+              <h2 className="text-xl sm:text-2xl font-display font-extrabold uppercase text-csg-black">
+                Để lại một dòng cho những năm tháng này
+              </h2>
             </div>
-          </div>
-        </section>
 
-        {/* ================= 04. COMPACT WISH BOX ================= */}
-        <section className="py-16 sm:py-20 px-4 sm:px-8 max-w-2xl mx-auto border-t-2 border-csg-black text-center space-y-4">
-          <h3 className="text-xl sm:text-2xl font-display font-extrabold uppercase text-csg-black">
-            Để lại một điều cho những năm tháng này.
-          </h3>
-
-          {wishSubmitted ? (
-            <div className="p-4 bg-csg-surface border-2 border-csg-black font-mono text-xs text-csg-black flex items-center justify-center gap-2">
-              <Check className="w-4 h-4 text-csg-red" />
-              <span>Cảm ơn bạn. Lời chúc đã được lưu lại trong cuốn sổ kỷ yếu 17 năm!</span>
-            </div>
-          ) : (
-            <form onSubmit={handleWishSubmit} className="space-y-3 text-left">
-              <div className="flex flex-col sm:flex-row gap-2">
+            {wishSubmitted ? (
+              <div className="p-4 bg-csg-surface border border-csg-black font-mono text-xs text-csg-black flex items-center justify-center gap-2">
+                <Check className="w-4 h-4 text-csg-red shrink-0" />
+                <span>Cảm ơn bạn. Dòng lưu bút đã được cài vào cuốn sổ kỷ niệm 17 năm!</span>
+              </div>
+            ) : (
+              <form onSubmit={handleWishSubmit} className="space-y-3">
                 <input
                   type="text"
                   placeholder="Tên / Khóa (VD: Anh Phát K12)"
                   value={wishAuthor}
                   onChange={(e) => setWishAuthor(e.target.value)}
-                  className="px-3.5 py-2.5 bg-csg-paper border-2 border-csg-black text-xs font-mono sm:w-1/3 outline-none focus:bg-white"
+                  className="w-full px-3.5 py-2.5 bg-csg-paper border border-csg-black/40 text-xs font-mono outline-none focus:border-csg-black focus:bg-white transition-colors"
                   required
                 />
-                <input
-                  type="text"
-                  placeholder="Một dòng nhắn gửi Cóc Sài Gòn..."
+                <textarea
+                  rows={2}
+                  placeholder="Một dòng gửi gắm đến Cóc Sài Gòn..."
                   value={wishContent}
                   onChange={(e) => setWishContent(e.target.value)}
-                  className="px-3.5 py-2.5 bg-csg-paper border-2 border-csg-black text-xs font-mono flex-1 outline-none focus:bg-white"
+                  className="w-full px-3.5 py-2.5 bg-csg-paper border border-csg-black/40 text-xs font-mono outline-none focus:border-csg-black focus:bg-white resize-none transition-colors"
                   required
                 />
-              </div>
-              <button
-                type="submit"
-                className="w-full py-2.5 bg-csg-black text-csg-yellow font-mono text-xs font-bold uppercase tracking-wider hover:bg-csg-red transition-colors"
-              >
-                GỬI LƯU BÚT 17Y →
-              </button>
-            </form>
-          )}
+                <button
+                  type="submit"
+                  className="w-full py-2.5 bg-csg-black text-csg-yellow font-mono text-xs font-bold uppercase tracking-wider hover:bg-csg-red hover:text-white transition-colors"
+                >
+                  ĐÓNG DẤU LƯU BÚT 17Y →
+                </button>
+              </form>
+            )}
+          </div>
         </section>
 
       </main>
 
-      {/* ================= 05. COLOPHON FOOTER ================= */}
-      <footer className="relative z-10 bg-csg-surface border-t-2 border-csg-black py-6 px-4 sm:px-8">
-        <div className="max-w-[1400px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 font-mono text-xs text-csg-black/70 text-center sm:text-left">
-          <span>CÓC SÀI GÒN // 17 YEARS (2009 — 2026) • ASIANA PLAZA TÂN PHÚ</span>
+      {/* ================= COLOPHON FOOTER ================= */}
+      <footer className="relative z-10 bg-csg-surface border-t border-csg-black/30 py-6 px-4 sm:px-8 mt-16">
+        <div className="max-w-[1360px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 font-mono text-xs text-csg-black/70 text-center sm:text-left">
+          <span>CLB TRUYỀN THÔNG CÓC SÀI GÒN • 2009 — 2026 • ĐẠI TIỆC GALA 17Y TẠI ASIANA PLAZA TÂN PHÚ</span>
 
           <div className="flex items-center gap-4">
             <button
