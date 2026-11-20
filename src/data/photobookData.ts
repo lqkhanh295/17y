@@ -1,11 +1,10 @@
 /**
- * CÓC SÀI GÒN 17Y - ARCHIVAL PHOTO DATA
+ * CÓC SÀI GÒN 17Y - PHOTO ARCHIVE DATA
  * 
- * Lưu trữ tập trung tư liệu hình ảnh của Cóc Sài Gòn 17 năm.
- * Khi có bộ ảnh sự kiện thực tế, chỉ cần thay đổi đường dẫn `src`
- * trong file này mà KHÔNG cần phải sửa đổi bất kỳ mã nguồn layout nào.
+ * Nguồn dữ liệu hình ảnh tập trung cho cuốn Photobook kỷ niệm 17 năm Cóc Sài Gòn.
+ * Khi có bộ ảnh tư liệu thực tế, chỉ cần thay đổi đường dẫn `src` trong file này.
  * 
- * Tuyệt đối không thêm mô tả bịa đặt, quote giả hay câu chuyện hư cấu.
+ * Lưu ý: Tuyệt đối không thêm mô tả bịa đặt, quote giả hay câu chuyện hư cấu.
  */
 
 export interface PhotobookImage {
@@ -13,72 +12,62 @@ export interface PhotobookImage {
   src: string;
   alt: string;
   aspectRatio?: 'panoramic' | 'landscape' | 'portrait' | 'square';
-  archiveCode: string;
 }
 
 export const PHOTOBOOK_IMAGES: Record<string, PhotobookImage> = {
   cover: {
     id: 'photo-cover',
     src: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=1800&q=85',
-    alt: 'Ảnh tư liệu Cóc Sài Gòn 01',
-    aspectRatio: 'landscape',
-    archiveCode: 'CSG-ARC-01'
+    alt: 'Ảnh tư liệu 01',
+    aspectRatio: 'landscape'
   },
   coverOffset: {
     id: 'photo-cover-offset',
     src: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=800&q=85',
-    alt: 'Ảnh tư liệu Cóc Sài Gòn 02',
-    aspectRatio: 'portrait',
-    archiveCode: 'CSG-ARC-02'
+    alt: 'Ảnh tư liệu 02',
+    aspectRatio: 'portrait'
   },
   camera: {
     id: 'photo-camera',
     src: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=1000&q=85',
-    alt: 'Ảnh tư liệu Cóc Sài Gòn 03',
-    aspectRatio: 'portrait',
-    archiveCode: 'CSG-ARC-03'
+    alt: 'Ảnh tư liệu 03',
+    aspectRatio: 'portrait'
   },
   workspace: {
     id: 'photo-workspace',
     src: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=1200&q=85',
-    alt: 'Ảnh tư liệu Cóc Sài Gòn 04',
-    aspectRatio: 'landscape',
-    archiveCode: 'CSG-ARC-04'
+    alt: 'Ảnh tư liệu 04',
+    aspectRatio: 'landscape'
   },
   beachPanoramic: {
     id: 'photo-beach',
     src: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1800&q=85',
-    alt: 'Ảnh tư liệu Cóc Sài Gòn 05',
-    aspectRatio: 'panoramic',
-    archiveCode: 'CSG-ARC-05'
+    alt: 'Ảnh tư liệu 05',
+    aspectRatio: 'panoramic'
   },
   bonfire: {
     id: 'photo-bonfire',
     src: 'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&w=1200&q=85',
-    alt: 'Ảnh tư liệu Cóc Sài Gòn 06',
-    aspectRatio: 'square',
-    archiveCode: 'CSG-ARC-06'
+    alt: 'Ảnh tư liệu 06',
+    aspectRatio: 'square'
   },
   stage: {
     id: 'photo-stage',
     src: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1400&q=85',
-    alt: 'Ảnh tư liệu Cóc Sài Gòn 07',
-    aspectRatio: 'landscape',
-    archiveCode: 'CSG-ARC-07'
+    alt: 'Ảnh tư liệu 07',
+    aspectRatio: 'landscape'
   },
   celebrationToast: {
     id: 'photo-toast',
     src: 'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?auto=format&fit=crop&w=1200&q=85',
-    alt: 'Ảnh tư liệu Cóc Sài Gòn 08',
-    aspectRatio: 'landscape',
-    archiveCode: 'CSG-ARC-08'
+    alt: 'Ảnh tư liệu 08',
+    aspectRatio: 'landscape'
   },
   gatheringCrowd: {
     id: 'photo-crowd',
     src: 'https://images.unsplash.com/photo-1528605248644-14dd04022da1?auto=format&fit=crop&w=1600&q=85',
-    alt: 'Ảnh tư liệu Cóc Sài Gòn 09',
-    aspectRatio: 'landscape',
-    archiveCode: 'CSG-ARC-09'
+    alt: 'Ảnh tư liệu 09',
+    aspectRatio: 'landscape'
   }
 };
 
