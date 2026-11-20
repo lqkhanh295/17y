@@ -4,10 +4,11 @@ import confetti from 'canvas-confetti';
 import { AudioPlayerToggle } from './components/AudioPlayerToggle';
 import { CinematicFilmOpening } from './components/CinematicFilmOpening';
 import { PhotobookFlow } from './components/PhotobookFlow';
+import { CelebrationStage } from './components/CelebrationStage';
 import { RegistrationModal } from './components/RegistrationModal';
 import { PaymentLookupModal } from './components/PaymentLookupModal';
 import { AdminDashboard } from './components/AdminDashboard';
-import { RegistrationRecord } from './types';
+import { RegistrationRecord, MascotFrog } from './types';
 import { apiClient } from './services/apiClient';
 import { audioService } from './services/audioService';
 
@@ -114,6 +115,40 @@ export const App: React.FC = () => {
 
   // Registrations state
   const [registrations, setRegistrations] = useState<RegistrationRecord[]>(INITIAL_REGISTRATIONS);
+
+  // Mascots crowd on Celebration Stage
+  const [stageCharacters] = useState<MascotFrog[]>([
+    {
+      id: 'char-1',
+      name: 'Anh Huỳnh Tấn Phát',
+      role: 'ALUMNI',
+      wish: 'Chúc Cóc Sài Gòn mãi là ngôi nhà ấm áp của bao thế hệ! 💛',
+      x: 18,
+      y: 78,
+      scale: 1,
+      direction: 1
+    },
+    {
+      id: 'char-2',
+      name: 'Chị Trần Thảo My',
+      role: 'ALUMNI',
+      wish: 'Hẹn gặp lại các em tại đêm tiệc 17Y hoành tráng! ✨',
+      x: 48,
+      y: 82,
+      scale: 1,
+      direction: -1
+    },
+    {
+      id: 'char-3',
+      name: 'Bạn Nguyễn Phúc An',
+      role: 'ACTIVE',
+      wish: 'Đêm nay Cóc cháy hết mình nha anh em ơi! 🔥',
+      x: 75,
+      y: 75,
+      scale: 1,
+      direction: 1
+    }
+  ]);
 
   // Optional Wish state
   const [wishSubmitted, setWishSubmitted] = useState(false);
@@ -254,6 +289,12 @@ export const App: React.FC = () => {
 
           {/* Minimal Quick Actions */}
           <nav className="flex items-center gap-5 sm:gap-7 font-mono text-xs uppercase tracking-wider text-csg-black/80 font-medium">
+            <a
+              href="#san-khau"
+              className="hover:text-csg-red transition-colors hidden md:inline font-bold"
+            >
+              SÂN KHẤU CÓC
+            </a>
             <button
               onClick={() => setShowCinematicIntro(true)}
               className="hover:text-csg-red transition-colors hidden sm:inline"
@@ -285,6 +326,14 @@ export const App: React.FC = () => {
           onWishSubmit={handleWishSubmit}
           wishSubmitted={wishSubmitted}
         />
+
+        {/* ================= SÂN KHẤU CÓC SÀI GÒN ================= */}
+        <div className="pt-10 border-t border-csg-black/15">
+          <CelebrationStage
+            characters={stageCharacters}
+            onOpenRegister={openRegister}
+          />
+        </div>
       </main>
 
       {/* ================= QUIET COLOPHON FOOTER ================= */}
