@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowRight, ShieldCheck, Check } from 'lucide-react';
+import { ShieldCheck } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { AudioPlayerToggle } from './components/AudioPlayerToggle';
-import { MemoryAlbum, ALBUM_PHOTOS } from './components/MemoryAlbum';
+import { PhotobookFlow } from './components/PhotobookFlow';
 import { RegistrationModal } from './components/RegistrationModal';
 import { PaymentLookupModal } from './components/PaymentLookupModal';
 import { AdminDashboard } from './components/AdminDashboard';
@@ -102,8 +102,6 @@ export const App: React.FC = () => {
   const [registrations, setRegistrations] = useState<RegistrationRecord[]>(INITIAL_REGISTRATIONS);
 
   // Optional Wish state
-  const [wishAuthor, setWishAuthor] = useState('');
-  const [wishContent, setWishContent] = useState('');
   const [wishSubmitted, setWishSubmitted] = useState(false);
 
   // URL-based routing handlers
@@ -186,20 +184,15 @@ export const App: React.FC = () => {
   };
 
   // Handle optional minimal wish submission
-  const handleWishSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!wishContent.trim()) return;
-
+  const handleWishSubmit = async (author: string, content: string) => {
     try {
       await apiClient.submitWish({
-        authorName: wishAuthor.trim() || 'Người bạn Cóc Sài Gòn',
+        authorName: author || 'Người bạn Cóc Sài Gòn',
         role: 'ACTIVE',
-        content: wishContent.trim(),
+        content,
         isPublic: true
       });
       setWishSubmitted(true);
-      setWishContent('');
-      setWishAuthor('');
     } catch {
       setWishSubmitted(true);
     }
@@ -227,21 +220,21 @@ export const App: React.FC = () => {
       {/* Floating Audio Controller */}
       <AudioPlayerToggle />
 
-      {/* ================= ULTRA-MINIMAL MASTHEAD ================= */}
-      <header className="sticky top-0 z-40 bg-csg-paper/95 backdrop-blur-md border-b border-csg-black/30">
+      {/* ================= EDITORIAL ART-BOOK MASTHEAD ================= */}
+      <header className="sticky top-0 z-40 bg-csg-paper/95 backdrop-blur-md border-b border-csg-black/20">
         <div className="max-w-[1360px] mx-auto px-4 sm:px-8 h-14 flex items-center justify-between">
           {/* Identity */}
-          <a href="/" onClick={(e) => { e.preventDefault(); closeModals(); }} className="flex items-center gap-2 group">
+          <a href="/" onClick={(e) => { e.preventDefault(); closeModals(); }} className="flex items-baseline gap-2 group">
             <span className="font-display font-extrabold text-base tracking-tight text-csg-black uppercase">
               CÓC SÀI GÒN <span className="font-editorial italic font-normal text-csg-red lowercase text-lg">17 năm</span>
             </span>
+            <span className="hidden sm:inline font-mono text-[10px] text-csg-black/40 uppercase tracking-widest pl-2">
+              Photobook // 2009 — 2026
+            </span>
           </a>
 
-          {/* Minimal Links */}
+          {/* Minimal Quick Actions */}
           <nav className="flex items-center gap-5 sm:gap-7 font-mono text-xs uppercase tracking-wider text-csg-black/80 font-medium">
-            <a href="#memories" className="hover:text-csg-red transition-colors hidden sm:inline">
-              SỔ KỶ NIỆM
-            </a>
             <button
               onClick={openLookup}
               className="hover:text-csg-red transition-colors"
@@ -252,217 +245,25 @@ export const App: React.FC = () => {
               onClick={openRegister}
               className="btn-editorial-primary px-3.5 py-1.5 font-display font-bold text-xs uppercase flex items-center gap-1 shadow-sm"
             >
-              <span>ĐĂNG KÝ ↗</span>
+              <span>ĐĂNG KÝ VÉ ↗</span>
             </button>
           </nav>
         </div>
       </header>
 
-      {/* Main Memory Album Canvas */}
-      <main className="relative z-10 flex-1 max-w-[1360px] mx-auto px-4 sm:px-8 w-full py-8 sm:py-12 space-y-20 sm:space-y-32">
-        
-        {/* ================= OPENING SPREAD: THE MEMORY DESK & GALA INVITATION ================= */}
-        <section className="relative">
-          
-          {/* Subtle Archival Running Head */}
-          <div className="flex items-center justify-between border-b border-csg-black/20 pb-2.5 mb-6 sm:mb-8 font-mono text-xs text-csg-black/60">
-            <div className="flex items-center gap-2 font-semibold">
-              <span className="text-csg-black">CUỐN KỶ YẾU 17 NĂM</span>
-              <span>•</span>
-              <span className="text-csg-red uppercase">GALA 19.12.2026</span>
-            </div>
-            <span className="hidden sm:inline italic font-editorial text-csg-black/70">
-              "Some memories never leave."
-            </span>
-          </div>
-
-          {/* The Asymmetric Scrapbook Spread */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
-            
-            {/* LEFT: Living Memory Photograph (7 cols) */}
-            <div className="lg:col-span-7 space-y-4">
-              
-              {/* Dominant Framed Photo Print */}
-              <div className="bg-white p-3 sm:p-4 pb-7 sm:pb-9 shadow-paper-lg border border-csg-black/25 relative group">
-                {/* Washi Tape Strip at Center */}
-                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 w-24 h-6 bg-[#E5DEC9]/85 border border-csg-black/10 backdrop-blur-[1px] -rotate-1 shadow-sm pointer-events-none" />
-                
-                {/* 17Y Anniversary Stamp */}
-                <div className="absolute top-5 left-5 z-10 px-2.5 py-1 bg-csg-yellow text-csg-black border border-csg-black font-mono text-[11px] font-extrabold uppercase -rotate-2 shadow-sm pointer-events-none">
-                  ★ 17 NĂM SẮC ÁO VÀNG
-                </div>
-
-                <div className="overflow-hidden bg-csg-muted">
-                  <img
-                    src={ALBUM_PHOTOS[0].url}
-                    alt={ALBUM_PHOTOS[0].alt}
-                    className="w-full aspect-[16/10] sm:aspect-[16/9] object-cover transition-transform duration-700 group-hover:scale-[1.01]"
-                  />
-                </div>
-
-                <div className="pt-3 px-1 flex items-baseline justify-between">
-                  <p className="font-handwriting text-2xl sm:text-3xl text-csg-black/85 -rotate-1">
-                    "Những năm tháng mình đã cùng nhau..."
-                  </p>
-                  <span className="font-mono text-[11px] text-csg-black/50 uppercase tracking-wider hidden sm:inline">
-                    Đêm Gala Hội Ngộ
-                  </span>
-                </div>
-              </div>
-
-              {/* Minimal Organic Editorial Note */}
-              <p className="font-editorial italic text-base sm:text-lg text-csg-black/75 px-1 leading-relaxed">
-                17 năm trôi qua, từng thế hệ đã đến, đã trưởng thành và mang theo sắc áo vàng đi khắp muôn phương. Đêm nay, chiếc bàn tiệc ấy lại được thắp sáng để đón bạn trở về.
-              </p>
-            </div>
-
-            {/* RIGHT: Pinned Keepsake Gala Invitation (5 cols) */}
-            <div className="lg:col-span-5 space-y-6">
-              
-              {/* Physical Invitation Ticket Stub */}
-              <div className="bg-[#FFFDF8] border-2 border-csg-black p-6 sm:p-8 shadow-poster relative space-y-6">
-                
-                {/* Perforated Top Seal */}
-                <div className="flex items-center justify-between border-b-2 border-dashed border-csg-black/25 pb-4">
-                  <span className="font-mono text-[11px] font-bold uppercase tracking-widest text-csg-red">
-                    THƯ MỜI HỘI NGỘ • SỐ 17
-                  </span>
-                  <span className="font-mono text-[11px] text-csg-black/50">
-                    NĂM 2009 — 2026
-                  </span>
-                </div>
-
-                {/* Event Heading */}
-                <div className="space-y-1">
-                  <h1 className="text-3xl sm:text-4xl font-display font-extrabold uppercase text-csg-black leading-[1.05] tracking-tight">
-                    ĐẠI TIỆC GALA 17Y
-                  </h1>
-                  <p className="font-editorial italic text-base text-csg-black/70">
-                    Cóc Sài Gòn — Mười Bảy Năm Một Mái Nhà
-                  </p>
-                </div>
-
-                {/* Event Particulars */}
-                <div className="font-mono text-xs divide-y divide-csg-black/15 py-1">
-                  <div className="flex justify-between py-2.5">
-                    <span className="text-csg-black/60 uppercase">THỜI GIAN:</span>
-                    <span className="font-bold text-csg-black">18:00 • Thứ Bảy, 19.12.2026</span>
-                  </div>
-                  <div className="flex justify-between py-2.5">
-                    <span className="text-csg-black/60 uppercase">ĐỊA ĐIỂM:</span>
-                    <span className="font-bold text-csg-black text-right">Asiana Plaza Tân Phú, TP. HCM</span>
-                  </div>
-                  <div className="flex justify-between py-2.5">
-                    <span className="text-csg-black/60 uppercase">TRANG PHỤC:</span>
-                    <span className="font-bold text-csg-black">Sắc Áo Vàng Truyền Thống</span>
-                  </div>
-                </div>
-
-                {/* Primary RSVP Action Right on Ticket */}
-                <div className="space-y-3 pt-2">
-                  <button
-                    onClick={openRegister}
-                    className="btn-editorial-primary w-full py-4 font-display font-extrabold text-sm sm:text-base uppercase tracking-wider flex items-center justify-center gap-2 shadow-poster"
-                  >
-                    <span>ĐĂNG KÝ THAM GIA</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </button>
-
-                  <div className="flex items-center justify-between font-mono text-xs pt-1">
-                    <button
-                      onClick={openLookup}
-                      className="text-csg-black/65 hover:text-csg-red underline decoration-1 underline-offset-4 transition-colors"
-                    >
-                      Tra cứu vé đã đặt →
-                    </button>
-                    <span className="text-csg-black/40 text-[11px]">
-                      Hạn chót: 15.12.2026
-                    </span>
-                  </div>
-                </div>
-
-              </div>
-
-              {/* Overlapping Candid Polaroid Pinned to Corner */}
-              <div className="hidden sm:flex items-center gap-4 bg-white p-3 shadow-paper-md border border-csg-black/20 -rotate-1 hover:rotate-0 transition-transform duration-300">
-                <div className="w-16 h-16 shrink-0 overflow-hidden bg-csg-muted">
-                  <img
-                    src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=300&q=80"
-                    alt="Nụ cười đồng đội"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div>
-                  <p className="font-handwriting text-xl text-csg-black/85 leading-snug">
-                    "Gặp lại những người anh, người chị, người bạn từng cùng mình trải qua thời sinh viên rực rỡ nhất."
-                  </p>
-                </div>
-              </div>
-
-            </div>
-
-          </div>
-
-        </section>
-
-        {/* ================= THE LIVING PHOTO ALBUM SPREADS ================= */}
-        <MemoryAlbum />
-
-        {/* ================= SỔ LƯU BÚT: MEMO CARD IN SCRAPBOOK ================= */}
-        <section className="max-w-xl mx-auto pt-8">
-          <div className="bg-[#FFFDF8] border-2 border-csg-black p-6 sm:p-8 shadow-poster relative space-y-4">
-            
-            {/* Memo Tape */}
-            <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 w-24 h-6 bg-[#E5DEC9]/85 border border-csg-black/10 backdrop-blur-[1px] rotate-1 shadow-sm pointer-events-none" />
-
-            <div className="text-center space-y-1">
-              <span className="font-mono text-[11px] font-bold text-csg-red uppercase tracking-widest">
-                SỔ LƯU BÚT 17 NĂM
-              </span>
-              <h2 className="text-xl sm:text-2xl font-display font-extrabold uppercase text-csg-black">
-                Để lại một dòng cho những năm tháng này
-              </h2>
-            </div>
-
-            {wishSubmitted ? (
-              <div className="p-4 bg-csg-surface border border-csg-black font-mono text-xs text-csg-black flex items-center justify-center gap-2">
-                <Check className="w-4 h-4 text-csg-red shrink-0" />
-                <span>Cảm ơn bạn. Dòng lưu bút đã được cài vào cuốn sổ kỷ niệm 17 năm!</span>
-              </div>
-            ) : (
-              <form onSubmit={handleWishSubmit} className="space-y-3">
-                <input
-                  type="text"
-                  placeholder="Tên / Khóa (VD: Anh Phát K12)"
-                  value={wishAuthor}
-                  onChange={(e) => setWishAuthor(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-csg-paper border border-csg-black/40 text-xs font-mono outline-none focus:border-csg-black focus:bg-white transition-colors"
-                  required
-                />
-                <textarea
-                  rows={2}
-                  placeholder="Một dòng gửi gắm đến Cóc Sài Gòn..."
-                  value={wishContent}
-                  onChange={(e) => setWishContent(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-csg-paper border border-csg-black/40 text-xs font-mono outline-none focus:border-csg-black focus:bg-white resize-none transition-colors"
-                  required
-                />
-                <button
-                  type="submit"
-                  className="w-full py-2.5 bg-csg-black text-csg-yellow font-mono text-xs font-bold uppercase tracking-wider hover:bg-csg-red hover:text-white transition-colors"
-                >
-                  ĐÓNG DẤU LƯU BÚT 17Y →
-                </button>
-              </form>
-            )}
-          </div>
-        </section>
-
+      {/* ================= CONTINUOUS PHOTOBOOK JOURNEY ================= */}
+      <main className="relative z-10 flex-1 max-w-[1360px] mx-auto px-4 sm:px-8 w-full py-6 sm:py-10">
+        <PhotobookFlow
+          onOpenRegister={openRegister}
+          onOpenLookup={openLookup}
+          onWishSubmit={handleWishSubmit}
+          wishSubmitted={wishSubmitted}
+        />
       </main>
 
-      {/* ================= COLOPHON FOOTER ================= */}
-      <footer className="relative z-10 bg-csg-surface border-t border-csg-black/30 py-6 px-4 sm:px-8 mt-16">
-        <div className="max-w-[1360px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 font-mono text-xs text-csg-black/70 text-center sm:text-left">
+      {/* ================= QUIET COLOPHON FOOTER ================= */}
+      <footer className="relative z-10 bg-csg-surface border-t border-csg-black/25 py-6 px-4 sm:px-8 mt-12">
+        <div className="max-w-[1360px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 font-mono text-xs text-csg-black/65 text-center sm:text-left">
           <span>CLB TRUYỀN THÔNG CÓC SÀI GÒN • 2009 — 2026 • ĐẠI TIỆC GALA 17Y TẠI ASIANA PLAZA TÂN PHÚ</span>
 
           <div className="flex items-center gap-4">
