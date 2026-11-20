@@ -10,7 +10,7 @@ import { RegistrationRecord } from './types';
 import { apiClient } from './services/apiClient';
 import { audioService } from './services/audioService';
 
-// Fallback seed registrations
+// Default initial fallback registrations
 const INITIAL_REGISTRATIONS: RegistrationRecord[] = [
   {
     id: 'reg-001',
@@ -264,38 +264,55 @@ export const App: React.FC = () => {
       {/* Main Content Area */}
       <main className="relative z-10 flex-1">
         
-        {/* ================= 01. THE NEW HERO: VISUAL CENTERPIECE ================= */}
+        {/* ================= 01. THE NEW HERO: A SCRAPBOOK OF MEMORIES ================= */}
         <section className="pt-8 sm:pt-14 pb-16 sm:pb-24 px-4 sm:px-8 max-w-[1400px] mx-auto">
-          <div className="space-y-6 sm:space-y-10">
+          <div className="space-y-8 sm:space-y-12">
             
-            {/* Top Identity Line */}
-            <div className="flex items-baseline justify-between border-b-2 border-csg-black pb-3 font-mono text-xs text-csg-black/70">
-              <span className="font-bold text-csg-black uppercase tracking-wider">
-                17 NĂM CÓC SÀI GÒN • 2009 — 2026
+            {/* Minimal Header Imprint */}
+            <div className="flex items-baseline justify-between border-b-2 border-csg-black/20 pb-3 font-mono text-xs text-csg-black/70">
+              <span className="font-bold tracking-[0.2em] uppercase text-csg-black">
+                17 YEARS OF CÓC SÀI GÒN
               </span>
               <span className="font-bold text-csg-red tracking-widest uppercase">
-                19.12.2026 • GALA DINNER
+                19.12.2026
               </span>
             </div>
 
-            {/* Visual Centerpiece (The Photobook Open Spread) */}
-            <div className="relative border-2 border-csg-black shadow-poster-lg overflow-hidden bg-csg-muted">
-              <img
-                src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=1800&q=85"
-                alt="Đại tiệc kỷ niệm Cóc Sài Gòn"
-                className="w-full aspect-[16/9] sm:aspect-[21/9] object-cover filter contrast-[102%] saturate-[105%]"
-              />
+            {/* Organic Collage of Physical Prints */}
+            <div className="relative pt-4 pb-8 sm:pb-14">
+              
+              {/* Primary Anchor Print (Bàn tiệc hội ngộ) */}
+              <div className="max-w-4xl mx-auto bg-white p-2 sm:p-4 pb-6 sm:pb-8 shadow-poster-lg border border-csg-black/40">
+                <div className="overflow-hidden bg-csg-muted">
+                  <img
+                    src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=1800&q=85"
+                    alt="Đại tiệc kỷ niệm Cóc Sài Gòn"
+                    className="w-full aspect-[16/9] sm:aspect-[21/9] object-cover filter contrast-[102%] saturate-[105%]"
+                  />
+                </div>
+              </div>
 
-              {/* Watermark 17Y inside the image */}
-              <div 
-                aria-hidden="true" 
-                className="absolute top-4 right-4 sm:top-8 sm:right-8 text-6xl sm:text-9xl font-display font-extrabold text-white/20 select-none pointer-events-none"
-              >
-                17Y
+              {/* Overlapping Candid Snapshot (Slight tilt -2deg) */}
+              <div className="hidden sm:block absolute -bottom-4 right-8 lg:right-16 w-56 md:w-64 bg-white p-2.5 pb-7 shadow-poster-lg border border-csg-black/40 -rotate-2 hover:rotate-0 transition-transform duration-300">
+                <div className="overflow-hidden bg-csg-muted">
+                  <img
+                    src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=800&q=85"
+                    alt="Những nụ cười đồng đội"
+                    className="w-full aspect-[4/3] object-cover"
+                  />
+                </div>
+                <p className="font-editorial italic text-xs text-csg-black/80 pt-2 text-center">
+                  "Nơi thanh xuân tụ hội."
+                </p>
+              </div>
+
+              {/* 17Y Anniversary Stamp */}
+              <div className="hidden sm:block absolute top-0 left-6 sm:left-12 px-3 py-1 bg-csg-yellow border-2 border-csg-black shadow-poster-sm rotate-[-3deg] font-mono text-xs font-extrabold uppercase">
+                ★ 17 NĂM SẮC ÁO VÀNG
               </div>
             </div>
 
-            {/* Short Meaningful Headline & Direct Action */}
+            {/* Minimalist Narrative & Single Clear CTA */}
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pt-2">
               <div className="space-y-2 max-w-2xl">
                 <h1 className="text-4xl sm:text-6xl lg:text-7xl font-display font-extrabold uppercase tracking-tight text-csg-black leading-[0.92]">
@@ -304,16 +321,16 @@ export const App: React.FC = () => {
                     Mình Đã Cùng Nhau.
                   </span>
                 </h1>
-                <p className="font-editorial italic text-base sm:text-lg text-csg-black/75 pt-1">
-                  "Không cần đọc nhiều. Chỉ cần nhìn những bức ảnh, là nhớ lại những năm tháng đó."
+                <p className="font-editorial italic text-lg sm:text-2xl text-csg-black/75 pt-1">
+                  "Some memories never leave."
                 </p>
               </div>
 
-              {/* Primary Single CTA */}
-              <div className="shrink-0 flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+              {/* Single Clear Primary CTA */}
+              <div className="shrink-0">
                 <button
                   onClick={openRegister}
-                  className="btn-editorial-primary px-8 py-4 font-display font-extrabold text-base sm:text-lg uppercase tracking-wider flex items-center justify-center gap-2 shadow-poster"
+                  className="btn-editorial-primary w-full sm:w-auto px-8 py-4 font-display font-extrabold text-base sm:text-lg uppercase tracking-wider flex items-center justify-center gap-2 shadow-poster"
                 >
                   <span>ĐĂNG KÝ THAM GIA</span>
                   <ArrowRight className="w-5 h-5" />
@@ -327,49 +344,51 @@ export const App: React.FC = () => {
         {/* ================= 02. MEMORY ALBUM: FLUID PHOTO JOURNEY ================= */}
         <MemoryAlbum />
 
-        {/* ================= 03. COMPACT EVENT INVITATION ================= */}
+        {/* ================= 03. COMPACT EVENT INVITATION CARD ================= */}
         <section id="event" className="py-20 sm:py-28 px-4 sm:px-8 max-w-[1400px] mx-auto border-t-2 border-csg-black">
-          <div className="bg-csg-surface border-2 border-csg-black shadow-poster p-6 sm:p-12">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          <div className="max-w-4xl mx-auto bg-csg-surface border-2 border-csg-black shadow-poster p-6 sm:p-10">
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
               
               {/* Event Title */}
-              <div className="lg:col-span-5 space-y-2">
+              <div className="md:col-span-5 space-y-1">
                 <span className="font-mono text-xs font-bold text-csg-red tracking-widest uppercase">
-                  THƯ MỜI SỰ KIỆN
+                  THƯ MỜI HỘI NGỘ
                 </span>
-                <h2 className="text-3xl sm:text-5xl font-display font-extrabold uppercase text-csg-black leading-[0.95]">
-                  Đại Tiệc Gala 17Y <br />
-                  <span className="font-editorial italic font-normal text-csg-red text-2xl sm:text-4xl">Đêm Hội Ngộ.</span>
+                <h2 className="text-3xl sm:text-4xl font-display font-extrabold uppercase text-csg-black leading-tight">
+                  Đại Tiệc Gala 17Y
                 </h2>
+                <p className="font-editorial italic text-sm text-csg-black/70">
+                  "Một đêm ngồi lại bên nhau."
+                </p>
               </div>
 
-              {/* Essential Event Metadata List */}
-              <div className="lg:col-span-4 font-mono text-xs sm:text-sm divide-y divide-csg-black/15 py-1">
-                <div className="flex justify-between py-2.5">
+              {/* Essential Event Metadata */}
+              <div className="md:col-span-4 font-mono text-xs divide-y divide-csg-black/15 py-1">
+                <div className="flex justify-between py-2">
                   <span className="text-csg-black/60 uppercase">THỜI GIAN:</span>
-                  <span className="font-bold text-csg-black">18:00 • Thứ Bảy, 19.12.2026</span>
+                  <span className="font-bold text-csg-black">18:00 • 19.12.2026</span>
                 </div>
-                <div className="flex justify-between py-2.5">
+                <div className="flex justify-between py-2">
                   <span className="text-csg-black/60 uppercase">ĐỊA ĐIỂM:</span>
-                  <span className="font-bold text-csg-black">Asiana Plaza Tân Phú, TP. HCM</span>
+                  <span className="font-bold text-csg-black">Asiana Plaza Tân Phú</span>
                 </div>
-                <div className="flex justify-between py-2.5">
+                <div className="flex justify-between py-2">
                   <span className="text-csg-black/60 uppercase">TRANG PHỤC:</span>
-                  <span className="font-bold text-csg-black">Sắc Áo Vàng truyền thống</span>
+                  <span className="font-bold text-csg-black">Sắc Áo Vàng</span>
                 </div>
               </div>
 
               {/* Action Column */}
-              <div className="lg:col-span-3 flex flex-col items-stretch lg:items-end gap-3">
+              <div className="md:col-span-3 flex flex-col items-stretch md:items-end gap-2.5">
                 <button
                   onClick={openRegister}
-                  className="btn-editorial-primary px-6 py-4 font-display font-extrabold text-sm sm:text-base uppercase tracking-wider shadow-poster flex items-center justify-center gap-2"
+                  className="btn-editorial-primary px-6 py-3.5 font-display font-extrabold text-sm uppercase tracking-wider shadow-poster flex items-center justify-center gap-1.5"
                 >
                   <span>ĐĂNG KÝ VÉ ↗</span>
                 </button>
                 <button
                   onClick={openLookup}
-                  className="font-mono text-xs text-csg-black/70 hover:text-csg-red underline decoration-1 underline-offset-4 text-center lg:text-right"
+                  className="font-mono text-xs text-csg-black/70 hover:text-csg-red underline decoration-1 underline-offset-4 text-center md:text-right"
                 >
                   Tra cứu vé đã đặt →
                 </button>
@@ -388,7 +407,7 @@ export const App: React.FC = () => {
           {wishSubmitted ? (
             <div className="p-4 bg-csg-surface border-2 border-csg-black font-mono text-xs text-csg-black flex items-center justify-center gap-2">
               <Check className="w-4 h-4 text-csg-red" />
-              <span>Cảm ơn bạn. Lời chúc đã được lưu lại trong kỷ yếu 17 năm!</span>
+              <span>Cảm ơn bạn. Lời chúc đã được lưu lại trong cuốn sổ kỷ yếu 17 năm!</span>
             </div>
           ) : (
             <form onSubmit={handleWishSubmit} className="space-y-3 text-left">
@@ -403,7 +422,7 @@ export const App: React.FC = () => {
                 />
                 <input
                   type="text"
-                  placeholder="Một dòng gửi Cóc Sài Gòn..."
+                  placeholder="Một dòng nhắn gửi Cóc Sài Gòn..."
                   value={wishContent}
                   onChange={(e) => setWishContent(e.target.value)}
                   className="px-3.5 py-2.5 bg-csg-paper border-2 border-csg-black text-xs font-mono flex-1 outline-none focus:bg-white"
@@ -445,6 +464,17 @@ export const App: React.FC = () => {
           </div>
         </div>
       </footer>
+
+      {/* ================= MOBILE STICKY CTA PILL ================= */}
+      <div className="sm:hidden fixed bottom-5 right-5 z-40 animate-fadeIn">
+        <button
+          onClick={openRegister}
+          className="btn-editorial-primary px-4 py-2.5 font-display font-extrabold text-xs uppercase shadow-poster flex items-center gap-1.5"
+          aria-label="Đăng ký tham gia 17Y"
+        >
+          <span>ĐĂNG KÝ 17Y ↗</span>
+        </button>
+      </div>
 
       {/* ================= FUNCTIONAL MODALS (100% PRESERVED) ================= */}
       <RegistrationModal
