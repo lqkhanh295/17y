@@ -65,8 +65,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
   const totalFee = isAlumni ? 449000 : 349000;
   
   let currentPayAmount = totalFee;
-  if (plan === 'DEPOSIT_100') currentPayAmount = 100000;
-  if (plan === 'DEPOSIT_150') currentPayAmount = 150000;
+  if (plan === 'DEPOSIT_150' || plan === 'DEPOSIT_100') currentPayAmount = 150000;
   const remainingAmount = totalFee - currentPayAmount;
 
   // VietQR Config
@@ -444,8 +443,8 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                 </div>
               </div>
 
-              {/* 3 Payment Options */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              {/* 2 Payment Options: 100% Trọn Gói & Đặt Cọc 150K */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <div
                   onClick={() => setPlan('FULL')}
                   className={`p-4 rounded-sm border-2 cursor-pointer transition-all ${
@@ -458,8 +457,8 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                     <span className="text-xs font-mono font-bold uppercase">100% TRỌN GÓI</span>
                     <span className="text-[9px] px-1.5 py-0.5 rounded bg-[#20231F] text-[#F4C542] font-bold">KHUYÊN DÙNG</span>
                   </div>
-                  <div className="text-xl font-display font-bold">{totalFee.toLocaleString('vi-VN')} đ</div>
-                  <p className="text-[11px] text-[#20231F]/70 mt-1">Hoàn tất ngay, nhận vé VIP sớm.</p>
+                  <div className="text-2xl font-display font-bold">{totalFee.toLocaleString('vi-VN')} đ</div>
+                  <p className="text-[11px] text-[#20231F]/70 mt-1">Hoàn tất ngay, nhận vé VIP chính thức sớm.</p>
                 </div>
 
                 <div
@@ -470,22 +469,12 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                       : 'bg-white border-[#20231F] hover:bg-[#F4EEDF]'
                   }`}
                 >
-                  <span className="text-xs font-mono font-bold uppercase block mb-1">ĐẶT CỌC 150K</span>
-                  <div className="text-xl font-display font-bold">150.000 đ</div>
-                  <p className="text-[11px] text-[#20231F]/70 mt-1">Còn lại: {(totalFee - 150000).toLocaleString('vi-VN')}đ đóng sau.</p>
-                </div>
-
-                <div
-                  onClick={() => setPlan('DEPOSIT_100')}
-                  className={`p-4 rounded-sm border-2 cursor-pointer transition-all ${
-                    plan === 'DEPOSIT_100'
-                      ? 'bg-[#F4C542] border-[#20231F] shadow-poster-sm'
-                      : 'bg-white border-[#20231F] hover:bg-[#F4EEDF]'
-                  }`}
-                >
-                  <span className="text-xs font-mono font-bold uppercase block mb-1">ĐẶT CỌC 100K</span>
-                  <div className="text-xl font-display font-bold">100.000 đ</div>
-                  <p className="text-[11px] text-[#20231F]/70 mt-1">Còn lại: {(totalFee - 100000).toLocaleString('vi-VN')}đ đóng sau.</p>
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="text-xs font-mono font-bold uppercase">ĐẶT CỌC GIỮ CHỖ</span>
+                    <span className="text-[9px] px-1.5 py-0.5 rounded bg-[#B94D35] text-white font-bold">CỌC 150K</span>
+                  </div>
+                  <div className="text-2xl font-display font-bold">150.000 đ</div>
+                  <p className="text-[11px] text-[#20231F]/70 mt-1">Còn lại: {(totalFee - 150000).toLocaleString('vi-VN')}đ đóng sau trước sự kiện.</p>
                 </div>
               </div>
 
@@ -833,7 +822,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                   <div>
                     <span className="text-[10px] font-mono text-[#20231F]/60 uppercase block">Gói & Biên lai thanh toán</span>
                     <span className="font-bold text-sm text-[#B94D35]">
-                      {plan === 'FULL' ? 'Đóng trọn gói 100%' : (plan === 'DEPOSIT_150' ? 'Đặt cọc 150.000đ' : 'Đặt cọc 100.000đ')}
+                      {plan === 'FULL' ? 'Đóng trọn gói 100%' : 'Đặt cọc giữ chỗ 150.000đ'}
                     </span>
                     <span className="text-xs text-[#20231F]/70 block">
                       Đã nộp: {currentPayAmount.toLocaleString('vi-VN')}đ {remainingAmount > 0 && `(Còn lại: ${remainingAmount.toLocaleString('vi-VN')}đ)`}
