@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Camera, Heart, Sparkles, X, ZoomIn, Calendar, Bookmark, ChevronLeft, ChevronRight, Tag, Folder } from 'lucide-react';
+import { ZoomIn, X, ChevronLeft, ChevronRight, Folder, Bookmark } from 'lucide-react';
 
 export interface PhotobookItem {
   id: string;
@@ -27,9 +27,9 @@ const PHOTOBOOK_ARCHIVE: PhotobookItem[] = [
     title: 'Đêm Hoàng Kim Cóc 16 Tuổi',
     caption: 'Hơn 120 thành viên qua các thế hệ tề tựu trong không gian ấm áp tại Sài Gòn, cùng nâng ly và thổi nến mừng 16 năm thành lập CLB.',
     note: 'Khoảnh khắc toàn thể anh em cùng hô vang khẩu hiệu Cóc Sài Gòn!',
-    url: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=1000&q=80',
+    url: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=1200&q=80',
     department: 'Ban Sự kiện & Ban Kỹ thuật',
-    archiveCode: 'CSG-ARC-2025-16Y',
+    archiveCode: 'PLATE 01 // CSG-ARC-2025-16Y',
     aspectRatio: 'landscape'
   },
   {
@@ -43,7 +43,7 @@ const PHOTOBOOK_ARCHIVE: PhotobookItem[] = [
     note: 'Tri ân các thế hệ Chủ nhiệm và Trưởng ban qua từng thời kỳ.',
     url: 'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?auto=format&fit=crop&w=800&q=80',
     department: 'Ban Điều Hành & Ban Nội dung',
-    archiveCode: 'CSG-ARC-2024-15Y',
+    archiveCode: 'PLATE 02 // CSG-ARC-2024-15Y',
     aspectRatio: 'square'
   },
   {
@@ -56,7 +56,7 @@ const PHOTOBOOK_ARCHIVE: PhotobookItem[] = [
     caption: 'Những tiết mục văn nghệ tự biên tự diễn mang đậm chất phóng khoáng, trẻ trung và không ngại thử thách của sinh viên truyền thông.',
     url: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=800&q=80',
     department: 'Ban Sự kiện',
-    archiveCode: 'CSG-ARC-2023-14Y',
+    archiveCode: 'PLATE 03 // CSG-ARC-2023-14Y',
     aspectRatio: 'portrait'
   },
 
@@ -70,9 +70,9 @@ const PHOTOBOOK_ARCHIVE: PhotobookItem[] = [
     title: 'Biển Vũng Tàu & Màu Áo Truyền Thống',
     caption: 'Cháy hết mình với chuỗi trò chơi vận động bãi biển. Nơi những gương mặt mới bước vào trường nhanh chóng trở thành người một nhà.',
     note: 'Đêm lửa trại không ngủ với những lời tâm sự chân thành bên bờ biển.',
-    url: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1000&q=80',
+    url: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1200&q=80',
     department: 'Toàn thể thành viên CSG',
-    archiveCode: 'CSG-ARC-2025-TB',
+    archiveCode: 'PLATE 04 // CSG-ARC-2025-TB',
     aspectRatio: 'landscape'
   },
   {
@@ -85,7 +85,7 @@ const PHOTOBOOK_ARCHIVE: PhotobookItem[] = [
     caption: 'Những cái ôm siết chặt và tiếng cười giòn giã giữa thiên nhiên, thắt chặt tình cảm giữa các thế hệ anh chị và các em khóa mới.',
     url: 'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&w=800&q=80',
     department: 'Ban Nhân sự & Ban Sự kiện',
-    archiveCode: 'CSG-ARC-2024-TRIP',
+    archiveCode: 'PLATE 05 // CSG-ARC-2024-TRIP',
     aspectRatio: 'square'
   },
 
@@ -101,7 +101,7 @@ const PHOTOBOOK_ARCHIVE: PhotobookItem[] = [
     note: 'Kíp máy ảnh và flycam hoạt động liên tục 14 tiếng.',
     url: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=800&q=80',
     department: 'Ban Kỹ thuật & Nhiếp ảnh',
-    archiveCode: 'CSG-ARC-2025-FCAMP',
+    archiveCode: 'PLATE 06 // CSG-ARC-2025-FCAMP',
     aspectRatio: 'portrait'
   },
   {
@@ -112,9 +112,9 @@ const PHOTOBOOK_ARCHIVE: PhotobookItem[] = [
     year: '2024',
     title: 'Bàn Tròn Sáng Tạo & Dựng Bài',
     caption: 'Buổi chia sẻ kỹ năng thiết kế đồ họa, chỉnh màu ảnh và viết bài truyền thông giữa các mentor tiền bối và đàn em khóa dưới.',
-    url: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=800&q=80',
+    url: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=1000&q=80',
     department: 'Ban Thiết kế & Ban Nội dung',
-    archiveCode: 'CSG-ARC-2024-WS',
+    archiveCode: 'PLATE 07 // CSG-ARC-2024-WS',
     aspectRatio: 'landscape'
   }
 ];
@@ -158,28 +158,31 @@ export const MemoryWall: React.FC = () => {
   }, [selectedPhotoIndex, handlePrev, handleNext]);
 
   return (
-    <section id="ky-niem" className="py-24 px-4 sm:px-6 max-w-7xl mx-auto border-t-2 border-csg-black">
-      {/* Editorial Chapter Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b-2 border-csg-black mb-10">
-        <div className="space-y-2">
+    <section id="ky-niem" className="py-20 sm:py-28 px-4 sm:px-6 max-w-7xl mx-auto border-t-2 border-csg-black">
+      {/* Exhibition Masthead Header */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b-2 border-csg-black mb-12">
+        <div className="space-y-2 max-w-3xl">
           <div className="flex items-center gap-3">
-            <span className="stamp-seal">TƯ LIỆU KỶ YẾU</span>
+            <span className="font-mono text-xs font-bold text-csg-red uppercase tracking-widest">
+              LƯU TRỮ TƯ LIỆU // VOL. 17
+            </span>
+            <span className="text-csg-black/30">•</span>
             <span className="text-xs font-mono text-csg-black/60 uppercase tracking-widest">
-              HÀNH TRÌNH 17 NĂM SẮC ÁO VÀNG (2009 - 2026)
+              2009 - 2026
             </span>
           </div>
           <h2 className="text-3xl sm:text-5xl font-display font-extrabold uppercase tracking-tight text-csg-black leading-none">
-            Cuốn Kỷ Yếu Sống Động
+            Cuốn Kỷ Yếu 17 Năm
           </h2>
-          <p className="font-editorial italic text-base sm:text-lg text-csg-black/80 max-w-2xl">
-            "Không chỉ là những bức ảnh lưu niệm, đây là trang nhật ký bằng hình ảnh đọng lại từng nụ cười, giọt mồ hôi và nhiệt huyết của tuổi trẻ FPTU."
+          <p className="font-editorial italic text-base sm:text-lg text-csg-black/85 leading-relaxed pt-1">
+            "Không chỉ là những bức ảnh lưu niệm, đây là trang nhật ký hình ảnh ghi lại từng nụ cười, giọt mồ hôi và nhiệt huyết của bao thế hệ Cóc Sài Gòn."
           </p>
         </div>
 
-        {/* Chapter Tabs */}
+        {/* Chapter Filter Navigation */}
         <div className="flex flex-wrap items-center gap-2">
           {[
-            { id: 'ALL', label: 'Toàn Bộ Tư Liệu' },
+            { id: 'ALL', label: 'Tất Cả Tư Liệu' },
             { id: 'GALA', label: 'Chương I: Gala Nights' },
             { id: 'TEAMBUILDING', label: 'Chương II: Dã Ngoại' },
             { id: 'FIELD_WORK', label: 'Chương III: Tác Nghiệp' },
@@ -190,10 +193,10 @@ export const MemoryWall: React.FC = () => {
                 setActiveChapter(tab.id);
                 setSelectedPhotoIndex(null);
               }}
-              className={`px-3.5 py-2 text-xs font-mono uppercase tracking-wider transition-all border ${
+              className={`px-3.5 py-1.5 text-xs font-mono uppercase tracking-wider transition-all border ${
                 activeChapter === tab.id
-                  ? 'bg-csg-black text-csg-paper border-csg-black shadow-poster-sm font-bold'
-                  : 'bg-csg-surface text-csg-black/80 border-csg-muted hover:border-csg-black hover:bg-csg-paper'
+                  ? 'bg-csg-black text-csg-paper border-csg-black font-bold'
+                  : 'bg-transparent text-csg-black/75 border-csg-black/20 hover:border-csg-black hover:text-csg-black'
               }`}
             >
               {tab.label}
@@ -202,179 +205,172 @@ export const MemoryWall: React.FC = () => {
         </div>
       </div>
 
-      {/* Asymmetrical Editorial Photobook Layout */}
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
-        {filteredArchive.map((item, index) => {
-          // Asymmetrical layout logic: item 0 and 3 take 8 cols, others take 4 or 6 cols
-          const colSpan = (index % 3 === 0) 
-            ? 'md:col-span-8' 
-            : (index % 3 === 1) 
-            ? 'md:col-span-4' 
-            : 'md:col-span-6';
+      {/* Curated Editorial Art Book Gallery (Unboxed, Photography-First) */}
+      <div className="space-y-16 sm:space-y-24">
+        {/* Dynamic Spread: Lead Hero Spread + Diptychs */}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-14 items-start">
+          {filteredArchive.map((item, index) => {
+            // Asymmetric rhythm: index 0 and 3 are panoramic spreads (8 cols), others are 4 or 6 cols
+            const isFullSpread = index % 3 === 0;
+            const colSpan = isFullSpread ? 'md:col-span-8' : index % 3 === 1 ? 'md:col-span-4' : 'md:col-span-6';
+            const isBookmarked = bookmarkedIds[item.id];
 
-          const isBookmarked = bookmarkedIds[item.id];
-          const rotation = index % 2 === 0 ? '-rotate-0.5' : 'rotate-0.5';
+            return (
+              <article
+                key={item.id}
+                onClick={() => setSelectedPhotoIndex(index)}
+                className={`${colSpan} group cursor-pointer space-y-3`}
+              >
+                {/* Pure Photography Container */}
+                <div className="relative bg-csg-muted overflow-hidden border border-csg-black/40">
+                  <img
+                    src={item.url}
+                    alt={item.title}
+                    className={`w-full object-cover transition-transform duration-700 group-hover:scale-[1.03] ${
+                      item.aspectRatio === 'landscape'
+                        ? 'aspect-[16/10]'
+                        : item.aspectRatio === 'portrait'
+                        ? 'aspect-[3/4]'
+                        : 'aspect-square'
+                    }`}
+                    loading="lazy"
+                  />
 
-          return (
-            <div
-              key={item.id}
-              onClick={() => setSelectedPhotoIndex(index)}
-              className={`${colSpan} group bg-csg-surface border-2 border-csg-black p-4 shadow-poster-sm hover:shadow-poster hover:-translate-y-1 transition-all duration-300 cursor-pointer ${rotation} hover:rotate-0`}
-            >
-              {/* Photo Area with tape and analogue border */}
-              <div className="polaroid-tape relative bg-csg-muted border border-csg-black/25 overflow-hidden mb-4">
-                <img
-                  src={item.url}
-                  alt={item.title}
-                  className={`w-full object-cover transition-transform duration-500 group-hover:scale-105 ${
-                    item.aspectRatio === 'landscape' 
-                      ? 'aspect-[16/10]' 
-                      : item.aspectRatio === 'portrait' 
-                      ? 'aspect-[3/4]' 
-                      : 'aspect-square'
-                  }`}
-                  loading="lazy"
-                />
-
-                {/* Top Corner Meta */}
-                <div className="absolute top-3 left-3 px-2 py-0.5 bg-csg-paper/95 border border-csg-black text-[10px] font-mono font-bold uppercase text-csg-black shadow-sm">
-                  {item.season}
-                </div>
-
-                <div className="absolute top-3 right-3 px-2 py-0.5 bg-csg-black text-csg-yellow text-[10px] font-mono font-bold shadow-sm">
-                  {item.year}
-                </div>
-
-                {/* Hover overlay hint */}
-                <div className="absolute inset-0 bg-csg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
-                  <div className="px-4 py-2 bg-csg-paper text-csg-black font-mono text-xs font-bold border-2 border-csg-black flex items-center gap-1.5 shadow-poster-sm">
-                    <ZoomIn className="w-3.5 h-3.5 text-csg-red" />
-                    <span>Xem phóng to & tư liệu</span>
+                  {/* Discrete Zoom Hint */}
+                  <div className="absolute bottom-3 right-3 bg-csg-paper/90 border border-csg-black px-2 py-1 text-[10px] font-mono font-bold flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <ZoomIn className="w-3 h-3 text-csg-red" />
+                    <span>PHÓNG TO</span>
                   </div>
                 </div>
-              </div>
 
-              {/* Editorial Captions & Story */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-xs font-mono text-csg-black/60 border-b border-csg-muted pb-1.5">
-                  <span className="flex items-center gap-1">
-                    <Folder className="w-3 h-3 text-csg-red" />
-                    {item.department}
-                  </span>
-                  <button
-                    onClick={(e) => toggleBookmark(item.id, e)}
-                    className="flex items-center gap-1 hover:text-csg-red transition-colors"
-                    title={isBookmarked ? 'Bỏ lưu' : 'Lưu trang tư liệu'}
-                  >
-                    <Bookmark className={`w-3.5 h-3.5 ${isBookmarked ? 'fill-csg-red text-csg-red' : ''}`} />
-                    <span>{isBookmarked ? 'Đã lưu' : 'Đánh dấu'}</span>
-                  </button>
-                </div>
+                {/* Museum-Grade Archival Captions */}
+                <div className="space-y-1.5 pt-1">
+                  <div className="flex items-center justify-between font-mono text-[11px] text-csg-black/60 border-b border-csg-black/15 pb-1">
+                    <span className="font-bold text-csg-black">{item.archiveCode}</span>
+                    <div className="flex items-center gap-3">
+                      <span>{item.year}</span>
+                      <button
+                        onClick={(e) => toggleBookmark(item.id, e)}
+                        className="hover:text-csg-red transition-colors"
+                        title={isBookmarked ? 'Bỏ lưu' : 'Đánh dấu'}
+                      >
+                        <Bookmark className={`w-3.5 h-3.5 ${isBookmarked ? 'fill-csg-red text-csg-red' : ''}`} />
+                      </button>
+                    </div>
+                  </div>
 
-                <h3 className="font-display font-extrabold text-xl text-csg-black group-hover:text-csg-red transition-colors leading-tight">
-                  {item.title}
-                </h3>
+                  <h3 className="font-display font-extrabold text-lg sm:text-xl text-csg-black group-hover:text-csg-red transition-colors leading-tight">
+                    {item.title}
+                  </h3>
 
-                <p className="text-xs sm:text-sm text-csg-black/80 font-sans leading-relaxed">
-                  {item.caption}
-                </p>
-
-                {item.note && (
-                  <p className="font-handwriting text-base text-csg-red/90 pt-1 leading-snug">
-                    * {item.note}
+                  <p className="text-xs sm:text-sm text-csg-black/80 font-sans leading-relaxed">
+                    {item.caption}
                   </p>
-                )}
-              </div>
-            </div>
-          );
-        })}
+
+                  {item.note && (
+                    <p className="font-handwriting text-base text-csg-red/90 pt-0.5 leading-snug">
+                      * {item.note}
+                    </p>
+                  )}
+                </div>
+              </article>
+            );
+          })}
+        </div>
       </div>
 
-      {/* Accessible Keyboard-Controlled Lightbox Modal */}
+      {/* Accessible Fullscreen Darkroom Lightbox */}
       {selectedItem && selectedPhotoIndex !== null && (
         <div
           role="dialog"
           aria-modal="true"
           aria-label={selectedItem.title}
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-csg-black/90 backdrop-blur-md animate-fadeIn"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-8 bg-[#11100E]/95 backdrop-blur-md animate-fadeIn"
           onClick={() => setSelectedPhotoIndex(null)}
         >
           <div
-            className="relative max-w-4xl w-full bg-csg-paper border-2 border-csg-black overflow-hidden shadow-poster-lg"
+            className="relative max-w-5xl w-full bg-[#1A1815] border border-[#F4EEDF]/20 text-[#F4EEDF] overflow-hidden shadow-2xl flex flex-col md:flex-row max-h-[90vh]"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Top Toolbar */}
-            <div className="flex items-center justify-between p-3.5 bg-csg-surface border-b-2 border-csg-black">
-              <div className="flex items-center gap-3">
-                <span className="font-mono text-xs font-bold text-csg-black px-2.5 py-1 bg-csg-yellow border border-csg-black shadow-poster-sm">
-                  TƯ LIỆU {selectedPhotoIndex + 1} / {filteredArchive.length}
-                </span>
-                <span className="text-xs font-mono text-csg-black/70 hidden sm:inline">
-                  {selectedItem.archiveCode}
-                </span>
-              </div>
-
-              <button
-                onClick={() => setSelectedPhotoIndex(null)}
-                aria-label="Đóng xem tư liệu"
-                className="w-8 h-8 rounded-none bg-csg-black text-csg-paper hover:bg-csg-red transition-colors flex items-center justify-center border border-csg-black font-bold"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* Navigation Buttons */}
+            {/* Close Button */}
             <button
-              onClick={handlePrev}
-              aria-label="Trang trước"
-              className="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-csg-paper hover:bg-csg-yellow text-csg-black border-2 border-csg-black shadow-poster-sm flex items-center justify-center transition-all"
+              onClick={() => setSelectedPhotoIndex(null)}
+              className="absolute top-4 right-4 z-20 p-2 bg-[#2A2722] hover:bg-[#B94D35] text-[#F4EEDF] transition-colors"
+              aria-label="Đóng xem chi tiết"
             >
-              <ChevronLeft className="w-6 h-6" />
+              <X className="w-5 h-5" />
             </button>
 
-            <button
-              onClick={handleNext}
-              aria-label="Trang sau"
-              className="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-csg-paper hover:bg-csg-yellow text-csg-black border-2 border-csg-black shadow-poster-sm flex items-center justify-center transition-all"
-            >
-              <ChevronRight className="w-6 h-6" />
-            </button>
-
-            {/* Photo Canvas */}
-            <div className="max-h-[60vh] bg-csg-black flex items-center justify-center overflow-hidden">
+            {/* High-Res Photograph */}
+            <div className="flex-1 bg-[#0E0D0B] flex items-center justify-center p-4 min-h-[300px] md:min-h-[500px]">
               <img
                 src={selectedItem.url}
                 alt={selectedItem.title}
-                className="max-h-[60vh] w-auto object-contain select-none"
+                className="max-h-[75vh] w-auto max-w-full object-contain"
               />
             </div>
 
-            {/* Editorial Metadata Footer */}
-            <div className="p-6 bg-csg-surface border-t-2 border-csg-black space-y-3">
-              <div className="flex flex-wrap items-center justify-between gap-2 text-xs font-mono text-csg-black/70 border-b border-csg-muted pb-2">
-                <span className="stamp-seal">
-                  {selectedItem.season} • NĂM {selectedItem.year}
-                </span>
-                <span>Phụ trách: <strong>{selectedItem.department}</strong></span>
+            {/* Archival Dossier Side Panel */}
+            <div className="w-full md:w-80 p-6 flex flex-col justify-between border-t md:border-t-0 md:border-l border-[#F4EEDF]/15 bg-[#181613]">
+              <div className="space-y-4">
+                <div className="space-y-1">
+                  <span className="font-mono text-xs text-[#F4C542] tracking-widest uppercase block">
+                    {selectedItem.archiveCode}
+                  </span>
+                  <span className="font-mono text-[10px] text-[#DCD5C4]/60 uppercase block">
+                    {selectedItem.chapterTitle}
+                  </span>
+                </div>
+
+                <h3 className="font-display font-bold text-2xl text-[#F4EEDF] leading-tight">
+                  {selectedItem.title}
+                </h3>
+
+                <p className="text-sm text-[#DCD5C4]/90 font-sans leading-relaxed">
+                  {selectedItem.caption}
+                </p>
+
+                {selectedItem.note && (
+                  <p className="font-handwriting text-lg text-[#F4C542] pt-2 border-t border-[#F4EEDF]/15">
+                    "{selectedItem.note}"
+                  </p>
+                )}
+
+                <div className="space-y-2 pt-4 border-t border-[#F4EEDF]/15 font-mono text-xs text-[#DCD5C4]/70">
+                  <div className="flex justify-between">
+                    <span>MÙA SỰ KIỆN:</span>
+                    <span className="text-[#F4EEDF] font-bold">{selectedItem.season}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>NĂM TƯ LIỆU:</span>
+                    <span className="text-[#F4EEDF] font-bold">{selectedItem.year}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>ĐƠN VỊ THỰC HIỆN:</span>
+                    <span className="text-[#F4EEDF] font-bold">{selectedItem.department}</span>
+                  </div>
+                </div>
               </div>
 
-              <h4 className="text-2xl font-display font-extrabold text-csg-black uppercase">
-                {selectedItem.title}
-              </h4>
-
-              <p className="text-sm text-csg-black/85 font-sans leading-relaxed">
-                {selectedItem.caption}
-              </p>
-
-              {selectedItem.note && (
-                <p className="font-handwriting text-lg text-csg-red">
-                  Ghi chú lưu bút: "{selectedItem.note}"
-                </p>
-              )}
-
-              <div className="pt-2 flex items-center justify-between text-xs font-mono text-csg-black/50 border-t border-csg-black/10">
-                <span>Dùng phím [←] và [→] để chuyển ảnh • [Esc] để thoát</span>
-                <span className="text-csg-red font-bold">#CocSaiGon17Y</span>
+              {/* Prev / Next Pagination */}
+              <div className="flex items-center justify-between pt-6 border-t border-[#F4EEDF]/15 mt-6 font-mono text-xs">
+                <button
+                  onClick={handlePrev}
+                  className="px-3 py-1.5 bg-[#25221D] hover:bg-[#F4C542] hover:text-[#20231F] text-[#F4EEDF] transition-colors flex items-center gap-1"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                  <span>TRƯỚC</span>
+                </button>
+                <span className="text-[#DCD5C4]/60">
+                  {selectedPhotoIndex + 1} / {filteredArchive.length}
+                </span>
+                <button
+                  onClick={handleNext}
+                  className="px-3 py-1.5 bg-[#25221D] hover:bg-[#F4C542] hover:text-[#20231F] text-[#F4EEDF] transition-colors flex items-center gap-1"
+                >
+                  <span>TIẾP</span>
+                  <ChevronRight className="w-4 h-4" />
+                </button>
               </div>
             </div>
           </div>

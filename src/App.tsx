@@ -344,50 +344,44 @@ export const App: React.FC = () => {
       {/* Navigation Header */}
       <header className="sticky top-0 z-40 bg-csg-paper/95 backdrop-blur-md border-b-2 border-csg-black">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between">
-          {/* Logo & Brand */}
+          {/* Masthead Brand */}
           <a href="/" onClick={(e) => { e.preventDefault(); closeModals(); }} className="flex items-center gap-3 group">
-            <div className="relative w-11 h-11 bg-csg-yellow border-2 border-csg-black flex items-center justify-center text-csg-black font-extrabold text-2xl shadow-poster-sm transition-transform group-hover:scale-105">
+            <div className="w-10 h-10 bg-csg-yellow border-2 border-csg-black flex items-center justify-center text-csg-black font-extrabold text-xl shadow-poster-sm transition-transform group-hover:scale-105">
               <span>🐸</span>
-              <span className="absolute -bottom-2 -right-1 px-1 bg-csg-black text-[9px] font-mono font-bold text-csg-yellow">
-                17Y
-              </span>
             </div>
             <div>
               <span className="font-display font-extrabold text-lg sm:text-xl uppercase tracking-tight text-csg-black block leading-none">
                 CÓC SÀI GÒN <span className="text-csg-red">17Y</span>
               </span>
               <span className="text-[10px] font-mono tracking-widest text-csg-black/70 uppercase">
-                CLB Truyền Thông • 2009 - 2026
+                Ấn Phẩm Kỷ Niệm 17 Năm • 2009 - 2026
               </span>
             </div>
           </a>
 
           {/* Quick Nav Links */}
-          <nav className="hidden lg:flex items-center gap-6 text-xs font-bold uppercase tracking-wider text-csg-black/80 font-mono">
+          <nav className="hidden lg:flex items-center gap-8 text-xs font-bold uppercase tracking-wider text-csg-black/80 font-mono">
             <a href="#the-party" className="hover:text-csg-red hover:underline decoration-csg-yellow decoration-2 transition-colors">
               The Party
             </a>
             <a href="#ky-niem" className="hover:text-csg-red hover:underline decoration-csg-yellow decoration-2 transition-colors">
-              Photobook Kỷ Niệm
+              Kỷ Yếu Kỷ Niệm
             </a>
             <a href="#wishes" className="hover:text-csg-red hover:underline decoration-csg-yellow decoration-2 transition-colors">
-              Wish Gate
+              Lưu Bút 17Y
             </a>
             <a href="#san-khau" className="hover:text-csg-red hover:underline decoration-csg-yellow decoration-2 transition-colors">
               Stage 17Y
             </a>
           </nav>
 
-          {/* Action Buttons */}
-          <div className="flex items-center gap-2 sm:gap-3">
+          {/* Action Links */}
+          <div className="flex items-center gap-3 sm:gap-4">
             <button
               onClick={openLookup}
-              className="px-3.5 py-2.5 bg-csg-surface hover:bg-csg-muted text-csg-black border-2 border-csg-black text-xs font-bold font-mono transition-all flex items-center gap-1.5 shadow-poster-sm"
-              title="Tra cứu hồ sơ & đóng số dư"
+              className="hidden sm:inline font-mono text-xs font-bold text-csg-black/80 hover:text-csg-red underline decoration-1 underline-offset-4 py-2 transition-colors"
             >
-              <Search className="w-3.5 h-3.5 text-csg-red" />
-              <span className="hidden sm:inline">Tra cứu vé & số dư</span>
-              <span className="sm:hidden">Tra vé</span>
+              Tra cứu vé cá nhân
             </button>
 
             <button
@@ -427,7 +421,7 @@ export const App: React.FC = () => {
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="p-2.5 hover:bg-csg-surface text-csg-black hover:text-csg-red transition-colors flex items-center justify-between border-b border-csg-muted"
               >
-                <span>Photobook Tư Liệu (Kỷ Niệm)</span>
+                <span>Kỷ Yếu Kỷ Niệm (Tư Liệu)</span>
                 <ChevronRight className="w-4 h-4 text-csg-black/40" />
               </a>
               <a 
@@ -461,7 +455,7 @@ export const App: React.FC = () => {
                 className="w-full py-2.5 bg-csg-surface text-csg-black border-2 border-csg-black text-xs font-bold font-mono flex items-center justify-center gap-2"
               >
                 <Search className="w-4 h-4 text-csg-red" />
-                <span>Tra cứu vé & đóng số dư</span>
+                <span>Tra cứu vé cá nhân & hồ sơ</span>
               </button>
             </div>
           </div>
@@ -470,165 +464,112 @@ export const App: React.FC = () => {
 
       {/* Main Content Area */}
       <main className="relative z-10 flex-1">
-        {/* ================= HERO SECTION (ASYMMETRICAL EDITORIAL POSTER COMPOSITION) ================= */}
-        <section className="pt-8 pb-16 px-4 sm:px-6 max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-            {/* Left Column: Dominant Typographic Poster Composition (7 Columns) */}
-            <div className="lg:col-span-7 space-y-6">
-              {/* Masthead Eyebrow */}
-              <div className="flex flex-wrap items-center gap-2 text-xs font-mono uppercase tracking-widest text-csg-black/70 border-b border-csg-black/20 pb-2">
-                <span>VOL. 17 / CHƯƠNG KỶ YẾU</span>
-                <span>•</span>
-                <span>TP. HỒ CHÍ MINH</span>
-                <span>•</span>
-                <span className="text-csg-red font-bold">2009 - 2026</span>
-              </div>
-
-              {/* Tag Stamp */}
-              <div className="inline-block">
-                <span className="stamp-seal text-xs font-mono">
-                  ★ ĐẠI TIỆC GALA KỶ NIỆM 17 NĂM THÀNH LẬP
-                </span>
-              </div>
-
-              {/* Massive Display Title */}
-              <div className="space-y-2">
-                <h1 className="text-4xl sm:text-6xl xl:text-7xl font-display font-extrabold uppercase tracking-[-0.02em] text-csg-black leading-[0.93]">
-                  NHỮNG NĂM THÁNG <br />
-                  <span className="text-csg-red underline decoration-csg-yellow decoration-4 underline-offset-4">
-                    MÌNH ĐÃ
-                  </span> CÙNG NHAU.
+        {/* ================= HERO SECTION (EDITORIAL BROADSIDE & MAGAZINE COVER) ================= */}
+        <section className="pt-6 sm:pt-10 pb-16 px-4 sm:px-6 max-w-7xl mx-auto">
+          {/* Masthead Eyebrow & Top Broadside Banner */}
+          <div className="border-b-2 border-csg-black pb-4 mb-8 sm:mb-12">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+              <div>
+                <div className="font-mono text-[11px] text-csg-black/60 uppercase tracking-widest mb-1.5 flex flex-wrap items-center gap-2">
+                  <span>ĐẠI HỌC FPT TP. HỒ CHÍ MINH</span>
+                  <span>•</span>
+                  <span>CLB TRUYỀN THÔNG CÓC SÀI GÒN</span>
+                  <span>•</span>
+                  <span className="text-csg-red font-bold">2009 - 2026</span>
+                </div>
+                <h1 className="text-4xl sm:text-6xl lg:text-7xl font-display font-extrabold uppercase tracking-[-0.03em] text-csg-black leading-[0.9]">
+                  NHỮNG NĂM THÁNG <br className="hidden sm:inline" />
+                  <span className="text-csg-red underline decoration-csg-yellow decoration-4 underline-offset-4">MÌNH ĐÃ</span> CÙNG NHAU.
                 </h1>
-                <p className="font-editorial italic text-2xl sm:text-3xl text-csg-black/85 leading-snug">
-                  "17 năm sắc áo vàng — Nơi thanh xuân tụ hội và câu chuyện chưa bao giờ kết thúc."
-                </p>
               </div>
+              <div className="font-mono text-left md:text-right text-xs text-csg-black/75 space-y-0.5 shrink-0 border-t md:border-t-0 pt-2 md:pt-0 border-csg-black/20">
+                <p className="font-bold text-csg-black">GALA DINNER • 17 YEARS OF MEMORIES</p>
+                <p>18:00 • THỨ BẢY, 19/12/2026</p>
+                <p className="text-csg-red font-bold">ASIANA PLAZA TÂN PHÚ</p>
+              </div>
+            </div>
+          </div>
 
-              <p className="text-csg-black/80 font-sans text-sm sm:text-base leading-relaxed max-w-xl">
-                Dành riêng cho các thế hệ Cựu thành viên và Thành viên đương nhiệm CLB Truyền thông Cóc Sài Gòn. Cùng ngồi lại bên nhau, mở cuốn kỷ yếu sống, thổi nến sinh nhật và đốt cháy sân khấu 17 tuổi!
+          {/* Asymmetric Editorial Spread */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-start">
+            {/* Left Column: Typographic Narrative, Colophon & RSVP (7 Columns) */}
+            <div className="lg:col-span-7 space-y-6">
+              <p className="font-editorial italic text-2xl sm:text-3xl text-csg-black/90 leading-snug">
+                "17 năm sắc áo vàng — Nơi thanh xuân tụ hội và câu chuyện chưa bao giờ kết thúc."
               </p>
 
-              {/* Editorial Event Metadata Table (Printed Ticket Strip) */}
-              <div className="p-4 bg-csg-surface border-2 border-csg-black space-y-2 font-mono text-xs">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 border-b border-csg-black/15 pb-2">
-                  <div className="flex items-center gap-2">
-                    <Calendar className="w-4 h-4 text-csg-red shrink-0" />
-                    <span><strong>THỜI GIAN:</strong> 18:00 • Thứ Bảy, 19/12/2026</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <MapPin className="w-4 h-4 text-csg-red shrink-0" />
-                    <span><strong>ĐỊA ĐIỂM:</strong> Asiana Plaza Tân Phú, TP. HCM</span>
-                  </div>
+              <p className="text-csg-black/80 font-sans text-sm sm:text-base leading-relaxed max-w-xl">
+                Dành riêng cho các thế hệ Cựu thành viên và Thành viên đương nhiệm CLB Truyền thông Cóc Sài Gòn. Cùng ngồi lại bên nhau, lật mở cuốn kỷ yếu sống, thổi nến sinh nhật và thắp sáng sân khấu tuổi 17.
+              </p>
+
+              {/* Event Colophon (Clean Typographic List, Unboxed) */}
+              <div className="py-4 border-y border-csg-black/20 space-y-2.5 font-mono text-xs max-w-xl">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 py-1 border-b border-csg-black/10">
+                  <span className="text-csg-black/60 uppercase">THỜI GIAN KHAI TIỆC</span>
+                  <span className="font-bold text-csg-black">18:00 • Thứ Bảy, 19 Tháng 12, 2026</span>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-csg-black/80">
-                  <div className="flex items-center gap-2">
-                    <Shirt className="w-4 h-4 text-csg-red shrink-0" />
-                    <span><strong>TRANG PHỤC:</strong> Sắc Áo Vàng hoặc Vàng - Đen - Trắng</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Users className="w-4 h-4 text-csg-red shrink-0" />
-                    <span><strong>QUY MÔ:</strong> 200 Ghế Ngồi Cho Các Thế Hệ Cóc</span>
-                  </div>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 py-1 border-b border-csg-black/10">
+                  <span className="text-csg-black/60 uppercase">ĐỊA ĐIỂM TỔ CHỨC</span>
+                  <span className="font-bold text-csg-black">Asiana Plaza Tân Phú, TP. Hồ Chí Minh</span>
+                </div>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 py-1 border-b border-csg-black/10">
+                  <span className="text-csg-black/60 uppercase">DRESS CODE</span>
+                  <span className="font-bold text-csg-black">Sắc Áo Vàng hoặc Vàng - Đen - Trắng</span>
+                </div>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 py-1">
+                  <span className="text-csg-black/60 uppercase">QUY MÔ THAM DỰ</span>
+                  <span className="font-bold text-csg-black">200 ghế ngồi dành riêng cho các thế hệ Cóc</span>
                 </div>
               </div>
 
-              {/* Real Countdown Clock (Ticking from actual event date) */}
-              <div className="space-y-1.5">
-                <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-csg-black/60 block">
-                  ĐẾM NGƯỢC ĐẾN THỜI KHẮC KHAI TIỆC:
+              {/* Countdown Colophon (Single Elegant Monospaced Line) */}
+              <div className="font-mono text-xs text-csg-black/80 flex flex-wrap items-center gap-2 pt-1">
+                <span className="w-2 h-2 rounded-full bg-csg-red animate-pulse" />
+                <span className="font-bold tracking-wider uppercase text-csg-black/70">ĐẾM NGƯỢC KHAI TIỆC:</span>
+                <span className="font-extrabold text-csg-black text-sm tracking-wide">
+                  {timeLeft.days} NGÀY {String(timeLeft.hours).padStart(2, '0')} GIỜ {String(timeLeft.minutes).padStart(2, '0')} PHÚT {String(timeLeft.seconds).padStart(2, '0')} GIÂY
                 </span>
-                <div className="flex items-center gap-2 max-w-md">
-                  {[
-                    { label: 'NGÀY', value: timeLeft.days },
-                    { label: 'GIỜ', value: timeLeft.hours },
-                    { label: 'PHÚT', value: timeLeft.minutes },
-                    { label: 'GIÂY', value: timeLeft.seconds },
-                  ].map((unit, i) => (
-                    <div key={i} className="flex-1 py-2 px-1 text-center bg-csg-paper border-2 border-csg-black shadow-poster-sm">
-                      <span className="text-xl sm:text-2xl font-mono font-extrabold text-csg-black block leading-none">
-                        {String(unit.value).padStart(2, '0')}
-                      </span>
-                      <span className="text-[9px] font-mono font-bold text-csg-black/60 tracking-wider">
-                        {unit.label}
-                      </span>
-                    </div>
-                  ))}
-                </div>
               </div>
 
-              {/* Primary Call To Action Off-Center */}
-              <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+              {/* Primary Invitation RSVP Action */}
+              <div className="pt-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
                 <button
                   onClick={openRegister}
-                  className="btn-editorial-primary px-8 py-4 font-display font-extrabold text-base sm:text-lg uppercase tracking-wider flex items-center justify-center gap-2 shadow-poster"
+                  className="btn-editorial-primary px-8 py-4 font-display font-extrabold text-base sm:text-lg uppercase tracking-wider flex items-center justify-center gap-3 shadow-poster"
                 >
-                  <span>BƯỚC VÀO ĐĂNG KÝ THAM GIA ↗</span>
+                  <span>MỞ THIỆP ĐĂNG KÝ THAM GIA</span>
+                  <ArrowRight className="w-5 h-5" />
                 </button>
 
                 <button
                   onClick={openLookup}
-                  className="btn-editorial-secondary px-5 py-4 font-mono font-bold text-xs sm:text-sm uppercase flex items-center justify-center gap-2"
+                  className="font-mono text-xs font-bold text-csg-black/75 hover:text-csg-red underline decoration-1 underline-offset-4 py-2 text-center sm:text-left transition-colors"
                 >
-                  <Search className="w-4 h-4 text-csg-red" />
-                  <span>Tra cứu hồ sơ & vé cá nhân →</span>
+                  Tra cứu vé cá nhân & hồ sơ đã duyệt →
                 </button>
               </div>
 
-              {/* Secret Pricing Guarantee (No prices revealed publicly) */}
               <p className="text-[11px] font-mono text-csg-black/60 italic">
                 * Quy chế tham dự và hỗ trợ chia đợt đóng phí sẽ được tự động cá nhân hóa theo vai trò (Cựu thành viên / Thành viên đương nhiệm) sau bước định danh.
               </p>
             </div>
 
-            {/* Right Column: Featured Archive Hero Photobook (5 Columns) */}
-            <div className="lg:col-span-5 relative">
-              <div className="polaroid-tape paper-sheet p-4 bg-csg-surface border-2 border-csg-black rotate-1 hover:rotate-0 transition-all duration-300 shadow-poster-lg">
-                {/* Big Archive Image */}
-                <div className="relative aspect-[4/5] bg-csg-muted border border-csg-black/30 overflow-hidden mb-3">
-                  <img
-                    src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=1200&q=80"
-                    alt="Khoảnh khắc Cóc Sài Gòn"
-                    className="w-full h-full object-cover filter grayscale-[10%] hover:grayscale-0 transition-all duration-500"
-                  />
-                  
-                  {/* Archive Identification Badge */}
-                  <div className="absolute top-3 left-3 bg-csg-paper/95 border border-csg-black px-2 py-0.5 text-[10px] font-mono font-bold uppercase shadow-sm">
-                    TƯ LIỆU CSG • MÙA 16Y
-                  </div>
-
-                  <div className="absolute bottom-3 right-3 bg-csg-black text-csg-yellow px-2.5 py-1 text-[11px] font-mono font-bold shadow-sm">
-                    ASIANA PLAZA • 2026
-                  </div>
-                </div>
-
-                {/* Hand-written Note Overlay in Caveat */}
-                <div className="space-y-1.5 px-1 border-t border-csg-muted pt-2.5">
-                  <div className="flex items-center justify-between text-xs font-mono text-csg-black/70">
-                    <span className="text-csg-red font-bold">LƯU TRỮ TRUYỀN THỐNG</span>
-                    <span>KHÓA K12 - K20</span>
-                  </div>
-                  <p className="font-editorial italic text-base text-csg-black leading-tight">
-                    "Có những nơi dù đã đi qua bao lâu, vẫn luôn có một chỗ để trở về."
-                  </p>
-                  <p className="font-handwriting text-lg text-csg-red leading-none pt-1">
-                    * Hẹn gặp lại các anh chị tiền bối và các em khóa mới!
-                  </p>
-                </div>
+            {/* Right Column: Prominent Archival Photograph (5 Columns) */}
+            <div className="lg:col-span-5 space-y-3">
+              <div className="relative aspect-[4/3] bg-csg-muted overflow-hidden border-2 border-csg-black shadow-poster">
+                <img
+                  src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=1200&q=80"
+                  alt="Đêm Gala Cóc Sài Gòn"
+                  className="w-full h-full object-cover filter contrast-[103%] saturate-[108%]"
+                />
               </div>
-
-              {/* Decorative Physical Ticket Badge Floating */}
-              <div className="absolute -bottom-6 -left-6 hidden sm:block p-3 bg-csg-yellow border-2 border-csg-black shadow-poster rotate-[-4deg] max-w-[200px]">
-                <div className="flex items-center gap-1.5 text-[10px] font-mono font-extrabold uppercase border-b border-csg-black pb-1 mb-1">
-                  <Ticket className="w-3.5 h-3.5 text-csg-black" />
-                  <span>VIP ADMIT ONE</span>
-                </div>
-                <p className="text-[11px] font-mono leading-tight font-bold text-csg-black">
-                  CSG-17Y GALA NIGHT
-                </p>
-                <span className="text-[9px] font-mono text-csg-black/80 block">
-                  Limited seats: 200 PAX
-                </span>
+              <div className="flex items-center justify-between font-mono text-[11px] text-csg-black/70 border-t border-csg-black/15 pt-2">
+                <span className="font-bold text-csg-black">PLATE 17 // ĐÊM HOÀNG KIM GALA 16Y</span>
+                <span>TƯ LIỆU LƯU TRỮ CSG • 2025</span>
               </div>
+              <p className="font-editorial italic text-sm text-csg-black/80">
+                "Có những nơi dù đã đi qua bao lâu, vẫn luôn có một chỗ để trở về."
+              </p>
             </div>
           </div>
         </section>
@@ -664,67 +605,54 @@ export const App: React.FC = () => {
               </div>
             </div>
 
-            {/* Right Column: Metadata & Schedule Flow */}
+            {/* Right Column: Editorial Schedule Flow (Unboxed) */}
             <div className="lg:col-span-7 space-y-6">
-              {/* Event Specification Box */}
-              <div className="p-6 sm:p-8 bg-csg-surface border-2 border-csg-black shadow-poster space-y-6">
-                <h3 className="text-xl font-display font-extrabold uppercase text-csg-black border-b border-csg-black/15 pb-3">
-                  Thông Tin Chi Tiết Buổi Tiệc
-                </h3>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-sm">
-                  <div className="space-y-1">
-                    <span className="text-xs font-mono text-csg-black/60 uppercase block">Thời Gian</span>
-                    <div className="flex items-center gap-2 font-bold text-csg-black">
-                      <Clock className="w-4 h-4 text-csg-red" />
-                      <span>18:00 - 22:00 • Thứ Bảy, 19/12/2026</span>
-                    </div>
-                  </div>
-
-                  <div className="space-y-1">
-                    <span className="text-xs font-mono text-csg-black/60 uppercase block">Địa Điểm Tổ Chức</span>
-                    <div className="flex items-center gap-2 font-bold text-csg-black">
-                      <MapPin className="w-4 h-4 text-csg-red" />
-                      <span>Asiana Plaza Tân Phú, TP. HCM</span>
-                    </div>
-                  </div>
-
-                  <div className="space-y-1">
-                    <span className="text-xs font-mono text-csg-black/60 uppercase block">Trang Phục (Dress Code)</span>
-                    <div className="flex items-center gap-2 font-bold text-csg-black">
-                      <Shirt className="w-4 h-4 text-csg-red" />
-                      <span>Sắc Áo Vàng hoặc Vàng - Đen - Trắng</span>
-                    </div>
-                  </div>
-
-                  <div className="space-y-1">
-                    <span className="text-xs font-mono text-csg-black/60 uppercase block">Quy Mô & Số Lượng</span>
-                    <div className="flex items-center gap-2 font-bold text-csg-black">
-                      <Users className="w-4 h-4 text-csg-red" />
-                      <span>Giới hạn 200 ghế cho toàn bộ thế hệ</span>
-                    </div>
-                  </div>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between border-b-2 border-csg-black pb-2">
+                  <h3 className="text-xs font-mono font-bold uppercase tracking-widest text-csg-black">
+                    CHƯƠNG TRÌNH ĐÊM ĐẠI TIỆC // PROGRAMME
+                  </h3>
+                  <span className="font-mono text-xs text-csg-black/60">19.12.2026</span>
                 </div>
 
-                {/* Timeline flow */}
-                <div className="pt-4 border-t border-csg-black/15 space-y-3">
-                  <span className="text-xs font-mono text-csg-black/60 uppercase block">Lịch Trình Đêm Tiệc</span>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs font-mono">
-                    <div className="p-3 bg-csg-paper border border-csg-black/20">
-                      <span className="text-csg-red font-bold">18:00 - 18:45</span>
-                      <p className="font-bold text-csg-black font-sans mt-0.5">Check-in thảm đỏ & Chụp ảnh Polaroid</p>
+                <div className="divide-y divide-csg-black/15 font-mono text-xs">
+                  <div className="py-3.5 flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 sm:gap-4">
+                    <span className="font-bold text-csg-red w-36 shrink-0 text-xs sm:text-sm">18:00 — 18:45</span>
+                    <div className="flex-1">
+                      <span className="font-bold text-csg-black font-sans text-sm block">Đón Tiếp, Thảm Đỏ & Check-in Polaroid</span>
+                      <span className="text-csg-black/70 font-sans text-xs block mt-0.5">
+                        Nhận thẻ đeo check-in QR, chụp ảnh lưu niệm lấy liền cùng các thế hệ và ký tên vào bảng lưu bút 17 năm.
+                      </span>
                     </div>
-                    <div className="p-3 bg-csg-paper border border-csg-black/20">
-                      <span className="text-csg-red font-bold">18:45 - 19:30</span>
-                      <p className="font-bold text-csg-black font-sans mt-0.5">Khai mạc, Video 17Y & Thổi nến sinh nhật</p>
+                  </div>
+
+                  <div className="py-3.5 flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 sm:gap-4">
+                    <span className="font-bold text-csg-red w-36 shrink-0 text-xs sm:text-sm">18:45 — 19:30</span>
+                    <div className="flex-1">
+                      <span className="font-bold text-csg-black font-sans text-sm block">Khai Mạc, Thước Phim 17Y & Thổi Nến</span>
+                      <span className="text-csg-black/70 font-sans text-xs block mt-0.5">
+                        Công chiếu video tư liệu 17 mùa sắc áo vàng, tri ân ban điều hành các thời kỳ và khoảnh khắc thổi nến đại gia đình.
+                      </span>
                     </div>
-                    <div className="p-3 bg-csg-paper border border-csg-black/20">
-                      <span className="text-csg-red font-bold">19:30 - 20:30</span>
-                      <p className="font-bold text-csg-black font-sans mt-0.5">Khai tiệc Gala Dinner & Giao lưu kết nối</p>
+                  </div>
+
+                  <div className="py-3.5 flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 sm:gap-4">
+                    <span className="font-bold text-csg-red w-36 shrink-0 text-xs sm:text-sm">19:30 — 20:30</span>
+                    <div className="flex-1">
+                      <span className="font-bold text-csg-black font-sans text-sm block">Khai Tiệc Gala Dinner & Nâng Ly</span>
+                      <span className="text-csg-black/70 font-sans text-xs block mt-0.5">
+                        Thưởng thức đại tiệc ẩm thực phong phú tại Asiana Plaza, giao lưu và kết nối giữa các thế hệ cựu thành viên và đương nhiệm.
+                      </span>
                     </div>
-                    <div className="p-3 bg-csg-paper border border-csg-black/20">
-                      <span className="text-csg-red font-bold">20:30 - 22:00</span>
-                      <p className="font-bold text-csg-black font-sans mt-0.5">Sân khấu âm nhạc bùng nổ & Lucky Draw</p>
+                  </div>
+
+                  <div className="py-3.5 flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 sm:gap-4">
+                    <span className="font-bold text-csg-red w-36 shrink-0 text-xs sm:text-sm">20:30 — 22:00</span>
+                    <div className="flex-1">
+                      <span className="font-bold text-csg-black font-sans text-sm block">Sân Khấu Âm Nhạc Bùng Nổ & Lucky Draw</span>
+                      <span className="text-csg-black/70 font-sans text-xs block mt-0.5">
+                        Các tiết mục ca nhạc tự biên đặc sắc của Cóc, bốc thăm may mắn quà tặng giới hạn 17Y và chụp ảnh kỷ niệm toàn đoàn.
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -763,45 +691,37 @@ export const App: React.FC = () => {
             </button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {(wishesList.length > 0 ? wishesList.slice(0, 3) : [
               {
                 id: 'w-1',
-                authorName: 'Anh Huỳnh Tấn Phát',
-                role: 'ALUMNI',
-                content: 'Chúc Cóc Sài Gòn mãi là ngôi nhà ấm áp của bao thế hệ! 💛'
+                authorName: 'Huỳnh Tấn Phát',
+                role: 'Cựu Thành Viên • K12',
+                content: 'Chúc Cóc Sài Gòn mãi là ngôi nhà ấm áp của bao thế hệ! Hẹn gặp lại các anh chị em ngày 19/12.'
               },
               {
                 id: 'w-2',
-                authorName: 'Bạn Nguyễn Phúc An',
-                role: 'ACTIVE',
-                content: 'Đêm nay Cóc cháy hết mình nha anh em ơi! 🔥'
+                authorName: 'Nguyễn Phúc An',
+                role: 'Thành Viên Đương Nhiệm • K18',
+                content: 'Đêm nay Cóc cháy hết mình nha anh em ơi! Tự hào là một phần của đại gia đình sắc áo vàng.'
               },
               {
                 id: 'w-3',
-                authorName: 'Chị Trần Thảo My',
-                role: 'ALUMNI',
-                content: 'Hẹn gặp lại các em tại đêm tiệc 17Y hoành tráng! ✨'
+                authorName: 'Trần Thảo My',
+                role: 'Cựu Thành Viên • K13',
+                content: 'Hẹn gặp lại các em tại đêm tiệc 17Y hoành tráng! 17 năm một chặng đường rực rỡ.'
               }
             ]).map((w) => (
-              <div key={w.id} className="p-6 bg-csg-surface border-2 border-csg-black shadow-poster-sm relative flex flex-col justify-between">
-                <Quote className="w-8 h-8 text-csg-yellow/60 absolute top-4 right-4" />
-                <div className="mb-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="stamp-seal text-[9px]">
-                      {w.role === 'ALUMNI' ? 'CỰU THÀNH VIÊN' : 'THÀNH VIÊN'}
-                    </span>
-                  </div>
-                  <p className="font-editorial italic text-base text-csg-black leading-relaxed">
-                    "{w.content}"
-                  </p>
-                </div>
-                <div className="pt-3 border-t border-csg-muted flex items-center justify-between">
-                  <span className="font-display font-bold text-sm text-csg-black">
+              <div key={w.id} className="py-5 px-6 border-l-2 border-csg-black bg-csg-surface/50 space-y-3">
+                <p className="font-editorial italic text-base text-csg-black/90 leading-relaxed">
+                  "{w.content}"
+                </p>
+                <div className="pt-2 border-t border-csg-black/10 flex flex-col font-mono text-xs">
+                  <span className="font-bold text-csg-black">
                     {w.authorName}
                   </span>
-                  <span className="text-[10px] font-mono text-csg-black/60">
-                    Cóc 17Y
+                  <span className="text-[11px] text-csg-red font-medium">
+                    {w.role}
                   </span>
                 </div>
               </div>
@@ -815,32 +735,31 @@ export const App: React.FC = () => {
           onOpenRegister={openRegister}
         />
 
-        {/* ================= SECTION 4.6: REGISTRATION CTA BANNER (NO SECRET PRICING) ================= */}
-        <section className="py-20 px-4 sm:px-6 bg-csg-yellow border-t-2 border-b-2 border-csg-black">
-          <div className="max-w-5xl mx-auto text-center space-y-6">
-            <span className="inline-block px-3 py-1 bg-csg-black text-csg-yellow text-xs font-mono font-bold uppercase tracking-widest shadow-sm">
-              MÙA TIỆC KỶ NIỆM 17 NĂM
+        {/* ================= SECTION: EDITORIAL CLOSING SPREAD ================= */}
+        <section className="py-20 sm:py-28 px-4 sm:px-6 border-t-2 border-csg-black">
+          <div className="max-w-4xl mx-auto text-center space-y-6">
+            <span className="font-mono text-xs font-bold text-csg-red uppercase tracking-widest block">
+              LỜI NGỎ KẾT THÚC // VOL. XVII
             </span>
-            <h2 className="text-3xl sm:text-5xl lg:text-6xl font-display font-extrabold uppercase text-csg-black tracking-tight leading-none">
+            <h2 className="text-3xl sm:text-5xl lg:text-6xl font-display font-extrabold uppercase text-csg-black tracking-tight leading-[0.95]">
               BẠN LÀ MỘT PHẦN CỦA CÂU CHUYỆN NÀY. <br />
-              GIỜ LÀ LÚC CÙNG NHAU VIẾT TIẾP MÙA 17.
+              <span className="font-editorial italic font-normal text-csg-red">Giờ là lúc cùng nhau viết tiếp.</span>
             </h2>
-            <p className="max-w-2xl mx-auto text-csg-black/90 font-sans text-sm sm:text-base leading-relaxed">
+            <p className="max-w-xl mx-auto text-csg-black/80 font-sans text-sm sm:text-base leading-relaxed">
               Dù bạn thuộc Gen 1 hay Gen 16, dù đã rời trường nhiều năm hay đang ngày ngày tác nghiệp, chiếc áo vàng và những người bạn cũ vẫn luôn đợi bạn trở về.
             </p>
             <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
               <button
                 onClick={openRegister}
-                className="w-full sm:w-auto px-10 py-5 bg-csg-black text-csg-yellow hover:bg-csg-black/90 font-display font-extrabold text-base sm:text-lg uppercase tracking-wider shadow-poster transition-all flex items-center justify-center gap-3"
+                className="btn-editorial-primary w-full sm:w-auto px-10 py-5 font-display font-extrabold text-base sm:text-lg uppercase tracking-wider shadow-poster flex items-center justify-center gap-3"
               >
-                <span>ĐĂNG KÝ THAM GIA TIỆC NGAY ↗</span>
+                <span>MỞ THIỆP ĐĂNG KÝ THAM GIA ↗</span>
               </button>
               <button
                 onClick={openLookup}
-                className="w-full sm:w-auto px-7 py-5 bg-csg-paper hover:bg-csg-surface text-csg-black font-bold text-sm border-2 border-csg-black transition-all flex items-center justify-center gap-2 shadow-poster-sm font-mono"
+                className="font-mono text-xs font-bold text-csg-black/80 hover:text-csg-red underline decoration-1 underline-offset-4 py-3"
               >
-                <Search className="w-4 h-4 text-csg-red" />
-                <span>Tra cứu vé & số dư đã cọc</span>
+                Tra cứu vé cá nhân & hồ sơ đã duyệt →
               </button>
             </div>
           </div>

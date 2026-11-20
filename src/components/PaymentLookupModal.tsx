@@ -139,56 +139,56 @@ END:VCALENDAR`;
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-[#111111]/85 backdrop-blur-md overflow-y-auto animate-fadeIn">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-[#20231F]/85 backdrop-blur-md overflow-y-auto animate-fadeIn">
       <div 
-        className="relative w-full max-w-3xl bg-[#F4F0E6] border-2 border-[#111111] rounded-2xl shadow-poster-lg overflow-hidden my-6 flex flex-col max-h-[92vh] animate-paper-unfold font-body"
+        className="relative w-full max-w-3xl bg-[#F4EEDF] border-2 border-[#20231F] rounded-sm shadow-poster-lg overflow-hidden my-6 flex flex-col max-h-[92vh] animate-paper-unfold font-body"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header Bar */}
-        <div className="flex items-center justify-between px-6 py-4 border-b-2 border-[#111111] bg-[#FFFFFF]">
+        <div className="flex items-center justify-between px-6 py-4 border-b-2 border-[#20231F] bg-[#FFFFFF]">
           <div className="flex items-center gap-3">
-            <span className="w-10 h-10 rounded-xl bg-[#F5C400] border-2 border-[#111111] flex items-center justify-center text-xl shadow-poster-sm">
+            <span className="w-10 h-10 rounded-sm bg-[#F4C542] border-2 border-[#20231F] flex items-center justify-center text-xl shadow-poster-sm">
               🎫
             </span>
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-display text-lg tracking-wider text-[#111111] uppercase">
+                <span className="font-display text-lg tracking-wider text-[#20231F] uppercase">
                   PARTICIPANT PORTAL
                 </span>
                 <span className="stamp-seal text-[9px]">
                   CỔNG THÀNH VIÊN
                 </span>
               </div>
-              <p className="text-[11px] text-[#111111]/70">
+              <p className="text-[11px] text-[#20231F]/70">
                 Tra cứu hồ sơ, đóng nốt số dư đợt 2 & nhận vé Check-in VIP
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg border-2 border-[#111111] hover:bg-[#F4F0E6] text-[#111111] transition-colors"
+            className="p-1.5 rounded-lg border-2 border-[#20231F] hover:bg-[#F4EEDF] text-[#20231F] transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Search Bar */}
-        <div className="p-4 sm:p-6 bg-[#FFFFFF] border-b-2 border-[#111111]">
+        <div className="p-4 sm:p-6 bg-[#FFFFFF] border-b-2 border-[#20231F]">
           <form onSubmit={handleSearch} className="flex gap-2">
             <div className="relative flex-1">
-              <Search className="w-4 h-4 text-[#111111]/50 absolute left-3 top-1/2 -translate-y-1/2" />
+              <Search className="w-4 h-4 text-[#20231F]/50 absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Nhập MSSV (VD: SE120101) hoặc Số điện thoại, Mã CSG26..."
-                className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-[#F4F0E6] border-2 border-[#111111] text-xs font-mono text-[#111111] focus:outline-none focus:ring-2 focus:ring-[#F5C400]"
+                className="w-full pl-9 pr-3 py-2.5 rounded-sm bg-[#F4EEDF] border-2 border-[#20231F] text-xs font-mono text-[#20231F] focus:outline-none focus:ring-2 focus:ring-[#F4C542]"
               />
             </div>
             <button
               type="submit"
               disabled={isLoading || !searchTerm.trim()}
-              className="btn-editorial-primary px-5 py-2.5 rounded-xl font-display text-lg uppercase tracking-wider flex items-center gap-1.5 shrink-0"
+              className="btn-editorial-primary px-5 py-2.5 rounded-sm font-display text-lg uppercase tracking-wider flex items-center gap-1.5 shrink-0"
             >
               <Search className="w-4 h-4" />
               <span>{isLoading ? 'Đang tra...' : 'TRA CỨU'}</span>
@@ -196,7 +196,7 @@ END:VCALENDAR`;
           </form>
 
           {searchError && (
-            <div className="mt-3 p-3 rounded-lg bg-red-50 border-2 border-[#D94C2B] text-[#D94C2B] text-xs flex items-center gap-2">
+            <div className="mt-3 p-3 rounded-lg bg-red-50 border-2 border-[#B94D35] text-[#B94D35] text-xs flex items-center gap-2">
               <AlertCircle className="w-4 h-4 shrink-0" />
               <span>{searchError}</span>
             </div>
@@ -206,11 +206,11 @@ END:VCALENDAR`;
         {/* Content Area */}
         <div className="p-6 overflow-y-auto flex-1 space-y-6">
           {!foundRecord && !hasSearched && (
-            <div className="text-center py-12 text-[#111111]/60 space-y-2">
-              <div className="w-16 h-16 mx-auto rounded-2xl bg-[#EAE4D6] border-2 border-[#111111] flex items-center justify-center text-3xl">
+            <div className="text-center py-12 text-[#20231F]/60 space-y-2">
+              <div className="w-16 h-16 mx-auto rounded-sm bg-[#EAE4D6] border-2 border-[#20231F] flex items-center justify-center text-3xl">
                 🔍
               </div>
-              <h4 className="font-display text-2xl text-[#111111] uppercase tracking-wide">
+              <h4 className="font-display text-2xl text-[#20231F] uppercase tracking-wide">
                 TRA CỨU VÉ & THÔNG TIN THANH TOÁN
               </h4>
               <p className="text-xs max-w-sm mx-auto">
@@ -222,14 +222,14 @@ END:VCALENDAR`;
           {foundRecord && (
             <div className="space-y-6 animate-fadeIn">
               {/* Navigation Tabs inside Portal */}
-              <div className="flex border-b-2 border-[#111111] pb-2 gap-2 overflow-x-auto">
+              <div className="flex border-b-2 border-[#20231F] pb-2 gap-2 overflow-x-auto">
                 <button
                   type="button"
                   onClick={() => setActiveTab('OVERVIEW')}
                   className={`px-3.5 py-1.5 rounded-lg text-xs font-bold uppercase transition-all whitespace-nowrap ${
                     activeTab === 'OVERVIEW'
-                      ? 'bg-[#111111] text-white'
-                      : 'bg-[#FFFFFF] border border-[#111111] text-[#111111] hover:bg-[#F4F0E6]'
+                      ? 'bg-[#20231F] text-white'
+                      : 'bg-[#FFFFFF] border border-[#20231F] text-[#20231F] hover:bg-[#F4EEDF]'
                   }`}
                 >
                   Tổng quan hồ sơ
@@ -239,8 +239,8 @@ END:VCALENDAR`;
                   onClick={() => setActiveTab('HISTORY')}
                   className={`px-3.5 py-1.5 rounded-lg text-xs font-bold uppercase transition-all whitespace-nowrap ${
                     activeTab === 'HISTORY'
-                      ? 'bg-[#111111] text-white'
-                      : 'bg-[#FFFFFF] border border-[#111111] text-[#111111] hover:bg-[#F4F0E6]'
+                      ? 'bg-[#20231F] text-white'
+                      : 'bg-[#FFFFFF] border border-[#20231F] text-[#20231F] hover:bg-[#F4EEDF]'
                   }`}
                 >
                   Lịch sử thanh toán
@@ -251,8 +251,8 @@ END:VCALENDAR`;
                     onClick={() => setActiveTab('PAY_PHASE2')}
                     className={`px-3.5 py-1.5 rounded-lg text-xs font-bold uppercase transition-all whitespace-nowrap ${
                       activeTab === 'PAY_PHASE2'
-                        ? 'bg-[#D94C2B] text-white'
-                        : 'bg-[#FFFFFF] border border-[#D94C2B] text-[#D94C2B] hover:bg-red-50'
+                        ? 'bg-[#B94D35] text-white'
+                        : 'bg-[#FFFFFF] border border-[#B94D35] text-[#B94D35] hover:bg-red-50'
                     }`}
                   >
                     Đóng số dư đợt 2 ({remainingDue.toLocaleString('vi-VN')}đ)
@@ -264,7 +264,7 @@ END:VCALENDAR`;
                   className={`px-3.5 py-1.5 rounded-lg text-xs font-bold uppercase transition-all whitespace-nowrap flex items-center gap-1.5 ${
                     activeTab === 'TICKET'
                       ? 'bg-[#3D6B45] text-white'
-                      : 'bg-[#FFFFFF] border border-[#111111] text-[#111111] hover:bg-[#F4F0E6]'
+                      : 'bg-[#FFFFFF] border border-[#20231F] text-[#20231F] hover:bg-[#F4EEDF]'
                   }`}
                 >
                   <TicketIcon className="w-3.5 h-3.5" />
@@ -276,18 +276,18 @@ END:VCALENDAR`;
               {activeTab === 'OVERVIEW' && (
                 <div className="space-y-4">
                   {/* Status Badges Header */}
-                  <div className="p-4 rounded-xl bg-white border-2 border-[#111111] shadow-poster-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="p-4 rounded-sm bg-white border-2 border-[#20231F] shadow-poster-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div>
                       <div className="flex items-center gap-2">
-                        <h4 className="text-xl font-display uppercase tracking-wide text-[#111111]">
+                        <h4 className="text-xl font-display uppercase tracking-wide text-[#20231F]">
                           WELCOME BACK, {foundRecord.fullName.toUpperCase()}!
                         </h4>
                         <span className="stamp-seal text-[9px]">
                           {foundRecord.role === 'ALUMNI' ? 'CỰU THÀNH VIÊN' : 'THÀNH VIÊN'}
                         </span>
                       </div>
-                      <p className="text-xs text-[#111111]/70 font-mono mt-0.5">
-                        Mã đăng ký: <span className="font-bold text-[#111111]">{foundRecord.id}</span> • MSSV: {foundRecord.mssv}
+                      <p className="text-xs text-[#20231F]/70 font-mono mt-0.5">
+                        Mã đăng ký: <span className="font-bold text-[#20231F]">{foundRecord.id}</span> • MSSV: {foundRecord.mssv}
                       </p>
                     </div>
 
@@ -296,7 +296,7 @@ END:VCALENDAR`;
                         foundRecord.isApproved100
                           ? 'bg-emerald-50 text-[#3D6B45] border-[#3D6B45]'
                           : foundRecord.status === 'REJECTED'
-                          ? 'bg-red-50 text-[#D94C2B] border-[#D94C2B]'
+                          ? 'bg-red-50 text-[#B94D35] border-[#B94D35]'
                           : 'bg-amber-50 text-[#D99B26] border-[#D99B26]'
                       }`}>
                         {foundRecord.isApproved100 
@@ -308,19 +308,19 @@ END:VCALENDAR`;
 
                   {/* Rejected Warning Alert if applicable */}
                   {foundRecord.status === 'REJECTED' && (
-                    <div className="p-4 rounded-xl bg-red-50 border-2 border-[#D94C2B] text-xs space-y-1">
-                      <div className="flex items-center gap-2 font-bold text-[#D94C2B]">
+                    <div className="p-4 rounded-sm bg-red-50 border-2 border-[#B94D35] text-xs space-y-1">
+                      <div className="flex items-center gap-2 font-bold text-[#B94D35]">
                         <AlertTriangle className="w-4 h-4 shrink-0" />
                         <span>Biên lai thanh toán chưa được xác nhận bởi Ban Tổ Chức</span>
                       </div>
-                      <p className="text-[#111111]/80 pl-6">
+                      <p className="text-[#20231F]/80 pl-6">
                         Lý do: <strong>{foundRecord.rejectReason || 'Ảnh chụp không rõ ràng hoặc không khớp cú pháp chuyển khoản.'}</strong>
                       </p>
                       <div className="pl-6 pt-1">
                         <button
                           type="button"
                           onClick={() => setActiveTab('PAY_PHASE2')}
-                          className="px-3 py-1.5 rounded-lg bg-[#D94C2B] text-white font-bold text-[11px] uppercase"
+                          className="px-3 py-1.5 rounded-lg bg-[#B94D35] text-white font-bold text-[11px] uppercase"
                         >
                           Tải lại biên lai hợp lệ ngay →
                         </button>
@@ -329,32 +329,32 @@ END:VCALENDAR`;
                   )}
 
                   {/* Payment Financial Summary */}
-                  <div className="p-5 rounded-xl bg-white border-2 border-[#111111] shadow-poster-sm space-y-3">
-                    <div className="flex items-center justify-between border-b border-[#111111]/15 pb-2">
-                      <span className="text-xs font-mono font-bold text-[#111111] uppercase">
+                  <div className="p-5 rounded-sm bg-white border-2 border-[#20231F] shadow-poster-sm space-y-3">
+                    <div className="flex items-center justify-between border-b border-[#20231F]/15 pb-2">
+                      <span className="text-xs font-mono font-bold text-[#20231F] uppercase">
                         TỔNG QUAN CHI PHÍ THAM DỰ
                       </span>
-                      <span className="text-xs font-bold text-[#111111]">
+                      <span className="text-xs font-bold text-[#20231F]">
                         Gói {foundRecord.role === 'ALUMNI' ? 'Cựu thành viên' : 'Thành viên'}
                       </span>
                     </div>
 
                     <div className="grid grid-cols-3 gap-3 text-center py-2">
-                      <div className="p-2.5 bg-[#F4F0E6] rounded-xl border border-[#111111]">
-                        <span className="text-[10px] text-[#111111]/60 block uppercase font-bold">Tổng chi phí</span>
-                        <span className="text-lg font-display font-bold text-[#111111]">
+                      <div className="p-2.5 bg-[#F4EEDF] rounded-sm border border-[#20231F]">
+                        <span className="text-[10px] text-[#20231F]/60 block uppercase font-bold">Tổng chi phí</span>
+                        <span className="text-lg font-display font-bold text-[#20231F]">
                           {foundRecord.totalRequired.toLocaleString('vi-VN')} đ
                         </span>
                       </div>
-                      <div className="p-2.5 bg-emerald-50 rounded-xl border border-[#3D6B45]">
+                      <div className="p-2.5 bg-emerald-50 rounded-sm border border-[#3D6B45]">
                         <span className="text-[10px] text-[#3D6B45] block uppercase font-bold">Đã nộp đối soát</span>
                         <span className="text-lg font-display font-bold text-[#3D6B45]">
                           {foundRecord.paidAmount.toLocaleString('vi-VN')} đ
                         </span>
                       </div>
-                      <div className="p-2.5 bg-amber-50 rounded-xl border border-[#D94C2B]">
-                        <span className="text-[10px] text-[#D94C2B] block uppercase font-bold">Số dư còn thiếu</span>
-                        <span className="text-lg font-display font-bold text-[#D94C2B]">
+                      <div className="p-2.5 bg-amber-50 rounded-sm border border-[#B94D35]">
+                        <span className="text-[10px] text-[#B94D35] block uppercase font-bold">Số dư còn thiếu</span>
+                        <span className="text-lg font-display font-bold text-[#B94D35]">
                           {remainingDue.toLocaleString('vi-VN')} đ
                         </span>
                       </div>
@@ -362,13 +362,13 @@ END:VCALENDAR`;
 
                     {/* Progress Bar */}
                     <div>
-                      <div className="flex justify-between text-[11px] font-mono text-[#111111]/70 mb-1">
+                      <div className="flex justify-between text-[11px] font-mono text-[#20231F]/70 mb-1">
                         <span>Tiến độ thanh toán</span>
                         <span>{Math.round((foundRecord.paidAmount / foundRecord.totalRequired) * 100)}%</span>
                       </div>
-                      <div className="w-full bg-[#EAE4D6] h-2.5 rounded-full overflow-hidden border border-[#111111]">
+                      <div className="w-full bg-[#EAE4D6] h-2.5 rounded-full overflow-hidden border border-[#20231F]">
                         <div 
-                          className="bg-[#F5C400] h-full"
+                          className="bg-[#F4C542] h-full"
                           style={{ width: `${Math.min(100, (foundRecord.paidAmount / foundRecord.totalRequired) * 100)}%` }}
                         />
                       </div>
@@ -379,7 +379,7 @@ END:VCALENDAR`;
                         <button
                           type="button"
                           onClick={() => setActiveTab('PAY_PHASE2')}
-                          className="btn-editorial-primary px-4 py-2 rounded-xl text-xs font-bold uppercase flex items-center gap-1.5"
+                          className="btn-editorial-primary px-4 py-2 rounded-sm text-xs font-bold uppercase flex items-center gap-1.5"
                         >
                           <CreditCard className="w-3.5 h-3.5" />
                           <span>Đóng nốt {remainingDue.toLocaleString('vi-VN')}đ tại đây →</span>
@@ -393,9 +393,9 @@ END:VCALENDAR`;
               {/* ================= TAB 2: PAYMENT HISTORY ================= */}
               {activeTab === 'HISTORY' && (
                 <div className="space-y-4">
-                  <div className="border-2 border-[#111111] rounded-xl overflow-hidden bg-white shadow-poster-sm">
+                  <div className="border-2 border-[#20231F] rounded-sm overflow-hidden bg-white shadow-poster-sm">
                     <table className="w-full text-left text-xs">
-                      <thead className="bg-[#EAE4D6] text-[#111111] uppercase font-mono font-bold border-b-2 border-[#111111]">
+                      <thead className="bg-[#EAE4D6] text-[#20231F] uppercase font-mono font-bold border-b-2 border-[#20231F]">
                         <tr>
                           <th className="py-2.5 px-3">Đợt / Ngày nộp</th>
                           <th className="py-2.5 px-3">Số tiền</th>
@@ -404,12 +404,12 @@ END:VCALENDAR`;
                           <th className="py-2.5 px-3">Trạng thái</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-[#111111]/15 font-body">
+                      <tbody className="divide-y divide-[#20231F]/15 font-body">
                         {/* Phase 1 record */}
-                        <tr className="hover:bg-[#F4F0E6]/50">
+                        <tr className="hover:bg-[#F4EEDF]/50">
                           <td className="py-3 px-3">
-                            <span className="font-bold text-[#111111] block">Đợt 1 (Đăng ký)</span>
-                            <span className="text-[10px] font-mono text-[#111111]/60">
+                            <span className="font-bold text-[#20231F] block">Đợt 1 (Đăng ký)</span>
+                            <span className="text-[10px] font-mono text-[#20231F]/60">
                               {new Date(foundRecord.createdAt).toLocaleDateString('vi-VN')}
                             </span>
                           </td>
@@ -442,12 +442,12 @@ END:VCALENDAR`;
 
                         {/* Phase 2 record if submitted */}
                         {foundRecord.receiptPhase2Url && (
-                          <tr className="hover:bg-[#F4F0E6]/50">
+                          <tr className="hover:bg-[#F4EEDF]/50">
                             <td className="py-3 px-3">
-                              <span className="font-bold text-[#111111] block">Đợt 2 (Bổ sung số dư)</span>
-                              <span className="text-[10px] font-mono text-[#111111]/60">Gần đây</span>
+                              <span className="font-bold text-[#20231F] block">Đợt 2 (Bổ sung số dư)</span>
+                              <span className="text-[10px] font-mono text-[#20231F]/60">Gần đây</span>
                             </td>
-                            <td className="py-3 px-3 font-mono font-bold text-[#D94C2B]">
+                            <td className="py-3 px-3 font-mono font-bold text-[#B94D35]">
                               {remainingDue.toLocaleString('vi-VN')} đ
                             </td>
                             <td className="py-3 px-3">Chuyển khoản VietQR</td>
@@ -475,7 +475,7 @@ END:VCALENDAR`;
                       </tbody>
                     </table>
                   </div>
-                  <p className="text-[11px] text-[#111111]/60 italic font-mono">
+                  <p className="text-[11px] text-[#20231F]/60 italic font-mono">
                     * Lịch sử thanh toán được lưu trữ bất biến để đảm bảo tính minh bạch đối soát của BTC.
                   </p>
                 </div>
@@ -485,72 +485,72 @@ END:VCALENDAR`;
               {activeTab === 'PAY_PHASE2' && (
                 <div className="space-y-4">
                   {successSubmitted ? (
-                    <div className="p-6 rounded-2xl bg-emerald-50 border-2 border-[#3D6B45] text-center space-y-3">
+                    <div className="p-6 rounded-sm bg-emerald-50 border-2 border-[#3D6B45] text-center space-y-3">
                       <CheckCircle className="w-12 h-12 text-[#3D6B45] mx-auto" />
-                      <h4 className="font-display text-2xl text-[#111111] uppercase">
+                      <h4 className="font-display text-2xl text-[#20231F] uppercase">
                         ĐÃ GỬI BIÊN LAI ĐỢT 2 THÀNH CÔNG!
                       </h4>
-                      <p className="text-xs text-[#111111]/75 max-w-sm mx-auto">
+                      <p className="text-xs text-[#20231F]/75 max-w-sm mx-auto">
                         Ban Tổ Chức đã nhận được ảnh chụp giao dịch bổ sung. Sau khi kiểm tra đối soát, vé QR sẽ tự động được phát hành cho bạn!
                       </p>
                       <button
                         type="button"
                         onClick={() => setActiveTab('OVERVIEW')}
-                        className="btn-editorial-primary px-5 py-2.5 rounded-xl font-bold text-xs uppercase"
+                        className="btn-editorial-primary px-5 py-2.5 rounded-sm font-bold text-xs uppercase"
                       >
                         Về trang tổng quan
                       </button>
                     </div>
                   ) : (
-                    <div className="p-5 rounded-2xl bg-white border-2 border-[#111111] shadow-poster-sm space-y-4">
-                      <div className="border-b border-[#111111]/15 pb-2">
-                        <h4 className="font-display text-2xl uppercase tracking-wide text-[#111111]">
+                    <div className="p-5 rounded-sm bg-white border-2 border-[#20231F] shadow-poster-sm space-y-4">
+                      <div className="border-b border-[#20231F]/15 pb-2">
+                        <h4 className="font-display text-2xl uppercase tracking-wide text-[#20231F]">
                           HOÀN TẤT SỐ DƯ CÒN THIẾU ({remainingDue.toLocaleString('vi-VN')} VNĐ)
                         </h4>
-                        <p className="text-xs text-[#111111]/70">
+                        <p className="text-xs text-[#20231F]/70">
                           Quét mã VietQR dưới đây để thanh toán số tiền còn lại và tải lên biên lai giao dịch.
                         </p>
                       </div>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="text-center p-3 bg-[#F4F0E6] rounded-xl border-2 border-[#111111]">
+                        <div className="text-center p-3 bg-[#F4EEDF] rounded-sm border-2 border-[#20231F]">
                           <img
                             src={vietQrUrl}
                             alt="VietQR Thanh toán đợt 2"
-                            className="w-44 h-44 mx-auto object-contain bg-white p-2 rounded-lg border border-[#111111]"
+                            className="w-44 h-44 mx-auto object-contain bg-white p-2 rounded-lg border border-[#20231F]"
                           />
-                          <span className="text-xs font-bold text-[#D94C2B] block mt-1.5 font-mono">
+                          <span className="text-xs font-bold text-[#B94D35] block mt-1.5 font-mono">
                             Số tiền: {remainingDue.toLocaleString('vi-VN')} VNĐ
                           </span>
                         </div>
 
                         <div className="space-y-2.5 text-xs">
-                          <div className="p-2.5 bg-[#F4F0E6] rounded-xl border border-[#111111]">
-                            <span className="text-[#111111]/60 block text-[10px] uppercase font-bold">Số tài khoản</span>
-                            <span className="font-mono font-bold text-sm text-[#111111]">{ACCOUNT_NO} (MB Bank)</span>
+                          <div className="p-2.5 bg-[#F4EEDF] rounded-sm border border-[#20231F]">
+                            <span className="text-[#20231F]/60 block text-[10px] uppercase font-bold">Số tài khoản</span>
+                            <span className="font-mono font-bold text-sm text-[#20231F]">{ACCOUNT_NO} (MB Bank)</span>
                           </div>
 
-                          <div className="p-2.5 bg-[#F4F0E6] rounded-xl border-2 border-[#D94C2B] flex items-center justify-between">
+                          <div className="p-2.5 bg-[#F4EEDF] rounded-sm border-2 border-[#B94D35] flex items-center justify-between">
                             <div>
-                              <span className="text-[#D94C2B] block text-[10px] uppercase font-bold">Nội dung chuyển khoản</span>
-                              <span className="font-mono font-bold text-sm text-[#111111]">{transferContent}</span>
+                              <span className="text-[#B94D35] block text-[10px] uppercase font-bold">Nội dung chuyển khoản</span>
+                              <span className="font-mono font-bold text-sm text-[#20231F]">{transferContent}</span>
                             </div>
                             <button
                               type="button"
                               onClick={() => copyToClipboard(transferContent)}
-                              className="px-2.5 py-1 rounded bg-[#D94C2B] text-white text-[11px] font-bold"
+                              className="px-2.5 py-1 rounded bg-[#B94D35] text-white text-[11px] font-bold"
                             >
                               {copiedBank ? 'Đã chép' : 'Sao chép'}
                             </button>
                           </div>
 
                           <div>
-                            <label className="block text-[11px] font-bold uppercase text-[#111111] mb-1">
+                            <label className="block text-[11px] font-bold uppercase text-[#20231F] mb-1">
                               TẢI LÊN BIÊN LAI ĐỢT 2 *
                             </label>
-                            <label className="border-2 border-dashed border-[#111111] rounded-xl p-3 bg-white flex items-center justify-center gap-2 cursor-pointer hover:bg-[#F4F0E6] transition-colors">
-                              <Upload className="w-4 h-4 text-[#111111]" />
-                              <span className="text-xs font-bold text-[#111111]">
+                            <label className="border-2 border-dashed border-[#20231F] rounded-sm p-3 bg-white flex items-center justify-center gap-2 cursor-pointer hover:bg-[#F4EEDF] transition-colors">
+                              <Upload className="w-4 h-4 text-[#20231F]" />
+                              <span className="text-xs font-bold text-[#20231F]">
                                 {receiptPhase2 ? '✓ Đã chọn ảnh biên lai đợt 2' : 'Chọn ảnh biên lai giao dịch'}
                               </span>
                               <input
@@ -569,7 +569,7 @@ END:VCALENDAR`;
                           type="button"
                           disabled={isSubmitting || !receiptPhase2}
                           onClick={handleSubmitPhase2}
-                          className="btn-editorial-primary px-6 py-3 rounded-xl font-display text-xl uppercase tracking-wider disabled:opacity-50"
+                          className="btn-editorial-primary px-6 py-3 rounded-sm font-display text-xl uppercase tracking-wider disabled:opacity-50"
                         >
                           {isSubmitting ? 'ĐANG GỬI...' : 'XÁC NHẬN GỬI BIÊN LAI ĐỢT 2 ↗'}
                         </button>
@@ -583,21 +583,21 @@ END:VCALENDAR`;
               {activeTab === 'TICKET' && (
                 <div className="space-y-4">
                   {!foundRecord.isApproved100 ? (
-                    <div className="p-8 rounded-2xl bg-white border-2 border-[#111111] shadow-poster-sm text-center space-y-3">
-                      <div className="w-14 h-14 mx-auto rounded-2xl bg-amber-50 border-2 border-[#D99B26] flex items-center justify-center text-2xl">
+                    <div className="p-8 rounded-sm bg-white border-2 border-[#20231F] shadow-poster-sm text-center space-y-3">
+                      <div className="w-14 h-14 mx-auto rounded-sm bg-amber-50 border-2 border-[#D99B26] flex items-center justify-center text-2xl">
                         🔒
                       </div>
-                      <h4 className="font-display text-2xl text-[#111111] uppercase tracking-wide">
+                      <h4 className="font-display text-2xl text-[#20231F] uppercase tracking-wide">
                         VÉ CHECK-IN CHƯA ĐƯỢC PHÁT HÀNH
                       </h4>
-                      <p className="text-xs text-[#111111]/75 max-w-md mx-auto">
+                      <p className="text-xs text-[#20231F]/75 max-w-md mx-auto">
                         Theo quy định của BTC, vé mời QR Check-in chính thức chỉ được phát hành cho những người đã thanh toán đủ 100% chi phí và được Admin xác nhận đối soát.
                       </p>
                       {foundRecord.remainingAmount > 0 && (
                         <button
                           type="button"
                           onClick={() => setActiveTab('PAY_PHASE2')}
-                          className="btn-editorial-primary px-5 py-2.5 rounded-xl font-bold text-xs uppercase"
+                          className="btn-editorial-primary px-5 py-2.5 rounded-sm font-bold text-xs uppercase"
                         >
                           Hoàn tất số dư còn lại để nhận vé →
                         </button>
@@ -605,46 +605,46 @@ END:VCALENDAR`;
                     </div>
                   ) : (
                     /* VIP Ticket Card */
-                    <div className="p-6 rounded-2xl bg-[#FFFFFF] border-2 border-[#111111] shadow-poster-lg text-center space-y-4 relative overflow-hidden animate-fadeIn">
-                      <div className="flex items-center justify-between text-xs text-[#111111] font-mono font-bold uppercase border-b-2 border-[#111111] pb-2">
+                    <div className="p-6 rounded-sm bg-[#FFFFFF] border-2 border-[#20231F] shadow-poster-lg text-center space-y-4 relative overflow-hidden animate-fadeIn">
+                      <div className="flex items-center justify-between text-xs text-[#20231F] font-mono font-bold uppercase border-b-2 border-[#20231F] pb-2">
                         <span>CLB TRUYỀN THÔNG CÓC SÀI GÒN</span>
                         <span className="stamp-seal text-[9px]">VÉ CHECK-IN VIP 17Y</span>
                       </div>
 
                       <div>
-                        <h3 className="text-3xl sm:text-4xl font-display font-black text-[#111111] uppercase tracking-wide">
+                        <h3 className="text-3xl sm:text-4xl font-display font-black text-[#20231F] uppercase tracking-wide">
                           {foundRecord.fullName}
                         </h3>
-                        <span className="text-xs text-[#111111]/70 font-mono">
+                        <span className="text-xs text-[#20231F]/70 font-mono">
                           MSSV: {foundRecord.mssv} • {foundRecord.role === 'ALUMNI' ? 'Cựu Thành Viên' : 'Thành Viên Đương Nhiệm'}
                         </span>
                       </div>
 
                       {/* QR Code Container */}
-                      <div className="p-3 bg-white border-2 border-[#111111] rounded-2xl inline-block shadow-poster-sm">
+                      <div className="p-3 bg-white border-2 border-[#20231F] rounded-sm inline-block shadow-poster-sm">
                         <img
                           src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(foundRecord.ticketToken || foundRecord.ticketCode)}`}
                           alt="Mã QR Check-in VIP"
                           className="w-40 h-40"
                         />
-                        <span className="text-xs font-mono font-bold text-[#111111] block mt-1.5">
+                        <span className="text-xs font-mono font-bold text-[#20231F] block mt-1.5">
                           {foundRecord.ticketCode}
                         </span>
                       </div>
 
-                      <div className="text-xs text-[#111111] space-y-1">
+                      <div className="text-xs text-[#20231F] space-y-1">
                         <p>🗓️ <strong>18:00, Thứ Bảy, 15/12/2026</strong></p>
                         <p>📍 <strong>Trung tâm Hội nghị Asiana Plaza Sài Gòn</strong></p>
-                        <p className="text-[11px] text-[#111111]/70 italic">Dress code: Áo vàng truyền thống CSG / Smart Casual</p>
+                        <p className="text-[11px] text-[#20231F]/70 italic">Dress code: Áo vàng truyền thống CSG / Smart Casual</p>
                       </div>
 
                       {/* Calendar Sync Buttons */}
-                      <div className="pt-3 border-t-2 border-[#111111] flex flex-col sm:flex-row gap-2">
+                      <div className="pt-3 border-t-2 border-[#20231F] flex flex-col sm:flex-row gap-2">
                         <a
                           href={getGoogleCalendarUrl(foundRecord)}
                           target="_blank"
                           rel="noreferrer"
-                          className="flex-1 py-2.5 px-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-colors"
+                          className="flex-1 py-2.5 px-3 rounded-sm bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-colors"
                         >
                           <ExternalLink className="w-3.5 h-3.5" />
                           <span>Lưu Google Calendar</span>
@@ -652,7 +652,7 @@ END:VCALENDAR`;
                         <button
                           type="button"
                           onClick={() => downloadIcsFile(foundRecord)}
-                          className="btn-editorial-primary flex-1 py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5"
+                          className="btn-editorial-primary flex-1 py-2.5 px-3 rounded-sm font-bold text-xs flex items-center justify-center gap-1.5"
                         >
                           <Calendar className="w-3.5 h-3.5" />
                           <span>Tải tệp Apple/Outlook (.ics)</span>
