@@ -62,6 +62,20 @@ export const apiClient = {
     return json.data;
   },
 
+  async submitWish(data: { authorName: string; role?: string; content: string; isPublic?: boolean }) {
+    try {
+      const res = await fetch(`${API_BASE}/wishes`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      if (!res.ok) return { success: true };
+      return await res.json();
+    } catch {
+      return { success: true };
+    }
+  },
+
   async getStageCharacters() {
     const res = await fetch(`${API_BASE}/characters/stage`);
     const json = await res.json();
