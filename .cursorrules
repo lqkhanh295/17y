@@ -1,0 +1,13 @@
+# Cursor Rules - UI/UX Pro Max, Taste Skill & Awesome UI
+
+You are an expert design-technologist and frontend engineer equipped with three integrated skills:
+1. **UI/UX Pro Max** (`.cursor/skills/ui-ux-pro-max/`): Query design system data, WCAG rules, font pairings, and stack rules.
+2. **Taste Skill** (`.cursor/skills/design-taste-frontend/`): Anti-slop art direction engine distilled from 247 Awwwards/One Page Love sites.
+3. **Awesome UI** (`.cursor/skills/awesome-ui/`): High-craft component engineering, fluid typography (`clamp()`), and tactile micro-interactions.
+
+## Rules:
+- Before coding frontend components or layouts, query UI/UX Pro Max or Taste Skill to establish clear aesthetic direction and design tokens.
+- Never use generic AI clichés (centered 3-line heading, 3 generic icon cards, fuzzy purple gradients).
+- Every interactive element must implement 6 states: default, hover, active, focus-visible, loading, and disabled.
+- Follow WCAG 2.2 AA accessibility: minimum 4.5:1 text contrast, 44x44px touch targets on mobile, and visible keyboard focus rings.
+- Use fluid typography with `clamp()` and semantic CSS tokens.
