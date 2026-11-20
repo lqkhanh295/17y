@@ -20,7 +20,7 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
   const [wishContent, setWishContent] = useState('');
   const [isSubmittingWish, setIsSubmittingWish] = useState(false);
 
-  // Lightbox keyboard navigation & scroll lock
+  // Lightbox keyboard navigation & body scroll lock
   const handlePrev = useCallback(() => {
     if (!selectedPhoto) return;
     const currentIndex = ALL_PHOTOBOOK_IMAGES.findIndex(img => img.id === selectedPhoto.id);
@@ -71,263 +71,363 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
   };
 
   return (
-    <div className="w-full space-y-24 sm:space-y-40 pb-20">
+    <div className="w-full space-y-16 sm:space-y-28 lg:space-y-36 pb-16">
 
-      {/* ================= A. OPENING: IMMERSIVE VISUAL ARCHIVE ================= */}
-      <section className="relative pt-2 sm:pt-6">
-        
-        {/* Subtle Running Archive Header */}
-        <div className="flex items-baseline justify-between border-b border-csg-black/15 pb-2.5 mb-8 font-mono text-[11px] text-csg-black/50">
-          <div className="flex items-center gap-3">
-            <span className="font-bold text-csg-black uppercase tracking-widest">ARCHIVE // NO. 17</span>
-            <span>•</span>
-            <span>CÓC SÀI GÒN (2009 — 2026)</span>
-          </div>
-          <span className="italic font-editorial text-csg-black/70 hidden sm:inline">
-            "Some memories never leave."
-          </span>
+      {/* ================= 1. THE OPENING COMPOSITION (MULTI-ELEMENT & LAYERED) ================= */}
+      
+      {/* Running archival header line */}
+      <div className="flex items-baseline justify-between border-b border-csg-black/15 pb-2 font-mono text-[11px] text-csg-black/50">
+        <div className="flex items-center gap-2">
+          <span className="font-bold text-csg-black uppercase tracking-widest">ARCHIVE // 17Y</span>
+          <span>•</span>
+          <span>CÓC SÀI GÒN (2009 — 2026)</span>
         </div>
+        <span className="text-csg-black/60 hidden sm:inline">
+          {ALL_PHOTOBOOK_IMAGES.length} PHOTOGRAPHS
+        </span>
+      </div>
 
-        {/* Master Opening Photographic Composition (Overlapping & Off-center) */}
-        <div className="relative">
-          
-          {/* Dominant Panoramic Photograph */}
-          <div 
+      {/* DESKTOP OPENING: Multi-image layered collage (No conventional banner) */}
+      <div className="hidden md:block relative pt-4 pb-8">
+        
+        {/* Main Anchor Image (64% width, right aligned) */}
+        <div className="ml-auto w-[64%] relative">
+          <div
             onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.cover)}
-            className="group cursor-pointer relative max-w-5xl overflow-hidden bg-csg-muted shadow-paper-lg transition-transform duration-500 hover:-translate-y-1"
+            className="group cursor-pointer relative overflow-hidden bg-csg-muted shadow-paper-lg border border-csg-black/20 transition-transform duration-500 hover:-translate-y-1"
           >
             <img
               src={PHOTOBOOK_IMAGES.cover.src}
               alt={PHOTOBOOK_IMAGES.cover.alt}
-              className="w-full aspect-[16/9] sm:aspect-[21/10] object-cover transition-transform duration-700 group-hover:scale-[1.01]"
+              className="w-full aspect-[16/10] object-cover transition-transform duration-700 group-hover:scale-[1.01]"
             />
             <div className="absolute bottom-3 right-3 bg-csg-paper/90 border border-csg-black px-2 py-0.5 font-mono text-[10px] font-bold text-csg-black opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 shadow-sm">
               <ZoomIn className="w-3 h-3 text-csg-red" />
               <span>PHÓNG TO</span>
             </div>
-          </div>
-
-          {/* Overlapping Candid Snapshot (Offset Lower-Right) */}
-          <div 
-            onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.coverOffset)}
-            className="group cursor-pointer hidden md:block absolute -bottom-10 right-4 lg:right-12 w-64 lg:w-72 bg-white p-2 pb-6 shadow-paper-lg border border-csg-black/30 -rotate-2 hover:rotate-0 transition-transform duration-300 z-20"
-          >
-            <div className="overflow-hidden bg-csg-muted">
-              <img
-                src={PHOTOBOOK_IMAGES.coverOffset.src}
-                alt={PHOTOBOOK_IMAGES.coverOffset.alt}
-                className="w-full aspect-[4/3] object-cover"
-              />
-            </div>
-            <p className="font-editorial italic text-xs text-csg-black/75 pt-2 text-center">
-              "Những nụ cười đồng đội."
-            </p>
-          </div>
-
-          {/* Opening Typography Imprint & Action Pill */}
-          <div className="pt-6 sm:pt-8 flex flex-col md:flex-row md:items-end justify-between gap-6">
-            <div className="space-y-1.5 max-w-xl">
-              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-display font-extrabold uppercase tracking-tight text-csg-black leading-[0.95]">
-                NHỮNG NĂM THÁNG <br />
-                <span className="font-editorial italic font-normal text-csg-red text-4xl sm:text-6xl lg:text-7xl">
-                  Mình Đã Cùng Nhau.
-                </span>
-              </h1>
-              <p className="font-mono text-xs sm:text-sm text-csg-black/60 pt-1">
-                Cuốn photobook kỷ niệm 17 năm sắc áo vàng Cóc Sài Gòn.
-              </p>
-            </div>
-
-            {/* Discoverable RSVP Ticket Pill */}
-            <div className="shrink-0 pt-2 md:pt-0">
-              <button
-                onClick={onOpenRegister}
-                className="btn-editorial-primary px-6 py-3.5 font-display font-extrabold text-xs sm:text-sm uppercase tracking-wider flex items-center gap-2 shadow-poster"
-              >
-                <span>ĐĂNG KÝ VÉ GALA 17Y</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
+            <div className="absolute top-3 left-3 bg-csg-black/75 text-white px-1.5 py-0.5 font-mono text-[9px] tracking-widest">
+              {PHOTOBOOK_IMAGES.cover.archiveCode}
             </div>
           </div>
-
         </div>
 
-      </section>
-
-      {/* ================= B. PHOTOBOOK FLOW: THE CONTINUOUS EDITORIAL ARCHIVE ================= */}
-
-      {/* SPREAD 1: The Solitary Pause & Negative Space */}
-      <section className="relative py-4 sm:py-10">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
-          
-          {/* Vertical Print (Positioned with Intentional Left Offset) */}
-          <div className="md:col-start-2 md:col-span-5">
-            <div 
-              onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.camera)}
-              className="group cursor-pointer relative overflow-hidden bg-csg-muted shadow-paper-lg transition-transform duration-500 hover:-translate-y-1"
-            >
-              <img
-                src={PHOTOBOOK_IMAGES.camera.src}
-                alt={PHOTOBOOK_IMAGES.camera.alt}
-                className="w-full aspect-[3/4] object-cover transition-transform duration-700 group-hover:scale-[1.01]"
-              />
-              <div className="absolute bottom-3 right-3 bg-csg-paper/90 border border-csg-black px-2 py-0.5 font-mono text-[10px] font-bold text-csg-black opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 shadow-sm">
-                <ZoomIn className="w-3 h-3 text-csg-red" />
-                <span>XEM ẢNH</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Generous Negative Space & Whispering Archive Marker */}
-          <div className="md:col-start-8 md:col-span-4 space-y-3 md:pl-2">
-            <span className="font-mono text-[11px] text-csg-black/40 uppercase tracking-widest block font-bold">
-              KÝ ỨC // 01
+        {/* Embedded Typography & Quick Registration Pill (Positioned in left negative space) */}
+        <div className="absolute top-2 left-0 w-[42%] z-10 space-y-4">
+          <div className="space-y-1.5">
+            <span className="font-mono text-[10px] uppercase tracking-widest text-csg-black/45 block font-bold">
+              TƯ LIỆU HÌNH ẢNH KỶ NIỆM
             </span>
-            <p className="font-editorial italic text-2xl sm:text-3xl text-csg-black/80 leading-snug">
-              "Chiếc máy ảnh mượn và những ngày rong ruổi sân trường không biết mệt."
-            </p>
+            <h1 className="font-display font-extrabold text-4xl lg:text-5xl uppercase tracking-tight text-csg-black leading-[0.92]">
+              CÓC SÀI GÒN <br />
+              <span className="font-editorial italic font-normal text-csg-red text-5xl lg:text-6xl lowercase">
+                17 năm.
+              </span>
+            </h1>
           </div>
 
-        </div>
-      </section>
-
-      {/* SPREAD 2: Asymmetric Diptych (Contrasting Scales) */}
-      <section className="relative">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 lg:gap-12 items-end">
-          
-          {/* Left Horizontal Print (7 cols) */}
-          <div className="md:col-span-7">
-            <div 
-              onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.workspace)}
-              className="group cursor-pointer relative overflow-hidden bg-csg-muted shadow-paper-lg transition-transform duration-500 hover:-translate-y-1"
+          <div className="pt-2">
+            <button
+              onClick={onOpenRegister}
+              className="btn-editorial-primary px-5 py-3 font-display font-extrabold text-xs uppercase tracking-wider flex items-center gap-2 shadow-poster"
             >
-              <img
-                src={PHOTOBOOK_IMAGES.workspace.src}
-                alt={PHOTOBOOK_IMAGES.workspace.alt}
-                className="w-full aspect-[16/10] object-cover transition-transform duration-700 group-hover:scale-[1.01]"
-              />
-              <div className="absolute bottom-3 right-3 bg-csg-paper/90 border border-csg-black px-2 py-0.5 font-mono text-[10px] font-bold text-csg-black opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 shadow-sm">
-                <ZoomIn className="w-3 h-3 text-csg-red" />
-                <span>XEM ẢNH</span>
-              </div>
-            </div>
-            <div className="pt-2 font-mono text-[11px] text-csg-black/50">
-              Sài Gòn // Đêm dựng tin bài bên nhau.
-            </div>
+              <span>ĐĂNG KÝ VÉ GALA 17Y</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
           </div>
-
-          {/* Right Square Campfire Offset Lower (5 cols) */}
-          <div className="md:col-span-5 md:pb-6">
-            <div 
-              onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.bonfire)}
-              className="group cursor-pointer relative overflow-hidden bg-csg-muted shadow-paper-lg transition-transform duration-500 hover:-translate-y-1"
-            >
-              <img
-                src={PHOTOBOOK_IMAGES.bonfire.src}
-                alt={PHOTOBOOK_IMAGES.bonfire.alt}
-                className="w-full aspect-square object-cover transition-transform duration-700 group-hover:scale-[1.01]"
-              />
-              <div className="absolute bottom-3 right-3 bg-csg-paper/90 border border-csg-black px-2 py-0.5 font-mono text-[10px] font-bold text-csg-black opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 shadow-sm">
-                <ZoomIn className="w-3 h-3 text-csg-red" />
-                <span>XEM ẢNH</span>
-              </div>
-            </div>
-            <div className="pt-2 font-mono text-[11px] text-csg-black/50 text-right">
-              Tàn tro bay nhưng lòng vẫn ấm.
-            </div>
-          </div>
-
         </div>
-      </section>
 
-      {/* SPREAD 3: Full-Bleed Panoramic Horizon */}
-      <section className="relative">
+        {/* Overlapping Candid Snapshot (Offset over the lower-left corner of the anchor photo) */}
         <div 
+          onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.coverOffset)}
+          className="group cursor-pointer absolute -bottom-10 left-[26%] w-[27%] z-20 bg-white p-2 pb-5 border border-csg-black/30 shadow-paper-lg -rotate-2 hover:rotate-0 transition-transform duration-300"
+        >
+          <div className="overflow-hidden bg-csg-muted">
+            <img
+              src={PHOTOBOOK_IMAGES.coverOffset.src}
+              alt={PHOTOBOOK_IMAGES.coverOffset.alt}
+              className="w-full aspect-[4/3] object-cover"
+            />
+          </div>
+          <div className="pt-1.5 flex items-center justify-between font-mono text-[9px] text-csg-black/40 px-0.5">
+            <span>{PHOTOBOOK_IMAGES.coverOffset.archiveCode}</span>
+            <ZoomIn className="w-2.5 h-2.5 text-csg-red opacity-0 group-hover:opacity-100 transition-opacity" />
+          </div>
+        </div>
+
+        {/* Intimate Vertical Photo (Tucked at lower left corner) */}
+        <div
+          onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.camera)}
+          className="group cursor-pointer absolute top-[210px] left-0 w-[22%] z-10 overflow-hidden bg-csg-muted shadow-md border border-csg-black/20 hover:-translate-y-1 transition-transform duration-300"
+        >
+          <img
+            src={PHOTOBOOK_IMAGES.camera.src}
+            alt={PHOTOBOOK_IMAGES.camera.alt}
+            className="w-full aspect-[3/4] object-cover"
+          />
+          <div className="absolute top-2 left-2 bg-csg-black/70 text-white px-1 py-0.5 font-mono text-[8px]">
+            {PHOTOBOOK_IMAGES.camera.archiveCode}
+          </div>
+        </div>
+
+      </div>
+
+      {/* MOBILE OPENING: Specially tailored compact 2-image montage */}
+      <div className="block md:hidden relative pt-2">
+        
+        {/* Title */}
+        <div className="space-y-1 mb-4">
+          <span className="font-mono text-[10px] uppercase tracking-widest text-csg-black/45 block font-bold">
+            TƯ LIỆU HÌNH ẢNH KỶ NIỆM
+          </span>
+          <h1 className="font-display font-extrabold text-3xl uppercase tracking-tight text-csg-black leading-[0.95]">
+            CÓC SÀI GÒN <span className="font-editorial italic font-normal text-csg-red text-4xl lowercase">17 năm</span>
+          </h1>
+        </div>
+
+        {/* Layered Mobile Photo Pair */}
+        <div className="relative pb-10">
+          {/* Main Photo */}
+          <div
+            onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.cover)}
+            className="w-[86%] overflow-hidden bg-csg-muted shadow-md border border-csg-black/20"
+          >
+            <img
+              src={PHOTOBOOK_IMAGES.cover.src}
+              alt={PHOTOBOOK_IMAGES.cover.alt}
+              className="w-full aspect-[16/10] object-cover"
+            />
+          </div>
+
+          {/* Overlapping Candid Snapshot */}
+          <div
+            onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.coverOffset)}
+            className="absolute bottom-0 right-0 w-[54%] bg-white p-1.5 pb-3 border border-csg-black/30 shadow-paper-lg -rotate-2 z-10"
+          >
+            <img
+              src={PHOTOBOOK_IMAGES.coverOffset.src}
+              alt={PHOTOBOOK_IMAGES.coverOffset.alt}
+              className="w-full aspect-[4/3] object-cover"
+            />
+            <div className="pt-1 font-mono text-[8px] text-csg-black/40 text-right">
+              {PHOTOBOOK_IMAGES.coverOffset.archiveCode}
+            </div>
+          </div>
+        </div>
+
+        {/* Action button */}
+        <div className="pt-2">
+          <button
+            onClick={onOpenRegister}
+            className="btn-editorial-primary w-full py-3 font-display font-extrabold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-poster"
+          >
+            <span>ĐĂNG KÝ VÉ GALA 17Y</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </button>
+        </div>
+
+      </div>
+
+
+      {/* ================= 2. CONTINUOUS VISUAL COMPOSITION (VARIED RHYTHM, NO RIGID SPREADS) ================= */}
+
+      {/* --- MOMENTUM 1: Asymmetric Right Shift (Workspace) --- */}
+      <div className="relative">
+        <div className="md:ml-auto md:w-[68%]">
+          <div
+            onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.workspace)}
+            className="group cursor-pointer relative overflow-hidden bg-csg-muted shadow-paper-lg border border-csg-black/20 transition-transform duration-500 hover:-translate-y-1"
+          >
+            <img
+              src={PHOTOBOOK_IMAGES.workspace.src}
+              alt={PHOTOBOOK_IMAGES.workspace.alt}
+              className="w-full aspect-[16/10] object-cover transition-transform duration-700 group-hover:scale-[1.01]"
+            />
+            <div className="absolute bottom-3 right-3 bg-csg-paper/90 border border-csg-black px-2 py-0.5 font-mono text-[10px] font-bold text-csg-black opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 shadow-sm">
+              <ZoomIn className="w-3 h-3 text-csg-red" />
+              <span>PHÓNG TO</span>
+            </div>
+            <div className="absolute top-3 left-3 bg-csg-black/75 text-white px-1.5 py-0.5 font-mono text-[9px] tracking-widest">
+              {PHOTOBOOK_IMAGES.workspace.archiveCode}
+            </div>
+          </div>
+          <div className="pt-2 flex items-center justify-between font-mono text-[10px] text-csg-black/40">
+            <span>[ ARCHIVE REF ]</span>
+            <span>04 / {ALL_PHOTOBOOK_IMAGES.length}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* --- MOMENTUM 2: Staggered Pair with Contrasting Scales (Bonfire + Stage) --- */}
+      {/* Desktop: Asymmetric contrast (Intimate square on left, energetic wide on right offset down) */}
+      <div className="hidden md:flex items-start gap-8 lg:gap-14">
+        
+        {/* Left: Intimate square crop (36% width) */}
+        <div className="w-[36%] pt-8">
+          <div
+            onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.bonfire)}
+            className="group cursor-pointer relative overflow-hidden bg-csg-muted shadow-paper-lg border border-csg-black/20 transition-transform duration-500 hover:-translate-y-1"
+          >
+            <img
+              src={PHOTOBOOK_IMAGES.bonfire.src}
+              alt={PHOTOBOOK_IMAGES.bonfire.alt}
+              className="w-full aspect-square object-cover transition-transform duration-700 group-hover:scale-[1.01]"
+            />
+            <div className="absolute bottom-3 right-3 bg-csg-paper/90 border border-csg-black px-2 py-0.5 font-mono text-[10px] font-bold text-csg-black opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 shadow-sm">
+              <ZoomIn className="w-3 h-3 text-csg-red" />
+              <span>PHÓNG TO</span>
+            </div>
+            <div className="absolute top-3 left-3 bg-csg-black/75 text-white px-1.5 py-0.5 font-mono text-[9px] tracking-widest">
+              {PHOTOBOOK_IMAGES.bonfire.archiveCode}
+            </div>
+          </div>
+          <div className="pt-2 font-mono text-[10px] text-csg-black/40">
+            05 / {ALL_PHOTOBOOK_IMAGES.length}
+          </div>
+        </div>
+
+        {/* Right: Energetic landscape (64% width, staggered down) */}
+        <div className="w-[64%] pt-20">
+          <div
+            onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.stage)}
+            className="group cursor-pointer relative overflow-hidden bg-csg-muted shadow-paper-lg border border-csg-black/20 transition-transform duration-500 hover:-translate-y-1"
+          >
+            <img
+              src={PHOTOBOOK_IMAGES.stage.src}
+              alt={PHOTOBOOK_IMAGES.stage.alt}
+              className="w-full aspect-[16/10] object-cover transition-transform duration-700 group-hover:scale-[1.01]"
+            />
+            <div className="absolute bottom-3 right-3 bg-csg-paper/90 border border-csg-black px-2 py-0.5 font-mono text-[10px] font-bold text-csg-black opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 shadow-sm">
+              <ZoomIn className="w-3 h-3 text-csg-red" />
+              <span>PHÓNG TO</span>
+            </div>
+            <div className="absolute top-3 left-3 bg-csg-black/75 text-white px-1.5 py-0.5 font-mono text-[9px] tracking-widest">
+              {PHOTOBOOK_IMAGES.stage.archiveCode}
+            </div>
+          </div>
+          <div className="pt-2 font-mono text-[10px] text-csg-black/40 text-right">
+            06 / {ALL_PHOTOBOOK_IMAGES.length}
+          </div>
+        </div>
+
+      </div>
+
+      {/* Mobile: Side-by-side staggered pair (Not stacked vertically, saves scroll fatigue!) */}
+      <div className="flex md:hidden items-start gap-3">
+        <div className="w-[46%]">
+          <div
+            onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.bonfire)}
+            className="overflow-hidden bg-csg-muted shadow-sm border border-csg-black/20"
+          >
+            <img
+              src={PHOTOBOOK_IMAGES.bonfire.src}
+              alt={PHOTOBOOK_IMAGES.bonfire.alt}
+              className="w-full aspect-square object-cover"
+            />
+          </div>
+          <div className="pt-1 font-mono text-[8px] text-csg-black/40">
+            {PHOTOBOOK_IMAGES.bonfire.archiveCode}
+          </div>
+        </div>
+
+        <div className="w-[54%] pt-6">
+          <div
+            onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.stage)}
+            className="overflow-hidden bg-csg-muted shadow-sm border border-csg-black/20"
+          >
+            <img
+              src={PHOTOBOOK_IMAGES.stage.src}
+              alt={PHOTOBOOK_IMAGES.stage.alt}
+              className="w-full aspect-[4/3] object-cover"
+            />
+          </div>
+          <div className="pt-1 font-mono text-[8px] text-csg-black/40 text-right">
+            {PHOTOBOOK_IMAGES.stage.archiveCode}
+          </div>
+        </div>
+      </div>
+
+      {/* --- MOMENTUM 3: Cinematic Panoramic Bleed (Beach Horizon) --- */}
+      <div className="relative">
+        <div
           onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.beachPanoramic)}
-          className="group cursor-pointer relative overflow-hidden bg-csg-muted shadow-paper-lg transition-transform duration-500 hover:-translate-y-1"
+          className="group cursor-pointer relative overflow-hidden bg-csg-muted shadow-paper-lg border border-csg-black/20 transition-transform duration-500 hover:-translate-y-1"
         >
           <img
             src={PHOTOBOOK_IMAGES.beachPanoramic.src}
             alt={PHOTOBOOK_IMAGES.beachPanoramic.alt}
-            className="w-full aspect-[16/8] sm:aspect-[21/8] object-cover transition-transform duration-700 group-hover:scale-[1.01]"
+            className="w-full aspect-[16/8] sm:aspect-[21/9] object-cover transition-transform duration-700 group-hover:scale-[1.01]"
           />
-          <div className="absolute bottom-4 right-4 bg-csg-paper/90 border border-csg-black px-2.5 py-1 font-mono text-[11px] font-bold text-csg-black opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 shadow-sm">
+          <div className="absolute bottom-3 right-3 bg-csg-paper/90 border border-csg-black px-2.5 py-1 font-mono text-[10px] font-bold text-csg-black opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 shadow-sm">
             <ZoomIn className="w-3.5 h-3.5 text-csg-red" />
-            <span>XEM RÕ TOÀN CẢNH</span>
+            <span>PHÓNG TO TOÀN CẢNH</span>
+          </div>
+          <div className="absolute top-3 left-3 bg-csg-black/75 text-white px-1.5 py-0.5 font-mono text-[9px] tracking-widest">
+            {PHOTOBOOK_IMAGES.beachPanoramic.archiveCode}
           </div>
         </div>
-        <div className="pt-2.5 flex items-baseline justify-between font-mono text-[11px] text-csg-black/50 px-1">
-          <span>NHỮNG CHUYẾN XE NỐI DÀI TÌNH ANH EM</span>
-          <span className="hidden sm:inline">TEAMBUILDING TRUYỀN THỐNG</span>
+        <div className="pt-2 flex items-center justify-between font-mono text-[10px] text-csg-black/40">
+          <span>PANORAMA ARCHIVE</span>
+          <span>07 / {ALL_PHOTOBOOK_IMAGES.length}</span>
         </div>
-      </section>
+      </div>
 
-      {/* SPREAD 4: Triad Montage (Staggered Scatter) */}
-      <section className="relative">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 lg:gap-10 items-center">
-          
-          {/* Stage Lights (6 cols) */}
-          <div className="md:col-span-6">
-            <div 
-              onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.stage)}
-              className="group cursor-pointer relative overflow-hidden bg-csg-muted shadow-paper-lg transition-transform duration-500 hover:-translate-y-1"
-            >
-              <img
-                src={PHOTOBOOK_IMAGES.stage.src}
-                alt={PHOTOBOOK_IMAGES.stage.alt}
-                className="w-full aspect-[16/10] object-cover transition-transform duration-700 group-hover:scale-[1.01]"
-              />
-              <div className="absolute bottom-3 right-3 bg-csg-paper/90 border border-csg-black px-2 py-0.5 font-mono text-[10px] font-bold text-csg-black opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 shadow-sm">
-                <ZoomIn className="w-3 h-3 text-csg-red" />
-                <span>XEM ẢNH</span>
-              </div>
+      {/* --- MOMENTUM 4: Quiet Inset & Ensemble Culmination (Celebration Toast & Gathering Crowd) --- */}
+      <div className="space-y-12 sm:space-y-20">
+        
+        {/* Inset Photo (46% width on desktop, 82% on mobile) */}
+        <div className="w-[82%] sm:w-[46%] sm:ml-8 lg:ml-16">
+          <div
+            onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.celebrationToast)}
+            className="group cursor-pointer relative overflow-hidden bg-csg-muted shadow-paper-lg border border-csg-black/20 transition-transform duration-500 hover:-translate-y-1"
+          >
+            <img
+              src={PHOTOBOOK_IMAGES.celebrationToast.src}
+              alt={PHOTOBOOK_IMAGES.celebrationToast.alt}
+              className="w-full aspect-[4/3] object-cover transition-transform duration-700 group-hover:scale-[1.01]"
+            />
+            <div className="absolute bottom-3 right-3 bg-csg-paper/90 border border-csg-black px-2 py-0.5 font-mono text-[10px] font-bold text-csg-black opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 shadow-sm">
+              <ZoomIn className="w-3 h-3 text-csg-red" />
+              <span>PHÓNG TO</span>
+            </div>
+            <div className="absolute top-3 left-3 bg-csg-black/75 text-white px-1.5 py-0.5 font-mono text-[9px] tracking-widest">
+              {PHOTOBOOK_IMAGES.celebrationToast.archiveCode}
             </div>
           </div>
+          <div className="pt-1.5 font-mono text-[10px] text-csg-black/40">
+            08 / {ALL_PHOTOBOOK_IMAGES.length}
+          </div>
+        </div>
 
-          {/* Toast and Crowd (6 cols, staggered down) */}
-          <div className="md:col-span-6 md:pt-12">
-            <div 
-              onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.celebrationToast)}
-              className="group cursor-pointer relative overflow-hidden bg-csg-muted shadow-paper-lg transition-transform duration-500 hover:-translate-y-1"
-            >
-              <img
-                src={PHOTOBOOK_IMAGES.celebrationToast.src}
-                alt={PHOTOBOOK_IMAGES.celebrationToast.alt}
-                className="w-full aspect-[4/3] object-cover transition-transform duration-700 group-hover:scale-[1.01]"
-              />
-              <div className="absolute bottom-3 right-3 bg-csg-paper/90 border border-csg-black px-2 py-0.5 font-mono text-[10px] font-bold text-csg-black opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 shadow-sm">
-                <ZoomIn className="w-3 h-3 text-csg-red" />
-                <span>XEM ẢNH</span>
-              </div>
+        {/* Grand Ensemble Photograph (78% width on desktop, 96% on mobile, aligned right) */}
+        <div className="w-[96%] sm:w-[78%] ml-auto">
+          <div
+            onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.gatheringCrowd)}
+            className="group cursor-pointer relative overflow-hidden bg-csg-muted shadow-paper-lg border border-csg-black/20 transition-transform duration-500 hover:-translate-y-1"
+          >
+            <img
+              src={PHOTOBOOK_IMAGES.gatheringCrowd.src}
+              alt={PHOTOBOOK_IMAGES.gatheringCrowd.alt}
+              className="w-full aspect-[16/9] object-cover transition-transform duration-700 group-hover:scale-[1.01]"
+            />
+            <div className="absolute bottom-3 right-3 bg-csg-paper/90 border border-csg-black px-2 py-0.5 font-mono text-[10px] font-bold text-csg-black opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 shadow-sm">
+              <ZoomIn className="w-3 h-3 text-csg-red" />
+              <span>PHÓNG TO</span>
+            </div>
+            <div className="absolute top-3 left-3 bg-csg-black/75 text-white px-1.5 py-0.5 font-mono text-[9px] tracking-widest">
+              {PHOTOBOOK_IMAGES.gatheringCrowd.archiveCode}
             </div>
           </div>
-
-        </div>
-      </section>
-
-      {/* SPREAD 5: The Grand Warmth of All Generations */}
-      <section className="relative">
-        <div 
-          onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.gatheringCrowd)}
-          className="group cursor-pointer max-w-5xl mx-auto relative overflow-hidden bg-csg-muted shadow-paper-lg transition-transform duration-500 hover:-translate-y-1"
-        >
-          <img
-            src={PHOTOBOOK_IMAGES.gatheringCrowd.src}
-            alt={PHOTOBOOK_IMAGES.gatheringCrowd.alt}
-            className="w-full aspect-[16/9] object-cover transition-transform duration-700 group-hover:scale-[1.01]"
-          />
-          <div className="absolute bottom-3 right-3 bg-csg-paper/90 border border-csg-black px-2 py-0.5 font-mono text-[10px] font-bold text-csg-black opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 shadow-sm">
-            <ZoomIn className="w-3 h-3 text-csg-red" />
-            <span>XEM ẢNH</span>
+          <div className="pt-1.5 flex items-center justify-between font-mono text-[10px] text-csg-black/40">
+            <span>CÓC SÀI GÒN // TẬP THỂ</span>
+            <span>09 / {ALL_PHOTOBOOK_IMAGES.length}</span>
           </div>
         </div>
-        <p className="font-editorial italic text-center text-lg sm:text-xl text-csg-black/80 pt-4">
-          "Nơi những người xa lạ trở thành anh em một mái nhà."
-        </p>
-      </section>
 
-      {/* ================= C & D. GALA DETAILS & REGISTRATION INVITATION ================= */}
-      <section className="relative pt-8 sm:pt-14 border-t border-csg-black/20">
+      </div>
+
+
+      {/* ================= 3. GALA INVITATION TICKET & SỔ LƯU BÚT ================= */}
+      <div className="pt-8 sm:pt-14 border-t border-csg-black/20">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           
           {/* The Gala Keepsake Ticket (7 cols) */}
@@ -354,7 +454,7 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
                 </p>
               </div>
 
-              {/* Clean Event Schedule Matrix */}
+              {/* Verified Event Schedule Matrix */}
               <div className="font-mono text-xs divide-y divide-csg-black/15 py-1">
                 <div className="flex justify-between py-2.5">
                   <span className="text-csg-black/60 uppercase">THỜI GIAN:</span>
@@ -405,7 +505,7 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
                   SỔ LƯU BÚT // 17 NĂM
                 </span>
                 <h3 className="text-xl sm:text-2xl font-display font-extrabold uppercase text-csg-black">
-                  Để lại một dòng cho những năm tháng này
+                  Gửi một lời chúc đến Cóc Sài Gòn
                 </h3>
               </div>
 
@@ -425,7 +525,7 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
                   />
                   <textarea
                     rows={2}
-                    placeholder="Một dòng gửi gắm đến Cóc Sài Gòn..."
+                    placeholder="Gửi gắm đến Cóc Sài Gòn..."
                     value={wishContent}
                     onChange={(e) => setWishContent(e.target.value)}
                     className="w-full px-3 py-2.5 bg-csg-paper border border-csg-black/40 text-xs font-mono outline-none focus:border-csg-black focus:bg-white resize-none transition-colors"
@@ -445,19 +545,15 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
           </div>
 
         </div>
-      </section>
+      </div>
 
-      {/* ================= E. CLOSING: CLOSING THE PHYSICAL ALBUM ================= */}
-      <section className="relative text-center space-y-2 pt-6">
-        <span className="font-mono text-xs uppercase tracking-widest text-csg-black/40 block">
-          CÓC SÀI GÒN // 2009 — 2026
-        </span>
-        <p className="font-editorial italic text-lg sm:text-xl text-csg-black/75">
-          "17 năm qua những lăng kính, hẹn gặp lại nhau tại đêm tiệc."
-        </p>
-      </section>
+      {/* ================= 4. MINIMAL ARCHIVAL COLOPHON ================= */}
+      <div className="text-center space-y-1 pt-4 font-mono text-xs text-csg-black/40 uppercase tracking-widest">
+        <div>CÓC SÀI GÒN // 2009 — 2026</div>
+        <div className="text-[10px]">17 NĂM MỘT MÁI NHÀ</div>
+      </div>
 
-      {/* ================= FULLSCREEN DARKROOM LIGHTBOX ================= */}
+      {/* ================= 5. FULLSCREEN DARKROOM LIGHTBOX ================= */}
       {selectedPhoto && (
         <div
           role="dialog"
@@ -497,7 +593,7 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
               </button>
 
               <span className="text-[#DCD5C4]/70">
-                {ALL_PHOTOBOOK_IMAGES.findIndex(img => img.id === selectedPhoto.id) + 1} / {ALL_PHOTOBOOK_IMAGES.length}
+                {selectedPhoto.archiveCode} • {ALL_PHOTOBOOK_IMAGES.findIndex(img => img.id === selectedPhoto.id) + 1} / {ALL_PHOTOBOOK_IMAGES.length}
               </span>
 
               <button
