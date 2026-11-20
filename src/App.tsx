@@ -12,6 +12,7 @@ import { RegistrationModal } from './components/RegistrationModal';
 import { PaymentLookupModal } from './components/PaymentLookupModal';
 import { AdminDashboard } from './components/AdminDashboard';
 import { CelebrationStage } from './components/CelebrationStage';
+import { CinematicFilmOpening } from './components/CinematicFilmOpening';
 import { MascotFrog, RegistrationRecord } from './types';
 import { apiClient } from './services/apiClient';
 import { audioService } from './services/audioService';
@@ -112,6 +113,22 @@ const INITIAL_REGISTRATIONS: RegistrationRecord[] = [
 ];
 
 export const App: React.FC = () => {
+  // One-time Cinematic Film Opening intro state
+  const [showCinematicIntro, setShowCinematicIntro] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    // Skip if user prefers reduced motion
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      return false;
+    }
+    // Skip if navigating directly into sub-routes or specific anchor sections
+    const path = window.location.pathname;
+    if (path === '/register' || path === '/portal' || path === '/admin' || window.location.hash) {
+      return false;
+    }
+    // Skip if already watched in this session
+    return sessionStorage.getItem('csg17y_film_intro_viewed') !== 'true';
+  });
+
   // Modal states
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
   const [isLookupOpen, setIsLookupOpen] = useState(false);
@@ -316,6 +333,11 @@ export const App: React.FC = () => {
 
   return (
     <div className="relative min-h-screen bg-csg-paper bg-paper-texture text-csg-black flex flex-col selection:bg-csg-yellow selection:text-csg-black font-body">
+      {/* One-Time Cinematic Analog Film Opening */}
+      {showCinematicIntro && (
+        <CinematicFilmOpening onComplete={() => setShowCinematicIntro(false)} />
+      )}
+
       {/* Floating Audio Controller */}
       <AudioPlayerToggle />
 
