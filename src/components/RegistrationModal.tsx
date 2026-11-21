@@ -6,22 +6,25 @@ import {
   UserCheck, ShieldAlert, FileText, Cake, Edit3, MessageSquare,
   HelpCircle, ExternalLink
 } from 'lucide-react';
-import { MemberDirectoryItem, PaymentPlan, RegistrationRecord } from '../types';
+import { MemberDirectoryItem, PaymentPlan, RegistrationRecord, MascotFrog } from '../types';
 import { apiClient } from '../services/apiClient';
 import { audioService } from '../services/audioService';
+import { CelebrationStage } from './CelebrationStage';
 
 interface RegistrationModalProps {
   isOpen: boolean;
   onClose: () => void;
   onRegistrationComplete: (record: RegistrationRecord) => void;
   onOpenPortal?: () => void;
+  stageCharacters?: MascotFrog[];
 }
 
 export const RegistrationModal: React.FC<RegistrationModalProps> = ({
   isOpen,
   onClose,
   onRegistrationComplete,
-  onOpenPortal
+  onOpenPortal,
+  stageCharacters = []
 }) => {
   // 6-Screen Guided Flow:
   // Screen 1: Identity Verification (MSSV / Name Lookup)
@@ -209,13 +212,13 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-[#20231F]/85 backdrop-blur-md overflow-y-auto animate-fadeIn">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-5 bg-[#20231F]/90 backdrop-blur-md overflow-y-auto animate-fadeIn">
       <div 
-        className="relative w-full max-w-2xl bg-[#F4EEDF] border-2 border-[#20231F] rounded-sm shadow-poster-lg overflow-hidden my-6 flex flex-col max-h-[92vh] animate-paper-unfold"
+        className={`relative w-full ${screen === 6 ? 'max-w-6xl' : 'max-w-2xl'} bg-[#F4EEDF] border-2 border-[#20231F] rounded-sm shadow-poster-lg overflow-hidden my-3 sm:my-6 flex flex-col max-h-[95vh] animate-paper-unfold`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header Bar */}
-        <div className="flex items-center justify-between px-6 py-4 border-b-2 border-[#20231F] bg-[#FFFFFF]">
+        <div className="flex items-center justify-between px-5 sm:px-6 py-3.5 border-b-2 border-[#20231F] bg-[#FFFFFF]">
           <div className="flex items-center gap-3">
             <span className="w-10 h-10 rounded-sm bg-[#F4C542] border-2 border-[#20231F] flex items-center justify-center text-xl shadow-poster-sm">
               🐸
@@ -226,19 +229,22 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                   CÓC SÀI GÒN 17Y
                 </span>
                 <span className="stamp-seal text-[9px]">
-                  BƯỚC 0{screen} / 06
+                  {screen === 6 ? 'SÂN KHẤU CÓC' : `BƯỚC 0${screen} / 06`}
                 </span>
               </div>
               <p className="text-[11px] font-body text-[#20231F]/70">
-                Đại tiệc kỷ niệm 17 năm • Đăng ký tham dự chính thức
+                {screen === 6 ? 'Linh vật đại diện cho bạn đã lên sân khấu kỷ niệm 17 năm!' : 'Đại tiệc kỷ niệm 17 năm • Đăng ký tham dự chính thức'}
               </p>
             </div>
           </div>
           <button
+            type="button"
             onClick={onClose}
-            className="p-1.5 rounded-lg border-2 border-[#20231F] hover:bg-[#F4EEDF] text-[#20231F] transition-colors"
+            className="px-3 py-1.5 rounded-sm bg-[#20231F] text-white hover:bg-[#B94D35] text-xs font-mono font-bold uppercase transition-colors flex items-center gap-1.5 shadow-sm"
+            title="Thoát ra trang chủ"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
+            <span className="hidden sm:inline">VỀ TRANG CHỦ</span>
           </button>
         </div>
 
@@ -891,72 +897,18 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
             </div>
           )}
 
-          {/* ================= SCREEN 06: REGISTRATION SUCCESS ================= */}
+          {/* ================= SCREEN 06: REGISTRATION SUCCESS & CELEBRATION STAGE ================= */}
           {screen === 6 && completedRecord && (
-            <div className="text-center space-y-6 py-4 animate-fadeIn">
-              <div className="w-20 h-20 mx-auto rounded-sm bg-[#F4C542] border-2 border-[#20231F] flex items-center justify-center text-4xl shadow-poster animate-bounce">
-                🐸
-              </div>
-
-              <div className="space-y-1">
-                <span className="text-xs font-mono font-bold tracking-widest text-[#B94D35] uppercase">
-                  REGISTRATION COMPLETED
-                </span>
-                <h3 className="text-4xl sm:text-5xl font-display uppercase tracking-tight text-[#20231F]">
-                  YOU'RE IN THE STORY NOW.
-                </h3>
-                <p className="text-sm text-[#20231F]/75 max-w-md mx-auto">
-                  Chào mừng {completedRecord.honorific} {completedRecord.fullName} đã chính thức có mặt tại Đại tiệc sinh nhật 17 năm Cóc Sài Gòn!
-                </p>
-              </div>
-
-              {/* Status summary receipt */}
-              <div className="p-4 rounded-sm bg-white border-2 border-[#20231F] text-xs max-w-sm mx-auto text-left space-y-2 shadow-poster-sm">
-                <div className="flex justify-between pb-1.5 border-b border-[#20231F]/20">
-                  <span className="text-[#20231F]/60">Mã đăng ký:</span>
-                  <span className="font-mono font-bold text-[#20231F]">{completedRecord.id}</span>
-                </div>
-                <div className="flex justify-between pb-1.5 border-b border-[#20231F]/20">
-                  <span className="text-[#20231F]/60">Số tiền đã nộp:</span>
-                  <span className="font-bold text-[#20231F]">{completedRecord.paidAmount.toLocaleString('vi-VN')} đ</span>
-                </div>
-                {completedRecord.remainingAmount > 0 && (
-                  <div className="flex justify-between pb-1.5 border-b border-[#20231F]/20">
-                    <span className="text-[#20231F]/60">Số dư còn thiếu:</span>
-                    <span className="font-bold text-[#B94D35]">{completedRecord.remainingAmount.toLocaleString('vi-VN')} đ</span>
-                  </div>
-                )}
-                <div className="flex justify-between">
-                  <span className="text-[#20231F]/60">Trạng thái:</span>
-                  <span className="font-bold text-[#D99B26]">
-                    Chờ BTC đối soát biên lai
-                  </span>
-                </div>
-              </div>
-
-              <p className="text-xs text-[#20231F]/70 max-w-sm mx-auto font-body">
-                ✨ Nhân vật Cóc Áo Vàng đại diện cho bạn mang lời chúc vừa xuất hiện tại Sân Khấu Kỷ Niệm!
-              </p>
-
-              <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
-                <button
-                  type="button"
-                  onClick={() => {
-                    onClose();
-                    if (onOpenPortal) onOpenPortal();
-                  }}
-                  className="btn-editorial-secondary flex-1 py-3 rounded-sm font-bold text-xs uppercase"
-                >
-                  Xem Portal Vé & Thanh toán
-                </button>
-                <button
-                  type="button"
-                  onClick={onClose}
-                  className="btn-editorial-primary flex-1 py-3 rounded-sm font-display text-xl uppercase tracking-wider"
-                >
-                  XEM SÂN KHẤU 17Y 🎉
-                </button>
-              </div>
+            <div className="space-y-4 animate-fadeIn">
+              <CelebrationStage
+                characters={stageCharacters}
+                newRegistrant={completedRecord}
+                onClose={onClose}
+                onOpenPortal={() => {
+                  onClose();
+                  if (onOpenPortal) onOpenPortal();
+                }}
+              />
             </div>
           )}
 

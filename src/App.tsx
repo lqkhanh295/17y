@@ -112,12 +112,13 @@ export const App: React.FC = () => {
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
   const [isLookupOpen, setIsLookupOpen] = useState(false);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
+  const [isStageOpen, setIsStageOpen] = useState(false);
 
   // Registrations state
   const [registrations, setRegistrations] = useState<RegistrationRecord[]>(INITIAL_REGISTRATIONS);
 
   // Mascots crowd on Celebration Stage
-  const [stageCharacters] = useState<MascotFrog[]>([
+  const [stageCharacters, setStageCharacters] = useState<MascotFrog[]>([
     {
       id: 'char-1',
       name: 'Anh Huỳnh Tấn Phát',
@@ -188,6 +189,7 @@ export const App: React.FC = () => {
     setIsRegisterOpen(false);
     setIsLookupOpen(false);
     setIsAdminOpen(false);
+    setIsStageOpen(false);
   };
 
   // Sync initial URL on mount and handle Back/Forward browser navigation
@@ -198,18 +200,22 @@ export const App: React.FC = () => {
         setIsRegisterOpen(true);
         setIsLookupOpen(false);
         setIsAdminOpen(false);
+        setIsStageOpen(false);
       } else if (path.startsWith('/portal')) {
         setIsLookupOpen(true);
         setIsRegisterOpen(false);
         setIsAdminOpen(false);
+        setIsStageOpen(false);
       } else if (path.startsWith('/admin')) {
         setIsAdminOpen(true);
         setIsRegisterOpen(false);
         setIsLookupOpen(false);
+        setIsStageOpen(false);
       } else {
         setIsRegisterOpen(false);
         setIsLookupOpen(false);
         setIsAdminOpen(false);
+        setIsStageOpen(false);
       }
     };
 
@@ -222,12 +228,25 @@ export const App: React.FC = () => {
   const handleRegistrationComplete = (newRecord: RegistrationRecord) => {
     setRegistrations(prev => [newRecord, ...prev]);
 
+    // Add newly registered frog to the stage characters
+    const newFrog: MascotFrog = {
+      id: `frog-${newRecord.id || Date.now()}`,
+      name: `${newRecord.honorific} ${newRecord.fullName}`,
+      role: newRecord.role,
+      wish: newRecord.wishes?.trim() || 'Mừng sinh nhật 17 năm Cóc Sài Gòn rực rỡ! 🎉',
+      x: 50,
+      y: 74,
+      scale: 1.25,
+      direction: 1
+    };
+    setStageCharacters(prev => [newFrog, ...prev.filter(c => c.id !== newFrog.id)]);
+
     // Trigger celebration chime & confetti
     audioService.playCelebrationChime();
     confetti({
-      particleCount: 80,
-      spread: 80,
-      origin: { y: 0.6 },
+      particleCount: 100,
+      spread: 90,
+      origin: { y: 0.5 },
       colors: ['#F4C542', '#B94D35', '#20231F', '#F4EEDF']
     });
   };
@@ -289,12 +308,12 @@ export const App: React.FC = () => {
 
           {/* Minimal Quick Actions */}
           <nav className="flex items-center gap-5 sm:gap-7 font-mono text-xs uppercase tracking-wider text-csg-black/80 font-medium">
-            <a
-              href="#san-khau"
+            <button
+              onClick={() => setIsStageOpen(true)}
               className="hover:text-csg-red transition-colors hidden md:inline font-bold"
             >
               SÂN KHẤU CÓC
-            </a>
+            </button>
             <button
               onClick={() => setShowCinematicIntro(true)}
               className="hover:text-csg-red transition-colors hidden sm:inline"
@@ -318,7 +337,7 @@ export const App: React.FC = () => {
         </div>
       </header>
 
-      {/* ================= CONTINUOUS PHOTOBOOK JOURNEY ================= */}
+      {/* ================= CONTINUOUS PHOTOBOOK JOURNEY (ẢNH & FORM) ================= */}
       <main className="relative z-10 flex-1 max-w-[1360px] mx-auto px-4 sm:px-8 w-full py-6 sm:py-10">
         <PhotobookFlow
           onOpenRegister={openRegister}
@@ -326,14 +345,6 @@ export const App: React.FC = () => {
           onWishSubmit={handleWishSubmit}
           wishSubmitted={wishSubmitted}
         />
-
-        {/* ================= SÂN KHẤU CÓC SÀI GÒN ================= */}
-        <div className="pt-10 border-t border-csg-black/15">
-          <CelebrationStage
-            characters={stageCharacters}
-            onOpenRegister={openRegister}
-          />
-        </div>
       </main>
 
       {/* ================= QUIET COLOPHON FOOTER ================= */}
@@ -371,13 +382,24 @@ export const App: React.FC = () => {
         </button>
       </div>
 
-      {/* ================= FUNCTIONAL MODALS (100% PRESERVED) ================= */}
+      {/* ================= FUNCTIONAL MODALS ================= */}
       <RegistrationModal
         isOpen={isRegisterOpen}
         onClose={closeModals}
         onRegistrationComplete={handleRegistrationComplete}
         onOpenPortal={openLookup}
+        stageCharacters={stageCharacters}
       />
+
+      {isStageOpen && (
+        <CelebrationStage
+          isModal={true}
+          characters={stageCharacters}
+          onClose={() => setIsStageOpen(false)}
+          onOpenRegister={openRegister}
+          onOpenPortal={openLookup}
+        />
+      )}
 
       <PaymentLookupModal
         isOpen={isLookupOpen}
