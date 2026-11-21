@@ -268,113 +268,217 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
         </div>
       </div>
 
-      {/* Theatrical Stage Canvas - Tái hiện y chang hội trường thực tế từ ảnh chụp */}
-      <div className="relative w-full h-[480px] sm:h-[560px] md:h-[600px] rounded-sm bg-[#2A231C] border-2 border-[#20231F] overflow-hidden shadow-poster select-none">
+      {/* Theatrical Stage Canvas - Tái hiện 3D hội trường thực tế từ ảnh chụp */}
+      <div className="relative w-full h-[520px] sm:h-[600px] rounded-sm bg-[#1C140D] border-2 border-[#20231F] overflow-hidden shadow-poster select-none perspective-[1000px]">
         
         {/* ========================================================================= */}
-        {/* 1. HỘI TRƯỜNG THỰC TẾ (REAL AUDITORIUM VENUE FROM USER PHOTO)              */}
+        {/* 1. TRẦN HỘI TRƯỜNG & ĐÈN DOWNLIGHT HẮT SÁNG                               */}
         {/* ========================================================================= */}
-        <div className="absolute inset-0">
-          <img 
-            src="/images/real_stage.jpg" 
-            alt="Sân khấu hội trường Cóc Sài Gòn" 
-            className="w-full h-full object-cover object-center select-none pointer-events-none"
-          />
-          {/* Subtle atmospheric vignette */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-black/15 pointer-events-none" />
+        <div className="absolute top-0 left-0 right-0 h-9 sm:h-11 bg-gradient-to-b from-[#FAF7F2] to-[#EAE0D2] border-b-2 border-[#C8B29B] z-10 flex items-center justify-around px-8">
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="relative flex flex-col items-center">
+              {/* Recessed Ceiling Light Panel */}
+              <div className="w-8 sm:w-12 h-2.5 sm:h-3 rounded-xs bg-[#FFFFFF] border border-[#C5B09A] shadow-inner" />
+              {/* Soft Ambient Downlight Cone */}
+              <div className="absolute top-3 w-16 sm:w-24 h-48 bg-gradient-to-b from-[#FFFDF0]/35 via-[#F4C542]/10 to-transparent blur-md pointer-events-none" />
+            </div>
+          ))}
         </div>
 
         {/* ========================================================================= */}
-        {/* 2. MÀN HÌNH LED MÀU ĐEN 16:9 CHUẨN TRÊN TƯỜNG                             */}
+        {/* 2. TƯỜNG SAU HỘI TRƯỜNG (3-TIER ACOUSTIC WOOD WALL STRUCTURE)              */}
         {/* ========================================================================= */}
-        <div 
-          className="absolute pointer-events-none rounded-xs overflow-hidden shadow-2xl border border-black/90 hidden sm:block"
-          style={{
-            top: '8.4%',
-            left: '37.3%',
-            width: '27.8%',
-            height: '30.6%',
-            backgroundColor: '#07080A'
-          }}
-        >
-          {/* Subtle LED panel matrix pattern */}
-          <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#3B4252_1px,transparent_1px)] [background-size:4px_4px]" />
-          <div className="absolute inset-0 opacity-10 bg-[linear-gradient(to_right,#1E222D_1px,transparent_1px),linear-gradient(to_bottom,#1E222D_1px,transparent_1px)] [background-size:33%_50%]" />
+        <div className="absolute top-9 sm:top-11 left-0 right-0 h-[52%] overflow-hidden">
           
-          {/* Tiny power LED indicator in bottom corner */}
-          <div className="absolute bottom-1 right-1.5 flex items-center gap-1 opacity-40">
-            <span className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="font-mono text-[7px] text-white/60">LED 16:9</span>
+          {/* Nửa trên: Ốp gỗ tiêu âm màu sáng (Upper Light Oak Panels) */}
+          <div className="h-[36%] w-full bg-gradient-to-b from-[#DEC7AC] via-[#D5BCA0] to-[#CBB194] border-b border-[#9D7653]/40 relative">
+            <div className="w-full h-full opacity-35 bg-[repeating-linear-gradient(90deg,#96724E_0px,#96724E_1.5px,transparent_1.5px,transparent_68px)]" />
+          </div>
+
+          {/* Dải viền gỗ nâu sẫm chạy ngang (Middle Dark Walnut Horizontal Band) */}
+          <div className="h-[20%] w-full bg-gradient-to-r from-[#4E2713] via-[#61341C] to-[#4E2713] border-y-2 border-[#33170A] shadow-inner relative">
+            <div className="w-full h-full opacity-30 bg-[repeating-linear-gradient(0deg,#2D1206_0px,#2D1206_1px,transparent_1px,transparent_6px)]" />
+          </div>
+
+          {/* Nửa dưới: Lam gỗ đứng dọc 2 bên màn LED (Lower Vertical Acoustic Slats) */}
+          <div className="h-[44%] w-full bg-[#3D2012] relative overflow-hidden">
+            {/* Real 3D Vertical Wooden Slats Pattern (Lam gỗ đứng y chang ảnh) */}
+            <div className="w-full h-full bg-[repeating-linear-gradient(90deg,#D4B48A_0px,#D4B48A_6px,#2E160A_6px,#2E160A_11px)] shadow-inner" />
           </div>
         </div>
 
         {/* ========================================================================= */}
-        {/* 3. CHẾ ĐỘ ĐÈN GALA BIỂU DIỄN (BEAM, PARLED & KATANA CHẠY CHẠY)            */}
+        {/* 3. VÁCH HÔNG PHỐI CẢNH 3D: CỬA EXIT (TRÁI) & BỤC PHÁT BIỂU (PHẢI)         */}
+        {/* ========================================================================= */}
+        {/* Vách trái: Cửa đôi thoát hiểm + Đèn EXIT xanh */}
+        <div 
+          className="absolute top-9 sm:top-11 left-0 w-24 sm:w-36 h-[52%] bg-gradient-to-r from-[#BA9C7A] to-[#D5BCA0] border-r-2 border-[#8A6543] z-10"
+          style={{ clipPath: 'polygon(0 0, 100% 6%, 100% 100%, 0 100%)' }}
+        >
+          {/* Cửa đôi thoát hiểm bằng gỗ */}
+          <div className="absolute bottom-1 left-2 sm:left-4 w-16 sm:w-22 h-28 sm:h-36 bg-[#5A311A] border-2 border-[#341608] rounded-t-xs shadow-md flex">
+            <div className="flex-1 border-r border-[#341608] flex items-center justify-end pr-1">
+              <div className="w-1 h-3 rounded-full bg-[#E5B558]" />
+            </div>
+            <div className="flex-1 flex items-center justify-start pl-1">
+              <div className="w-1 h-3 rounded-full bg-[#E5B558]" />
+            </div>
+          </div>
+          {/* Đèn báo EXIT màu xanh lá phát sáng */}
+          <div className="absolute bottom-30 sm:bottom-38 left-4 sm:left-6 px-1.5 py-0.5 rounded-xs bg-[#059669] border border-[#10B981] shadow-[0_0_12px_#10B981] flex items-center gap-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+            <span className="font-mono text-[8px] font-black text-white tracking-widest">EXIT</span>
+          </div>
+        </div>
+
+        {/* Vách phải: Bục phát biểu (Presentation Podium) */}
+        <div 
+          className="absolute top-9 sm:top-11 right-0 w-24 sm:w-36 h-[52%] bg-gradient-to-l from-[#BA9C7A] to-[#D5BCA0] border-l-2 border-[#8A6543] z-10"
+          style={{ clipPath: 'polygon(0 6%, 100% 0, 100% 100%, 0 100%)' }}
+        />
+
+        {/* Bục phát biểu đặt góc phải sân khấu */}
+        <div className="absolute right-5 sm:right-9 bottom-[40%] sm:bottom-[42%] w-14 sm:w-18 h-22 sm:h-28 z-25 pointer-events-none flex flex-col items-center">
+          {/* Micro cổ ngỗng */}
+          <div className="w-0.5 h-5 bg-[#20231F] -rotate-12 translate-x-1" />
+          {/* Mặt bục nghiêng */}
+          <div className="w-full h-4 rounded-xs bg-[#E5CBA8] border-2 border-[#63391F] shadow-sm" />
+          {/* Thân bục bằng gỗ */}
+          <div className="w-[84%] flex-1 bg-gradient-to-b from-[#552D17] to-[#3B1C0B] border-2 border-[#2E1407] p-1 flex flex-col justify-between items-center shadow-md">
+            <div className="w-full h-1 bg-[#E5B558] rounded-full opacity-60" />
+            <span className="font-mono text-[7px] text-[#E5B558] font-bold">CSG</span>
+            <div className="w-full space-y-0.5">
+              <div className="w-full h-0.5 bg-white/30" />
+              <div className="w-full h-0.5 bg-white/30" />
+            </div>
+          </div>
+        </div>
+
+        {/* ========================================================================= */}
+        {/* 4. MÀN HÌNH LED MÀU ĐEN 16:9 CHÍNH GIỮA (CENTER BLACK 16:9 LED SCREEN)     */}
+        {/* ========================================================================= */}
+        <div className="absolute top-12 sm:top-14 left-1/2 -translate-x-1/2 w-[62%] sm:w-[50%] max-w-[430px] aspect-[16/9] z-20 pointer-events-none">
+          {/* Ambient Wall Drop Shadow */}
+          <div className="absolute -inset-1.5 bg-black/60 rounded-xs blur-md -z-10" />
+
+          {/* Heavy Matte Black LED Frame */}
+          <div className="w-full h-full bg-[#07080A] border-2 sm:border-3 border-[#1E232E] rounded-xs relative overflow-hidden shadow-2xl">
+            {/* Modular LED Cabinet Panel Grid */}
+            <div className="absolute inset-0 opacity-15 bg-[linear-gradient(to_right,#161B26_1px,transparent_1px),linear-gradient(to_bottom,#161B26_1px,transparent_1px)] [background-size:25%_50%]" />
+            {/* Fine LED Pitch Matrix Texture */}
+            <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#303848_1px,transparent_1px)] [background-size:4px_4px]" />
+            
+            {/* Corner Rigging Screws */}
+            <div className="absolute top-1 left-1 w-1 h-1 rounded-full bg-[#202530]" />
+            <div className="absolute top-1 right-1 w-1 h-1 rounded-full bg-[#202530]" />
+            <div className="absolute bottom-1 left-1 w-1 h-1 rounded-full bg-[#202530]" />
+            <div className="absolute bottom-1 right-1 w-1 h-1 rounded-full bg-[#202530]" />
+
+            {/* Faint Standby Signal Badge */}
+            <div className="absolute bottom-1.5 right-2 flex items-center gap-1 opacity-30">
+              <span className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="font-mono text-[7px] text-white/60">LED 16:9</span>
+            </div>
+          </div>
+        </div>
+
+        {/* ========================================================================= */}
+        {/* 5. SÀN SÂN KHẤU MÀU GỖ VÀNG SỒI (HONEY-OAK WOODEN STAGE FLOOR)             */}
+        {/* ========================================================================= */}
+        <div className="absolute bottom-0 left-0 right-0 h-[48%] sm:h-[50%] bg-gradient-to-b from-[#E2C79E] via-[#D5B78A] to-[#C19C68] border-t-2 border-[#A2794C] overflow-hidden">
+          {/* Thớ gỗ ghép ván ngang (Horizontal parquet seams) */}
+          <div className="w-full h-full opacity-25 bg-[repeating-linear-gradient(0deg,#70451E_0px,#70451E_1.5px,transparent_1.5px,transparent_24px)]" />
+          {/* Thớ gỗ ghép dọc tỏa phối cảnh (Perspective vertical seams) */}
+          <div className="absolute inset-0 opacity-20 bg-[repeating-linear-gradient(90deg,#70451E_0px,#70451E_1.5px,transparent_1.5px,transparent_64px)]" />
+          
+          {/* Độ bóng hắt sáng mặt sàn gỗ nhẵn (Polished Sheen) */}
+          <div className="absolute inset-0 bg-gradient-to-b from-white/20 via-amber-200/10 to-transparent pointer-events-none" />
+          
+          {/* Bục mép trước sân khấu (Stage Front Apron Rim) */}
+          <div className="absolute bottom-0 left-0 right-0 h-4 bg-[#8C6237] border-t border-[#AA7D4F]" />
+        </div>
+
+        {/* ========================================================================= */}
+        {/* 6. HỆ THỐNG ĐÈN GALA BIỂU DIỄN (BEAM, PARLED & KATANA CHẠY CHẠY)           */}
         {/* ========================================================================= */}
         {stageLightsOn && (
-          <div className="absolute inset-0 pointer-events-none overflow-hidden z-10 transition-opacity duration-500">
-            {/* Top Theatrical Lighting Truss Bar */}
-            <div className="absolute top-0 left-0 right-0 h-6 bg-[#12141A]/90 border-b border-[#232733]/60 z-20 flex items-center justify-around px-4">
-              <div className="absolute inset-0 opacity-20 bg-[repeating-linear-gradient(45deg,#343A4C_0px,#343A4C_2px,transparent_2px,transparent_12px)]" />
-              {[...Array(8)].map((_, i) => (
+          <div className="absolute inset-0 pointer-events-none overflow-hidden z-25 transition-opacity duration-500">
+            {/* Dàn đèn Par LED wash trên trần */}
+            <div className="absolute top-9 left-0 right-0 flex justify-around px-8">
+              {[...Array(6)].map((_, i) => (
                 <div key={i} className="relative flex flex-col items-center">
-                  <div className={`w-3 h-3 rounded-full border ${
-                    i % 2 === 0 ? 'bg-[#2A2210] border-[#F4C542]' : 'bg-[#261210] border-[#B94D35]'
-                  } flex items-center justify-center shadow-sm`}>
-                    <div className={`w-1 h-1 rounded-full ${
-                      i % 2 === 0 ? 'bg-[#F4C542]' : 'bg-[#B94D35]'
-                    } animate-pulse`} />
+                  <div className="w-2.5 h-2.5 rounded-full bg-[#1A1A1A] border border-[#F4C542] flex items-center justify-center">
+                    <div className="w-1 h-1 rounded-full bg-[#F4C542] animate-pulse" />
                   </div>
-                  {/* Par LED Wash Cones */}
+                  {/* Par LED Wash Cone */}
                   <div 
-                    className={`absolute top-3 w-16 sm:w-20 h-44 sm:h-56 pointer-events-none stage-parled-pulse ${
-                      i % 2 === 0 
-                        ? 'bg-gradient-to-b from-[#F4C542]/25 via-[#F4C542]/5 to-transparent' 
-                        : 'bg-gradient-to-b from-[#B94D35]/25 via-[#B94D35]/5 to-transparent'
-                    } blur-lg`} 
-                    style={{ animationDelay: `${(i * 0.35).toFixed(1)}s` }}
+                    className="absolute top-2 w-20 sm:w-28 h-56 pointer-events-none stage-parled-pulse bg-gradient-to-b from-[#F4C542]/30 via-[#F4C542]/5 to-transparent blur-lg" 
+                    style={{ animationDelay: `${(i * 0.4).toFixed(1)}s` }}
                   />
                 </div>
               ))}
             </div>
 
-            {/* ĐÈN BEAM (Moving Head Volumetric Beams qua không gian hội trường) */}
+            {/* ĐÈN BEAM (Volumetric Sweeping Beams quét qua không gian 3D) */}
             <div 
-              className="absolute -top-4 left-[16%] w-20 sm:w-28 h-[520px] bg-gradient-to-b from-[#F4C542]/45 via-[#F4C542]/10 to-transparent blur-md stage-beam-left"
+              className="absolute -top-4 left-[18%] w-20 sm:w-28 h-[540px] bg-gradient-to-b from-[#F4C542]/50 via-[#F4C542]/10 to-transparent blur-md stage-beam-left"
               style={{ clipPath: 'polygon(45% 0%, 55% 0%, 100% 100%, 0% 100%)' }}
             />
             <div 
-              className="absolute -top-4 left-[28%] w-16 sm:w-24 h-[490px] bg-gradient-to-b from-[#FFF]/30 via-[#F4C542]/10 to-transparent blur-sm stage-beam-cross"
+              className="absolute -top-4 left-[30%] w-16 sm:w-22 h-[510px] bg-gradient-to-b from-[#FFF]/35 via-[#F4C542]/10 to-transparent blur-sm stage-beam-cross"
               style={{ clipPath: 'polygon(46% 0%, 54% 0%, 100% 100%, 0% 100%)' }}
             />
             <div 
-              className="absolute -top-4 right-[16%] w-20 sm:w-28 h-[520px] bg-gradient-to-b from-[#F4C542]/45 via-[#F4C542]/10 to-transparent blur-md stage-beam-right"
+              className="absolute -top-4 right-[18%] w-20 sm:w-28 h-[540px] bg-gradient-to-b from-[#F4C542]/50 via-[#F4C542]/10 to-transparent blur-md stage-beam-right"
               style={{ clipPath: 'polygon(45% 0%, 55% 0%, 100% 100%, 0% 100%)' }}
             />
             <div 
-              className="absolute -top-4 right-[28%] w-16 sm:w-24 h-[490px] bg-gradient-to-b from-[#B94D35]/40 via-[#B94D35]/10 to-transparent blur-sm stage-beam-center"
+              className="absolute -top-4 right-[30%] w-16 sm:w-22 h-[510px] bg-gradient-to-b from-[#B94D35]/45 via-[#B94D35]/10 to-transparent blur-sm stage-beam-center"
               style={{ clipPath: 'polygon(46% 0%, 54% 0%, 100% 100%, 0% 100%)' }}
             />
 
-            {/* ĐÈN KATANA (Motorized LED Batten Chasing Light bar) */}
-            <div className="absolute top-6 left-1/2 -translate-x-1/2 w-[45%] max-w-[360px] z-15 flex flex-col items-center">
-              <div className="w-full h-2 rounded-xs bg-[#090A0D]/90 border border-[#2D3342]/80 p-0.5 overflow-hidden shadow-[0_0_12px_rgba(244,197,66,0.5)]">
+            {/* ĐÈN KATANA (Thanh LED Batten chạy pixel phía trên màn hình LED) */}
+            <div className="absolute top-9 left-1/2 -translate-x-1/2 w-[48%] max-w-[380px] z-25 flex flex-col items-center">
+              <div className="w-full h-2 rounded-xs bg-[#090A0D] border border-[#2D3342] p-0.5 overflow-hidden shadow-[0_0_12px_rgba(244,197,66,0.6)]">
                 <div className="w-full h-full stage-katana-chase rounded-xs" />
               </div>
               <div 
-                className="w-full h-28 bg-gradient-to-b from-[#F4C542]/35 via-[#F4C542]/5 to-transparent blur-xs stage-katana-blade pointer-events-none"
+                className="w-full h-28 bg-gradient-to-b from-[#F4C542]/40 via-[#F4C542]/5 to-transparent blur-xs stage-katana-blade pointer-events-none"
                 style={{ clipPath: 'polygon(6% 0%, 94% 0%, 100% 100%, 0% 100%)' }}
               />
             </div>
           </div>
         )}
 
-        {/* Golden Footlights along bottom of stage floor (trên hàng ghế khán giả) */}
-        <div className="absolute bottom-[16%] left-0 right-0 flex justify-between px-6 sm:px-14 pointer-events-none z-15">
-          {[...Array(10)].map((_, i) => (
-            <div key={i} className="relative flex flex-col items-center">
-              <div className="w-2 h-2 rounded-full bg-[#F4C542]/90 shadow-[0_0_8px_#F4C542]" />
-              <div className="w-6 h-6 bg-gradient-to-t from-transparent to-[#F4C542]/20 blur-xs -translate-y-1" />
+        {/* ========================================================================= */}
+        {/* 7. HÀNG GHẾ KHÁN GIẢ TIỀN CẢNH (3D AUDITORIUM AUDIENCE CHAIRS)            */}
+        {/* ========================================================================= */}
+        <div className="absolute -bottom-2 left-0 right-0 h-16 sm:h-20 pointer-events-none z-30 flex justify-around px-2 sm:px-6">
+          {[
+            { tag: '7B', col: 'bg-[#1E3A8A]' },
+            { tag: '6B', col: 'bg-[#1E3A8A]' },
+            { tag: '1B', col: 'bg-[#1E3A8A]' },
+            { tag: '6A', col: 'bg-[#1E3A8A]' },
+            { tag: '7A', col: 'bg-[#1E3A8A]' },
+            { tag: '8A', col: 'bg-[#1E3A8A]' },
+          ].map((chair, i) => (
+            <div key={i} className="relative flex flex-col items-center w-12 sm:w-16 shadow-2xl">
+              {/* Tay vịn bên hông ghế */}
+              <div className="absolute -left-1.5 top-3 w-1.5 sm:w-2 h-12 bg-[#1A1A1A] border-t-2 border-[#D97706] rounded-t-xs -z-10" />
+              <div className="absolute -right-1.5 top-3 w-1.5 sm:w-2 h-12 bg-[#1A1A1A] border-t-2 border-[#D97706] rounded-t-xs -z-10" />
+              
+              {/* Tựa lưng ghế màu xanh đặc trưng hội trường */}
+              <div className={`w-full h-full ${chair.col} border-2 border-[#0F172A] rounded-t-xl overflow-hidden flex flex-col justify-between shadow-md`}>
+                {/* Đệm tựa đầu màu đỏ nỉ */}
+                <div className="w-full h-4 sm:h-5 bg-[#DC2626] border-b-2 border-[#991B1B] rounded-t-lg flex items-center justify-center">
+                  {/* Thẻ số ghế màu xanh lá cây hình oval */}
+                  <span className="px-1.5 py-0.2 rounded-full bg-[#15803D] border border-white/60 text-[7px] font-mono text-white font-bold leading-none">
+                    {chair.tag}
+                  </span>
+                </div>
+                {/* Vỏ ghế nhựa đen phía sau */}
+                <div className="w-full h-3 bg-[#0F172A] opacity-60" />
+              </div>
             </div>
           ))}
         </div>
