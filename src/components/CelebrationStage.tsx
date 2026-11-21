@@ -76,8 +76,8 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
     allCharacters.forEach((c, idx) => {
       const isNewUser = newRegistrant && (c.id === `frog-${newRegistrant.id}` || c.name.includes(newRegistrant.fullName));
       pos[c.id] = {
-        x: isNewUser ? 50 : (c.x || 25 + ((idx * 16) % 50)),
-        y: isNewUser ? 68 : (c.y || 61 + ((idx * 3) % 12)),
+        x: isNewUser ? 50 : (c.x || 16 + ((idx * 18) % 68)),
+        y: isNewUser ? 68 : (c.y || 62 + ((idx * 3) % 12)),
         dir: c.direction || (idx % 2 === 0 ? 1 : -1)
       };
     });
@@ -99,12 +99,12 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
           const speed = isCenter ? 0.05 : 0.12;
           x += dir * speed;
 
-          // Confine walking to stage area between left door and right podium
-          if (x > 76) {
-            x = 76;
+          // Confine walking across the stage floor
+          if (x > 86) {
+            x = 86;
             dir = -1;
-          } else if (x < 24) {
-            x = 24;
+          } else if (x < 14) {
+            x = 14;
             dir = 1;
           }
 
@@ -308,54 +308,7 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
         </div>
 
         {/* ========================================================================= */}
-        {/* 3. VÁCH HÔNG PHỐI CẢNH 3D: CỬA EXIT (TRÁI) & BỤC PHÁT BIỂU (PHẢI)         */}
-        {/* ========================================================================= */}
-        {/* Vách trái: Cửa đôi thoát hiểm + Đèn EXIT xanh */}
-        <div 
-          className="absolute top-9 sm:top-11 left-0 w-24 sm:w-36 h-[52%] bg-gradient-to-r from-[#BA9C7A] to-[#D5BCA0] border-r-2 border-[#8A6543] z-10"
-          style={{ clipPath: 'polygon(0 0, 100% 6%, 100% 100%, 0 100%)' }}
-        >
-          {/* Cửa đôi thoát hiểm bằng gỗ */}
-          <div className="absolute bottom-1 left-2 sm:left-4 w-16 sm:w-22 h-28 sm:h-36 bg-[#5A311A] border-2 border-[#341608] rounded-t-xs shadow-md flex">
-            <div className="flex-1 border-r border-[#341608] flex items-center justify-end pr-1">
-              <div className="w-1 h-3 rounded-full bg-[#E5B558]" />
-            </div>
-            <div className="flex-1 flex items-center justify-start pl-1">
-              <div className="w-1 h-3 rounded-full bg-[#E5B558]" />
-            </div>
-          </div>
-          {/* Đèn báo EXIT màu xanh lá phát sáng */}
-          <div className="absolute bottom-30 sm:bottom-38 left-4 sm:left-6 px-1.5 py-0.5 rounded-xs bg-[#059669] border border-[#10B981] shadow-[0_0_12px_#10B981] flex items-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-            <span className="font-mono text-[8px] font-black text-white tracking-widest">EXIT</span>
-          </div>
-        </div>
-
-        {/* Vách phải: Bục phát biểu (Presentation Podium) */}
-        <div 
-          className="absolute top-9 sm:top-11 right-0 w-24 sm:w-36 h-[52%] bg-gradient-to-l from-[#BA9C7A] to-[#D5BCA0] border-l-2 border-[#8A6543] z-10"
-          style={{ clipPath: 'polygon(0 6%, 100% 0, 100% 100%, 0 100%)' }}
-        />
-
-        {/* Bục phát biểu đặt góc phải sân khấu */}
-        <div className="absolute right-5 sm:right-9 bottom-[40%] sm:bottom-[42%] w-14 sm:w-18 h-22 sm:h-28 z-25 pointer-events-none flex flex-col items-center">
-          {/* Micro cổ ngỗng */}
-          <div className="w-0.5 h-5 bg-[#20231F] -rotate-12 translate-x-1" />
-          {/* Mặt bục nghiêng */}
-          <div className="w-full h-4 rounded-xs bg-[#E5CBA8] border-2 border-[#63391F] shadow-sm" />
-          {/* Thân bục bằng gỗ */}
-          <div className="w-[84%] flex-1 bg-gradient-to-b from-[#552D17] to-[#3B1C0B] border-2 border-[#2E1407] p-1 flex flex-col justify-between items-center shadow-md">
-            <div className="w-full h-1 bg-[#E5B558] rounded-full opacity-60" />
-            <span className="font-mono text-[7px] text-[#E5B558] font-bold">CSG</span>
-            <div className="w-full space-y-0.5">
-              <div className="w-full h-0.5 bg-white/30" />
-              <div className="w-full h-0.5 bg-white/30" />
-            </div>
-          </div>
-        </div>
-
-        {/* ========================================================================= */}
-        {/* 4. MÀN HÌNH LED MÀU ĐEN 16:9 CHÍNH GIỮA (CENTER BLACK 16:9 LED SCREEN)     */}
+        {/* 3. MÀN HÌNH LED MÀU ĐEN 16:9 CHÍNH GIỮA (CENTER BLACK 16:9 LED SCREEN)     */}
         {/* ========================================================================= */}
         <div className="absolute top-12 sm:top-14 left-1/2 -translate-x-1/2 w-[62%] sm:w-[50%] max-w-[430px] aspect-[16/9] z-20 pointer-events-none">
           {/* Ambient Wall Drop Shadow */}
@@ -383,7 +336,7 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
         </div>
 
         {/* ========================================================================= */}
-        {/* 5. SÀN SÂN KHẤU MÀU GỖ VÀNG SỒI (HONEY-OAK WOODEN STAGE FLOOR)             */}
+        {/* 4. SÀN SÂN KHẤU MÀU GỖ VÀNG SỒI (HONEY-OAK WOODEN STAGE FLOOR)             */}
         {/* ========================================================================= */}
         <div className="absolute bottom-0 left-0 right-0 h-[48%] sm:h-[50%] bg-gradient-to-b from-[#E2C79E] via-[#D5B78A] to-[#C19C68] border-t-2 border-[#A2794C] overflow-hidden">
           {/* Thớ gỗ ghép ván ngang (Horizontal parquet seams) */}
@@ -399,7 +352,7 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
         </div>
 
         {/* ========================================================================= */}
-        {/* 6. HỆ THỐNG ĐÈN GALA BIỂU DIỄN (BEAM, PARLED & KATANA CHẠY CHẠY)           */}
+        {/* 5. HỆ THỐNG ĐÈN GALA BIỂU DIỄN (BEAM, PARLED & KATANA CHẠY CHẠY)           */}
         {/* ========================================================================= */}
         {stageLightsOn && (
           <div className="absolute inset-0 pointer-events-none overflow-hidden z-25 transition-opacity duration-500">
@@ -451,36 +404,53 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
         )}
 
         {/* ========================================================================= */}
-        {/* 7. HÀNG GHẾ KHÁN GIẢ TIỀN CẢNH (3D AUDITORIUM AUDIENCE CHAIRS)            */}
+        {/* 6. HÀNG GHẾ KHÁN GIẢ TIỀN CẢNH: MỖI BÊN 5 CÁI, LỐI ĐI Ở GIỮA, KHÔNG CÓ SỐ */}
         {/* ========================================================================= */}
-        <div className="absolute -bottom-2 left-0 right-0 h-16 sm:h-20 pointer-events-none z-30 flex justify-around px-2 sm:px-6">
-          {[
-            { tag: '7B', col: 'bg-[#1E3A8A]' },
-            { tag: '6B', col: 'bg-[#1E3A8A]' },
-            { tag: '1B', col: 'bg-[#1E3A8A]' },
-            { tag: '6A', col: 'bg-[#1E3A8A]' },
-            { tag: '7A', col: 'bg-[#1E3A8A]' },
-            { tag: '8A', col: 'bg-[#1E3A8A]' },
-          ].map((chair, i) => (
-            <div key={i} className="relative flex flex-col items-center w-12 sm:w-16 shadow-2xl">
-              {/* Tay vịn bên hông ghế */}
-              <div className="absolute -left-1.5 top-3 w-1.5 sm:w-2 h-12 bg-[#1A1A1A] border-t-2 border-[#D97706] rounded-t-xs -z-10" />
-              <div className="absolute -right-1.5 top-3 w-1.5 sm:w-2 h-12 bg-[#1A1A1A] border-t-2 border-[#D97706] rounded-t-xs -z-10" />
-              
-              {/* Tựa lưng ghế màu xanh đặc trưng hội trường */}
-              <div className={`w-full h-full ${chair.col} border-2 border-[#0F172A] rounded-t-xl overflow-hidden flex flex-col justify-between shadow-md`}>
-                {/* Đệm tựa đầu màu đỏ nỉ */}
-                <div className="w-full h-4 sm:h-5 bg-[#DC2626] border-b-2 border-[#991B1B] rounded-t-lg flex items-center justify-center">
-                  {/* Thẻ số ghế màu xanh lá cây hình oval */}
-                  <span className="px-1.5 py-0.2 rounded-full bg-[#15803D] border border-white/60 text-[7px] font-mono text-white font-bold leading-none">
-                    {chair.tag}
-                  </span>
+        <div className="absolute -bottom-2 left-0 right-0 h-16 sm:h-20 pointer-events-none z-30 flex items-end justify-between px-3 sm:px-8">
+          
+          {/* Dãy ghế bên trái: đúng 5 ghế */}
+          <div className="flex items-end gap-1.5 sm:gap-2.5 flex-1 justify-around">
+            {[...Array(5)].map((_, i) => (
+              <div key={`left-chair-${i}`} className="relative flex flex-col items-center flex-1 max-w-[56px] h-14 sm:h-18 shadow-2xl">
+                {/* Tay vịn bên hông ghế */}
+                <div className="absolute -left-1 top-2.5 w-1.5 h-11 bg-[#1A1A1A] border-t-2 border-[#D97706] rounded-t-xs -z-10" />
+                <div className="absolute -right-1 top-2.5 w-1.5 h-11 bg-[#1A1A1A] border-t-2 border-[#D97706] rounded-t-xs -z-10" />
+                
+                {/* Tựa lưng ghế màu xanh đặc trưng hội trường */}
+                <div className="w-full h-full bg-[#1E3A8A] border-2 border-[#0F172A] rounded-t-xl overflow-hidden flex flex-col justify-between shadow-md">
+                  {/* Đệm tựa đầu màu đỏ nỉ - KHÔNG CÓ SỐ */}
+                  <div className="w-full h-4 sm:h-5 bg-[#DC2626] border-b-2 border-[#991B1B] rounded-t-lg shadow-inner" />
+                  {/* Vỏ ghế nhựa đen phía sau */}
+                  <div className="w-full h-3 bg-[#0F172A] opacity-60" />
                 </div>
-                {/* Vỏ ghế nhựa đen phía sau */}
-                <div className="w-full h-3 bg-[#0F172A] opacity-60" />
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
+
+          {/* Lối đi ở giữa hội trường (Center Aisle) */}
+          <div className="w-8 sm:w-16 shrink-0 h-full flex items-center justify-center">
+            <div className="w-full h-1 bg-[#8C6237]/35 rounded-full" />
+          </div>
+
+          {/* Dãy ghế bên phải: đúng 5 ghế */}
+          <div className="flex items-end gap-1.5 sm:gap-2.5 flex-1 justify-around">
+            {[...Array(5)].map((_, i) => (
+              <div key={`right-chair-${i}`} className="relative flex flex-col items-center flex-1 max-w-[56px] h-14 sm:h-18 shadow-2xl">
+                {/* Tay vịn bên hông ghế */}
+                <div className="absolute -left-1 top-2.5 w-1.5 h-11 bg-[#1A1A1A] border-t-2 border-[#D97706] rounded-t-xs -z-10" />
+                <div className="absolute -right-1 top-2.5 w-1.5 h-11 bg-[#1A1A1A] border-t-2 border-[#D97706] rounded-t-xs -z-10" />
+                
+                {/* Tựa lưng ghế màu xanh đặc trưng hội trường */}
+                <div className="w-full h-full bg-[#1E3A8A] border-2 border-[#0F172A] rounded-t-xl overflow-hidden flex flex-col justify-between shadow-md">
+                  {/* Đệm tựa đầu màu đỏ nỉ - KHÔNG CÓ SỐ */}
+                  <div className="w-full h-4 sm:h-5 bg-[#DC2626] border-b-2 border-[#991B1B] rounded-t-lg shadow-inner" />
+                  {/* Vỏ ghế nhựa đen phía sau */}
+                  <div className="w-full h-3 bg-[#0F172A] opacity-60" />
+                </div>
+              </div>
+            ))}
+          </div>
+
         </div>
 
         {/* Mascot Frogs On Stage */}
