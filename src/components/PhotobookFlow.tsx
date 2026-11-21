@@ -5,20 +5,15 @@ import { PHOTOBOOK_IMAGES, ALL_PHOTOBOOK_IMAGES, PhotobookImage, GALA_EVENT_DETA
 interface PhotobookFlowProps {
   onOpenRegister: () => void;
   onOpenLookup: () => void;
-  onWishSubmit: (author: string, content: string) => Promise<void>;
-  wishSubmitted: boolean;
+  onWishSubmit?: (author: string, content: string) => Promise<void>;
+  wishSubmitted?: boolean;
 }
 
 export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
   onOpenRegister,
   onOpenLookup,
-  onWishSubmit,
-  wishSubmitted
 }) => {
   const [selectedPhoto, setSelectedPhoto] = useState<PhotobookImage | null>(null);
-  const [wishAuthor, setWishAuthor] = useState('');
-  const [wishContent, setWishContent] = useState('');
-  const [isSubmittingWish, setIsSubmittingWish] = useState(false);
   const [isAnimationComplete, setIsAnimationComplete] = useState(false);
 
   // Cinematic film-reveal entrance animation coordinator
@@ -74,19 +69,6 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [selectedPhoto, handlePrev, handleNext]);
-
-  const handleFormSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!wishContent.trim()) return;
-    setIsSubmittingWish(true);
-    try {
-      await onWishSubmit(wishAuthor.trim(), wishContent.trim());
-      setWishAuthor('');
-      setWishContent('');
-    } finally {
-      setIsSubmittingWish(false);
-    }
-  };
 
   return (
     <div className="w-full pb-20">
@@ -447,123 +429,73 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
 
 
       {/* ========================================================================= */}
-      {/* GALA INVITATION KEEPSAKE TICKET & SỔ LƯU BÚT                                */}
+      {/* GALA INVITATION KEEPSAKE TICKET                                           */}
       {/* ========================================================================= */}
       <div className="pt-16 sm:pt-24 mt-16 sm:mt-28 border-t border-csg-black/15">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+        <div className="max-w-2xl mx-auto">
           
-          {/* The Gala Keepsake Ticket (7 cols) */}
-          <div className="lg:col-span-7">
-            <div className="bg-[#FFFDF8] border-2 border-csg-black p-6 sm:p-8 shadow-poster relative space-y-6">
-              
-              {/* Perforation Stamp */}
-              <div className="flex items-center justify-between border-b-2 border-dashed border-csg-black/25 pb-3 font-mono text-[11px]">
-                <span className="font-bold uppercase tracking-widest text-csg-red">
-                  THƯ MỜI HỘI NGỘ • KỶ NIỆM 17 NĂM
-                </span>
-                <span className="text-csg-black/50">
-                  {GALA_EVENT_DETAILS.rsvpDeadline ? `Hạn chót: ${GALA_EVENT_DETAILS.rsvpDeadline}` : '19.12.2026'}
-                </span>
-              </div>
+          {/* The Gala Keepsake Ticket */}
+          <div className="bg-[#FFFDF8] border-2 border-csg-black p-6 sm:p-8 shadow-poster relative space-y-6">
+            
+            {/* Perforation Stamp */}
+            <div className="flex items-center justify-between border-b-2 border-dashed border-csg-black/25 pb-3 font-mono text-[11px]">
+              <span className="font-bold uppercase tracking-widest text-csg-red">
+                THƯ MỜI HỘI NGỘ • KỶ NIỆM 17 NĂM
+              </span>
+              <span className="text-csg-black/50">
+                {GALA_EVENT_DETAILS.rsvpDeadline ? `Hạn chót: ${GALA_EVENT_DETAILS.rsvpDeadline}` : '19.12.2026'}
+              </span>
+            </div>
 
-              {/* Event Typography */}
-              <div className="space-y-1.5">
-                <h2 className="text-3xl sm:text-4xl font-display font-extrabold uppercase text-csg-black leading-[1.02] tracking-tight">
-                  {GALA_EVENT_DETAILS.title}
-                </h2>
-                <p className="font-editorial italic text-base text-csg-black/75">
-                  {GALA_EVENT_DETAILS.subtitle}
-                </p>
-              </div>
+            {/* Event Typography */}
+            <div className="space-y-1.5">
+              <h2 className="text-3xl sm:text-4xl font-display font-extrabold uppercase text-csg-black leading-[1.02] tracking-tight">
+                {GALA_EVENT_DETAILS.title}
+              </h2>
+              <p className="font-editorial italic text-base text-csg-black/75">
+                {GALA_EVENT_DETAILS.subtitle}
+              </p>
+            </div>
 
-              {/* Verified Event Schedule Matrix */}
-              <div className="font-mono text-xs divide-y divide-csg-black/15 py-1">
-                <div className="flex justify-between py-2.5">
-                  <span className="text-csg-black/60 uppercase">THỜI GIAN:</span>
-                  <span className="font-bold text-csg-black">{GALA_EVENT_DETAILS.time}</span>
-                </div>
-                <div className="flex justify-between py-2.5">
-                  <span className="text-csg-black/60 uppercase">ĐỊA ĐIỂM:</span>
-                  <span className="font-bold text-csg-black text-right">{GALA_EVENT_DETAILS.venue}</span>
-                </div>
-                <div className="flex justify-between py-2.5">
-                  <span className="text-csg-black/60 uppercase">TRANG PHỤC:</span>
-                  <span className="font-bold text-csg-black">{GALA_EVENT_DETAILS.dressCode}</span>
-                </div>
+            {/* Verified Event Schedule Matrix */}
+            <div className="font-mono text-xs divide-y divide-csg-black/15 py-1">
+              <div className="flex justify-between py-2.5">
+                <span className="text-csg-black/60 uppercase">THỜI GIAN:</span>
+                <span className="font-bold text-csg-black">{GALA_EVENT_DETAILS.time}</span>
               </div>
+              <div className="flex justify-between py-2.5">
+                <span className="text-csg-black/60 uppercase">ĐỊA ĐIỂM:</span>
+                <span className="font-bold text-csg-black text-right">{GALA_EVENT_DETAILS.venue}</span>
+              </div>
+              <div className="flex justify-between py-2.5">
+                <span className="text-csg-black/60 uppercase">TRANG PHỤC:</span>
+                <span className="font-bold text-csg-black">{GALA_EVENT_DETAILS.dressCode}</span>
+              </div>
+            </div>
 
-              {/* Direct Instant RSVP Action */}
-              <div className="space-y-3 pt-1">
+            {/* Direct Instant RSVP Action */}
+            <div className="space-y-3 pt-1">
+              <button
+                onClick={onOpenRegister}
+                className="btn-editorial-primary w-full py-4 font-display font-extrabold text-sm sm:text-base uppercase tracking-wider flex items-center justify-center gap-2 shadow-poster"
+              >
+                <span>ĐĂNG KÝ THAM GIA GALA 17Y</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+
+              <div className="flex items-center justify-between font-mono text-xs pt-1">
                 <button
-                  onClick={onOpenRegister}
-                  className="btn-editorial-primary w-full py-4 font-display font-extrabold text-sm sm:text-base uppercase tracking-wider flex items-center justify-center gap-2 shadow-poster"
+                  onClick={onOpenLookup}
+                  className="text-csg-black/65 hover:text-csg-red underline decoration-1 underline-offset-4 transition-colors"
                 >
-                  <span>ĐĂNG KÝ THAM GIA GALA 17Y</span>
-                  <ArrowRight className="w-4 h-4" />
+                  Tra cứu vé đã đặt →
                 </button>
-
-                <div className="flex items-center justify-between font-mono text-xs pt-1">
-                  <button
-                    onClick={onOpenLookup}
-                    className="text-csg-black/65 hover:text-csg-red underline decoration-1 underline-offset-4 transition-colors"
-                  >
-                    Tra cứu vé đã đặt →
-                  </button>
-                  <span className="text-csg-black/45 text-[11px]">
-                    Dành cho thành viên & cựu thành viên CSG
-                  </span>
-                </div>
-              </div>
-
-            </div>
-          </div>
-
-          {/* Sổ Lưu Bút Memo Card (5 cols) */}
-          <div className="lg:col-span-5">
-            <div className="bg-[#FFFDF8] border-2 border-csg-black p-6 sm:p-7 shadow-poster relative space-y-4">
-              
-              <div className="space-y-1">
-                <span className="font-mono text-[11px] font-bold text-csg-red uppercase tracking-widest block">
-                  SỔ LƯU BÚT // 17 NĂM
+                <span className="text-csg-black/45 text-[11px]">
+                  Dành cho thành viên & cựu thành viên CSG
                 </span>
-                <h3 className="text-xl sm:text-2xl font-display font-extrabold uppercase text-csg-black">
-                  Gửi một lời chúc đến Cóc Sài Gòn
-                </h3>
               </div>
-
-              {wishSubmitted ? (
-                <div className="p-4 bg-csg-surface border border-csg-black font-mono text-xs text-csg-black flex items-center justify-center gap-2">
-                  <span>✓ Cảm ơn bạn. Lời chúc đã được lưu lại trong cuốn sổ kỷ yếu 17 năm!</span>
-                </div>
-              ) : (
-                <form onSubmit={handleFormSubmit} className="space-y-3">
-                  <input
-                    type="text"
-                    placeholder="Tên / Khóa (VD: Anh Phát K12)"
-                    value={wishAuthor}
-                    onChange={(e) => setWishAuthor(e.target.value)}
-                    className="w-full px-3 py-2.5 bg-csg-paper border border-csg-black/40 text-xs font-mono outline-none focus:border-csg-black focus:bg-white transition-colors"
-                    required
-                  />
-                  <textarea
-                    rows={2}
-                    placeholder="Gửi gắm đến Cóc Sài Gòn..."
-                    value={wishContent}
-                    onChange={(e) => setWishContent(e.target.value)}
-                    className="w-full px-3 py-2.5 bg-csg-paper border border-csg-black/40 text-xs font-mono outline-none focus:border-csg-black focus:bg-white resize-none transition-colors"
-                    required
-                  />
-                  <button
-                    type="submit"
-                    disabled={isSubmittingWish}
-                    className="w-full py-2.5 bg-csg-black text-csg-yellow font-mono text-xs font-bold uppercase tracking-wider hover:bg-csg-red hover:text-white transition-colors disabled:opacity-50"
-                  >
-                    {isSubmittingWish ? 'ĐANG GỬI...' : 'ĐÓNG DẤU LƯU BÚT 17Y →'}
-                  </button>
-                </form>
-              )}
-
             </div>
+
           </div>
 
         </div>
