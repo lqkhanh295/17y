@@ -252,44 +252,180 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
       </div>
 
       {/* Theatrical Stage Canvas */}
-      <div className="relative w-full h-[480px] sm:h-[560px] rounded-sm bg-gradient-to-b from-[#F2EADB] to-[#E3D9C5] border-2 border-[#20231F] overflow-hidden shadow-poster select-none">
-        {/* Backdrop Decorations */}
-        <div className="absolute inset-0 pointer-events-none opacity-40">
-          {/* Spotlight cones */}
-          <div className="absolute -top-12 left-1/4 -translate-x-1/2 w-72 h-[450px] bg-gradient-to-b from-[#F4C542]/35 via-[#F4C542]/10 to-transparent transform -rotate-12 blur-2xl" />
-          <div className="absolute -top-12 right-1/4 translate-x-1/2 w-72 h-[450px] bg-gradient-to-b from-[#F4C542]/35 via-[#F4C542]/10 to-transparent transform rotate-12 blur-2xl" />
+      <div className="relative w-full h-[500px] sm:h-[580px] rounded-sm bg-gradient-to-b from-[#0D0F14] via-[#14171F] to-[#241B16] border-2 border-[#20231F] overflow-hidden shadow-poster select-none">
+        
+        {/* ========================================================================= */}
+        {/* STAGE LIGHTING RIG: KHUNG TRUSS, ĐÈN BEAM, PARLED & KATANA CHẠY           */}
+        {/* ========================================================================= */}
+
+        {/* Overhead Heavy-Duty Aluminum Stage Truss */}
+        <div className="absolute top-0 left-0 right-0 h-8 bg-[#12141A] border-b-2 border-[#232733] z-20 flex items-center justify-between px-4">
+          <div className="absolute inset-0 opacity-25 bg-[repeating-linear-gradient(45deg,#343A4C_0px,#343A4C_2px,transparent_2px,transparent_14px)]" />
           
-          {/* Garland */}
-          <div className="absolute top-0 left-0 right-0 h-10 border-b border-dashed border-[#20231F]/20 flex justify-around px-2">
-            {[...Array(16)].map((_, i) => (
-              <div 
-                key={i} 
-                className={`w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-t-[18px] ${
-                  i % 3 === 0 ? 'border-t-[#F4C542]' : i % 3 === 1 ? 'border-t-[#B94D35]' : 'border-t-[#20231F]'
-                }`}
-              />
+          {/* Par LED Wash Cans array along truss */}
+          <div className="relative z-10 w-full flex justify-around items-center">
+            {[...Array(10)].map((_, i) => (
+              <div key={i} className="relative flex flex-col items-center">
+                {/* Parled Fixture Body */}
+                <div className={`w-3.5 h-3.5 rounded-full border ${
+                  i % 2 === 0 ? 'bg-[#2A2210] border-[#F4C542]' : 'bg-[#261210] border-[#B94D35]'
+                } flex items-center justify-center shadow-sm`}>
+                  <div className={`w-1.5 h-1.5 rounded-full ${
+                    i % 2 === 0 ? 'bg-[#F4C542]' : 'bg-[#B94D35]'
+                  } animate-pulse`} />
+                </div>
+                {/* Parled Light Cone Wash */}
+                <div 
+                  className={`absolute top-3.5 w-16 sm:w-24 h-48 sm:h-64 pointer-events-none stage-parled-pulse ${
+                    i % 2 === 0 
+                      ? 'bg-gradient-to-b from-[#F4C542]/30 via-[#F4C542]/10 to-transparent' 
+                      : 'bg-gradient-to-b from-[#B94D35]/30 via-[#B94D35]/10 to-transparent'
+                  } blur-xl`} 
+                  style={{ animationDelay: `${(i * 0.3).toFixed(1)}s` }}
+                />
+              </div>
             ))}
           </div>
+        </div>
 
-          {/* Center Stage Banner */}
-          <div className="absolute top-8 left-1/2 -translate-x-1/2 text-center">
-            <div className="inline-block px-5 py-2 bg-white/90 border-2 border-[#20231F] rounded-sm shadow-sm">
-              <span className="font-display font-black text-xs sm:text-sm tracking-widest text-[#20231F] uppercase">
-                🎉 ĐẠI TIỆC GALA KỶ NIỆM CÓC SÀI GÒN 17Y 🎉
+        {/* ĐÈN BEAM (Moving Head Volumetric Sweeping Beams) */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden z-10">
+          {/* Left Sweeping Beams */}
+          <div 
+            className="absolute -top-6 left-[14%] w-24 sm:w-36 h-[540px] bg-gradient-to-b from-[#F4C542]/50 via-[#F4C542]/15 to-transparent blur-lg stage-beam-left"
+            style={{ clipPath: 'polygon(45% 0%, 55% 0%, 100% 100%, 0% 100%)' }}
+          />
+          <div 
+            className="absolute -top-6 left-[26%] w-20 sm:w-28 h-[510px] bg-gradient-to-b from-[#FFF]/35 via-[#F4C542]/15 to-transparent blur-md stage-beam-cross"
+            style={{ clipPath: 'polygon(46% 0%, 54% 0%, 100% 100%, 0% 100%)' }}
+          />
+
+          {/* Right Sweeping Beams */}
+          <div 
+            className="absolute -top-6 right-[14%] w-24 sm:w-36 h-[540px] bg-gradient-to-b from-[#F4C542]/50 via-[#F4C542]/15 to-transparent blur-lg stage-beam-right"
+            style={{ clipPath: 'polygon(45% 0%, 55% 0%, 100% 100%, 0% 100%)' }}
+          />
+          <div 
+            className="absolute -top-6 right-[26%] w-20 sm:w-28 h-[510px] bg-gradient-to-b from-[#B94D35]/45 via-[#B94D35]/15 to-transparent blur-md stage-beam-center"
+            style={{ clipPath: 'polygon(46% 0%, 54% 0%, 100% 100%, 0% 100%)' }}
+          />
+
+          {/* Center Fan Beams */}
+          <div 
+            className="absolute -top-6 left-1/2 -translate-x-1/2 w-48 sm:w-64 h-[500px] bg-gradient-to-b from-[#F4C542]/35 via-[#F4C542]/10 to-transparent blur-xl stage-beam-center"
+            style={{ clipPath: 'polygon(48% 0%, 52% 0%, 100% 100%, 0% 100%)' }}
+          />
+        </div>
+
+        {/* ĐÈN KATANA (Motorized LED Tilt Bar / Pixel Batten Chasing Light) */}
+        {/* Top Katana Bar */}
+        <div className="absolute top-8 left-1/2 -translate-x-1/2 w-[74%] max-w-[560px] z-15 flex flex-col items-center">
+          <div className="w-full h-2.5 rounded-sm bg-[#090A0D] border border-[#2D3342] p-0.5 flex gap-1 overflow-hidden shadow-[0_0_15px_rgba(244,197,66,0.5)]">
+            <div className="w-full h-full stage-katana-chase rounded-xs" />
+          </div>
+          {/* Katana Light Blade Sweep (Lưỡi sáng Katana quét xuống sân khấu) */}
+          <div 
+            className="w-full h-36 bg-gradient-to-b from-[#F4C542]/40 via-[#F4C542]/10 to-transparent blur-sm stage-katana-blade pointer-events-none"
+            style={{ clipPath: 'polygon(5% 0%, 95% 0%, 100% 100%, 0% 100%)' }}
+          />
+        </div>
+
+        {/* ========================================================================= */}
+        {/* MÀN HÌNH LED MÀU ĐEN Ở GIỮA (CONCERT BLACK LED WALL)                       */}
+        {/* ========================================================================= */}
+        <div className="absolute top-16 sm:top-18 left-1/2 -translate-x-1/2 w-[84%] sm:w-[72%] max-w-[570px] h-[175px] sm:h-[195px] z-10 pointer-events-none">
+          {/* Ambient LED Screen Backlight Glow */}
+          <div className="absolute -inset-2 bg-[#F4C542]/15 rounded-sm blur-xl -z-10" />
+
+          {/* Heavy Black LED Cabinet Frame */}
+          <div className="w-full h-full bg-[#0A0C10] border-2 sm:border-3 border-[#242936] rounded-sm p-2.5 sm:p-3.5 flex flex-col justify-between relative overflow-hidden shadow-2xl">
+            {/* LED Matrix Pixel Grid Pattern */}
+            <div className="absolute inset-0 opacity-20 bg-[radial-gradient(#4A5568_1px,transparent_1px)] [background-size:5px_5px]" />
+            <div className="absolute inset-0 opacity-15 bg-[linear-gradient(to_right,#1E2330_1px,transparent_1px),linear-gradient(to_bottom,#1E2330_1px,transparent_1px)] [background-size:40px_40px]" />
+
+            {/* LED Top Status Header */}
+            <div className="relative z-10 flex items-center justify-between border-b border-[#202533] pb-1.5 font-mono text-[9px] sm:text-[10px]">
+              <div className="flex items-center gap-1.5 text-[#F4C542]">
+                <span className="w-2 h-2 rounded-full bg-red-500 animate-ping inline-block" />
+                <span className="font-bold tracking-widest uppercase">STAGE LED • GALA 17Y</span>
+              </div>
+              <div className="flex items-center gap-2 text-white/50">
+                <span>4K DCI // LIVE FEED</span>
+                <span className="hidden sm:inline">19.12.2026</span>
+              </div>
+            </div>
+
+            {/* LED Main Typography / Visual Centerpiece */}
+            <div className="relative z-10 text-center py-1 sm:py-2 space-y-1">
+              <span className="font-mono text-[9px] sm:text-[11px] text-[#F4C542] uppercase tracking-[0.25em] font-semibold block">
+                CLB TRUYỀN THÔNG CÓC SÀI GÒN
               </span>
+              <h3 className="font-display font-black text-xl sm:text-3xl text-white tracking-wider uppercase leading-none drop-shadow-[0_0_12px_rgba(244,197,66,0.6)]">
+                17 NĂM MỘT MÁI NHÀ
+              </h3>
+              <p className="font-mono text-[10px] sm:text-xs text-[#EAE4D6]/70 tracking-widest">
+                ★ 2009 — 2026 ★ ĐẠI TIỆC HỘI NGỘ
+              </p>
+            </div>
+
+            {/* LED Bottom Audio Equalizer Visualizer & Katana Sub-bar */}
+            <div className="relative z-10 pt-1 border-t border-[#202533] flex items-end justify-between px-2">
+              {/* Audio Spectrum Equalizer Bars */}
+              <div className="flex items-end gap-1 h-5 w-28 sm:w-40">
+                {[...Array(14)].map((_, i) => (
+                  <div
+                    key={i}
+                    className={`flex-1 rounded-t-xs ${
+                      i % 3 === 0 
+                        ? 'bg-[#F4C542] stage-eq-1' 
+                        : i % 3 === 1 
+                        ? 'bg-[#B94D35] stage-eq-2' 
+                        : 'bg-white stage-eq-3'
+                    }`}
+                    style={{ animationDelay: `${(i * 0.12).toFixed(2)}s` }}
+                  />
+                ))}
+              </div>
+
+              {/* Katana Bottom Chasing Bar */}
+              <div className="flex items-center gap-1.5 font-mono text-[9px] text-[#F4C542]/80">
+                <span className="hidden sm:inline">KATANA SYSTEM</span>
+                <div className="w-16 sm:w-24 h-1.5 bg-[#12141A] rounded-full overflow-hidden border border-[#2D3342]">
+                  <div className="w-full h-full stage-katana-chase" />
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Stage Wooden Floor */}
-        <div className="absolute bottom-0 left-0 right-0 h-44 bg-[#D4C3A3] border-t-2 border-[#20231F] overflow-hidden">
-          <div className="w-full h-full opacity-30 bg-[repeating-linear-gradient(90deg,#8C7355_0px,#8C7355_2px,transparent_2px,transparent_60px)]" />
-          <div className="absolute bottom-0 left-0 right-0 h-5 bg-[#20231F]/15" />
+        {/* ========================================================================= */}
+        {/* SÀN SÂN KHẤU MÀU NÂU (RICH BROWN THEATRICAL WOODEN FLOOR)                 */}
+        {/* ========================================================================= */}
+        <div className="absolute bottom-0 left-0 right-0 h-44 sm:h-50 bg-gradient-to-b from-[#54341E] via-[#3E2313] to-[#2B170B] border-t-2 border-[#1E1107] overflow-hidden">
+          {/* Wood Planks Seams (Perspective & Horizontal boards) */}
+          <div className="w-full h-full opacity-40 bg-[repeating-linear-gradient(90deg,#1A0C04_0px,#1A0C04_2px,transparent_2px,transparent_56px)]" />
+          <div className="absolute inset-0 opacity-25 bg-[repeating-linear-gradient(0deg,#1A0C04_0px,#1A0C04_1px,transparent_1px,transparent_28px)]" />
           
-          {/* Footlights */}
-          <div className="absolute top-1 left-0 right-0 flex justify-between px-6 sm:px-10">
-            {[...Array(12)].map((_, i) => (
-              <div key={i} className="w-2.5 h-2.5 rounded-full bg-[#F4C542] border border-[#20231F]/60 shadow-sm" />
+          {/* Polished Stage Gloss / Light Reflection from LED & Beams */}
+          <div className="absolute inset-0 bg-gradient-to-b from-white/10 via-amber-400/5 to-transparent pointer-events-none" />
+          
+          {/* Stage Front Apron & Fascia (Bục trước sân khấu có chiều sâu) */}
+          <div className="absolute bottom-0 left-0 right-0 h-6 bg-[#1A0C04] border-t border-[#3E2313]/50 flex items-center justify-between px-4">
+            <span className="font-mono text-[8px] text-[#A67C52]/50 tracking-widest uppercase">
+              ASIANA PLAZA • MAIN STAGE
+            </span>
+            <span className="font-mono text-[8px] text-[#A67C52]/50 tracking-widest uppercase">
+              STAGE ELEVATION: +1.20M
+            </span>
+          </div>
+
+          {/* Golden Stage Footlights Along Rim */}
+          <div className="absolute top-1 left-0 right-0 flex justify-between px-4 sm:px-10">
+            {[...Array(14)].map((_, i) => (
+              <div key={i} className="relative flex flex-col items-center">
+                <div className="w-2.5 h-2.5 rounded-full bg-[#F4C542] border border-[#1A0C04] shadow-[0_0_8px_#F4C542]" />
+                <div className="w-6 h-8 bg-gradient-to-t from-transparent to-[#F4C542]/20 blur-xs -translate-y-2 pointer-events-none" />
+              </div>
             ))}
           </div>
         </div>
