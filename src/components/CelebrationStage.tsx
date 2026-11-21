@@ -85,10 +85,6 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
     // Initial confetti celebration if new registrant just joined
     if (newRegistrant) {
       triggerConfettiBlast();
-      const myFrog = allCharacters.find(c => c.id === `frog-${newRegistrant.id}` || c.name.includes(newRegistrant.fullName));
-      if (myFrog) {
-        setActiveCharacter(myFrog);
-      }
     }
 
     // Subtle ambient walking drift across the stage floor
