@@ -331,69 +331,29 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
         </div>
 
         {/* ========================================================================= */}
-        {/* MÀN HÌNH LED MÀU ĐEN Ở GIỮA (CONCERT BLACK LED WALL)                       */}
+        {/* MÀN HÌNH LED MÀU ĐEN TỶ LỆ 16:9 Ở GIỮA                                    */}
         {/* ========================================================================= */}
-        <div className="absolute top-16 sm:top-18 left-1/2 -translate-x-1/2 w-[84%] sm:w-[72%] max-w-[570px] h-[175px] sm:h-[195px] z-10 pointer-events-none">
-          {/* Ambient LED Screen Backlight Glow */}
-          <div className="absolute -inset-2 bg-[#F4C542]/15 rounded-sm blur-xl -z-10" />
+        <div className="absolute top-10 sm:top-12 left-1/2 -translate-x-1/2 w-[78%] sm:w-[65%] max-w-[500px] aspect-[16/9] z-10 pointer-events-none">
+          {/* Subtle Ambient LED Backlight / Stage Shadow */}
+          <div className="absolute -inset-2 bg-black/60 rounded-sm blur-xl -z-10" />
 
-          {/* Heavy Black LED Cabinet Frame */}
-          <div className="w-full h-full bg-[#0A0C10] border-2 sm:border-3 border-[#242936] rounded-sm p-2.5 sm:p-3.5 flex flex-col justify-between relative overflow-hidden shadow-2xl">
-            {/* LED Matrix Pixel Grid Pattern */}
-            <div className="absolute inset-0 opacity-20 bg-[radial-gradient(#4A5568_1px,transparent_1px)] [background-size:5px_5px]" />
-            <div className="absolute inset-0 opacity-15 bg-[linear-gradient(to_right,#1E2330_1px,transparent_1px),linear-gradient(to_bottom,#1E2330_1px,transparent_1px)] [background-size:40px_40px]" />
+          {/* Heavy Black Concert LED Screen Cabinet Frame (Tỷ lệ chuẩn 16:9) */}
+          <div className="w-full h-full bg-[#08090C] border-2 sm:border-3 border-[#1A1E27] rounded-sm relative overflow-hidden shadow-2xl">
+            {/* Modular LED Cabinet Panel Seams (Lưới ghép module LED cabinet) */}
+            <div className="absolute inset-0 opacity-20 bg-[linear-gradient(to_right,#141822_1px,transparent_1px),linear-gradient(to_bottom,#141822_1px,transparent_1px)] [background-size:25%_50%]" />
+            {/* Fine LED Pitch Matrix Texture */}
+            <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#2E3547_1px,transparent_1px)] [background-size:4px_4px]" />
+            
+            {/* Corner Rigging Bolts */}
+            <div className="absolute top-1.5 left-1.5 w-1.5 h-1.5 rounded-full bg-[#1A1E27] border border-black/40" />
+            <div className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-[#1A1E27] border border-black/40" />
+            <div className="absolute bottom-1.5 left-1.5 w-1.5 h-1.5 rounded-full bg-[#1A1E27] border border-black/40" />
+            <div className="absolute bottom-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-[#1A1E27] border border-black/40" />
 
-            {/* LED Top Status Header */}
-            <div className="relative z-10 flex items-center justify-between border-b border-[#202533] pb-1.5 font-mono text-[9px] sm:text-[10px]">
-              <div className="flex items-center gap-1.5 text-[#F4C542]">
-                <span className="w-2 h-2 rounded-full bg-red-500 animate-ping inline-block" />
-                <span className="font-bold tracking-widest uppercase">STAGE LED • GALA 17Y</span>
-              </div>
-              <div className="flex items-center gap-2 text-white/50">
-                <span>4K DCI // LIVE FEED</span>
-                <span className="hidden sm:inline">19.12.2026</span>
-              </div>
-            </div>
-
-            {/* LED Main Typography / Visual Centerpiece */}
-            <div className="relative z-10 text-center py-1 sm:py-2 space-y-1">
-              <span className="font-mono text-[9px] sm:text-[11px] text-[#F4C542] uppercase tracking-[0.25em] font-semibold block">
-                CLB TRUYỀN THÔNG CÓC SÀI GÒN
-              </span>
-              <h3 className="font-display font-black text-xl sm:text-3xl text-white tracking-wider uppercase leading-none drop-shadow-[0_0_12px_rgba(244,197,66,0.6)]">
-                17 NĂM MỘT MÁI NHÀ
-              </h3>
-              <p className="font-mono text-[10px] sm:text-xs text-[#EAE4D6]/70 tracking-widest">
-                ★ 2009 — 2026 ★ ĐẠI TIỆC HỘI NGỘ
-              </p>
-            </div>
-
-            {/* LED Bottom Audio Equalizer Visualizer & Katana Sub-bar */}
-            <div className="relative z-10 pt-1 border-t border-[#202533] flex items-end justify-between px-2">
-              {/* Audio Spectrum Equalizer Bars */}
-              <div className="flex items-end gap-1 h-5 w-28 sm:w-40">
-                {[...Array(14)].map((_, i) => (
-                  <div
-                    key={i}
-                    className={`flex-1 rounded-t-xs ${
-                      i % 3 === 0 
-                        ? 'bg-[#F4C542] stage-eq-1' 
-                        : i % 3 === 1 
-                        ? 'bg-[#B94D35] stage-eq-2' 
-                        : 'bg-white stage-eq-3'
-                    }`}
-                    style={{ animationDelay: `${(i * 0.12).toFixed(2)}s` }}
-                  />
-                ))}
-              </div>
-
-              {/* Katana Bottom Chasing Bar */}
-              <div className="flex items-center gap-1.5 font-mono text-[9px] text-[#F4C542]/80">
-                <span className="hidden sm:inline">KATANA SYSTEM</span>
-                <div className="w-16 sm:w-24 h-1.5 bg-[#12141A] rounded-full overflow-hidden border border-[#2D3342]">
-                  <div className="w-full h-full stage-katana-chase" />
-                </div>
-              </div>
+            {/* Faint Standby Signal in bottom right corner */}
+            <div className="absolute bottom-2 right-2.5 flex items-center gap-1.5 opacity-35">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse inline-block" />
+              <span className="font-mono text-[8px] text-white/50 tracking-wider">LED 16:9</span>
             </div>
           </div>
         </div>
