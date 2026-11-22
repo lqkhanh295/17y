@@ -60,9 +60,12 @@ export interface RegistrationRecord {
   
   // Approval & State
   status: PaymentStatus;
+  paymentStatus?: PaymentStatus;
   isApproved100: boolean;
   approvedBy?: string;
   approvedAt?: string;
+  verifiedBy?: string;
+  verifiedAt?: string;
   rejectReason?: string;
   
   // Payment History

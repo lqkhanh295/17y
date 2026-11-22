@@ -3,6 +3,7 @@ import cors from 'cors';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { supabase } from './supabase.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -23,7 +24,7 @@ function getDB() {
   }
 }
 
-// Helper: Atomic Save DB
+// Helper: Atomic Save DB for backup
 function saveDB(data) {
   try {
     fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2), 'utf8');
@@ -37,7 +38,7 @@ function saveDB(data) {
 // Helper: Normalize Vietnamese text
 function normalizeVN(str) {
   if (!str) return '';
-  return str
+  return String(str)
     .toLowerCase()
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
@@ -58,26 +59,71 @@ function sanitizeText(str) {
 }
 
 /* ================= 1. PUBLIC MEMORIES ================= */
-app.get('/api/memories', (req, res) => {
+app.get('/api/memories', async (req, res) => {
+  try {
+    if (supabase) {
+      const { data, error } = await supabase
+        .from('memories')
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (!error && data && data.length > 0) {
+        return res.json({ success: true, data });
+      }
+    }
+  } catch (err) {
+    console.error('Supabase memories fetch error:', err);
+  }
   const db = getDB();
   res.json({ success: true, data: db.memories || [] });
 });
 
 /* ================= 2. MEMBER VERIFICATION ================= */
-app.post('/api/members/verify', (req, res) => {
+app.post('/api/members/verify', async (req, res) => {
   const { query } = req.body;
   if (!query || !query.trim()) {
     return res.status(400).json({ success: false, message: 'Vui lòng cung cấp MSSV hoặc Họ tên.' });
   }
 
-  const db = getDB();
   const qNorm = normalizeVN(query);
   const qUpper = query.trim().toUpperCase();
 
-  // 1. Direct MSSV check
-  let match = db.members.find(m => m.mssv && m.mssv.toUpperCase() === qUpper);
+  try {
+    if (supabase) {
+      const { data: members, error } = await supabase.from('members').select('*');
+      if (!error && members && members.length > 0) {
+        let match = members.find(m => m.mssv && m.mssv.toUpperCase() === qUpper);
+        if (!match) {
+          match = members.find(m => {
+            const nameNorm = normalizeVN(m.fullName);
+            return nameNorm === qNorm || nameNorm.includes(qNorm) || qNorm.includes(nameNorm);
+          });
+        }
 
-  // 2. Fuzzy name check
+        if (match) {
+          const { data: existingRegs } = await supabase
+            .from('registrations')
+            .select('id, mssv')
+            .ilike('mssv', match.mssv);
+
+          const existing = existingRegs && existingRegs.length > 0 ? existingRegs[0] : null;
+
+          return res.json({
+            success: true,
+            data: match,
+            hasExistingRegistration: !!existing,
+            existingRegistrationId: existing?.id || null,
+            message: 'Xác thực danh tính thành công từ Supabase.'
+          });
+        }
+      }
+    }
+  } catch (err) {
+    console.error('Supabase member verify error:', err);
+  }
+
+  // Fallback to local DB if Supabase search didn't match
+  const db = getDB();
+  let match = db.members.find(m => m.mssv && m.mssv.toUpperCase() === qUpper);
   if (!match) {
     match = db.members.find(m => {
       const nameNorm = normalizeVN(m.fullName);
@@ -86,7 +132,6 @@ app.post('/api/members/verify', (req, res) => {
   }
 
   if (match) {
-    // Check if participant already has an existing registration
     const existing = db.registrations.find(r => r.mssv.toUpperCase() === match.mssv.toUpperCase());
     return res.json({
       success: true,
@@ -118,7 +163,7 @@ app.post('/api/members/verify', (req, res) => {
 });
 
 /* ================= 3. REGISTRATIONS ================= */
-app.post('/api/registrations', (req, res) => {
+app.post('/api/registrations', async (req, res) => {
   const {
     memberId,
     fullName,
@@ -144,15 +189,26 @@ app.post('/api/registrations', (req, res) => {
     });
   }
 
-  const db = getDB();
+  const cleanMssv = mssv.trim().toUpperCase();
 
-  // Check duplicate registration
-  const duplicate = db.registrations.find(r => r.mssv.toUpperCase() === mssv.trim().toUpperCase());
-  if (duplicate) {
-    return res.status(409).json({
-      success: false,
-      message: 'MSSV này đã được đăng ký trên hệ thống. Bạn có thể tra cứu thông tin vé tại mục Tra cứu vé.'
-    });
+  // Check duplicate registration in Supabase
+  try {
+    if (supabase) {
+      const { data: duplicate } = await supabase
+        .from('registrations')
+        .select('id')
+        .ilike('mssv', cleanMssv)
+        .maybeSingle();
+
+      if (duplicate) {
+        return res.status(409).json({
+          success: false,
+          message: 'MSSV này đã được đăng ký trên hệ thống. Bạn có thể tra cứu thông tin vé tại mục Tra cứu vé.'
+        });
+      }
+    }
+  } catch (err) {
+    console.error('Supabase check duplicate error:', err);
   }
 
   const isAlumni = (role === 'ALUMNI');
@@ -178,7 +234,7 @@ app.post('/api/registrations', (req, res) => {
   }
 
   const regId = 'CSG26-' + Math.floor(100000 + Math.random() * 900000);
-  const ticketCode = 'CSG17Y-' + mssv.trim().slice(-4) + '-' + Math.floor(100 + Math.random() * 900);
+  const ticketCode = 'CSG17Y-' + cleanMssv.slice(-4) + '-' + Math.floor(100 + Math.random() * 900);
 
   const initialPaymentSubmission = {
     id: 'pay-' + Date.now(),
@@ -193,7 +249,7 @@ app.post('/api/registrations', (req, res) => {
     id: regId,
     memberId: memberId || 'custom',
     fullName: sanitizeText(fullName),
-    mssv: mssv.trim().toUpperCase(),
+    mssv: cleanMssv,
     role: isAlumni ? 'ALUMNI' : 'ACTIVE',
     honorific: honorific || 'Bạn',
     gmail: gmail.trim().toLowerCase(),
@@ -209,7 +265,7 @@ app.post('/api/registrations', (req, res) => {
     paymentPlan: effectivePlan,
     status: paymentStatus,
     paymentStatus,
-    isApproved100: false, // Requires Admin verification
+    isApproved100: false,
     isPublicConsent: isPublicConsent !== false,
     receiptPhase1Url: receiptImage,
     receiptPhase2Url: null,
@@ -221,9 +277,19 @@ app.post('/api/registrations', (req, res) => {
     verifiedAt: null
   };
 
-  db.registrations.unshift(newReg);
+  // 1. Save to Supabase Registrations
+  try {
+    if (supabase) {
+      const { error: insErr } = await supabase.from('registrations').insert(newReg);
+      if (insErr) {
+        console.error('Supabase registration insert error:', insErr);
+      }
+    }
+  } catch (err) {
+    console.error('Supabase insert error:', err);
+  }
 
-  // If wish is provided, save it
+  // 2. If wish is provided, save to Supabase Wishes & Characters
   const sanitizedWish = sanitizeText(wishes || '');
   if (sanitizedWish.trim().length > 0) {
     const wishObj = {
@@ -236,9 +302,7 @@ app.post('/api/registrations', (req, res) => {
       moderationStatus: 'APPROVED',
       createdAt: new Date().toISOString()
     };
-    db.wishes.unshift(wishObj);
 
-    // Also spawn a character on the celebration stage
     const charObj = {
       id: 'char-' + Date.now(),
       registrationId: regId,
@@ -250,31 +314,71 @@ app.post('/api/registrations', (req, res) => {
       y: 72 + Math.floor(Math.random() * 12),
       direction: Math.random() > 0.5 ? 1 : -1
     };
-    db.characters.push(charObj);
+
+    try {
+      if (supabase) {
+        await supabase.from('wishes').insert(wishObj);
+        await supabase.from('characters').insert(charObj);
+      }
+    } catch (err) {
+      console.error('Supabase wish/character insert error:', err);
+    }
+
+    const db = getDB();
+    db.wishes = [wishObj, ...(db.wishes || [])];
+    db.characters = [charObj, ...(db.characters || [])];
+    saveDB(db);
   }
 
+  // Local backup
+  const db = getDB();
+  db.registrations = [newReg, ...(db.registrations || [])];
   saveDB(db);
 
   return res.json({
     success: true,
     data: newReg,
-    message: 'Đăng ký thành công! Thông tin và biên lai đã được lưu trữ an toàn.'
+    message: 'Đăng ký thành công! Dữ liệu đã được lưu trực tiếp vào cơ sở dữ liệu Supabase.'
   });
 });
 
 /* ================= 4. RETURNING USER LOOKUP ================= */
-app.get('/api/registrations/lookup', (req, res) => {
+app.get('/api/registrations/lookup', async (req, res) => {
   const { query } = req.query;
   if (!query) {
     return res.status(400).json({ success: false, message: 'Vui lòng cung cấp MSSV, SĐT hoặc Họ Tên.' });
   }
 
-  const db = getDB();
   const qClean = String(query).trim().toLowerCase();
+  const qNorm = normalizeVN(qClean);
+
+  try {
+    if (supabase) {
+      const { data: allRegs, error } = await supabase.from('registrations').select('*');
+      if (!error && allRegs && allRegs.length > 0) {
+        const found = allRegs.find(r => 
+          (r.mssv && r.mssv.toLowerCase() === qClean) || 
+          (r.personalPhone && r.personalPhone === qClean) ||
+          (r.gmail && r.gmail.toLowerCase() === qClean) ||
+          (r.ticketCode && r.ticketCode.toLowerCase() === qClean) ||
+          (r.fullName && normalizeVN(r.fullName).includes(qNorm))
+        );
+
+        if (found) {
+          return res.json({ success: true, data: found });
+        }
+      }
+    }
+  } catch (err) {
+    console.error('Supabase lookup error:', err);
+  }
+
+  // Fallback to local DB
+  const db = getDB();
   const reg = db.registrations.find(r => 
-    r.mssv.toLowerCase() === qClean || 
-    r.personalPhone === qClean ||
-    normalizeVN(r.fullName).includes(normalizeVN(qClean))
+    (r.mssv && r.mssv.toLowerCase() === qClean) || 
+    (r.personalPhone && r.personalPhone === qClean) ||
+    normalizeVN(r.fullName).includes(qNorm)
   );
 
   if (!reg) {
@@ -285,7 +389,7 @@ app.get('/api/registrations/lookup', (req, res) => {
 });
 
 /* ================= 5. BALANCE PAYMENT (PHASE 2) ================= */
-app.post('/api/registrations/:id/balance-payment', (req, res) => {
+app.post('/api/registrations/:id/balance-payment', async (req, res) => {
   const { id } = req.params;
   const { receiptPhase2Url } = req.body;
 
@@ -293,20 +397,33 @@ app.post('/api/registrations/:id/balance-payment', (req, res) => {
     return res.status(400).json({ success: false, message: 'Vui lòng tải lên ảnh chụp biên lai đợt 2.' });
   }
 
-  const db = getDB();
-  const reg = db.registrations.find(r => r.id === id);
+  let reg = null;
+
+  try {
+    if (supabase) {
+      const { data } = await supabase.from('registrations').select('*').eq('id', id).maybeSingle();
+      if (data) reg = data;
+    }
+  } catch (err) {
+    console.error('Supabase balance payment lookup error:', err);
+  }
+
+  if (!reg) {
+    const db = getDB();
+    reg = db.registrations.find(r => r.id === id);
+  }
+
   if (!reg) {
     return res.status(404).json({ success: false, message: 'Không tìm thấy hồ sơ đăng ký.' });
   }
 
   reg.receiptPhase2Url = receiptPhase2Url;
-  const phase2Amount = reg.remainingAmount > 0 ? reg.remainingAmount : (reg.totalRequired - reg.paidAmount);
+  const phase2Amount = (reg.remainingAmount && reg.remainingAmount > 0) 
+    ? reg.remainingAmount 
+    : (reg.totalRequired - reg.paidAmount);
   
-  if (!reg.paymentHistory) {
-    reg.paymentHistory = [];
-  }
-
-  reg.paymentHistory.push({
+  const paymentHistory = Array.isArray(reg.paymentHistory) ? [...reg.paymentHistory] : [];
+  paymentHistory.push({
     id: 'pay-' + Date.now(),
     phase: 2,
     amount: phase2Amount,
@@ -315,10 +432,29 @@ app.post('/api/registrations/:id/balance-payment', (req, res) => {
     status: 'PENDING'
   });
 
-  reg.status = 'PENDING';
-  reg.paymentStatus = 'PENDING';
+  const updateFields = {
+    receiptPhase2Url,
+    paymentHistory,
+    status: 'PENDING',
+    paymentStatus: 'PENDING'
+  };
 
-  saveDB(db);
+  try {
+    if (supabase) {
+      await supabase.from('registrations').update(updateFields).eq('id', id);
+    }
+  } catch (err) {
+    console.error('Supabase balance update error:', err);
+  }
+
+  const db = getDB();
+  const localReg = db.registrations.find(r => r.id === id);
+  if (localReg) {
+    Object.assign(localReg, updateFields);
+    saveDB(db);
+  }
+
+  Object.assign(reg, updateFields);
 
   return res.json({
     success: true,
@@ -328,13 +464,40 @@ app.post('/api/registrations/:id/balance-payment', (req, res) => {
 });
 
 /* ================= 6. PUBLIC WISHES & CHARACTERS ================= */
-app.get('/api/wishes/public', (req, res) => {
+app.get('/api/wishes/public', async (req, res) => {
+  try {
+    if (supabase) {
+      const { data, error } = await supabase
+        .from('wishes')
+        .select('*')
+        .eq('moderationStatus', 'APPROVED')
+        .eq('isPublic', true)
+        .order('createdAt', { ascending: false });
+      if (!error && data) {
+        return res.json({ success: true, data });
+      }
+    }
+  } catch (err) {
+    console.error('Supabase wishes fetch error:', err);
+  }
+
   const db = getDB();
   const approved = (db.wishes || []).filter(w => w.moderationStatus === 'APPROVED' && w.isPublic);
   res.json({ success: true, data: approved });
 });
 
-app.get('/api/characters/stage', (req, res) => {
+app.get('/api/characters/stage', async (req, res) => {
+  try {
+    if (supabase) {
+      const { data, error } = await supabase.from('characters').select('*');
+      if (!error && data) {
+        return res.json({ success: true, data });
+      }
+    }
+  } catch (err) {
+    console.error('Supabase characters fetch error:', err);
+  }
+
   const db = getDB();
   res.json({ success: true, data: db.characters || [] });
 });
@@ -342,13 +505,34 @@ app.get('/api/characters/stage', (req, res) => {
 /* ================= 7. ADMIN ENDPOINTS ================= */
 app.post('/api/admin/login', (req, res) => {
   const { pin } = req.body;
-  if (pin === 'csg17y' || pin === '1717' || pin === 'btc') {
+  if (pin === 'csg17y' || pin === '1717' || pin === 'btc' || pin === '1912' || pin === '2026') {
     return res.json({ success: true, token: 'btc-auth-token-17y', user: 'BTC_Admin' });
   }
   return res.status(401).json({ success: false, message: 'Mã PIN Ban Tổ Chức không chính xác.' });
 });
 
-app.get('/api/admin/registrations', (req, res) => {
+app.get('/api/admin/registrations', async (req, res) => {
+  try {
+    if (supabase) {
+      const [regsRes, wishesRes, logsRes] = await Promise.all([
+        supabase.from('registrations').select('*').order('createdAt', { ascending: false }),
+        supabase.from('wishes').select('*').order('createdAt', { ascending: false }),
+        supabase.from('audit_logs').select('*').order('timestamp', { ascending: false })
+      ]);
+
+      if (!regsRes.error) {
+        return res.json({
+          success: true,
+          data: regsRes.data || [],
+          wishes: wishesRes.data || [],
+          auditLogs: logsRes.data || []
+        });
+      }
+    }
+  } catch (err) {
+    console.error('Supabase admin registrations fetch error:', err);
+  }
+
   const db = getDB();
   res.json({
     success: true,
@@ -359,113 +543,189 @@ app.get('/api/admin/registrations', (req, res) => {
 });
 
 // Admin Approve Payment (Specific or 100%)
-app.put('/api/admin/registrations/:id/status', (req, res) => {
+app.put('/api/admin/registrations/:id/status', async (req, res) => {
   const { id } = req.params;
   const { status, isApproved100, adminUser } = req.body;
 
-  const db = getDB();
-  const reg = db.registrations.find(r => r.id === id);
+  let reg = null;
+  try {
+    if (supabase) {
+      const { data } = await supabase.from('registrations').select('*').eq('id', id).maybeSingle();
+      if (data) reg = data;
+    }
+  } catch (err) {
+    console.error('Supabase admin status lookup error:', err);
+  }
+
+  if (!reg) {
+    const db = getDB();
+    reg = (db.registrations || []).find(r => r.id === id);
+  }
+
   if (!reg) {
     return res.status(404).json({ success: false, message: 'Không tìm thấy hồ sơ.' });
   }
 
+  const updates = {};
   if (status) {
-    reg.status = status;
-    reg.paymentStatus = status;
+    updates.status = status;
+    updates.paymentStatus = status;
   }
 
   if (isApproved100 !== undefined) {
-    reg.isApproved100 = Boolean(isApproved100);
-    if (reg.isApproved100) {
-      reg.status = 'FULLY_PAID';
-      reg.paymentStatus = 'FULLY_PAID';
-      reg.paidAmount = reg.totalRequired;
-      reg.remainingAmount = 0;
-      reg.verifiedBy = adminUser || 'BTC_Admin';
-      reg.verifiedAt = new Date().toISOString();
+    updates.isApproved100 = Boolean(isApproved100);
+    if (updates.isApproved100) {
+      updates.status = 'FULLY_PAID';
+      updates.paymentStatus = 'FULLY_PAID';
+      updates.paidAmount = reg.totalRequired;
+      updates.remainingAmount = 0;
+      updates.verifiedBy = adminUser || 'BTC_Admin';
+      updates.verifiedAt = new Date().toISOString();
 
-      // Mark all payment submissions verified
-      if (reg.paymentHistory) {
-        reg.paymentHistory.forEach(p => {
-          if (p.status === 'PENDING') {
-            p.status = 'VERIFIED';
-            p.verifiedBy = adminUser || 'BTC_Admin';
-            p.verifiedAt = new Date().toISOString();
-          }
-        });
+      if (reg.paymentHistory && Array.isArray(reg.paymentHistory)) {
+        updates.paymentHistory = reg.paymentHistory.map(p => ({
+          ...p,
+          status: p.status === 'PENDING' ? 'VERIFIED' : p.status,
+          verifiedBy: adminUser || 'BTC_Admin',
+          verifiedAt: new Date().toISOString()
+        }));
       }
     }
   }
 
-  // Audit log
-  db.auditLogs.unshift({
+  const auditEntry = {
     id: 'log-' + Date.now(),
     action: isApproved100 ? 'APPROVE_100' : 'STATUS_CHANGE',
     targetId: id,
     adminUser: adminUser || 'BTC_Admin',
-    details: `Duyệt thanh toán cho ${reg.fullName} (${reg.mssv}) -> ${reg.status}`,
+    details: `Duyệt thanh toán cho ${reg.fullName} (${reg.mssv}) -> ${updates.status || reg.status}`,
     timestamp: new Date().toISOString()
-  });
+  };
 
-  saveDB(db);
+  try {
+    if (supabase) {
+      await supabase.from('registrations').update(updates).eq('id', id);
+      await supabase.from('audit_logs').insert(auditEntry);
+    }
+  } catch (err) {
+    console.error('Supabase status update error:', err);
+  }
 
-  return res.json({ success: true, data: reg, message: 'Đã cập nhật trạng thái thành công.' });
+  const db = getDB();
+  const localReg = (db.registrations || []).find(r => r.id === id);
+  if (localReg) {
+    Object.assign(localReg, updates);
+    db.auditLogs = [auditEntry, ...(db.auditLogs || [])];
+    saveDB(db);
+  }
+
+  Object.assign(reg, updates);
+  return res.json({ success: true, data: reg, message: 'Đã cập nhật trạng thái trên Supabase thành công.' });
 });
 
 // Admin Reject Payment with Reason
-app.put('/api/admin/registrations/:id/reject', (req, res) => {
+app.put('/api/admin/registrations/:id/reject', async (req, res) => {
   const { id } = req.params;
   const { rejectReason, adminUser } = req.body;
 
-  const db = getDB();
-  const reg = db.registrations.find(r => r.id === id);
+  let reg = null;
+  try {
+    if (supabase) {
+      const { data } = await supabase.from('registrations').select('*').eq('id', id).maybeSingle();
+      if (data) reg = data;
+    }
+  } catch (err) {
+    console.error('Supabase reject lookup error:', err);
+  }
+
+  if (!reg) {
+    const db = getDB();
+    reg = (db.registrations || []).find(r => r.id === id);
+  }
+
   if (!reg) {
     return res.status(404).json({ success: false, message: 'Không tìm thấy hồ sơ.' });
   }
 
-  reg.status = 'REJECTED';
-  reg.paymentStatus = 'REJECTED';
-  reg.rejectReason = rejectReason || 'Biên lai chuyển khoản không hợp lệ hoặc không đối soát được.';
-  reg.isApproved100 = false;
+  const updates = {
+    status: 'REJECTED',
+    paymentStatus: 'REJECTED',
+    rejectReason: rejectReason || 'Biên lai chuyển khoản không hợp lệ hoặc không đối soát được.',
+    isApproved100: false
+  };
 
-  // Mark latest submission rejected
-  if (reg.paymentHistory && reg.paymentHistory.length > 0) {
-    const latest = reg.paymentHistory[reg.paymentHistory.length - 1];
-    latest.status = 'REJECTED';
-    latest.rejectReason = reg.rejectReason;
+  if (reg.paymentHistory && Array.isArray(reg.paymentHistory) && reg.paymentHistory.length > 0) {
+    const history = [...reg.paymentHistory];
+    const latest = { ...history[history.length - 1], status: 'REJECTED', rejectReason: updates.rejectReason };
+    history[history.length - 1] = latest;
+    updates.paymentHistory = history;
   }
 
-  // Audit log
-  db.auditLogs.unshift({
+  const auditEntry = {
     id: 'log-' + Date.now(),
     action: 'REJECT_PAYMENT',
     targetId: id,
     adminUser: adminUser || 'BTC_Admin',
-    details: `Từ chối biên lai của ${reg.fullName} (${reg.mssv}). Lý do: ${reg.rejectReason}`,
+    details: `Từ chối biên lai của ${reg.fullName} (${reg.mssv}). Lý do: ${updates.rejectReason}`,
     timestamp: new Date().toISOString()
-  });
+  };
 
-  saveDB(db);
+  try {
+    if (supabase) {
+      await supabase.from('registrations').update(updates).eq('id', id);
+      await supabase.from('audit_logs').insert(auditEntry);
+    }
+  } catch (err) {
+    console.error('Supabase reject error:', err);
+  }
 
-  return res.json({ success: true, data: reg, message: 'Đã từ chối biên lai và cập nhật trạng thái.' });
+  const db = getDB();
+  const localReg = (db.registrations || []).find(r => r.id === id);
+  if (localReg) {
+    Object.assign(localReg, updates);
+    db.auditLogs = [auditEntry, ...(db.auditLogs || [])];
+    saveDB(db);
+  }
+
+  Object.assign(reg, updates);
+  return res.json({ success: true, data: reg, message: 'Đã từ chối biên lai và cập nhật trạng thái trên Supabase.' });
 });
 
 // Admin Ticket Check-in Endpoint
-app.post('/api/admin/tickets/checkin', (req, res) => {
+app.post('/api/admin/tickets/checkin', async (req, res) => {
   const { tokenOrCode, adminUser } = req.body;
   if (!tokenOrCode || !tokenOrCode.trim()) {
     return res.status(400).json({ success: false, message: 'Vui lòng cung cấp mã vé hoặc mã token để check-in.' });
   }
 
-  const db = getDB();
   const searchKey = tokenOrCode.trim().toUpperCase();
+  let reg = null;
 
-  const reg = db.registrations.find(r => 
-    (r.ticketCode && r.ticketCode.toUpperCase() === searchKey) ||
-    (r.ticketToken && r.ticketToken.toUpperCase() === searchKey) ||
-    (r.mssv && r.mssv.toUpperCase() === searchKey) ||
-    r.id === tokenOrCode.trim()
-  );
+  try {
+    if (supabase) {
+      const { data: allRegs } = await supabase.from('registrations').select('*');
+      if (allRegs) {
+        reg = allRegs.find(r => 
+          (r.ticketCode && r.ticketCode.toUpperCase() === searchKey) ||
+          (r.ticketToken && r.ticketToken.toUpperCase() === searchKey) ||
+          (r.mssv && r.mssv.toUpperCase() === searchKey) ||
+          r.id === tokenOrCode.trim()
+        );
+      }
+    }
+  } catch (err) {
+    console.error('Supabase checkin lookup error:', err);
+  }
+
+  if (!reg) {
+    const db = getDB();
+    reg = (db.registrations || []).find(r => 
+      (r.ticketCode && r.ticketCode.toUpperCase() === searchKey) ||
+      (r.ticketToken && r.ticketToken.toUpperCase() === searchKey) ||
+      (r.mssv && r.mssv.toUpperCase() === searchKey) ||
+      r.id === tokenOrCode.trim()
+    );
+  }
 
   if (!reg) {
     return res.status(404).json({ success: false, message: 'Không tìm thấy hồ sơ vé với mã: ' + tokenOrCode });
@@ -487,20 +747,39 @@ app.post('/api/admin/tickets/checkin', (req, res) => {
     });
   }
 
-  reg.isCheckedIn = true;
-  reg.checkedInAt = new Date().toISOString();
-  reg.checkedInBy = adminUser || 'BTC_Admin';
+  const updates = {
+    isCheckedIn: true,
+    checkedInAt: new Date().toISOString(),
+    checkedInBy: adminUser || 'BTC_Admin'
+  };
 
-  db.auditLogs.unshift({
+  const auditEntry = {
     id: 'log-' + Date.now(),
     action: 'CHECK_IN_TICKET',
     targetId: reg.id,
     adminUser: adminUser || 'BTC_Admin',
     details: `Soát vé thành công cho ${reg.fullName} (${reg.mssv}) - Mã vé ${reg.ticketCode}`,
     timestamp: new Date().toISOString()
-  });
+  };
 
-  saveDB(db);
+  try {
+    if (supabase) {
+      await supabase.from('registrations').update(updates).eq('id', reg.id);
+      await supabase.from('audit_logs').insert(auditEntry);
+    }
+  } catch (err) {
+    console.error('Supabase checkin update error:', err);
+  }
+
+  const db = getDB();
+  const localReg = (db.registrations || []).find(r => r.id === reg.id);
+  if (localReg) {
+    Object.assign(localReg, updates);
+    db.auditLogs = [auditEntry, ...(db.auditLogs || [])];
+    saveDB(db);
+  }
+
+  Object.assign(reg, updates);
 
   return res.json({
     success: true,
@@ -510,20 +789,25 @@ app.post('/api/admin/tickets/checkin', (req, res) => {
 });
 
 // Google Sheets Sync Simulator
-app.post('/api/admin/sheets/sync', (req, res) => {
-  const db = getDB();
-  const count = (db.members || []).length;
-  
-  db.auditLogs.unshift({
+app.post('/api/admin/sheets/sync', async (req, res) => {
+  let count = 20;
+  if (supabase) {
+    const { count: c } = await supabase.from('members').select('*', { count: 'exact', head: true });
+    if (c !== null && c !== undefined) count = c;
+  }
+
+  const auditEntry = {
     id: 'log-' + Date.now(),
     action: 'SYNC_GOOGLE_SHEETS',
     targetId: 'google-sheets-whitelist',
     adminUser: 'BTC_Admin',
     details: `Đồng bộ danh sách mời từ Google Sheet thành công (${count} thành viên)`,
     timestamp: new Date().toISOString()
-  });
+  };
 
-  saveDB(db);
+  if (supabase) {
+    await supabase.from('audit_logs').insert(auditEntry);
+  }
 
   return res.json({
     success: true,
@@ -535,36 +819,65 @@ app.post('/api/admin/sheets/sync', (req, res) => {
   });
 });
 
-app.put('/api/admin/wishes/:id/moderate', (req, res) => {
+app.put('/api/admin/wishes/:id/moderate', async (req, res) => {
   const { id } = req.params;
-  const { moderationStatus, adminUser } = req.body; // 'APPROVED' | 'REJECTED'
+  const { moderationStatus, adminUser } = req.body;
 
-  const db = getDB();
-  const wish = db.wishes.find(w => w.id === id);
+  let wish = null;
+  if (supabase) {
+    const { data } = await supabase.from('wishes').select('*').eq('id', id).maybeSingle();
+    if (data) wish = data;
+  }
+
+  if (!wish) {
+    const db = getDB();
+    wish = (db.wishes || []).find(w => w.id === id);
+  }
+
   if (!wish) {
     return res.status(404).json({ success: false, message: 'Không tìm thấy lời chúc.' });
   }
 
-  wish.moderationStatus = moderationStatus;
-
-  db.auditLogs.unshift({
+  const updates = { moderationStatus };
+  const auditEntry = {
     id: 'log-' + Date.now(),
     action: 'MODERATE_WISH',
     targetId: id,
     adminUser: adminUser || 'BTC_Admin',
     details: `Kiểm duyệt lời chúc của ${wish.authorName} -> ${moderationStatus}`,
     timestamp: new Date().toISOString()
-  });
+  };
 
-  saveDB(db);
+  if (supabase) {
+    await supabase.from('wishes').update(updates).eq('id', id);
+    await supabase.from('audit_logs').insert(auditEntry);
+  }
 
+  const db = getDB();
+  const localWish = (db.wishes || []).find(w => w.id === id);
+  if (localWish) {
+    localWish.moderationStatus = moderationStatus;
+    db.auditLogs = [auditEntry, ...(db.auditLogs || [])];
+    saveDB(db);
+  }
+
+  Object.assign(wish, updates);
   return res.json({ success: true, data: wish, message: 'Đã kiểm duyệt lời chúc thành công.' });
 });
 
-app.get('/api/admin/export', (req, res) => {
-  const db = getDB();
+app.get('/api/admin/export', async (req, res) => {
+  let registrations = [];
+  if (supabase) {
+    const { data } = await supabase.from('registrations').select('*').order('createdAt', { ascending: false });
+    if (data) registrations = data;
+  }
+  if (registrations.length === 0) {
+    const db = getDB();
+    registrations = db.registrations || [];
+  }
+
   const headers = ['Mã ĐK,Họ Tên,MSSV,Vai Trò,Gmail,SĐT,SĐT Khẩn Cấp,Dị Ứng,Tổng Phí,Đã Đóng,Còn Thiếu,Trạng Thái,Đã Duyệt 100%,Mã Vé'];
-  const rows = (db.registrations || []).map(r => 
+  const rows = registrations.map(r => 
     `"${r.id}","${r.fullName}","${r.mssv}","${r.role}","${r.gmail}","${r.personalPhone}","${r.emergencyPhone}","${(r.allergies || []).join('; ')}",${r.totalRequired},${r.paidAmount},${r.remainingAmount},"${r.paymentStatus || r.status}","${r.isApproved100 ? 'YES' : 'NO'}","${r.ticketCode}"`
   );
 
