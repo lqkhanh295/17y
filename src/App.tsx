@@ -322,16 +322,10 @@ export const App: React.FC = () => {
               THƯỚC PHIM 17Y
             </button>
             <button
-              onClick={openLookup}
-              className="hover:text-csg-red transition-colors"
-            >
-              TRA CỨU VÉ
-            </button>
-            <button
               onClick={openRegister}
               className="btn-editorial-primary px-3.5 py-1.5 font-display font-bold text-xs uppercase flex items-center gap-1 shadow-sm"
             >
-              <span>ĐĂNG KÝ VÉ ↗</span>
+              <span>ĐĂNG KÝ THAM GIA ↗</span>
             </button>
           </nav>
         </div>
@@ -353,13 +347,6 @@ export const App: React.FC = () => {
           <span>CLB TRUYỀN THÔNG CÓC SÀI GÒN • 2009 — 2026 • ĐẠI TIỆC GALA 17Y TẠI ĐỒI SỨ VILLA</span>
 
           <div className="flex items-center gap-4">
-            <button
-              onClick={openLookup}
-              className="hover:text-csg-red underline decoration-1 underline-offset-4 transition-colors"
-            >
-              Tra cứu vé
-            </button>
-            <span>•</span>
             <button
               onClick={openAdmin}
               className="hover:text-csg-red flex items-center gap-1 transition-colors"

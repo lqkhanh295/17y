@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import confetti from 'canvas-confetti';
-import { 
-  X, CheckCircle, ArrowRight, ArrowLeft, Upload, 
+import {
+  X, CheckCircle, ArrowRight, ArrowLeft, Upload,
   Copy, Check, Sparkles, AlertCircle, HeartHandshake,
   UserCheck, ShieldAlert, FileText, Cake, Edit3, MessageSquare,
   HelpCircle, ExternalLink, Ticket
@@ -74,7 +74,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
   // Pricing calculation
   const isAlumni = identifiedMember?.role === 'ALUMNI';
   const totalFee = isAlumni ? 449000 : 349000;
-  
+
   let currentPayAmount = totalFee;
   if (plan === 'DEPOSIT_150' || plan === 'DEPOSIT_100') currentPayAmount = 150000;
   const remainingAmount = totalFee - currentPayAmount;
@@ -150,7 +150,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
   };
 
   const toggleAllergy = (item: string) => {
-    setAllergies(prev => 
+    setAllergies(prev =>
       prev.includes(item) ? prev.filter(a => a !== item) : [...prev, item]
     );
   };
@@ -166,7 +166,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
   // Validate Screen 4 (Personal Info)
   const validateScreen4 = () => {
     const errors: { [key: string]: string } = {};
-    if (!gmail.includes('@')) errors.gmail = 'Vui lòng nhập địa chỉ Gmail hợp lệ để nhận vé.';
+    if (!gmail.includes('@')) errors.gmail = 'Vui lòng nhập địa chỉ Gmail hợp lệ.';
     if (!phone || phone.length < 9) errors.phone = 'Vui lòng nhập số điện thoại cá nhân.';
     if (!emergencyPhone || emergencyPhone.length < 9) errors.emergencyPhone = 'Vui lòng nhập SĐT người thân đón về khi say tiệc.';
 
@@ -221,7 +221,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
 
   return (
     <div className={`fixed inset-0 z-50 flex items-center justify-center ${screen === 6 ? 'p-1 sm:p-3' : 'p-2 sm:p-5'} bg-[#20231F]/90 backdrop-blur-md overflow-hidden animate-fadeIn`}>
-      <div 
+      <div
         className={`relative w-full ${screen === 6 ? 'max-w-6xl h-[95vh] max-h-[95vh] my-auto' : 'max-w-2xl max-h-[95vh] my-3 sm:my-6'} bg-[#F4EEDF] border-2 border-[#20231F] rounded-sm shadow-poster-lg overflow-hidden flex flex-col animate-paper-unfold`}
         onClick={(e) => e.stopPropagation()}
       >
@@ -240,26 +240,12 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                   <span className="stamp-seal text-[8px] bg-white">OFFICIAL</span>
                 </div>
                 <p className="text-[11px] font-mono text-[#20231F]/90 truncate">
-                  Chào mừng <strong>{completedRecord.honorific} {completedRecord.fullName}</strong> ({completedRecord.role === 'ALUMNI' ? 'Cựu TV' : 'Thành viên'}) • Mã vé: <strong className="bg-white/90 px-1 py-0.5 rounded border border-[#20231F]/40">{completedRecord.ticketCode || completedRecord.id}</strong> • Đã nộp: <strong>{completedRecord.paidAmount.toLocaleString('vi-VN')} đ</strong>
+                  Chào mừng <strong>{completedRecord.honorific} {completedRecord.fullName}</strong> ({completedRecord.role === 'ALUMNI' ? 'Cựu TV' : 'Thành viên'}) • Đã đăng ký thành công đại tiệc 17Y! 🎉
                 </p>
               </div>
             </div>
 
             <div className="flex items-center gap-2 shrink-0 ml-2">
-              {onOpenPortal && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    onClose();
-                    onOpenPortal();
-                  }}
-                  className="px-2.5 py-1.5 rounded-sm bg-white border-2 border-[#20231F] hover:bg-[#F4EEDF] text-xs font-mono font-bold uppercase transition-colors flex items-center gap-1 shadow-xs"
-                  title="Tra cứu vé & lịch sự kiện"
-                >
-                  <Ticket className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">Tra cứu vé</span>
-                </button>
-              )}
               <button
                 type="button"
                 onClick={onClose}
@@ -306,7 +292,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
         {/* Progress Bar (Only during registration steps 1-5) */}
         {screen < 6 && (
           <div className="w-full bg-[#EAE4D6] h-1.5 border-b border-[#20231F]/20 shrink-0">
-            <div 
+            <div
               className="bg-[#F4C542] h-full transition-all duration-300"
               style={{ width: `${(screen / 6) * 100}%` }}
             />
@@ -314,8 +300,8 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
         )}
 
         {/* Wizard Screens Container */}
-        <div 
-          ref={screensContainerRef} 
+        <div
+          ref={screensContainerRef}
           className={`${screen === 6 ? 'p-2 sm:p-2.5 overflow-hidden flex-1 flex flex-col h-full' : 'p-6 sm:p-8 overflow-y-auto flex-1 font-body'}`}
         >
 
@@ -448,7 +434,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
               {/* Role & Ticket Tier Switcher */}
               <div className="p-3 bg-[#FFFFFF] border-2 border-[#20231F] rounded-sm space-y-2 text-left shadow-poster-sm">
                 <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#20231F]/70 block">
-                  XÁC NHẬN HẠNG VÉ / VAI TRÒ CỦA BẠN:
+                  XÁC NHẬN VAI TRÒ CỦA BẠN:
                 </span>
                 <div className="grid grid-cols-2 gap-2">
                   <button
@@ -456,14 +442,14 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                     onClick={() => setIdentifiedMember(prev => prev ? { ...prev, role: 'ALUMNI', honorific: prev.honorific === 'Chị' ? 'Chị' : 'Anh' } : null)}
                     className={`py-2 px-2 rounded-sm text-xs font-mono font-bold border-2 transition-all text-center ${isAlumni ? 'bg-[#20231F] text-white border-[#20231F] shadow-sm' : 'bg-[#F4EEDF] text-[#20231F] border-[#20231F]/30 hover:border-[#20231F]'}`}
                   >
-                    🎓 Cựu Thành Viên (449k)
+                    Cựu Thành Viên (449k)
                   </button>
                   <button
                     type="button"
                     onClick={() => setIdentifiedMember(prev => prev ? { ...prev, role: 'ACTIVE', honorific: 'Bạn' } : null)}
                     className={`py-2 px-2 rounded-sm text-xs font-mono font-bold border-2 transition-all text-center ${!isAlumni ? 'bg-[#20231F] text-white border-[#20231F] shadow-sm' : 'bg-[#F4EEDF] text-[#20231F] border-[#20231F]/30 hover:border-[#20231F]'}`}
                   >
-                    ⚡ Thành Viên / Khách Mời (349k)
+                    Thành Viên / Khách Mời (349k)
                   </button>
                 </div>
               </div>
@@ -513,27 +499,25 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <div
                   onClick={() => setPlan('FULL')}
-                  className={`p-4 rounded-sm border-2 cursor-pointer transition-all ${
-                    plan === 'FULL'
-                      ? 'bg-[#F4C542] border-[#20231F] shadow-poster-sm'
-                      : 'bg-white border-[#20231F] hover:bg-[#F4EEDF]'
-                  }`}
+                  className={`p-4 rounded-sm border-2 cursor-pointer transition-all ${plan === 'FULL'
+                    ? 'bg-[#F4C542] border-[#20231F] shadow-poster-sm'
+                    : 'bg-white border-[#20231F] hover:bg-[#F4EEDF]'
+                    }`}
                 >
                   <div className="flex justify-between items-center mb-1">
                     <span className="text-xs font-mono font-bold uppercase">100% TRỌN GÓI</span>
                     <span className="text-[9px] px-1.5 py-0.5 rounded bg-[#20231F] text-[#F4C542] font-bold">KHUYÊN DÙNG</span>
                   </div>
                   <div className="text-2xl font-display font-bold">{totalFee.toLocaleString('vi-VN')} đ</div>
-                  <p className="text-[11px] text-[#20231F]/70 mt-1">Hoàn tất ngay, nhận vé VIP chính thức sớm.</p>
+                  <p className="text-[11px] text-[#20231F]/70 mt-1">Hoàn tất ngay</p>
                 </div>
 
                 <div
                   onClick={() => setPlan('DEPOSIT_150')}
-                  className={`p-4 rounded-sm border-2 cursor-pointer transition-all ${
-                    plan === 'DEPOSIT_150'
-                      ? 'bg-[#F4C542] border-[#20231F] shadow-poster-sm'
-                      : 'bg-white border-[#20231F] hover:bg-[#F4EEDF]'
-                  }`}
+                  className={`p-4 rounded-sm border-2 cursor-pointer transition-all ${plan === 'DEPOSIT_150'
+                    ? 'bg-[#F4C542] border-[#20231F] shadow-poster-sm'
+                    : 'bg-white border-[#20231F] hover:bg-[#F4EEDF]'
+                    }`}
                 >
                   <div className="flex justify-between items-center mb-1">
                     <span className="text-xs font-mono font-bold uppercase">ĐẶT CỌC GIỮ CHỖ</span>
@@ -613,7 +597,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                             className="w-14 h-14 object-cover border border-[#20231F]"
                           />
                           <div>
-                            <span className="text-xs font-bold text-emerald-800 block">✓ Đã đính kèm ảnh biên lai</span>
+                            <span className="text-xs font-bold text-emerald-800 block">Đã đính kèm ảnh biên lai</span>
                             <span className="text-[10px] font-mono text-[#20231F]/60">Sẵn sàng để BTC đối soát</span>
                           </div>
                         </div>
@@ -718,7 +702,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                     </div>
                     <div>
                       <label className="block text-[11px] font-bold text-[#20231F] uppercase mb-1">
-                        GMAIL NHẬN VÉ QR *
+                        ĐỊA CHỈ GMAIL LIÊN HỆ *
                       </label>
                       <input
                         type="email"
@@ -748,16 +732,12 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                 {/* Block 2: Just in Case */}
                 <div className="p-4 rounded-sm bg-white border-2 border-[#20231F] space-y-3">
                   <h4 className="text-xs font-mono font-bold text-[#B94D35] uppercase border-b border-[#20231F]/15 pb-1.5 flex items-center justify-between">
-                    <span>2. PHÒNG KHI CẦN (JUST IN CASE)</span>
-                    <span className="text-[10px] font-normal text-[#20231F]/60">Bảo mật nội bộ</span>
+                    <span>2. GIÚP BTC HIỂU BẠN HƠN</span>
                   </h4>
                   <div>
                     <label className="block text-[11px] font-bold text-[#20231F] uppercase mb-0.5">
-                      SỐ ĐIỆN THOẠI NGƯỜI THÂN (LIÊN HỆ KHẨN CẤP / ĐÓN VỀ KHI SAY) *
+                      SỐ ĐIỆN THOẠI NGƯỜI THÂN
                     </label>
-                    <p className="text-[10px] text-[#20231F]/60 mb-1.5">
-                      Dành cho trường hợp bạn cần hỗ trợ hoặc cần người thân đến đón sau tiệc. Dữ liệu này chỉ Admin có quyền truy cập.
-                    </p>
                     <input
                       type="tel"
                       value={emergencyPhone}
@@ -770,24 +750,9 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
 
                   <div>
                     <label className="block text-[11px] font-bold text-[#20231F] uppercase mb-1">
-                      LƯU Ý DỊ ỨNG THỰC PHẨM / ĐỒ UỐNG (NẾU CÓ)
+                      BẠN CÓ DỊ ỨNG VỚI GÌ HEM
                     </label>
-                    <div className="flex flex-wrap gap-1.5 mb-2">
-                      {['Hải sản', 'Đậu phộng', 'Không uống được cồn', 'Ăn chay'].map((item) => (
-                        <button
-                          key={item}
-                          type="button"
-                          onClick={() => toggleAllergy(item)}
-                          className={`px-2.5 py-1 rounded-md text-[11px] font-bold border transition-colors ${
-                            allergies.includes(item)
-                              ? 'bg-[#B94D35] text-white border-[#B94D35]'
-                              : 'bg-[#F4EEDF] text-[#20231F] border-[#20231F]/30 hover:border-[#20231F]'
-                          }`}
-                        >
-                          {item}
-                        </button>
-                      ))}
-                    </div>
+
                     <input
                       type="text"
                       value={allergyNote}
@@ -934,7 +899,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
               </div>
 
               <div className="p-3 rounded-sm bg-amber-50 border border-[#F4C542] text-xs text-[#20231F]/80">
-                🔒 Biên lai chuyển khoản của bạn sẽ được Ban Tổ Chức kiểm tra và duyệt vé chính thức. Khi đã duyệt đủ 100%, vé QR sẽ được phát hành.
+                🔒 Thông tin đăng ký và xác nhận đóng phí tham gia sẽ được Ban Tổ Chức kiểm tra và liên hệ thông báo sớm nhất đến bạn.
               </div>
 
               <div className="flex gap-3 pt-2">

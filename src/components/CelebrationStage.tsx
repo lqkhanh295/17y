@@ -152,22 +152,12 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
                 <span className="stamp-seal text-[8px] bg-white">OFFICIAL</span>
               </div>
               <p className="text-[11px] text-[#20231F]/80 font-mono truncate">
-                Chào mừng <strong>{newRegistrant.honorific} {newRegistrant.fullName}</strong> ({newRegistrant.role === 'ALUMNI' ? 'Cựu Thành Viên' : 'Thành Viên'}) • Mã vé: <strong className="bg-white px-1 py-0.5 rounded border border-[#20231F]">{newRegistrant.ticketCode || newRegistrant.id}</strong> • Đã nộp: <strong>{newRegistrant.paidAmount.toLocaleString('vi-VN')} đ</strong>
+                Chào mừng <strong>{newRegistrant.honorific} {newRegistrant.fullName}</strong> ({newRegistrant.role === 'ALUMNI' ? 'Cựu Thành Viên' : 'Thành Viên'}) • Đã đăng ký thành công đại tiệc 17Y! 🎉
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-2 w-full sm:w-auto justify-end shrink-0">
-            {onOpenPortal && (
-              <button
-                type="button"
-                onClick={onOpenPortal}
-                className="btn-editorial-secondary px-3 py-1 rounded-sm text-xs font-bold uppercase flex items-center justify-center gap-1"
-              >
-                <Ticket className="w-3.5 h-3.5" />
-                <span>Tra cứu vé</span>
-              </button>
-            )}
             {onClose && (
               <button
                 type="button"

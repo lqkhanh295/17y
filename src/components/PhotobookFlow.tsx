@@ -91,7 +91,7 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
             onClick={onOpenRegister}
             className="text-csg-black/80 hover:text-csg-red underline underline-offset-4 tracking-wider uppercase transition-colors font-bold"
           >
-            Đăng ký vé Gala 17Y →
+            Đăng ký tham gia Gala 17Y →
           </button>
         </div>
       </header>
@@ -479,13 +479,7 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
                 <ArrowRight className="w-4 h-4" />
               </button>
 
-              <div className="flex items-center justify-between font-mono text-xs pt-1">
-                <button
-                  onClick={onOpenLookup}
-                  className="text-csg-black/65 hover:text-csg-red underline decoration-1 underline-offset-4 transition-colors"
-                >
-                  Tra cứu vé đã đặt →
-                </button>
+              <div className="text-center font-mono text-xs pt-1">
                 <span className="text-csg-black/45 text-[11px]">
                   Dành cho thành viên & cựu thành viên CSG
                 </span>
