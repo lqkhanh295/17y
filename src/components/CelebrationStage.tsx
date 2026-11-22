@@ -154,104 +154,72 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
     if (userFrog) {
       // User frog is the center star at 50%
       const userX = 50;
-      const userY = 71;
+      const userY = 74;
       pos[userFrog.id] = {
         x: userX,
         y: userY,
         laneY: userY,
         dir: 1,
-        speed: 0.02,
-        scale: 1.15,
-        minX: 48,
-        maxX: 52
+        speed: 0.03,
+        scale: 1.18,
+        minX: 47.5,
+        maxX: 52.5
       };
 
-      // Staggered depth formation around the center star:
-      // Left side frogs at X ~ 20-24%, right side frogs at X ~ 76-80%
-      // Tiered rows: Front row at Y=81%, Back row at Y=63%
+      // Split other frogs between left (18% - 38%) and right (62% - 82%)
       const leftCount = Math.ceil(otherFrogs.length / 2);
       const leftFrogs = otherFrogs.slice(0, leftCount);
       const rightFrogs = otherFrogs.slice(leftCount);
 
       leftFrogs.forEach((c, idx) => {
-        const isFront = idx % 2 === 0;
-        const laneY = isFront ? 81 : 63;
-        const anchorX = isFront ? 24 : 20;
-        const scale = isFront ? 1.0 : 0.88;
+        const step = leftFrogs.length > 1 ? 20 / (leftFrogs.length - 1) : 0;
+        const anchorX = leftFrogs.length > 1 ? 18 + idx * step : 28;
+        const laneY = idx % 2 === 0 ? 66 : 78;
+        const scale = laneY === 66 ? 0.92 : 1.05;
         pos[c.id] = {
           x: anchorX,
           y: laneY,
           laneY,
-          dir: isFront ? 1 : -1,
-          speed: 0.025,
+          dir: idx % 2 === 0 ? 1 : -1,
+          speed: 0.035,
           scale,
-          minX: anchorX - 2.5,
-          maxX: anchorX + 2.5
+          minX: anchorX - 2.8,
+          maxX: anchorX + 2.8
         };
       });
 
       rightFrogs.forEach((c, idx) => {
-        const isFront = idx % 2 === 0;
-        const laneY = isFront ? 81 : 63;
-        const anchorX = isFront ? 76 : 80;
-        const scale = isFront ? 1.0 : 0.88;
+        const step = rightFrogs.length > 1 ? 20 / (rightFrogs.length - 1) : 0;
+        const anchorX = rightFrogs.length > 1 ? 62 + idx * step : 72;
+        const laneY = idx % 2 === 0 ? 78 : 66;
+        const scale = laneY === 66 ? 0.92 : 1.05;
         pos[c.id] = {
           x: anchorX,
           y: laneY,
           laneY,
-          dir: isFront ? -1 : 1,
-          speed: 0.025,
+          dir: idx % 2 === 0 ? -1 : 1,
+          speed: 0.035,
           scale,
-          minX: anchorX - 2.5,
-          maxX: anchorX + 2.5
+          minX: anchorX - 2.8,
+          maxX: anchorX + 2.8
         };
       });
     } else {
-      // Diamond / horseshoe formation across width and depth
-      const count = allCharacters.length;
+      // Standard distribution across 18% to 82%
       allCharacters.forEach((c, idx) => {
-        let anchorX = 50;
-        let laneY = 72;
-        let scale = 1.0;
-        let dir = 1;
-
-        if (count === 1) {
-          anchorX = 50;
-          laneY = 72;
-          scale = 1.15;
-        } else if (count === 2) {
-          anchorX = idx === 0 ? 30 : 70;
-          laneY = 74;
-          scale = 1.05;
-          dir = idx === 0 ? 1 : -1;
-        } else if (count === 3) {
-          if (idx === 0) { anchorX = 24; laneY = 66; scale = 0.92; dir = 1; }
-          else if (idx === 1) { anchorX = 50; laneY = 78; scale = 1.12; dir = 1; }
-          else { anchorX = 76; laneY = 66; scale = 0.92; dir = -1; }
-        } else if (count === 4) {
-          if (idx === 0) { anchorX = 20; laneY = 63; scale = 0.88; dir = 1; }
-          else if (idx === 1) { anchorX = 25; laneY = 81; scale = 1.02; dir = 1; }
-          else if (idx === 2) { anchorX = 75; laneY = 81; scale = 1.02; dir = -1; }
-          else { anchorX = 80; laneY = 63; scale = 0.88; dir = -1; }
-        } else {
-          // 5 or more
-          const isFront = idx % 2 === 1;
-          laneY = isFront ? 81 : 63;
-          scale = isFront ? 1.02 : 0.88;
-          const step = count > 1 ? 64 / (count - 1) : 0;
-          anchorX = 18 + idx * step;
-          dir = idx % 2 === 0 ? 1 : -1;
-        }
-
+        const step = allCharacters.length > 1 ? 64 / (allCharacters.length - 1) : 0;
+        const anchorX = allCharacters.length > 1 ? 18 + idx * step : 50;
+        const laneY = idx % 2 === 0 ? 66 : 78;
+        const scale = laneY === 66 ? 0.92 : 1.05;
         pos[c.id] = {
           x: anchorX,
           y: laneY,
           laneY,
-          dir,
-          speed: 0.025,
+          dir: idx % 2 === 0 ? 1 : -1,
+          speed: 0.035,
           scale,
-          minX: anchorX - 2.5,
-          maxX: anchorX + 2.5
+          minX: anchorX - 3,
+          maxX: anchorX + 3
         };
       });
     }
@@ -450,7 +418,7 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
         {/* ========================================================================= */}
         {/* 2. TƯỜNG SAU HỘI TRƯỜNG (3-TIER ACOUSTIC WOOD WALL STRUCTURE)              */}
         {/* ========================================================================= */}
-        <div className="absolute top-9 sm:top-11 left-0 right-0 h-[38%] sm:h-[48%] overflow-hidden">
+        <div className="absolute top-9 sm:top-11 left-0 right-0 h-[52%] overflow-hidden">
           
           {/* Nửa trên: Ốp gỗ tiêu âm màu sáng (Upper Light Oak Panels) */}
           <div className="h-[36%] w-full bg-gradient-to-b from-[#DEC7AC] via-[#D5BCA0] to-[#CBB194] border-b border-[#9D7653]/40 relative">
@@ -472,7 +440,7 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
         {/* ========================================================================= */}
         {/* 3. MÀN HÌNH LED MÀU ĐEN 16:9 CHÍNH GIỮA (CENTER BLACK 16:9 LED SCREEN)     */}
         {/* ========================================================================= */}
-        <div className="absolute top-10 sm:top-14 left-1/2 -translate-x-1/2 w-[86%] sm:w-[52%] md:w-[45%] max-w-[580px] aspect-[16/9] z-20 pointer-events-none">
+        <div className="absolute top-[16%] sm:top-14 left-1/2 -translate-x-1/2 w-[70%] sm:w-[52%] md:w-[45%] max-w-[580px] aspect-[16/9] z-20 pointer-events-none">
           {/* Ambient Wall Drop Shadow */}
           <div className="absolute -inset-1.5 bg-black/60 rounded-xs blur-md -z-10" />
 
@@ -500,7 +468,7 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
         {/* ========================================================================= */}
         {/* 4. SÀN SÂN KHẤU MÀU GỖ VÀNG SỒI (HONEY-OAK WOODEN STAGE FLOOR)             */}
         {/* ========================================================================= */}
-        <div className="absolute bottom-0 left-0 right-0 h-[62%] sm:h-[52%] bg-gradient-to-b from-[#E2C79E] via-[#D5B78A] to-[#C19C68] border-t-2 border-[#A2794C] overflow-hidden">
+        <div className="absolute bottom-0 left-0 right-0 h-[48%] sm:h-[50%] bg-gradient-to-b from-[#E2C79E] via-[#D5B78A] to-[#C19C68] border-t-2 border-[#A2794C] overflow-hidden">
           {/* Thớ gỗ ghép ván ngang (Horizontal parquet seams) */}
           <div className="w-full h-full opacity-25 bg-[repeating-linear-gradient(0deg,#70451E_0px,#70451E_1.5px,transparent_1.5px,transparent_24px)]" />
           {/* Thớ gỗ ghép dọc tỏa phối cảnh (Perspective vertical seams) */}
@@ -566,48 +534,48 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
         )}
 
         {/* ========================================================================= */}
-        {/* 6. HÀNG GHẾ KHÁN GIẢ TIỀN CẢNH: MỖI BÊN 4 GHẾ, LỐI ĐI Ở GIỮA, KHÔNG CÓ SỐ */}
+        {/* 6. HÀNG GHẾ KHÁN GIẢ TIỀN CẢNH: MỖI BÊN 5 CÁI, LỐI ĐI Ở GIỮA, KHÔNG CÓ SỐ */}
         {/* ========================================================================= */}
-        <div className="absolute bottom-0 left-0 right-0 h-12 sm:h-16 md:h-20 pointer-events-none z-30 flex items-end justify-between px-2 sm:px-6 md:px-8 pb-[env(safe-area-inset-bottom,0px)]">
+        <div className="absolute -bottom-2 left-0 right-0 h-16 sm:h-20 pointer-events-none z-30 flex items-end justify-between px-3 sm:px-8">
           
-          {/* Dãy ghế bên trái */}
-          <div className="flex items-end gap-1 sm:gap-2 flex-1 justify-around">
-            {[...Array(4)].map((_, i) => (
-              <div key={`left-chair-${i}`} className="relative flex flex-col items-center flex-1 max-w-[42px] sm:max-w-[56px] h-10 sm:h-14 md:h-18 shadow-2xl">
+          {/* Dãy ghế bên trái: đúng 5 ghế */}
+          <div className="flex items-end gap-1.5 sm:gap-2.5 flex-1 justify-around">
+            {[...Array(5)].map((_, i) => (
+              <div key={`left-chair-${i}`} className="relative flex flex-col items-center flex-1 max-w-[56px] h-14 sm:h-18 shadow-2xl">
                 {/* Tay vịn bên hông ghế */}
-                <div className="absolute -left-0.5 sm:-left-1 top-2 sm:top-2.5 w-1 sm:w-1.5 h-7 sm:h-11 bg-[#1A1A1A] border-t sm:border-t-2 border-[#D97706] rounded-t-xs -z-10" />
-                <div className="absolute -right-0.5 sm:-right-1 top-2 sm:top-2.5 w-1 sm:w-1.5 h-7 sm:h-11 bg-[#1A1A1A] border-t sm:border-t-2 border-[#D97706] rounded-t-xs -z-10" />
+                <div className="absolute -left-1 top-2.5 w-1.5 h-11 bg-[#1A1A1A] border-t-2 border-[#D97706] rounded-t-xs -z-10" />
+                <div className="absolute -right-1 top-2.5 w-1.5 h-11 bg-[#1A1A1A] border-t-2 border-[#D97706] rounded-t-xs -z-10" />
                 
                 {/* Tựa lưng ghế màu xanh đặc trưng hội trường */}
-                <div className="w-full h-full bg-[#1E3A8A] border sm:border-2 border-[#0F172A] rounded-t-md sm:rounded-t-xl overflow-hidden flex flex-col justify-between shadow-md">
+                <div className="w-full h-full bg-[#1E3A8A] border-2 border-[#0F172A] rounded-t-xl overflow-hidden flex flex-col justify-between shadow-md">
                   {/* Đệm tựa đầu màu đỏ nỉ - KHÔNG CÓ SỐ */}
-                  <div className="w-full h-3 sm:h-4 md:h-5 bg-[#DC2626] border-b sm:border-b-2 border-[#991B1B] rounded-t-xs sm:rounded-t-lg shadow-inner" />
+                  <div className="w-full h-4 sm:h-5 bg-[#DC2626] border-b-2 border-[#991B1B] rounded-t-lg shadow-inner" />
                   {/* Vỏ ghế nhựa đen phía sau */}
-                  <div className="w-full h-2 sm:h-3 bg-[#0F172A] opacity-60" />
+                  <div className="w-full h-3 bg-[#0F172A] opacity-60" />
                 </div>
               </div>
             ))}
           </div>
 
           {/* Lối đi ở giữa hội trường (Center Aisle) */}
-          <div className="w-6 sm:w-16 shrink-0 h-full flex items-center justify-center">
+          <div className="w-8 sm:w-16 shrink-0 h-full flex items-center justify-center">
             <div className="w-full h-1 bg-[#8C6237]/35 rounded-full" />
           </div>
 
-          {/* Dãy ghế bên phải */}
-          <div className="flex items-end gap-1 sm:gap-2 flex-1 justify-around">
-            {[...Array(4)].map((_, i) => (
-              <div key={`right-chair-${i}`} className="relative flex flex-col items-center flex-1 max-w-[42px] sm:max-w-[56px] h-10 sm:h-14 md:h-18 shadow-2xl">
+          {/* Dãy ghế bên phải: đúng 5 ghế */}
+          <div className="flex items-end gap-1.5 sm:gap-2.5 flex-1 justify-around">
+            {[...Array(5)].map((_, i) => (
+              <div key={`right-chair-${i}`} className="relative flex flex-col items-center flex-1 max-w-[56px] h-14 sm:h-18 shadow-2xl">
                 {/* Tay vịn bên hông ghế */}
-                <div className="absolute -left-0.5 sm:-left-1 top-2 sm:top-2.5 w-1 sm:w-1.5 h-7 sm:h-11 bg-[#1A1A1A] border-t sm:border-t-2 border-[#D97706] rounded-t-xs -z-10" />
-                <div className="absolute -right-0.5 sm:-right-1 top-2 sm:top-2.5 w-1 sm:w-1.5 h-7 sm:h-11 bg-[#1A1A1A] border-t sm:border-t-2 border-[#D97706] rounded-t-xs -z-10" />
+                <div className="absolute -left-1 top-2.5 w-1.5 h-11 bg-[#1A1A1A] border-t-2 border-[#D97706] rounded-t-xs -z-10" />
+                <div className="absolute -right-1 top-2.5 w-1.5 h-11 bg-[#1A1A1A] border-t-2 border-[#D97706] rounded-t-xs -z-10" />
                 
                 {/* Tựa lưng ghế màu xanh đặc trưng hội trường */}
-                <div className="w-full h-full bg-[#1E3A8A] border sm:border-2 border-[#0F172A] rounded-t-md sm:rounded-t-xl overflow-hidden flex flex-col justify-between shadow-md">
+                <div className="w-full h-full bg-[#1E3A8A] border-2 border-[#0F172A] rounded-t-xl overflow-hidden flex flex-col justify-between shadow-md">
                   {/* Đệm tựa đầu màu đỏ nỉ - KHÔNG CÓ SỐ */}
-                  <div className="w-full h-3 sm:h-4 md:h-5 bg-[#DC2626] border-b sm:border-b-2 border-[#991B1B] rounded-t-xs sm:rounded-t-lg shadow-inner" />
+                  <div className="w-full h-4 sm:h-5 bg-[#DC2626] border-b-2 border-[#991B1B] rounded-t-lg shadow-inner" />
                   {/* Vỏ ghế nhựa đen phía sau */}
-                  <div className="w-full h-2 sm:h-3 bg-[#0F172A] opacity-60" />
+                  <div className="w-full h-3 bg-[#0F172A] opacity-60" />
                 </div>
               </div>
             ))}
@@ -628,21 +596,21 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
           // Dynamic horizontal positioning to prevent bubble edge clipping
           const bubbleAlignClass = 
             pos.x < 35 
-              ? 'left-0 translate-x-0' 
+              ? 'left-[-20px] sm:left-[-30px]' 
               : pos.x > 65 
-                ? 'right-0 left-auto translate-x-0' 
+                ? 'right-[-20px] sm:right-[-30px]' 
                 : 'left-1/2 -translate-x-1/2';
 
           const pointerAlignClass = 
             pos.x < 35 
-              ? 'left-6 -translate-x-1/2' 
+              ? 'left-8 sm:left-10' 
               : pos.x > 65 
-                ? 'right-6 -translate-x-1/2' 
+                ? 'right-8 sm:right-10' 
                 : 'left-1/2 -translate-x-1/2';
 
           // Depth-based z-index: front row (larger y) rendered above back row, active speaker elevated
-          const baseZ = Math.round(pos.y * 2);
-          const computedZ = (isUserFrog ? 80 : baseZ) + (isHovered ? 200 : (showBubble ? 150 : 0));
+          const baseZ = Math.round(pos.y);
+          const computedZ = (isUserFrog ? 60 : baseZ) + (isHovered ? 150 : (showBubble ? 120 : 0));
 
           return (
             <div
@@ -654,23 +622,21 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
               style={{
                 left: `${pos.x}%`,
                 top: `${pos.y}%`,
+                transform: 'translate(-50%, -50%)',
                 zIndex: computedZ
               }}
-              className="absolute -translate-x-1/2 -translate-y-1/2 cursor-pointer transition-transform duration-75 group select-none flex flex-col items-center"
+              className="absolute cursor-pointer transition-transform duration-75 group select-none flex flex-col items-center"
               title={`Nhấp để xem lời chúc của ${c.name}`}
             >
               {/* Highlight Halo for New Registrant */}
               {isUserFrog && (
-                <div 
-                  className="absolute -inset-4 sm:-inset-6 rounded-full bg-[#F4C542]/25 border-2 border-dashed border-[#B94D35] animate-spin -z-10 pointer-events-none" 
-                  style={{ animationDuration: '8s' }} 
-                />
+                <div className="absolute -inset-6 rounded-full bg-[#F4C542]/30 border-2 border-dashed border-[#B94D35] animate-spin -z-10" style={{ animationDuration: '8s' }} />
               )}
 
               {/* Compact Name Tag (Visible when speech bubble is NOT shown - clean & zero clutter) */}
               {!showBubble && (
                 <div 
-                  className={`absolute bottom-full mb-1 sm:mb-1.5 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full border text-[9px] sm:text-[11px] font-bold font-display shadow-xs flex items-center gap-1 whitespace-nowrap pointer-events-none group-hover:scale-105 transition-transform ${
+                  className={`absolute -top-7 sm:-top-8 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full border text-[10px] sm:text-[11px] font-bold font-display shadow-xs flex items-center gap-1 whitespace-nowrap pointer-events-none group-hover:scale-105 transition-transform ${
                     isUserFrog
                       ? 'bg-[#F4C542] text-[#20231F] border-[#B94D35] ring-2 ring-[#F4C542]/50 font-black'
                       : 'bg-white/95 text-[#20231F] border-[#20231F]'
@@ -689,7 +655,7 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
               {/* Speech Bubble (Upright, smoothly shown for active speakers) */}
               {showBubble && (
                 <div 
-                  className={`absolute bottom-full mb-2 ${bubbleAlignClass} w-56 sm:w-64 max-w-[88vw] p-2.5 rounded-sm bg-white border-2 text-left shadow-poster transition-all duration-200 animate-fadeIn z-50 ${
+                  className={`absolute -top-24 sm:-top-28 ${bubbleAlignClass} w-48 sm:w-56 max-w-[82vw] p-2.5 rounded-sm bg-white border-2 text-left shadow-poster transition-all duration-200 animate-fadeIn z-50 ${
                     isUserFrog 
                       ? 'border-[#B94D35] ring-2 ring-[#F4C542]' 
                       : isHovered 
@@ -725,7 +691,7 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
               {/* The Iconic Yellow-Shirt Cóc Sài Gòn 2D Vector Mascot */}
               <div 
                 style={{ transform: `scale(${pos.scale || 1}) scaleX(${pos.dir})` }}
-                className="relative w-13 h-13 sm:w-16 sm:h-16 md:w-18 md:h-18 animate-float-gentle transition-transform"
+                className="relative w-14 h-14 sm:w-16 sm:h-16 animate-float-gentle transition-transform"
               >
                 <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-md">
                   {/* Frog Body */}
