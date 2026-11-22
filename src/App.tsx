@@ -12,88 +12,6 @@ import { RegistrationRecord, MascotFrog } from './types';
 import { apiClient } from './services/apiClient';
 import { audioService } from './services/audioService';
 
-// Default initial fallback registrations
-const INITIAL_REGISTRATIONS: RegistrationRecord[] = [
-  {
-    id: 'reg-001',
-    memberId: 'm-001',
-    fullName: 'Huỳnh Tấn Phát',
-    mssv: 'SE120101',
-    role: 'ALUMNI',
-    honorific: 'Anh',
-    gmail: 'phat.huynh@gmail.com',
-    personalPhone: '0909123456',
-    emergencyPhone: '0909988776',
-    allergies: ['Không uống được cồn'],
-    allergyNote: 'Uống nước ngọt hoặc mocktail',
-    wishes: 'Chúc Cóc Sài Gòn mãi là ngôi nhà ấm áp của bao thế hệ! 💛',
-    plan: 'FULL',
-    totalRequired: 449000,
-    paidAmount: 449000,
-    remainingAmount: 0,
-    receiptPhase1Url: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=400&q=80',
-    status: 'COMPLETED_100',
-    isApproved100: true,
-    approvedBy: 'BTC_Admin',
-    ticketCode: 'CSG17Y-HP12',
-    ticketToken: 'TKT-HP12-VIP',
-    createdAt: '2026-11-14T10:30:00Z',
-    isCheckedIn: true,
-    checkedInAt: '2026-11-20T18:15:00Z',
-    checkedInBy: 'BTC_Admin'
-  },
-  {
-    id: 'reg-002',
-    memberId: 'm-010',
-    fullName: 'Nguyễn Phúc An',
-    mssv: 'SE170112',
-    role: 'ACTIVE',
-    honorific: 'Bạn',
-    gmail: 'an.np.se17@gmail.com',
-    personalPhone: '0918765432',
-    emergencyPhone: '0912334455',
-    allergies: ['Dị ứng hải sản'],
-    allergyNote: '',
-    wishes: 'Đêm nay Cóc cháy hết mình nha anh em ơi! 🔥',
-    plan: 'DEPOSIT_150',
-    totalRequired: 349000,
-    paidAmount: 150000,
-    remainingAmount: 199000,
-    receiptPhase1Url: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=400&q=80',
-    status: 'DEPOSITED',
-    isApproved100: false,
-    ticketCode: 'CSG17Y-AN17',
-    ticketToken: 'TKT-AN17-PENDING',
-    createdAt: '2026-11-14T14:20:00Z'
-  },
-  {
-    id: 'reg-003',
-    memberId: 'm-002',
-    fullName: 'Trần Thảo My',
-    mssv: 'SE130245',
-    role: 'ALUMNI',
-    honorific: 'Chị',
-    gmail: 'thaomy.csg@gmail.com',
-    personalPhone: '0933221100',
-    emergencyPhone: '0933112233',
-    allergies: [],
-    allergyNote: '',
-    wishes: 'Hẹn gặp lại các em tại đêm tiệc 17Y hoành tráng! ✨',
-    plan: 'FULL',
-    totalRequired: 449000,
-    paidAmount: 449000,
-    remainingAmount: 0,
-    receiptPhase1Url: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=400&q=80',
-    status: 'COMPLETED_100',
-    isApproved100: true,
-    approvedBy: 'BTC_Admin',
-    ticketCode: 'CSG17Y-TM13',
-    ticketToken: 'TKT-TM13-VIP',
-    createdAt: '2026-11-15T08:10:00Z',
-    isCheckedIn: false
-  }
-];
-
 export const App: React.FC = () => {
   // Cinematic Film Opening intro state
   const [showCinematicIntro, setShowCinematicIntro] = useState<boolean>(() => {
@@ -114,42 +32,40 @@ export const App: React.FC = () => {
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [isStageOpen, setIsStageOpen] = useState(false);
 
-  // Registrations state
-  const [registrations, setRegistrations] = useState<RegistrationRecord[]>(INITIAL_REGISTRATIONS);
+  // Registrations state - strictly loaded from database
+  const [registrations, setRegistrations] = useState<RegistrationRecord[]>([]);
 
-  // Mascots crowd on Celebration Stage
-  const [stageCharacters, setStageCharacters] = useState<MascotFrog[]>([
-    {
-      id: 'char-1',
-      name: 'Anh Huỳnh Tấn Phát',
-      role: 'ALUMNI',
-      wish: 'Chúc Cóc Sài Gòn mãi là ngôi nhà ấm áp của bao thế hệ! 💛',
-      x: 18,
-      y: 78,
-      scale: 1,
-      direction: 1
-    },
-    {
-      id: 'char-2',
-      name: 'Chị Trần Thảo My',
-      role: 'ALUMNI',
-      wish: 'Hẹn gặp lại các em tại đêm tiệc 17Y hoành tráng! ✨',
-      x: 48,
-      y: 82,
-      scale: 1,
-      direction: -1
-    },
-    {
-      id: 'char-3',
-      name: 'Bạn Nguyễn Phúc An',
-      role: 'ACTIVE',
-      wish: 'Đêm nay Cóc cháy hết mình nha anh em ơi! 🔥',
-      x: 75,
-      y: 75,
-      scale: 1,
-      direction: 1
-    }
-  ]);
+  // Mascots crowd on Celebration Stage - strictly loaded from database
+  const [stageCharacters, setStageCharacters] = useState<MascotFrog[]>([]);
+
+  // Fetch live stage characters and registrations on initial load directly from real database
+  useEffect(() => {
+    let isMounted = true;
+    const loadRealData = async () => {
+      try {
+        const [chars, adminData] = await Promise.allSettled([
+          apiClient.getStageCharacters(),
+          apiClient.getAdminRegistrations()
+        ]);
+        if (isMounted) {
+          if (chars.status === 'fulfilled' && chars.value && chars.value.length > 0) {
+            setStageCharacters(chars.value);
+          }
+          if (adminData.status === 'fulfilled' && adminData.value && adminData.value.data) {
+            setRegistrations(adminData.value.data);
+          }
+        }
+      } catch (err) {
+        console.warn('Failed to load live database data:', err);
+      }
+    };
+
+    loadRealData();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   // Optional Wish state
   const [wishSubmitted, setWishSubmitted] = useState(false);
@@ -268,7 +184,7 @@ export const App: React.FC = () => {
       id: `frog-${newRecord.id || Date.now()}`,
       name: `${newRecord.honorific} ${newRecord.fullName}`,
       role: newRecord.role,
-      wish: newRecord.wishes?.trim() || 'Mừng sinh nhật 17 năm Cóc Sài Gòn rực rỡ! 🎉',
+      wish: newRecord.wishes?.trim() || 'Mừng sinh nhật 17 năm Cóc Sài Gòn rực rỡ!',
       x: 50,
       y: 74,
       scale: 1.25,
@@ -296,6 +212,11 @@ export const App: React.FC = () => {
         isPublic: true
       });
       setWishSubmitted(true);
+      // Immediately refresh stage characters so the new wish appears on stage
+      const refreshed = await apiClient.getStageCharacters();
+      if (refreshed && refreshed.length > 0) {
+        setStageCharacters(refreshed);
+      }
     } catch {
       setWishSubmitted(true);
     }
@@ -355,8 +276,11 @@ export const App: React.FC = () => {
               className="hover:text-csg-red transition-colors font-bold px-2 py-1.5 min-h-[44px] min-w-[44px] flex items-center justify-center gap-1.5 active:scale-95 text-xs rounded-sm"
               title="Xem sân khấu kỷ niệm 17Y"
             >
-              <FrogIcon size={16} className="shrink-0" />
+              <FrogIcon size={16} className="shrink-0 text-[#B94D35]" />
               <span className="hidden sm:inline">SÂN KHẤU CÓC</span>
+              <span className="px-1.5 py-0.2 rounded-full bg-csg-yellow text-csg-black font-mono text-[10px] font-bold shadow-xs">
+                {stageCharacters.length}
+              </span>
             </button>
             <button
               onClick={() => setShowCinematicIntro(true)}
@@ -381,14 +305,16 @@ export const App: React.FC = () => {
         <PhotobookFlow
           onOpenRegister={openRegister}
           onOpenLookup={openLookup}
+          onOpenStage={() => setIsStageOpen(true)}
+          totalWishesCount={stageCharacters.length}
           onWishSubmit={handleWishSubmit}
           wishSubmitted={wishSubmitted}
         />
       </main>
 
       {/* ================= QUIET COLOPHON FOOTER ================= */}
-      <footer className="relative z-10 bg-csg-surface border-t border-csg-black/25 pt-6 pb-28 sm:pb-8 pl-4 pr-36 sm:px-8 mt-12">
-        <div className="max-w-[1360px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 font-mono text-xs text-csg-black/65 text-left leading-relaxed">
+      <footer className="relative z-10 bg-csg-surface border-t border-csg-black/25 pt-6 pb-24 sm:pb-8 px-4 sm:px-8 mt-12">
+        <div className="max-w-[1360px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 font-mono text-xs text-csg-black/65 text-center sm:text-left leading-relaxed">
           <span>CLB TRUYỀN THÔNG CÓC SÀI GÒN • 2009 — 2026 • ĐẠI TIỆC GALA 17Y TẠI ĐỒI SỨ VILLA</span>
         </div>
       </footer>

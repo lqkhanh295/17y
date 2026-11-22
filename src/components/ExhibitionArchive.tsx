@@ -15,74 +15,74 @@ const EXHIBITION_PHOTOS: ExhibitionPhoto[] = [
   {
     id: 'p-01',
     plate: 'PLATE 01',
-    year: '2025',
-    title: 'Đêm Hoàng Kim • Bàn Tiệc Hội Tụ',
-    era: 'GALA 16Y',
-    url: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=1600&q=85',
-    aspect: 'pano'
+    year: '2023',
+    title: 'Đại Hội Cóc Sài Gòn • Song Hành',
+    era: 'GALA ĐẠI HỘI',
+    url: '/images/csg/IMG_9688.JPG',
+    aspect: 'landscape'
   },
   {
     id: 'p-02',
     plate: 'PLATE 02',
-    year: '2009',
-    title: 'Khởi Đầu Tác Nghiệp • F-Camp',
-    era: 'KHÓA K05 - K10',
-    url: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=1000&q=85',
-    aspect: 'portrait'
+    year: '2024',
+    title: 'Khởi Hành Tác Nghiệp • Chuyến Xe Tuổi Trẻ',
+    era: 'HÀNH TRÌNH TÁC NGHIỆP',
+    url: '/images/csg/IMG_9695.JPG',
+    aspect: 'landscape'
   },
   {
     id: 'p-03',
     plate: 'PLATE 03',
-    year: '2024',
-    title: 'Màn Tri Ân Tròn 15 Năm',
-    era: 'GALA 15Y',
-    url: 'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?auto=format&fit=crop&w=1200&q=85',
+    year: '2022',
+    title: 'Đại Hội Cóc Sài Gòn • Vọng Tiến',
+    era: 'GALA ĐẠI HỘI',
+    url: '/images/csg/IMG_9686.PNG',
     aspect: 'landscape'
   },
   {
     id: 'p-04',
     plate: 'PLATE 04',
-    year: '2017',
-    title: 'Biển Vũng Tàu • Sắc Áo Vàng',
-    era: 'TEAMBUILDING',
-    url: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1600&q=85',
+    year: '2023',
+    title: 'Dấu Chân Tháp Chàm • Po Klong Garai',
+    era: 'HÀNH TRÌNH DI SẢN',
+    url: '/images/csg/IMG_9696.JPG',
     aspect: 'pano'
   },
   {
     id: 'p-05',
     plate: 'PLATE 05',
     year: '2024',
-    title: 'Lửa Trại Gắn Kết Tân Binh',
-    era: 'DÃ NGOẠI K18',
-    url: 'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&w=1000&q=85',
-    aspect: 'square'
+    title: 'Quảng Trường Lâm Viên • Sắc Cờ Cóc Vàng',
+    era: 'ĐÀ LẠT TRIP',
+    url: '/images/csg/IMG_9697.JPG',
+    aspect: 'landscape'
   },
   {
     id: 'p-06',
     plate: 'PLATE 06',
-    year: '2023',
-    title: 'Sân Khấu Âm Nhạc Tự Do',
-    era: 'GALA 14Y',
-    url: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1200&q=85',
+    year: '2024',
+    title: 'Sân Khấu Tổng Kết Kỳ • Phá Kén',
+    era: 'SPRING - SUMMER 2024',
+    url: '/images/csg/IMG_9690.JPG',
     aspect: 'landscape'
   },
   {
     id: 'p-07',
     plate: 'PLATE 07',
-    year: '2024',
-    title: 'Bàn Tròn Sáng Tạo & Dựng Bài',
-    era: 'WORKSHOP THIẾT KẾ',
-    url: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=1200&q=85',
-    aspect: 'landscape'
+    year: '2021',
+    title: 'SaiGon Talk • Kết Nối Trực Tuyến Vượt Mùa Dịch',
+    era: 'TALKSHOW & WORKSHOP',
+    url: '/images/csg/IMG_9682.JPG',
+    aspect: 'pano'
   },
   {
     id: 'p-08',
     plate: 'PLATE 08',
-    year: '2025',
-    title: 'Khoảnh Khắc Vỡ Òa Chiến Thắng',
-    era: 'F-CAMP FINALE',
-    url: 'https://images.unsplash.com/photo-1528605248644-14dd04022da1?auto=format&fit=crop&w=1400&q=85',
-    aspect: 'pano'
+    year: '2024',
+    title: 'Cóc Sài Gòn Đón Gió Biển • Nắng Vàng Tuổi Trẻ',
+    era: 'HÀNH TRÌNH BIỂN',
+    url: '/images/csg/IMG_9699.JPG',
+    aspect: 'landscape'
   }
 ];
 

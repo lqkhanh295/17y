@@ -131,24 +131,24 @@ export const CinematicFilmOpening: React.FC<CinematicFilmOpeningProps> = ({ onCo
           {/* Continuous Film Negative Background */}
           <div className="flex items-center gap-6 sm:gap-10 py-8 sm:py-12 px-8 bg-[#181613] border-y-[6px] border-[#2A2722] shadow-[0_20px_60px_rgba(0,0,0,0.8)]">
             
-            {/* FRAME 01: F-CAMP KHỞI ĐẦU */}
+            {/* FRAME 01: F-CAMP KHỞI ĐẦU / KHỞI HÀNH TÁC NGHIỆP */}
             <div className="relative shrink-0 w-[240px] sm:w-[340px] aspect-[4/3] bg-[#0E0D0B] overflow-hidden">
               <img
-                src="https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=1000&q=80"
-                alt="Khởi đầu tác nghiệp"
-                className="w-full h-full object-cover filter contrast-105 brightness-90 grayscale-[15%]"
+                src="/images/csg/IMG_9695.JPG"
+                alt="Khởi hành tác nghiệp Cóc Sài Gòn"
+                className="w-full h-full object-cover filter contrast-105 brightness-95"
               />
               <div className="absolute bottom-2 left-3 font-mono text-[10px] text-[#DCD5C4]/80 tracking-widest uppercase">
-                EXP. 01 • KHỞI ĐẦU TÁC NGHIỆP
+                EXP. 01 • KHỞI HÀNH TÁC NGHIỆP
               </div>
             </div>
 
-            {/* FRAME 02: TEAMBUILDING */}
+            {/* FRAME 02: SẮC ÁO VÀNG / TEAMBUILDING */}
             <div className="relative shrink-0 w-[240px] sm:w-[340px] aspect-[4/3] bg-[#0E0D0B] overflow-hidden">
               <img
-                src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1000&q=80"
-                alt="Thanh xuân rực rỡ"
-                className="w-full h-full object-cover filter contrast-105 brightness-90"
+                src="/images/csg/IMG_9697.JPG"
+                alt="Sắc áo vàng Cóc Sài Gòn"
+                className="w-full h-full object-cover filter contrast-105 brightness-95"
               />
               <div className="absolute bottom-2 left-3 font-mono text-[10px] text-[#DCD5C4]/80 tracking-widest uppercase">
                 EXP. 09 • SẮC ÁO VÀNG
@@ -158,9 +158,9 @@ export const CinematicFilmOpening: React.FC<CinematicFilmOpeningProps> = ({ onCo
             {/* FRAME 03: SÂN KHẤU CÓC SÀI GÒN (STAGE PHOTO) */}
             <div className="relative shrink-0 w-[240px] sm:w-[340px] aspect-[4/3] bg-[#0E0D0B] overflow-hidden">
               <img
-                src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1000&q=80"
+                src="/images/csg/IMG_9690.JPG"
                 alt="Sân khấu Cóc Sài Gòn"
-                className="w-full h-full object-cover filter contrast-105 brightness-90"
+                className="w-full h-full object-cover filter contrast-105 brightness-95"
               />
               <div className="absolute bottom-2 left-3 font-mono text-[10px] text-[#F4C542] tracking-widest uppercase font-bold">
                 EXP. 16 • SÂN KHẤU CÓC
@@ -176,7 +176,7 @@ export const CinematicFilmOpening: React.FC<CinematicFilmOpeningProps> = ({ onCo
               }`}
             >
               <img
-                src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=1200&q=80"
+                src="/images/csg/IMG_9688.JPG"
                 alt="Đêm Hoàng Kim Gala Cóc Sài Gòn"
                 className="w-full h-full object-cover"
               />

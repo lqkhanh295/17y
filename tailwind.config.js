@@ -37,12 +37,14 @@ export default {
         }
       },
       fontFamily: {
-        // DESIGN.md specification
-        display: ['"Be Vietnam Pro"', '-apple-system', 'sans-serif'],
-        body: ['"Be Vietnam Pro"', '-apple-system', 'sans-serif'],
-        editorial: ['"Playfair Display"', 'Georgia', 'serif'],
+        // Vietnamese-optimized typography system
+        sans: ['"Be Vietnam Pro"', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'sans-serif'],
+        display: ['"Be Vietnam Pro"', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'sans-serif'],
+        body: ['"Be Vietnam Pro"', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'sans-serif'],
+        serif: ['"Playfair Display"', '"Lora"', 'Georgia', 'serif'],
+        editorial: ['"Playfair Display"', '"Lora"', 'Georgia', 'serif'],
         mono: ['"IBM Plex Mono"', 'monospace'],
-        handwriting: ['"Caveat"', 'cursive'],
+        handwriting: ['"Patrick Hand"', '"Dancing Script"', 'cursive'],
       },
       boxShadow: {
         'poster': '4px 4px 0px #20231F',

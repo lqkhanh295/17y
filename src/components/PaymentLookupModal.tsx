@@ -154,8 +154,8 @@ END:VCALENDAR`;
         {/* Header Bar */}
         <div className="flex items-center justify-between px-4 sm:px-6 py-3.5 sm:py-4 border-b-2 border-[#20231F] bg-[#FFFFFF] shrink-0">
           <div className="flex items-center gap-3">
-            <span className="w-10 h-10 rounded-sm bg-[#F4C542] border-2 border-[#20231F] flex items-center justify-center text-xl shadow-poster-sm shrink-0">
-              🎫
+            <span className="w-10 h-10 rounded-sm bg-[#F4C542] border-2 border-[#20231F] flex items-center justify-center shadow-poster-sm shrink-0">
+              <TicketIcon size={20} className="text-[#20231F]" />
             </span>
             <div>
               <div className="flex items-center gap-2">
@@ -217,8 +217,8 @@ END:VCALENDAR`;
         <div className="p-6 overflow-y-auto flex-1 space-y-6">
           {!foundRecord && !hasSearched && (
             <div className="text-center py-12 text-[#20231F]/60 space-y-2">
-              <div className="w-16 h-16 mx-auto rounded-sm bg-[#EAE4D6] border-2 border-[#20231F] flex items-center justify-center text-3xl">
-                🔍
+              <div className="w-16 h-16 mx-auto rounded-sm bg-[#EAE4D6] border-2 border-[#20231F] flex items-center justify-center">
+                <SearchIcon size={28} className="text-[#20231F]" />
               </div>
               <h4 className="font-display text-2xl text-[#20231F] uppercase tracking-wide">
                 TRA CỨU VÉ & THÔNG TIN THANH TOÁN
@@ -310,8 +310,8 @@ END:VCALENDAR`;
                           : 'bg-amber-50 text-[#D99B26] border-[#D99B26]'
                       }`}>
                         {foundRecord.isApproved100 
-                          ? '✓ ĐÃ DUYỆT 100%' 
-                          : (foundRecord.status === 'REJECTED' ? '✕ BIÊN LAI BỊ TỪ CHỐI' : '⏳ CHỜ DUYỆT ĐỐI SOÁT')}
+                          ? 'ĐÃ DUYỆT 100%' 
+                          : (foundRecord.status === 'REJECTED' ? 'BIÊN LAI BỊ TỪ CHỐI' : 'CHỜ DUYỆT ĐỐI SOÁT')}
                       </span>
                     </div>
                   </div>
@@ -597,8 +597,8 @@ END:VCALENDAR`;
                 <div className="space-y-4">
                   {!foundRecord.isApproved100 ? (
                     <div className="p-8 rounded-sm bg-white border-2 border-[#20231F] shadow-poster-sm text-center space-y-3">
-                      <div className="w-14 h-14 mx-auto rounded-sm bg-amber-50 border-2 border-[#D99B26] flex items-center justify-center text-2xl">
-                        🔒
+                      <div className="w-14 h-14 mx-auto rounded-sm bg-amber-50 border-2 border-[#D99B26] flex items-center justify-center">
+                        <AlertCircleIcon size={28} className="text-[#D99B26]" />
                       </div>
                       <h4 className="font-display text-2xl text-[#20231F] uppercase tracking-wide">
                         VÉ CHECK-IN CHƯA ĐƯỢC PHÁT HÀNH
@@ -646,8 +646,8 @@ END:VCALENDAR`;
                       </div>
 
                       <div className="text-xs text-[#20231F] space-y-1">
-                        <p>🗓️ <strong>2 ngày: 12 & 13/12/2026</strong></p>
-                        <p>📍 <strong>Đồi Sứ Villa</strong></p>
+                        <p><CalendarIcon size={14} className="inline mr-1" /> <strong>2 ngày: 12 & 13/12/2026</strong></p>
+                        <p><strong>Địa điểm: Đồi Sứ Villa</strong></p>
                       </div>
 
                       {/* Calendar Sync Buttons */}

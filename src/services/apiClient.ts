@@ -379,16 +379,22 @@ export const apiClient = {
   // 6. Public wishes & Stage characters
   async getPublicWishes() {
     const res = await safeFetchJson<{ success: boolean; data: any[] }>(`${API_BASE}/wishes/public`);
-    if (res && res.success && res.data) return res.data;
+    if (res && res.success && Array.isArray(res.data) && res.data.length > 0) return res.data;
 
-    const { data } = await supabase
-      .from('wishes')
-      .select('*')
-      .eq('moderationStatus', 'APPROVED')
-      .eq('isPublic', true)
-      .order('createdAt', { ascending: false });
+    try {
+      const { data, error } = await supabase
+        .from('wishes')
+        .select('*')
+        .eq('moderationStatus', 'APPROVED')
+        .eq('isPublic', true)
+        .order('createdAt', { ascending: false });
 
-    return data || [];
+      if (!error && data && data.length > 0) return data;
+    } catch (err) {
+      console.warn('Supabase getPublicWishes error:', err);
+    }
+
+    return [];
   },
 
   async submitWish(data: { authorName: string; role?: string; content: string; isPublic?: boolean }) {
@@ -412,12 +418,77 @@ export const apiClient = {
     return { success: true };
   },
 
-  async getStageCharacters() {
+  async getStageCharacters(): Promise<MascotFrog[]> {
+    let rawChars: any[] = [];
     const res = await safeFetchJson<{ success: boolean; data: MascotFrog[] }>(`${API_BASE}/characters/stage`);
-    if (res && res.success && res.data) return res.data;
+    if (res && res.success && Array.isArray(res.data) && res.data.length > 0) {
+      rawChars = res.data;
+    } else {
+      try {
+        const { data, error } = await supabase.from('characters').select('*');
+        if (!error && data && data.length > 0) {
+          rawChars = data;
+        }
+      } catch (err) {
+        console.warn('Supabase getStageCharacters error:', err);
+      }
+    }
 
-    const { data } = await supabase.from('characters').select('*');
-    return (data || []) as unknown as MascotFrog[];
+    // Also fetch public wishes to ensure no wish in the database is omitted from stage
+    let publicWishes: any[] = [];
+    try {
+      publicWishes = await this.getPublicWishes();
+    } catch {
+      // fallback safe
+    }
+
+    const charMap = new Map<string, MascotFrog>();
+
+    // 1. Process all raw characters from character table
+    rawChars.forEach((c: any, idx: number) => {
+      const id = String(c.id || `char-${idx}`);
+      let displayName = c.name || 'Thành viên Cóc Sài Gòn';
+      if (c.honorific && !displayName.toLowerCase().startsWith(c.honorific.toLowerCase())) {
+        displayName = `${c.honorific} ${displayName}`;
+      }
+
+      charMap.set(id, {
+        id,
+        name: displayName,
+        role: (c.role === 'ALUMNI' ? 'ALUMNI' : 'ACTIVE') as any,
+        wish: c.wish?.trim() || 'Mừng sinh nhật 17 năm Cóc Sài Gòn rực rỡ và bùng cháy!',
+        x: typeof c.x === 'number' ? c.x : 14 + ((idx * 16) % 72),
+        y: typeof c.y === 'number' ? c.y : 66 + ((idx * 6) % 16),
+        scale: typeof c.scale === 'number' ? c.scale : 1,
+        direction: c.direction === -1 ? -1 : 1
+      });
+    });
+
+    // 2. Synthesize characters for any public wish not already represented
+    publicWishes.forEach((w: any, idx: number) => {
+      if (!w.content || !w.content.trim()) return;
+      const cleanWish = w.content.trim();
+
+      const alreadyHas = Array.from(charMap.values()).some(
+        c => c.wish.trim() === cleanWish || (w.authorName && c.name.toLowerCase().includes(w.authorName.toLowerCase()))
+      );
+
+      if (!alreadyHas) {
+        const charId = `char-w-${w.id || idx}`;
+        charMap.set(charId, {
+          id: charId,
+          name: w.authorName || 'Thành viên CSG',
+          role: (w.role === 'ALUMNI' ? 'ALUMNI' : 'ACTIVE') as any,
+          wish: cleanWish,
+          x: 14 + ((idx * 19) % 72),
+          y: 67 + ((idx * 7) % 15),
+          scale: 1,
+          direction: idx % 2 === 0 ? 1 : -1
+        });
+      }
+    });
+
+    return Array.from(charMap.values());
   },
 
   // 7. Admin API
@@ -633,7 +704,7 @@ export const apiClient = {
     return {
       success: true,
       data: updatedReg,
-      message: `Xác nhận check-in thành công! Chào mừng ${reg.honorific || ''} ${reg.fullName} đến với Đại tiệc Cóc Sài Gòn 17Y 🎉`
+      message: `Xác nhận check-in thành công! Chào mừng ${reg.honorific || ''} ${reg.fullName} đến với Đại tiệc Cóc Sài Gòn 17Y`
     };
   }
 };

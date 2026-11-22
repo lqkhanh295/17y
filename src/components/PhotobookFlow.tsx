@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { CloseIcon, ChevronLeftIcon, ChevronRightIcon, ArrowRightIcon } from 'naive-icons';
+import { CloseIcon, ChevronLeftIcon, ChevronRightIcon, ArrowRightIcon, FrogIcon, HeartIcon } from 'naive-icons';
 import { PHOTOBOOK_IMAGES, ALL_PHOTOBOOK_IMAGES, PhotobookImage, GALA_EVENT_DETAILS } from '../data/photobookData';
 
 interface PhotobookFlowProps {
   onOpenRegister: () => void;
   onOpenLookup: () => void;
+  onOpenStage?: () => void;
+  totalWishesCount?: number;
   onWishSubmit?: (author: string, content: string) => Promise<void>;
   wishSubmitted?: boolean;
 }
@@ -12,20 +14,20 @@ interface PhotobookFlowProps {
 export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
   onOpenRegister,
   onOpenLookup,
+  onOpenStage,
+  totalWishesCount = 15,
 }) => {
   const [selectedPhoto, setSelectedPhoto] = useState<PhotobookImage | null>(null);
   const [isAnimationComplete, setIsAnimationComplete] = useState(false);
 
   // Cinematic film-reveal entrance animation coordinator
   useEffect(() => {
-    // Skip motion if user prefers reduced motion
     const prefersReducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (prefersReducedMotion) {
       setIsAnimationComplete(true);
       return;
     }
 
-    // Automatically transition to clean stable state after reveal sequence finishes (2.2s)
     const timer = setTimeout(() => {
       setIsAnimationComplete(true);
     }, 2200);
@@ -71,358 +73,529 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
   }, [selectedPhoto, handlePrev, handleNext]);
 
   return (
-    <div className="w-full pb-20">
+    <div className="w-full pb-12 sm:pb-16 font-body">
 
-      {/* ================= EDITORIAL MASTHEAD ENTRY ================= */}
-      <header className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-3 border-b border-csg-black/15 pb-3 mb-12 sm:mb-20 font-body">
-        <div className="flex items-baseline gap-2.5">
-          <span className="font-display font-extrabold text-xl sm:text-2xl tracking-tight text-csg-black uppercase">
-            CÓC SÀI GÒN
-          </span>
-          <span className="font-editorial italic font-normal text-csg-red text-2xl sm:text-3xl">
-            17 năm
-          </span>
-          <span className="font-mono text-[10px] text-csg-black/40 pl-1 tracking-widest hidden sm:inline">
-            // 2009 — 2026
-          </span>
+      {/* ================= EDITORIAL EXHIBITION PROLOGUE ================= */}
+      <section className="border-b border-csg-black/15 pb-4 mb-8 sm:mb-12">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="space-y-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="px-2 py-0.5 rounded-xs bg-csg-yellow text-csg-black font-mono font-bold text-[10px] uppercase tracking-wider shadow-xs">
+                GÓC KỶ NIỆM // 2009 — 2026
+              </span>
+              <span className="font-mono text-xs text-csg-black/60 hidden sm:inline">
+                9 KHOẢNH KHẮC • 17 NĂM MỘT MÁI NHÀ
+              </span>
+            </div>
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-display font-extrabold uppercase text-csg-black tracking-tight leading-tight">
+              MƯỜI BẢY NĂM // HÀNH TRÌNH TỤI MÌNH LỚN
+            </h1>
+          </div>
+          <div className="flex items-center gap-3 font-mono text-xs shrink-0">
+            <button
+              onClick={onOpenRegister}
+              className="btn-editorial-primary px-3.5 py-2 text-xs font-display font-bold uppercase tracking-wider flex items-center gap-1.5 active:scale-95 shadow-sm min-h-[44px]"
+            >
+              <span>ĐĂNG KÝ GALA 17Y</span>
+              <ArrowRightIcon size={14} className="shrink-0" />
+            </button>
+          </div>
         </div>
-        <div className="flex items-center gap-4 font-mono text-xs">
-          <button
-            onClick={onOpenRegister}
-            className="text-csg-black/80 hover:text-csg-red underline underline-offset-4 tracking-wider uppercase transition-colors font-bold inline-flex items-center gap-1.5"
-          >
-            <span>Đăng ký tham gia Gala 17Y</span>
-            <ArrowRightIcon size={14} className="shrink-0" />
-          </button>
-        </div>
-      </header>
-
+      </section>
 
       {/* ========================================================================= */}
-      {/* DESKTOP ART DIRECTION (Continuous, organic, unpredictable canvas)          */}
+      {/* DESKTOP & TABLET ART DIRECTION (Balanced, dense, editorial spreads)        */}
       {/* ========================================================================= */}
-      <div className="hidden md:block">
+      <div className="hidden md:block space-y-12 lg:space-y-16">
 
-        {/* 1. TIGHT PAIRING: Collaborative workspace and vertical camera sitting closely */}
-        <div className="flex items-start gap-6 lg:gap-8 max-w-5xl">
-          {/* Workspace photo (62%) */}
-          <div
-            onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.workspace)}
-            className={`w-[62%] cursor-pointer transition-opacity duration-300 hover:opacity-90 shadow-md ${
-              !isAnimationComplete ? 'film-reveal-item' : ''
-            }`}
-            style={{ animationDelay: '100ms' }}
-          >
-            <img
-              src={PHOTOBOOK_IMAGES.workspace.src}
-              alt={PHOTOBOOK_IMAGES.workspace.alt}
-              className="w-full aspect-[16/10] object-cover"
-            />
+        {/* ---------------- SPREAD 01: KHỞI NGUYÊN & TIẾP NỐI ---------------- */}
+        <section className="space-y-3">
+          <div className="flex items-center justify-between border-b border-csg-black/15 pb-2 font-mono text-xs">
+            <span className="font-bold uppercase tracking-wider text-csg-black/80">
+              CHƯƠNG I // NHỮNG NGÀY BÊN NHAU
+            </span>
+            <span className="text-csg-black/40 text-[11px]">
+              KỶ NIỆM 2021 — 2023
+            </span>
           </div>
 
-          {/* Vertical camera photo (28%, offset down 48px) */}
-          <div
-            onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.camera)}
-            className={`w-[28%] pt-12 cursor-pointer transition-opacity duration-300 hover:opacity-90 shadow-md ${
-              !isAnimationComplete ? 'film-reveal-item' : ''
-            }`}
-            style={{ animationDelay: '220ms' }}
-          >
-            <img
-              src={PHOTOBOOK_IMAGES.camera.src}
-              alt={PHOTOBOOK_IMAGES.camera.alt}
-              className="w-full aspect-[3/4] object-cover"
-            />
+          <div className="grid grid-cols-12 gap-6 lg:gap-8 items-start">
+            {/* Major Feature with Overlapping Polaroid (Col 7) */}
+            <div className="col-span-7 relative">
+              {/* Primary Plate Card */}
+              <div
+                onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.cover)}
+                className={`paper-sheet p-2 sm:p-2.5 pb-3 sm:pb-3.5 cursor-pointer transition-all duration-300 hover:shadow-poster active:scale-[0.99] ${
+                  !isAnimationComplete ? 'film-reveal-item' : ''
+                }`}
+                style={{ animationDelay: '100ms' }}
+              >
+                <div className="overflow-hidden bg-csg-black/5">
+                  <img
+                    src={PHOTOBOOK_IMAGES.cover.src}
+                    alt={PHOTOBOOK_IMAGES.cover.alt}
+                    className="w-full aspect-[16/10] object-cover transition-transform duration-500 hover:scale-[1.02]"
+                    loading="lazy"
+                  />
+                </div>
+                <div className="pt-2.5 flex items-baseline justify-between font-mono text-xs">
+                  <span className="font-bold text-csg-black uppercase text-[11px]">
+                    01 // ĐẠI HỘI SONG HÀNH 2023
+                  </span>
+                  <span className="text-csg-black/50 text-[10px] shrink-0">
+                    Tháng 10.2023
+                  </span>
+                </div>
+                <p className="text-[11px] text-csg-black/75 font-body pt-0.5 max-w-[62%] leading-relaxed">
+                  Một màu áo vàng, ngập tràn hoa hướng dương và những nụ cười ngày hội ngộ tụi mình bên nhau.
+                </p>
+              </div>
+
+              {/* Overlapping Candid Print */}
+              <div
+                onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.coverOffset)}
+                className={`absolute -bottom-6 -right-5 w-[38%] z-20 cursor-pointer transition-transform duration-300 hover:scale-[1.04] shadow-poster-sm rotate-2 bg-white p-1.5 pb-2.5 border-2 border-csg-black ${
+                  !isAnimationComplete ? 'film-reveal-item' : ''
+                }`}
+                style={{ animationDelay: '300ms' }}
+                title="Nhấp để phóng to khoảnh khắc này"
+              >
+                <img
+                  src={PHOTOBOOK_IMAGES.coverOffset.src}
+                  alt={PHOTOBOOK_IMAGES.coverOffset.alt}
+                  className="w-full aspect-[4/3] object-cover"
+                  loading="lazy"
+                />
+                <div className="pt-1 text-center font-mono text-[9px] text-csg-black/75 truncate font-bold">
+                  Nụ cười hướng dương
+                </div>
+              </div>
+            </div>
+
+            {/* Complementary Workspace Dialogue (Col 5) */}
+            <div className="col-span-5 space-y-3">
+              <div
+                onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.workspace)}
+                className={`paper-sheet p-2 sm:p-2.5 pb-3 sm:pb-3.5 cursor-pointer transition-all duration-300 hover:shadow-poster active:scale-[0.99] ${
+                  !isAnimationComplete ? 'film-reveal-item' : ''
+                }`}
+                style={{ animationDelay: '200ms' }}
+              >
+                <div className="overflow-hidden bg-csg-black/5">
+                  <img
+                    src={PHOTOBOOK_IMAGES.workspace.src}
+                    alt={PHOTOBOOK_IMAGES.workspace.alt}
+                    className="w-full aspect-[16/11] object-cover transition-transform duration-500 hover:scale-[1.02]"
+                    loading="lazy"
+                  />
+                </div>
+                <div className="pt-2.5 flex items-baseline justify-between font-mono text-xs">
+                  <span className="font-bold text-csg-black uppercase text-[11px]">
+                    02 // SAIGON TALK — NHỮNG ĐÊM ONLINE
+                  </span>
+                  <span className="text-csg-black/50 text-[10px] shrink-0">
+                    Mùa giãn cách 2021
+                  </span>
+                </div>
+                <p className="text-[11px] text-csg-black/75 font-body pt-0.5 leading-relaxed">
+                  Dù chỉ nhìn nhau qua màn hình máy tính, ngọn lửa của tụi mình chưa một lần nguội lạnh.
+                </p>
+              </div>
+
+              {/* Heartfelt Note */}
+              <div className="p-3 bg-csg-surface/80 border border-csg-black/20 rounded-xs font-mono text-xs space-y-1">
+                <div className="flex items-center gap-1.5 text-csg-red font-bold text-[10px] uppercase">
+                  <HeartIcon size={12} />
+                  <span>MẨU CHUYỆN NHỎ</span>
+                </div>
+                <p className="text-[11px] text-csg-black/75 leading-relaxed font-body italic">
+                  "Cách nhau cả thành phố, nhưng chỉ cần nghe một tiếng 'Cóc ơi' vang lên qua loa là thấy nhà ở đây rồi."
+                </p>
+              </div>
+            </div>
           </div>
-        </div>
+        </section>
 
-        {/* --- INTENTIONAL WHITESPACE VOID (140px) --- */}
-        <div className="h-28 lg:h-36" aria-hidden="true" />
-
-        {/* 2. MASSIVE RIGHT ANCHOR WITH OVERLAPPING CANDID SNAPSHOT */}
-        <div className="relative ml-auto w-[74%] max-w-4xl">
-          {/* Cover banquet photo (74%) */}
-          <div
-            onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.cover)}
-            className={`w-full cursor-pointer transition-opacity duration-300 hover:opacity-90 shadow-lg ${
-              !isAnimationComplete ? 'film-reveal-item' : ''
-            }`}
-            style={{ animationDelay: '360ms' }}
-          >
-            <img
-              src={PHOTOBOOK_IMAGES.cover.src}
-              alt={PHOTOBOOK_IMAGES.cover.alt}
-              className="w-full aspect-[16/9] object-cover"
-            />
+        {/* ---------------- SPREAD 02: DẤU CHÂN HÀNH TRÌNH ---------------- */}
+        <section className="space-y-4">
+          <div className="flex items-center justify-between border-b border-csg-black/15 pb-2 font-mono text-xs">
+            <span className="font-bold uppercase tracking-wider text-csg-black/80">
+              CHƯƠNG II // NHỮNG CHUYẾN ĐI XA
+            </span>
+            <span className="text-csg-black/40 text-[11px]">
+              DẤU CHÂN & CỘT MỐC
+            </span>
           </div>
 
-          {/* Overlapping candid snapshot (Offset onto the top-left area of the cover photo) */}
-          <div
-            onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.coverOffset)}
-            className={`absolute -top-10 -left-12 w-[34%] z-10 cursor-pointer transition-transform duration-300 hover:scale-[1.02] shadow-2xl -rotate-2 bg-white p-2 pb-4 ${
-              !isAnimationComplete ? 'film-reveal-item' : ''
-            }`}
-            style={{ animationDelay: '500ms' }}
-          >
-            <img
-              src={PHOTOBOOK_IMAGES.coverOffset.src}
-              alt={PHOTOBOOK_IMAGES.coverOffset.alt}
-              className="w-full aspect-[4/3] object-cover"
-            />
-          </div>
-        </div>
-
-        {/* 3. ASYMMETRIC RIGHT-SIDE MICRO DISCOVERY (Breaks alternating pattern!) */}
-        <div className="pt-16 pb-8 flex justify-end pr-16 lg:pr-28">
-          {/* Bonfire square photo (26%) */}
-          <div
-            onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.bonfire)}
-            className={`w-[26%] max-w-[280px] cursor-pointer transition-opacity duration-300 hover:opacity-90 shadow-md ${
-              !isAnimationComplete ? 'film-reveal-item' : ''
-            }`}
-            style={{ animationDelay: '640ms' }}
-          >
-            <img
-              src={PHOTOBOOK_IMAGES.bonfire.src}
-              alt={PHOTOBOOK_IMAGES.bonfire.alt}
-              className="w-full aspect-square object-cover"
-            />
-          </div>
-        </div>
-
-        {/* --- INTENTIONAL WHITESPACE VOID (100px) --- */}
-        <div className="h-20 lg:h-28" aria-hidden="true" />
-
-        {/* 4. EXPANSIVE CINEMATIC HORIZON (PULLED TO LEFT) */}
-        <div className="w-[94%] mr-auto">
-          {/* Beach panoramic photo (94%) */}
+          {/* Panoramic Expedition Feature */}
           <div
             onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.beachPanoramic)}
-            className={`w-full cursor-pointer transition-opacity duration-300 hover:opacity-90 shadow-lg ${
+            className={`paper-sheet p-2 sm:p-3 pb-3 sm:pb-4 cursor-pointer transition-all duration-300 hover:shadow-poster active:scale-[0.99] ${
               !isAnimationComplete ? 'film-reveal-item' : ''
             }`}
-            style={{ animationDelay: '780ms' }}
+            style={{ animationDelay: '400ms' }}
           >
-            <img
-              src={PHOTOBOOK_IMAGES.beachPanoramic.src}
-              alt={PHOTOBOOK_IMAGES.beachPanoramic.alt}
-              className="w-full aspect-[22/8] object-cover"
-            />
-          </div>
-        </div>
-
-        {/* --- INTENTIONAL WHITESPACE VOID (140px) --- */}
-        <div className="h-28 lg:h-36" aria-hidden="true" />
-
-        {/* 5. CÓC STAGE PHOTOGRAPH & CELEBRATION MOMENT (Prominent, Uncovered & Visually Striking) */}
-        <div className="flex flex-col lg:flex-row items-start gap-8 lg:gap-14 max-w-6xl">
-          {/* PROMINENT CÓC STAGE PHOTO (68% width - fully visible, stage lights & crowd celebration) */}
-          <div
-            onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.stage)}
-            className={`w-full lg:w-[68%] cursor-pointer transition-opacity duration-300 hover:opacity-90 shadow-xl ${
-              !isAnimationComplete ? 'film-reveal-item' : ''
-            }`}
-            style={{ animationDelay: '920ms' }}
-          >
-            <img
-              src={PHOTOBOOK_IMAGES.stage.src}
-              alt={PHOTOBOOK_IMAGES.stage.alt}
-              className="w-full aspect-[16/10] object-cover"
-            />
+            <div className="overflow-hidden bg-csg-black/5">
+              <img
+                src={PHOTOBOOK_IMAGES.beachPanoramic.src}
+                alt={PHOTOBOOK_IMAGES.beachPanoramic.alt}
+                className="w-full aspect-[22/8] object-cover transition-transform duration-500 hover:scale-[1.01]"
+                loading="lazy"
+              />
+            </div>
+            <div className="pt-3 flex flex-col sm:flex-row sm:items-center justify-between gap-1 font-mono text-xs">
+              <span className="font-bold text-csg-black uppercase text-xs">
+                03 // CỜ CÓC BAY Ở PO KLONG GARAI
+              </span>
+              <span className="text-csg-black/60 text-[11px]">
+                Chuyến đi xa cùng nhau, lá cờ CLB giương cao giữa nắng gió miền Trung.
+              </span>
+            </div>
           </div>
 
-          {/* Celebration toast photo (Placed alongside/below without obscuring the stage photo) */}
-          <div
-            onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.celebrationToast)}
-            className={`w-full lg:w-[32%] lg:pt-20 cursor-pointer transition-opacity duration-300 hover:opacity-90 shadow-md ${
-              !isAnimationComplete ? 'film-reveal-item' : ''
-            }`}
-            style={{ animationDelay: '1060ms' }}
-          >
-            <img
-              src={PHOTOBOOK_IMAGES.celebrationToast.src}
-              alt={PHOTOBOOK_IMAGES.celebrationToast.alt}
-              className="w-full aspect-[4/3] object-cover"
-            />
+          {/* Paired Heritage Discovery Row */}
+          <div className="grid grid-cols-12 gap-6 items-start">
+            {/* Vertical Chronology (Col 5) */}
+            <div
+              onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.camera)}
+              className={`col-span-5 paper-sheet p-2 sm:p-2.5 pb-3 sm:pb-3.5 cursor-pointer transition-all duration-300 hover:shadow-poster active:scale-[0.99] ${
+                !isAnimationComplete ? 'film-reveal-item' : ''
+              }`}
+              style={{ animationDelay: '500ms' }}
+            >
+              <div className="overflow-hidden bg-csg-black/5">
+                <img
+                  src={PHOTOBOOK_IMAGES.camera.src}
+                  alt={PHOTOBOOK_IMAGES.camera.alt}
+                  className="w-full aspect-[3/4] object-cover transition-transform duration-500 hover:scale-[1.02]"
+                  loading="lazy"
+                />
+              </div>
+              <div className="pt-2 flex items-baseline justify-between font-mono text-xs">
+                <span className="font-bold text-csg-black uppercase text-[11px]">
+                  04 // NĂM MÙA THỔI NẾN (7TH — 11TH)
+                </span>
+                <span className="text-csg-black/50 text-[10px]">
+                  2016 — 2020
+                </span>
+              </div>
+              <p className="text-[11px] text-csg-black/75 font-body line-clamp-1 pt-0.5">
+                Từng chiếc bánh kem qua từng năm tháng — mỗi mùa sinh nhật là thêm một lứa Cóc trưởng thành.
+              </p>
+            </div>
+
+            {/* Highland Gathering (Col 7) */}
+            <div
+              onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.bonfire)}
+              className={`col-span-7 paper-sheet p-2 sm:p-2.5 pb-3 sm:pb-3.5 cursor-pointer transition-all duration-300 hover:shadow-poster active:scale-[0.99] ${
+                !isAnimationComplete ? 'film-reveal-item' : ''
+              }`}
+              style={{ animationDelay: '600ms' }}
+            >
+              <div className="overflow-hidden bg-csg-black/5">
+                <img
+                  src={PHOTOBOOK_IMAGES.bonfire.src}
+                  alt={PHOTOBOOK_IMAGES.bonfire.alt}
+                  className="w-full aspect-[16/11] object-cover transition-transform duration-500 hover:scale-[1.02]"
+                  loading="lazy"
+                />
+              </div>
+              <div className="pt-2.5 flex items-baseline justify-between font-mono text-xs">
+                <span className="font-bold text-csg-black uppercase text-[11px]">
+                  05 // ĐÀ LẠT SƯƠNG MÙ & SẮC ÁO VÀNG
+                </span>
+                <span className="text-csg-black/50 text-[10px]">
+                  Lâm Viên
+                </span>
+              </div>
+              <p className="text-[11px] text-csg-black/75 font-body line-clamp-1 pt-0.5">
+                Giữa cái lạnh cao nguyên, tụi mình đứng cạnh nhau là thấy ấm ran cả lòng.
+              </p>
+            </div>
           </div>
-        </div>
+        </section>
 
-        {/* --- INTENTIONAL WHITESPACE VOID (160px) --- */}
-        <div className="h-32 lg:h-44" aria-hidden="true" />
+        {/* ---------------- SPREAD 03: SÂN KHẤU & THANH XUÂN ---------------- */}
+        <section className="space-y-3">
+          <div className="flex items-center justify-between border-b border-csg-black/15 pb-2 font-mono text-xs">
+            <span className="font-bold uppercase tracking-wider text-csg-black/80">
+              CHƯƠNG III // CHÁY HẾT MÌNH TRÊN SÂN KHẤU
+            </span>
+            <span className="text-csg-black/40 text-[11px]">
+              ĐÊM ĐẠI HỘI & BIỂN XANH
+            </span>
+          </div>
 
-        {/* 6. SOLITARY CLIMAX MONUMENT */}
-        <div className="w-[78%] mx-auto">
-          {/* Gathering crowd photo (78%) */}
+          <div className="grid grid-cols-12 gap-6 lg:gap-8 items-start">
+            {/* Prominent Stage Feature (Col 7) */}
+            <div
+              onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.stage)}
+              className={`col-span-7 paper-sheet p-2 sm:p-2.5 pb-3 sm:pb-3.5 cursor-pointer transition-all duration-300 hover:shadow-poster active:scale-[0.99] ${
+                !isAnimationComplete ? 'film-reveal-item' : ''
+              }`}
+              style={{ animationDelay: '700ms' }}
+            >
+              <div className="overflow-hidden bg-csg-black/5">
+                <img
+                  src={PHOTOBOOK_IMAGES.stage.src}
+                  alt={PHOTOBOOK_IMAGES.stage.alt}
+                  className="w-full aspect-[16/10] object-cover transition-transform duration-500 hover:scale-[1.02]"
+                  loading="lazy"
+                />
+              </div>
+              <div className="pt-2.5 flex items-baseline justify-between font-mono text-xs">
+                <span className="font-bold text-csg-black uppercase text-[11px]">
+                  06 // ĐÊM HỘI TRƯỜNG VỌNG TIẾN
+                </span>
+                <span className="text-csg-black/50 text-[10px]">
+                  Đại hội 2022
+                </span>
+              </div>
+              <p className="text-[11px] text-csg-black/75 font-body line-clamp-1 pt-0.5">
+                Ánh đèn bừng sáng, tiếng hò reo và những cánh tay giơ cao hòa chung một nhịp đập tuổi trẻ.
+              </p>
+            </div>
+
+            {/* Coastal Toast Feature (Col 5) */}
+            <div
+              onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.celebrationToast)}
+              className={`col-span-5 paper-sheet p-2 sm:p-2.5 pb-3 sm:pb-3.5 cursor-pointer transition-all duration-300 hover:shadow-poster active:scale-[0.99] ${
+                !isAnimationComplete ? 'film-reveal-item' : ''
+              }`}
+              style={{ animationDelay: '800ms' }}
+            >
+              <div className="overflow-hidden bg-csg-black/5">
+                <img
+                  src={PHOTOBOOK_IMAGES.celebrationToast.src}
+                  alt={PHOTOBOOK_IMAGES.celebrationToast.alt}
+                  className="w-full aspect-[4/3] object-cover transition-transform duration-500 hover:scale-[1.02]"
+                  loading="lazy"
+                />
+              </div>
+              <div className="pt-2.5 flex items-baseline justify-between font-mono text-xs">
+                <span className="font-bold text-csg-black uppercase text-[11px]">
+                  07 // GIÓ BIỂN VÀ NỤ CƯỜI THANH XUÂN
+                </span>
+                <span className="text-csg-black/50 text-[10px]">
+                  Bờ kè đá xanh
+                </span>
+              </div>
+              <p className="text-[11px] text-csg-black/75 font-body line-clamp-1 pt-0.5">
+                Ngồi bên bờ kè đón gió biển, cười nói giòn tan những ngày tháng đôi mươi rực rỡ.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ---------------- SPREAD 04: ĐẠI GIA ĐÌNH 17 NĂM (CENTERFOLD) ---------------- */}
+        <section className="space-y-3">
+          <div className="flex items-center justify-between border-b border-csg-black/15 pb-2 font-mono text-xs">
+            <span className="font-bold uppercase tracking-wider text-csg-black/80">
+              TRANG KỶ NIỆM // ĐẠI GIA ĐÌNH CÓC SÀI GÒN
+            </span>
+            <span className="text-csg-black/40 text-[11px]">
+              2009 — 2026 • 17 NĂM MỘT MÁI NHÀ
+            </span>
+          </div>
+
           <div
             onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.gatheringCrowd)}
-            className={`w-full cursor-pointer transition-opacity duration-300 hover:opacity-90 shadow-2xl ${
+            className={`paper-sheet p-2.5 sm:p-3.5 pb-3 sm:pb-4 max-w-4xl mx-auto cursor-pointer transition-all duration-300 hover:shadow-poster active:scale-[0.99] ${
               !isAnimationComplete ? 'film-reveal-item' : ''
             }`}
-            style={{ animationDelay: '1200ms' }}
+            style={{ animationDelay: '900ms' }}
           >
-            <img
-              src={PHOTOBOOK_IMAGES.gatheringCrowd.src}
-              alt={PHOTOBOOK_IMAGES.gatheringCrowd.alt}
-              className="w-full aspect-[16/9] object-cover"
-            />
+            <div className="overflow-hidden bg-csg-black/5">
+              <img
+                src={PHOTOBOOK_IMAGES.gatheringCrowd.src}
+                alt={PHOTOBOOK_IMAGES.gatheringCrowd.alt}
+                className="w-full aspect-[16/9] object-cover transition-transform duration-500 hover:scale-[1.01]"
+                loading="lazy"
+              />
+            </div>
+            <div className="pt-3 flex flex-col sm:flex-row sm:items-center justify-between gap-1 font-mono text-xs border-t border-csg-black/15 mt-3">
+              <span className="font-bold text-csg-black uppercase text-xs">
+                08 // MƯỜI BẢY NĂM TRỌN MỘT MÁI NHÀ
+              </span>
+              <span className="text-csg-black/60 text-[11px]">
+                Bao thế hệ Cóc đã đi qua, nhưng mỗi lần nhìn lại, tụi mình vẫn là một gia đình.
+              </span>
+            </div>
           </div>
-        </div>
+        </section>
 
       </div>
 
 
       {/* ========================================================================= */}
-      {/* MOBILE ART DIRECTION (Dedicated, natural flow without vertical exhaustion) */}
+      {/* MOBILE ART DIRECTION (Compact, cohesive cards without dead space)         */}
       {/* ========================================================================= */}
-      <div className="block md:hidden space-y-7">
+      <div className="block md:hidden space-y-6">
 
-        {/* 1. Mobile Opening: Layered 2-photo dialogue */}
-        <div className="relative pb-6">
+        {/* Mobile Item 1: Song Hành with Overlay */}
+        <div className="space-y-2">
+          <div className="font-mono text-[10px] text-csg-black/60 uppercase font-bold tracking-wider">
+            01 & 02 // ĐẠI HỘI SONG HÀNH & HOA HƯỚNG DƯƠNG
+          </div>
+          <div className="relative">
+            <div
+              onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.cover)}
+              className="paper-sheet p-1.5 pb-2.5 cursor-pointer shadow-sm active:scale-95"
+            >
+              <img
+                src={PHOTOBOOK_IMAGES.cover.src}
+                alt={PHOTOBOOK_IMAGES.cover.alt}
+                className="w-full aspect-[16/10] object-cover"
+                loading="lazy"
+              />
+              <p className="pt-1.5 font-mono text-[10px] text-csg-black/75 truncate font-bold">
+                {PHOTOBOOK_IMAGES.cover.alt}
+              </p>
+            </div>
+
+            <div
+              onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.coverOffset)}
+              className="absolute -bottom-3 right-2 w-[42%] z-10 cursor-pointer shadow-poster-sm rotate-2 bg-white p-1 pb-2 border border-csg-black"
+            >
+              <img
+                src={PHOTOBOOK_IMAGES.coverOffset.src}
+                alt={PHOTOBOOK_IMAGES.coverOffset.alt}
+                className="w-full aspect-[4/3] object-cover"
+                loading="lazy"
+              />
+              <div className="pt-0.5 text-center font-mono text-[8px] text-csg-black/75 truncate font-bold">
+                Nụ cười hướng dương
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile Item 2: 2-Column Discovery Grid (SaiGon Talk & Camera) */}
+        <div className="grid grid-cols-2 gap-2.5 pt-2">
           <div
             onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.workspace)}
-            className={`w-[84%] cursor-pointer shadow-md ${
-              !isAnimationComplete ? 'film-reveal-item' : ''
-            }`}
-            style={{ animationDelay: '100ms' }}
+            className="paper-sheet p-1.5 pb-2 cursor-pointer shadow-sm active:scale-95"
           >
             <img
               src={PHOTOBOOK_IMAGES.workspace.src}
               alt={PHOTOBOOK_IMAGES.workspace.alt}
-              className="w-full aspect-[16/10] object-cover"
+              className="w-full aspect-square object-cover"
+              loading="lazy"
             />
+            <div className="pt-1 font-mono text-[9px] text-csg-black/80 truncate font-bold">
+              SaiGon Talk online
+            </div>
           </div>
 
           <div
             onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.camera)}
-            className={`absolute -bottom-2 right-0 w-[46%] z-10 cursor-pointer shadow-xl ${
-              !isAnimationComplete ? 'film-reveal-item' : ''
-            }`}
-            style={{ animationDelay: '220ms' }}
+            className="paper-sheet p-1.5 pb-2 cursor-pointer shadow-sm active:scale-95"
           >
             <img
               src={PHOTOBOOK_IMAGES.camera.src}
               alt={PHOTOBOOK_IMAGES.camera.alt}
-              className="w-full aspect-[3/4] object-cover"
-            />
-          </div>
-        </div>
-
-        {/* 2. Right-Aligned Banquet Image */}
-        <div className="w-[88%] ml-auto pt-4">
-          <div
-            onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.cover)}
-            className={`w-full cursor-pointer shadow-md ${
-              !isAnimationComplete ? 'film-reveal-item' : ''
-            }`}
-            style={{ animationDelay: '360ms' }}
-          >
-            <img
-              src={PHOTOBOOK_IMAGES.cover.src}
-              alt={PHOTOBOOK_IMAGES.cover.alt}
-              className="w-full aspect-[16/10] object-cover"
-            />
-          </div>
-        </div>
-
-        {/* 3. Tilted Candid Snapshot */}
-        <div className="w-[58%] -rotate-2">
-          <div
-            onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.coverOffset)}
-            className={`w-full cursor-pointer shadow-md bg-white p-1 pb-3 ${
-              !isAnimationComplete ? 'film-reveal-item' : ''
-            }`}
-            style={{ animationDelay: '500ms' }}
-          >
-            <img
-              src={PHOTOBOOK_IMAGES.coverOffset.src}
-              alt={PHOTOBOOK_IMAGES.coverOffset.alt}
-              className="w-full aspect-[4/3] object-cover"
-            />
-          </div>
-        </div>
-
-        {/* 4. Small Discovery (Right-aligned) */}
-        <div className="w-[42%] ml-auto">
-          <div
-            onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.bonfire)}
-            className={`w-full cursor-pointer shadow-sm ${
-              !isAnimationComplete ? 'film-reveal-item' : ''
-            }`}
-            style={{ animationDelay: '640ms' }}
-          >
-            <img
-              src={PHOTOBOOK_IMAGES.bonfire.src}
-              alt={PHOTOBOOK_IMAGES.bonfire.alt}
               className="w-full aspect-square object-cover"
+              loading="lazy"
             />
+            <div className="pt-1 font-mono text-[9px] text-csg-black/80 truncate font-bold">
+              5 Mùa thổi nến
+            </div>
           </div>
         </div>
 
-        {/* 5. Full-Bleed Panorama Breakout */}
-        <div className="-mx-4 py-2">
+        {/* Mobile Item 3: Cinematic Panorama Breakout */}
+        <div className="space-y-1">
+          <div className="font-mono text-[10px] text-csg-black/60 uppercase font-bold tracking-wider">
+            03 // CỜ CÓC TẠI PO KLONG GARAI
+          </div>
           <div
             onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.beachPanoramic)}
-            className={`w-full cursor-pointer shadow-sm ${
-              !isAnimationComplete ? 'film-reveal-item' : ''
-            }`}
-            style={{ animationDelay: '780ms' }}
+            className="paper-sheet p-1.5 pb-2.5 cursor-pointer shadow-sm active:scale-95"
           >
             <img
               src={PHOTOBOOK_IMAGES.beachPanoramic.src}
               alt={PHOTOBOOK_IMAGES.beachPanoramic.alt}
               className="w-full aspect-[21/9] object-cover"
+              loading="lazy"
             />
+            <p className="pt-1.5 font-mono text-[10px] text-csg-black/75 truncate font-bold">
+              {PHOTOBOOK_IMAGES.beachPanoramic.alt}
+            </p>
           </div>
         </div>
 
-        {/* 6. PROMINENT CÓC STAGE PHOTO (Full width on mobile, memorable concert energy) */}
-        <div className="w-full pt-2">
+        {/* Mobile Item 4: 2-Column Discovery Grid (Lâm Viên & Biển Xanh) */}
+        <div className="grid grid-cols-2 gap-2.5">
+          <div
+            onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.bonfire)}
+            className="paper-sheet p-1.5 pb-2 cursor-pointer shadow-sm active:scale-95"
+          >
+            <img
+              src={PHOTOBOOK_IMAGES.bonfire.src}
+              alt={PHOTOBOOK_IMAGES.bonfire.alt}
+              className="w-full aspect-square object-cover"
+              loading="lazy"
+            />
+            <div className="pt-1 font-mono text-[9px] text-csg-black/80 truncate font-bold">
+              Đà Lạt sương mù
+            </div>
+          </div>
+
+          <div
+            onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.celebrationToast)}
+            className="paper-sheet p-1.5 pb-2 cursor-pointer shadow-sm active:scale-95"
+          >
+            <img
+              src={PHOTOBOOK_IMAGES.celebrationToast.src}
+              alt={PHOTOBOOK_IMAGES.celebrationToast.alt}
+              className="w-full aspect-square object-cover"
+              loading="lazy"
+            />
+            <div className="pt-1 font-mono text-[9px] text-csg-black/80 truncate font-bold">
+              Gió biển thanh xuân
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile Item 5: Stage Concert Energy */}
+        <div className="space-y-1">
+          <div className="font-mono text-[10px] text-csg-black/60 uppercase font-bold tracking-wider">
+            06 // ĐÊM HỘI TRƯỜNG VỌNG TIẾN
+          </div>
           <div
             onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.stage)}
-            className={`w-full cursor-pointer shadow-lg ${
-              !isAnimationComplete ? 'film-reveal-item' : ''
-            }`}
-            style={{ animationDelay: '920ms' }}
+            className="paper-sheet p-1.5 pb-2.5 cursor-pointer shadow-sm active:scale-95"
           >
             <img
               src={PHOTOBOOK_IMAGES.stage.src}
               alt={PHOTOBOOK_IMAGES.stage.alt}
               className="w-full aspect-[16/10] object-cover"
+              loading="lazy"
             />
+            <p className="pt-1.5 font-mono text-[10px] text-csg-black/75 truncate font-bold">
+              {PHOTOBOOK_IMAGES.stage.alt}
+            </p>
           </div>
         </div>
 
-        {/* 7. Celebration Toast Photo */}
-        <div className="w-[60%] mx-auto pt-2">
-          <div
-            onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.celebrationToast)}
-            className={`w-full cursor-pointer shadow-md ${
-              !isAnimationComplete ? 'film-reveal-item' : ''
-            }`}
-            style={{ animationDelay: '1060ms' }}
-          >
-            <img
-              src={PHOTOBOOK_IMAGES.celebrationToast.src}
-              alt={PHOTOBOOK_IMAGES.celebrationToast.alt}
-              className="w-full aspect-[4/3] object-cover"
-            />
+        {/* Mobile Item 6: Climax Monument Centerpiece */}
+        <div className="space-y-1">
+          <div className="font-mono text-[10px] text-csg-black/60 uppercase font-bold tracking-wider">
+            08 // ĐẠI GIA ĐÌNH CÓC GIỮA RỪNG THÔNG
           </div>
-        </div>
-
-        {/* 8. Climax Gathering */}
-        <div className="w-full pt-4">
           <div
             onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.gatheringCrowd)}
-            className={`w-full cursor-pointer shadow-lg ${
-              !isAnimationComplete ? 'film-reveal-item' : ''
-            }`}
-            style={{ animationDelay: '1200ms' }}
+            className="paper-sheet p-1.5 pb-2.5 cursor-pointer shadow-sm active:scale-95"
           >
             <img
               src={PHOTOBOOK_IMAGES.gatheringCrowd.src}
               alt={PHOTOBOOK_IMAGES.gatheringCrowd.alt}
               className="w-full aspect-[16/9] object-cover"
+              loading="lazy"
             />
+            <p className="pt-1.5 font-mono text-[10px] text-csg-black/75 truncate font-bold">
+              {PHOTOBOOK_IMAGES.gatheringCrowd.alt}
+            </p>
           </div>
         </div>
 
@@ -430,13 +603,29 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
 
 
       {/* ========================================================================= */}
-      {/* GALA INVITATION KEEPSAKE TICKET                                           */}
+      {/* GRAND FINALE SPREAD: GALA KEEPSAKE TICKET FIRST, SÂN KHẤU CÓC COMPANION    */}
+      {/* User Rule: "form trc rồi tới sân khấu cóc sau"                            */}
       {/* ========================================================================= */}
-      <div className="pt-16 sm:pt-24 mt-16 sm:mt-28 border-t border-csg-black/15">
-        <div className="max-w-2xl mx-auto">
+      <section className="pt-10 sm:pt-14 mt-10 sm:mt-14 border-t border-csg-black/20">
+        
+        {/* Section Header Bar */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 pb-4 mb-6 border-b border-csg-black/15 font-mono text-xs">
+          <div className="flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-csg-red animate-pulse" />
+            <span className="font-bold uppercase tracking-wider text-csg-black">
+              ĐẠI TIỆC GALA 17Y // THƯ MỜI HỘI NGỘ & SÂN KHẤU KỶ NIỆM
+            </span>
+          </div>
+          <span className="text-csg-black/50 text-[11px]">
+            12 & 13.12.2026 • ĐỒI SỨ VILLA
+          </span>
+        </div>
+
+        {/* Unified Finale Suite: Form Ticket First (Col 7), Sân Khấu Cóc Companion (Col 5) */}
+        <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch">
           
-          {/* The Gala Keepsake Ticket */}
-          <div className="bg-[#FFFDF8] border-2 border-csg-black p-4 sm:p-8 shadow-poster relative space-y-4 sm:space-y-6">
+          {/* 1. GALA KEEPSAKE TICKET (FIRST IN DOM & FIRST VISUALLY) */}
+          <div className="lg:col-span-7 bg-[#FFFDF8] border-2 border-csg-black p-4 sm:p-6 shadow-poster flex flex-col justify-between space-y-4">
             
             {/* Perforation Stamp */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 border-b-2 border-dashed border-csg-black/25 pb-2.5 font-mono text-[10px] sm:text-[11px]">
@@ -450,10 +639,10 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
 
             {/* Event Typography */}
             <div className="space-y-1">
-              <h2 className="text-2xl sm:text-4xl font-display font-extrabold uppercase text-csg-black leading-tight tracking-tight whitespace-nowrap sm:whitespace-normal">
+              <h2 className="text-2xl sm:text-3xl font-display font-extrabold uppercase text-csg-black leading-tight tracking-tight">
                 {GALA_EVENT_DETAILS.title}
               </h2>
-              <p className="font-editorial italic text-sm sm:text-base text-csg-black/75 truncate sm:whitespace-normal">
+              <p className="font-editorial italic text-sm sm:text-base text-csg-black/75">
                 {GALA_EVENT_DETAILS.subtitle}
               </p>
             </div>
@@ -462,16 +651,16 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
             <div className="font-mono text-xs divide-y divide-csg-black/15 py-1">
               <div className="flex items-center justify-between py-2 gap-2">
                 <span className="text-csg-black/60 uppercase whitespace-nowrap shrink-0">THỜI GIAN:</span>
-                <span className="font-bold text-csg-black text-right whitespace-nowrap">{GALA_EVENT_DETAILS.time}</span>
+                <span className="font-bold text-csg-black text-right">{GALA_EVENT_DETAILS.time}</span>
               </div>
               <div className="flex items-center justify-between py-2 gap-2">
                 <span className="text-csg-black/60 uppercase whitespace-nowrap shrink-0">ĐỊA ĐIỂM:</span>
-                <span className="font-bold text-csg-black text-right whitespace-nowrap">{GALA_EVENT_DETAILS.venue}</span>
+                <span className="font-bold text-csg-black text-right">{GALA_EVENT_DETAILS.venue}</span>
               </div>
             </div>
 
             {/* Direct Instant RSVP Action */}
-            <div className="space-y-3 pt-1">
+            <div className="space-y-2 pt-1">
               <button
                 onClick={onOpenRegister}
                 className="btn-editorial-primary w-full py-3.5 sm:py-4 min-h-[48px] font-display font-extrabold text-sm sm:text-base uppercase tracking-wider flex items-center justify-center gap-2 shadow-poster active:scale-[0.98] whitespace-nowrap"
@@ -480,17 +669,68 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
                 <ArrowRightIcon size={16} className="shrink-0" />
               </button>
 
-              <div className="text-center font-mono text-xs pt-0.5">
-                <span className="text-csg-black/45 text-[10px] sm:text-[11px] whitespace-nowrap">
-                  Dành cho thành viên & cựu thành viên CSG
-                </span>
+              <div className="text-center font-mono text-[10px] sm:text-[11px] text-csg-black/45">
+                Dành cho thành viên & cựu thành viên CSG
               </div>
             </div>
 
           </div>
 
+          {/* 2. SÂN KHẤU CÓC COMPANION PASSPORT (SECOND / SAU FORM) */}
+          {onOpenStage && (
+            <div className="lg:col-span-5 bg-csg-surface border-2 border-csg-black p-4 sm:p-6 shadow-poster flex flex-col justify-between space-y-4">
+              
+              <div className="space-y-3">
+                <div className="flex items-center justify-between gap-2 border-b-2 border-csg-black/15 pb-2.5">
+                  <span className="px-2 py-0.5 rounded-xs bg-csg-yellow text-csg-black font-mono font-bold text-[10px] uppercase tracking-wider shadow-xs">
+                    SÂN KHẤU CÓC 17Y
+                  </span>
+                  <span className="font-mono text-xs font-bold text-csg-black/70 flex items-center gap-1">
+                    <FrogIcon size={14} className="text-csg-red" />
+                    <span>{totalWishesCount} LỜI CHÚC</span>
+                  </span>
+                </div>
+
+                {/* Animated Mascot Visual Hook */}
+                <div className="relative p-3 bg-white/70 border border-csg-black/20 rounded-xs flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-xs bg-csg-yellow border border-csg-black flex items-center justify-center shadow-xs shrink-0 animate-bounce">
+                    <FrogIcon size={24} className="text-csg-black" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-display font-bold text-xs text-csg-black leading-snug">
+                      Mỗi lời chúc gửi về đều xuất hiện cùng một chú Cóc Áo Vàng nhảy múa trên sân khấu ảo!
+                    </p>
+                    <span className="font-mono text-[10px] text-csg-black/50 block pt-0.5">
+                      Đầy đủ lời chúc từ các thế hệ cựu thành viên
+                    </span>
+                  </div>
+                </div>
+
+                {/* Mini Live Wish Quote Ticker */}
+                <div className="p-2.5 bg-[#FAF7F0] border-l-3 border-csg-red rounded-r-xs font-handwriting text-base sm:text-lg text-csg-black/85 leading-snug">
+                  "Chúc Cóc Sài Gòn mãi là ngôi nhà ấm áp của bao thế hệ!"
+                </div>
+              </div>
+
+              {/* Enter Stage CTA Button */}
+              <div className="pt-2">
+                <button
+                  type="button"
+                  onClick={onOpenStage}
+                  className="btn-editorial-primary w-full py-3 min-h-[44px] text-xs sm:text-sm font-display font-black uppercase tracking-wider shadow-sm flex items-center justify-center gap-2 whitespace-nowrap active:scale-95"
+                >
+                  <FrogIcon size={16} className="shrink-0" />
+                  <span>XEM SÂN KHẤU CÓC & LỜI CHÚC</span>
+                  <ArrowRightIcon size={14} className="shrink-0" />
+                </button>
+              </div>
+
+            </div>
+          )}
+
         </div>
-      </div>
+
+      </section>
 
       {/* ================= MINIMAL ARCHIVAL COLOPHON ================= */}
       <div className="text-center pt-8 font-mono text-xs text-csg-black/40 uppercase tracking-widest">
@@ -522,11 +762,16 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
             <img
               src={selectedPhoto.src}
               alt={selectedPhoto.alt}
-              className="max-h-[78vh] w-auto max-w-full object-contain shadow-2xl"
+              className="max-h-[72vh] w-auto max-w-full object-contain shadow-2xl"
             />
 
+            {/* Inscription Description */}
+            <p className="text-white/80 font-mono text-xs text-center pt-3 px-4 max-w-2xl">
+              {selectedPhoto.alt}
+            </p>
+
             {/* Bottom Controls */}
-            <div className="w-full max-w-xs mt-4 flex items-center justify-between text-xs font-mono text-white/70">
+            <div className="w-full max-w-xs mt-3 flex items-center justify-between text-xs font-mono text-white/70">
               <button
                 onClick={handlePrev}
                 className="px-3 py-2 min-h-[44px] min-w-[70px] hover:text-csg-yellow transition-colors flex items-center justify-center gap-1 active:scale-95"

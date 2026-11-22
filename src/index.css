@@ -27,12 +27,12 @@
     --color-error: #B7352A;
     --color-info: #315D91;
 
-    /* Typography */
-    --font-display: "Be Vietnam Pro", -apple-system, sans-serif;
-    --font-body: "Be Vietnam Pro", -apple-system, sans-serif;
-    --font-editorial: "Playfair Display", Georgia, serif;
+    /* Typography - Vietnamese optimized */
+    --font-display: "Be Vietnam Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --font-body: "Be Vietnam Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --font-editorial: "Playfair Display", "Lora", Georgia, serif;
     --font-label: "IBM Plex Mono", monospace;
-    --font-handwriting: "Caveat", cursive;
+    --font-handwriting: "Patrick Hand", "Dancing Script", cursive;
 
     /* Shadows */
     --shadow-poster: 4px 4px 0px var(--color-foreground);
@@ -384,5 +384,98 @@
 .stage-eq-1 { animation: eqPulse1 1.2s ease-in-out infinite; }
 .stage-eq-2 { animation: eqPulse2 0.9s ease-in-out infinite; }
 .stage-eq-3 { animation: eqPulse3 1.4s ease-in-out infinite; }
+
+/* ========================================================================= */
+/* LIVELY CÓC MASCOT STAGE MOVEMENT & HOPPING ANIMATIONS                      */
+/* ========================================================================= */
+
+@keyframes frogHopMotion {
+  0% {
+    transform: translateY(0) scale(1, 1);
+  }
+  20% {
+    transform: translateY(2px) scale(1.12, 0.88);
+  }
+  50% {
+    transform: translateY(-16px) scale(0.92, 1.12);
+  }
+  80% {
+    transform: translateY(-2px) scale(1.08, 0.92);
+  }
+  100% {
+    transform: translateY(0) scale(1, 1);
+  }
+}
+
+@keyframes frogShadowHop {
+  0%, 100% {
+    transform: translateX(-50%) scale(1);
+    opacity: 0.28;
+  }
+  50% {
+    transform: translateX(-50%) scale(0.65);
+    opacity: 0.12;
+  }
+}
+
+@keyframes frogIdleBreathing {
+  0%, 100% {
+    transform: translateY(0px) scale(1, 1);
+  }
+  50% {
+    transform: translateY(-2.5px) scale(1.02, 0.98);
+  }
+}
+
+@keyframes frogCelebrateJump {
+  0% {
+    transform: translateY(0) scale(1, 1);
+  }
+  25% {
+    transform: translateY(3px) scale(1.2, 0.8);
+  }
+  50% {
+    transform: translateY(-34px) scale(0.88, 1.15) rotate(4deg);
+  }
+  75% {
+    transform: translateY(-4px) scale(1.1, 0.9) rotate(-2deg);
+  }
+  100% {
+    transform: translateY(0) scale(1, 1);
+  }
+}
+
+.animate-frog-hopping {
+  animation: frogHopMotion 0.48s ease-in-out infinite;
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+.animate-frog-shadow-hopping {
+  animation: frogShadowHop 0.48s ease-in-out infinite;
+  will-change: transform, opacity;
+  transform: translateZ(0);
+}
+
+.animate-frog-idling {
+  animation: frogIdleBreathing 2.8s ease-in-out infinite;
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+.animate-frog-celebrating {
+  animation: frogCelebrateJump 0.75s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-frog-hopping,
+  .animate-frog-shadow-hopping,
+  .animate-frog-celebrating {
+    animation: none !important;
+  }
+}
+
 
 

@@ -92,4 +92,5 @@ export interface MascotFrog {
   y: number; // percentage 10% - 85%
   scale: number;
   direction: number; // 1 or -1
+  hearts?: number;
 }

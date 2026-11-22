@@ -1,12 +1,14 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { 
   SparklesIcon, SearchIcon, Volume2Icon, VolumeXIcon, PartyIcon, 
-  CloseIcon, BulbIcon, FrogIcon, GraduationCapIcon, BoltIcon, HeartIcon
+  CloseIcon, BulbIcon, FrogIcon, GraduationCapIcon, BoltIcon, HeartIcon,
+  BookOpenIcon, ArrowRightIcon
 } from 'naive-icons';
 import confetti from 'canvas-confetti';
 import { MascotFrog, MemberRole, RegistrationRecord } from '../types';
 import { audioService } from '../services/audioService';
+import { apiClient } from '../services/apiClient';
 
 export interface CelebrationStageProps {
   characters: MascotFrog[];
@@ -16,6 +18,20 @@ export interface CelebrationStageProps {
   newRegistrant?: RegistrationRecord | null;
   onOpenPortal?: () => void;
   hideBanner?: boolean;
+}
+
+interface FrogMotionState {
+  x: number;
+  y: number;
+  targetX: number;
+  targetY: number;
+  dir: number;
+  speed: number;
+  scale: number;
+  isHopping: boolean;
+  isCelebrating: boolean;
+  celebrateTicks: number;
+  idleTicks: number;
 }
 
 export const CelebrationStage: React.FC<CelebrationStageProps> = ({
@@ -44,42 +60,200 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [activeCharacter]);
 
+  const [isWishDrawerOpen, setIsWishDrawerOpen] = useState(false);
+  const [internalCharacters, setInternalCharacters] = useState<MascotFrog[]>(characters);
+
+  // Mobile screen responsiveness & performance optimization
+  const [isMobile, setIsMobile] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    return window.innerWidth < 640;
+  });
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Pause physics loop when browser tab is inactive to preserve mobile battery
+  useEffect(() => {
+    const handleVisibility = () => {
+      if (document.hidden) {
+        canRoamRef.current = false;
+      } else {
+        canRoamRef.current = true;
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => document.removeEventListener('visibilitychange', handleVisibility);
+  }, []);
+
+  // Keep internal list in sync when parent passes new characters
+  useEffect(() => {
+    if (characters && characters.length > 0) {
+      setInternalCharacters(characters);
+    }
+  }, [characters]);
+
+  // Proactively fetch live characters & wishes on mount to ensure all DB wishes appear
+  useEffect(() => {
+    let isMounted = true;
+    const syncFreshCharacters = async () => {
+      try {
+        const fresh = await apiClient.getStageCharacters();
+        if (isMounted && fresh && fresh.length > 0) {
+          setInternalCharacters(fresh);
+        }
+      } catch (err) {
+        console.warn('CelebrationStage sync error:', err);
+      }
+    };
+    syncFreshCharacters();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   // Combine external characters with newRegistrant if provided
   const allCharacters = useMemo(() => {
-    if (!newRegistrant) return characters;
-    const existing = characters.some(
+    const baseList = internalCharacters.length > 0 ? internalCharacters : characters;
+    if (!newRegistrant) return baseList;
+    const existing = baseList.some(
       c => c.id === `frog-${newRegistrant.id}` || c.name.toLowerCase().includes(newRegistrant.fullName.toLowerCase())
     );
-    if (existing) return characters;
+    if (existing) return baseList;
 
     const myFrog: MascotFrog = {
       id: `frog-${newRegistrant.id}`,
       name: `${newRegistrant.honorific} ${newRegistrant.fullName}`,
       role: newRegistrant.role,
-      wish: newRegistrant.wishes?.trim() || 'Mừng sinh nhật 17 năm Cóc Sài Gòn rực rỡ và bùng cháy! 🎉',
+      wish: newRegistrant.wishes?.trim() || 'Mừng sinh nhật 17 năm Cóc Sài Gòn rực rỡ và bùng cháy!',
       x: 50,
-      y: 68,
-      scale: 1.25,
+      y: 72,
+      scale: 1.2,
       direction: 1
     };
-    return [myFrog, ...characters];
-  }, [characters, newRegistrant]);
+    return [myFrog, ...baseList];
+  }, [internalCharacters, characters, newRegistrant]);
 
-  // Positions and non-overlapping slot allocation for stage walk simulation
-  const [positions, setPositions] = useState<{ 
-    [id: string]: { 
-      x: number; 
-      y: number; 
-      dir: number; 
-      speed: number; 
-      laneY: number; 
-      scale: number;
-      minX: number;
-      maxX: number;
-    } 
-  }>({});
+  // Positions and lively stage roaming state
+  const [positions, setPositions] = useState<{ [id: string]: FrogMotionState }>({});
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [activeSpeakerId, setActiveSpeakerId] = useState<string | null>(null);
+
+  // Initial stillness: Frogs do NOT move immediately on entering stage
+  const canRoamRef = useRef(false);
+
+  useEffect(() => {
+    // Keep frogs standing in place for initial 3.5s before active roaming begins
+    canRoamRef.current = false;
+    const timer = setTimeout(() => {
+      canRoamRef.current = true;
+    }, 3500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Heart / like system: 1 heart per account, with counts per character
+  const getInitialHearts = useCallback((id: string, name: string): number => {
+    let hash = 0;
+    const str = id + name;
+    for (let i = 0; i < str.length; i++) {
+      hash = (hash << 5) - hash + str.charCodeAt(i);
+      hash |= 0;
+    }
+    return 8 + (Math.abs(hash) % 22);
+  }, []);
+
+  const [heartsCount, setHeartsCount] = useState<Record<string, number>>(() => {
+    try {
+      const saved = localStorage.getItem('csg_wishes_hearts');
+      if (saved) return JSON.parse(saved);
+    } catch {}
+    return {};
+  });
+
+  const [userHeartedWishId, setUserHeartedWishId] = useState<string | null>(() => {
+    try {
+      return localStorage.getItem('csg_user_hearted_wish_id');
+    } catch {
+      return null;
+    }
+  });
+
+  const handleToggleHeart = useCallback((targetId: string) => {
+    if (soundEnabled) {
+      audioService.playCelebrationChime();
+    }
+
+    setHeartsCount(prev => {
+      const next = { ...prev };
+      const currentTargetCount = next[targetId] !== undefined 
+        ? next[targetId] 
+        : getInitialHearts(targetId, targetId);
+
+      if (userHeartedWishId === targetId) {
+        next[targetId] = Math.max(0, currentTargetCount - 1);
+        setUserHeartedWishId(null);
+        try {
+          localStorage.removeItem('csg_user_hearted_wish_id');
+          localStorage.setItem('csg_wishes_hearts', JSON.stringify(next));
+        } catch {}
+      } else {
+        if (userHeartedWishId && next[userHeartedWishId] !== undefined) {
+          next[userHeartedWishId] = Math.max(0, next[userHeartedWishId] - 1);
+        }
+        next[targetId] = currentTargetCount + 1;
+        setUserHeartedWishId(targetId);
+        try {
+          localStorage.setItem('csg_user_hearted_wish_id', targetId);
+          localStorage.setItem('csg_wishes_hearts', JSON.stringify(next));
+        } catch {}
+
+        // Make the frog that received a heart jump up excitedly!
+        setPositions(posPrev => {
+          if (!posPrev[targetId]) return posPrev;
+          return {
+            ...posPrev,
+            [targetId]: {
+              ...posPrev[targetId],
+              isCelebrating: true,
+              celebrateTicks: 30
+            }
+          };
+        });
+
+        confetti({
+          particleCount: 30,
+          spread: 60,
+          origin: { y: 0.6 },
+          colors: ['#F43F5E', '#F4C542', '#B94D35']
+        });
+      }
+
+      return next;
+    });
+  }, [soundEnabled, userHeartedWishId, getInitialHearts]);
+
+  // Find the wish with the most hearts (Top 1)
+  const topHeartedId = useMemo(() => {
+    if (allCharacters.length === 0) return null;
+    let topId = allCharacters[0]?.id || '';
+    let maxCount = -1;
+
+    allCharacters.forEach(c => {
+      const count = heartsCount[c.id] !== undefined 
+        ? heartsCount[c.id] 
+        : getInitialHearts(c.id, c.name);
+      if (count > maxCount) {
+        maxCount = count;
+        topId = c.id;
+      }
+    });
+
+    return maxCount > 0 ? topId : null;
+  }, [allCharacters, heartsCount, getInitialHearts]);
 
   // Confetti blast trigger
   const triggerConfettiBlast = (e?: React.MouseEvent) => {
@@ -97,7 +271,7 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
     });
   };
 
-  // Strictly ONE speech bubble active at a time - rotating smoothly without clutter or collision
+  // Strictly ONE speech bubble active at a time - starts with a RANDOM frog jumping for 7 seconds
   useEffect(() => {
     if (allCharacters.length === 0) return;
 
@@ -105,24 +279,44 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
       ? allCharacters.find(c => c.id === `frog-${newRegistrant.id}` || c.name.includes(newRegistrant.fullName)) 
       : null;
 
-    // If newly registered, give user's frog the celebratory spotlight for 6s
+    // If newly registered, spotlight user's frog; otherwise pick a RANDOM frog mascot!
+    let initialIndex = 0;
     if (userFrog) {
-      setActiveSpeakerId(userFrog.id);
+      initialIndex = allCharacters.indexOf(userFrog);
     } else {
-      setActiveSpeakerId(allCharacters[0]?.id || null);
+      initialIndex = Math.floor(Math.random() * allCharacters.length);
+    }
+    const initialSpeaker = allCharacters[initialIndex] || allCharacters[0];
+    const initialId = initialSpeaker?.id || null;
+
+    setActiveSpeakerId(initialId);
+
+    // Make this random frog jump up with its wish!
+    if (initialId) {
+      setPositions(prev => {
+        if (!prev[initialId]) return prev;
+        return {
+          ...prev,
+          [initialId]: {
+            ...prev[initialId],
+            isCelebrating: true,
+            celebrateTicks: 45 // jump celebration
+          }
+        };
+      });
     }
 
-    let currentIndex = userFrog ? allCharacters.indexOf(userFrog) : 0;
-    const initialDelay = userFrog ? 6000 : 2500;
-
+    let currentIndex = initialIndex;
     let intervalId: NodeJS.Timeout | null = null;
+
+    // Show this random frog's wish for exactly 7 seconds (7000ms)
     const initialTimer = setTimeout(() => {
-      // Start cycling one frog at a time every 4.8s
+      // After 7 seconds, rotate through subsequent frogs every 5 seconds
       intervalId = setInterval(() => {
         currentIndex = (currentIndex + 1) % allCharacters.length;
         setActiveSpeakerId(allCharacters[currentIndex]?.id || null);
-      }, 4800);
-    }, initialDelay);
+      }, 5000);
+    }, 7000);
 
     return () => {
       clearTimeout(initialTimer);
@@ -130,272 +324,360 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
     };
   }, [allCharacters, newRegistrant]);
 
-  // Non-overlapping dedicated slot layout: frogs pace strictly in their own dedicated sector
+  // Initialize and distribute frog positions along the stage floor
   useEffect(() => {
     if (allCharacters.length === 0) return;
 
-    const pos: { 
-      [id: string]: { 
-        x: number; 
-        y: number; 
-        dir: number; 
-        speed: number; 
-        laneY: number; 
-        scale: number;
-        minX: number;
-        maxX: number;
-      } 
-    } = {};
+    setPositions(prev => {
+      const next: { [id: string]: FrogMotionState } = { ...prev };
+      const count = allCharacters.length;
 
-    const userFrogId = newRegistrant ? `frog-${newRegistrant.id}` : null;
-    const otherFrogs = allCharacters.filter(c => c.id !== userFrogId && !c.name.includes(newRegistrant?.fullName || '___none___'));
-    const userFrog = allCharacters.find(c => c.id === userFrogId || (newRegistrant && c.name.includes(newRegistrant.fullName)));
-
-    if (userFrog) {
-      // User frog is the center star at 50%
-      const userX = 50;
-      const userY = 74;
-      pos[userFrog.id] = {
-        x: userX,
-        y: userY,
-        laneY: userY,
-        dir: 1,
-        speed: 0.03,
-        scale: 1.18,
-        minX: 47.5,
-        maxX: 52.5
-      };
-
-      // Split other frogs between left (18% - 38%) and right (62% - 82%)
-      const leftCount = Math.ceil(otherFrogs.length / 2);
-      const leftFrogs = otherFrogs.slice(0, leftCount);
-      const rightFrogs = otherFrogs.slice(leftCount);
-
-      leftFrogs.forEach((c, idx) => {
-        const step = leftFrogs.length > 1 ? 20 / (leftFrogs.length - 1) : 0;
-        const anchorX = leftFrogs.length > 1 ? 18 + idx * step : 28;
-        const laneY = idx % 2 === 0 ? 66 : 78;
-        const scale = laneY === 66 ? 0.92 : 1.05;
-        pos[c.id] = {
-          x: anchorX,
-          y: laneY,
-          laneY,
-          dir: idx % 2 === 0 ? 1 : -1,
-          speed: 0.035,
-          scale,
-          minX: anchorX - 2.8,
-          maxX: anchorX + 2.8
-        };
-      });
-
-      rightFrogs.forEach((c, idx) => {
-        const step = rightFrogs.length > 1 ? 20 / (rightFrogs.length - 1) : 0;
-        const anchorX = rightFrogs.length > 1 ? 62 + idx * step : 72;
-        const laneY = idx % 2 === 0 ? 78 : 66;
-        const scale = laneY === 66 ? 0.92 : 1.05;
-        pos[c.id] = {
-          x: anchorX,
-          y: laneY,
-          laneY,
-          dir: idx % 2 === 0 ? -1 : 1,
-          speed: 0.035,
-          scale,
-          minX: anchorX - 2.8,
-          maxX: anchorX + 2.8
-        };
-      });
-    } else {
-      // Standard distribution across 18% to 82%
       allCharacters.forEach((c, idx) => {
-        const step = allCharacters.length > 1 ? 64 / (allCharacters.length - 1) : 0;
-        const anchorX = allCharacters.length > 1 ? 18 + idx * step : 50;
-        const laneY = idx % 2 === 0 ? 66 : 78;
-        const scale = laneY === 66 ? 0.92 : 1.05;
-        pos[c.id] = {
-          x: anchorX,
-          y: laneY,
-          laneY,
-          dir: idx % 2 === 0 ? 1 : -1,
-          speed: 0.035,
+        // If already tracking this frog, keep its current dynamic motion state
+        if (next[c.id]) return;
+
+        // Distribute nicely along stage floor (12% to 88% width, 65% to 81% depth)
+        const stepX = count > 1 ? 76 / (count - 1) : 0;
+        const initialX = count > 1 ? 12 + idx * stepX : 50;
+        const initialY = 65 + (idx % 3) * 6; // 65%, 71%, 77%
+        const initialDir = idx % 2 === 0 ? 1 : -1;
+        const speed = 0.20 + (idx % 4) * 0.04;
+        const scale = 0.88 + ((initialY - 64) / 18) * 0.26;
+
+        next[c.id] = {
+          x: initialX,
+          y: initialY,
+          targetX: initialX,
+          targetY: initialY,
+          dir: initialDir,
+          speed: 0.36 + (idx % 4) * 0.05,
           scale,
-          minX: anchorX - 3,
-          maxX: anchorX + 3
+          isHopping: false,
+          isCelebrating: false,
+          celebrateTicks: 0,
+          idleTicks: 6 + Math.floor(Math.random() * 25) // staggered initial pause
         };
       });
-    }
 
-    setPositions(pos);
+      return next;
+    });
 
-    // Initial confetti celebration if new registrant just joined
     if (newRegistrant) {
       triggerConfettiBlast();
     }
+  }, [allCharacters, newRegistrant]);
 
-    // Gentle natural walking drift strictly within each frog's non-overlapping slot
+  // Lively roaming & hopping engine across the stage floor
+  useEffect(() => {
+    if (allCharacters.length === 0) return;
+
     const interval = setInterval(() => {
+      if (typeof document !== 'undefined' && document.hidden) return;
+
       setPositions(prev => {
-        const next = { ...prev };
-        Object.keys(next).forEach(id => {
-          if (!next[id]) return;
-          let { x, y, dir, speed, laneY, scale, minX, maxX } = next[id];
-          x += dir * speed;
-          if (x >= maxX) {
-            x = maxX;
-            dir = -1;
-          } else if (x <= minX) {
-            x = minX;
-            dir = 1;
-          }
-          next[id] = { x, y: laneY, laneY, dir, speed, scale, minX, maxX };
+        const next: { [id: string]: FrogMotionState } = { ...prev };
+        let hasChanges = false;
+
+        // Limit concurrent hops to preserve battery and 60fps on mobile
+        let currentHoppingCount = 0;
+        Object.keys(next).forEach(k => {
+          if (next[k]?.isHopping) currentHoppingCount++;
         });
-        return next;
+        const maxConcurrentHops = isMobile ? 2 : 4;
+
+        Object.keys(next).forEach(id => {
+          const frog = next[id];
+          if (!frog) return;
+
+          let {
+            x,
+            y,
+            targetX,
+            targetY,
+            dir,
+            speed,
+            scale,
+            isHopping,
+            isCelebrating,
+            celebrateTicks,
+            idleTicks
+          } = frog;
+
+          if (isCelebrating) {
+            celebrateTicks -= 1;
+            if (celebrateTicks <= 0) {
+              isCelebrating = false;
+            }
+            hasChanges = true;
+          }
+
+          if (isHopping) {
+            const distX = Math.abs(targetX - x);
+            const distY = Math.abs(targetY - y);
+
+            if (distX < 0.6 && distY < 0.6) {
+              // Arrived at destination! Settle into IDLE
+              x = targetX;
+              y = targetY;
+              isHopping = false;
+              // Rest for 1.5s - 3.8s (25 to 65 ticks)
+              idleTicks = 25 + Math.floor(Math.random() * 40);
+              // 40% chance to flip direction to look around while resting
+              if (Math.random() < 0.4) {
+                dir = -dir;
+              }
+            } else {
+              // Advance horizontally
+              const stepX = Math.min(speed, distX);
+              x += dir * stepX;
+
+              // Advance vertically towards target lane
+              const distToY = targetY - y;
+              const stepY = Math.sign(distToY) * Math.min(0.22, Math.abs(distToY));
+              y += stepY;
+
+              // Dynamically adjust scale based on depth perspective
+              scale = 0.88 + Math.max(0, Math.min(1, (y - 64) / 18)) * 0.28;
+            }
+            hasChanges = true;
+          } else {
+            // Idle state countdown: wait for canRoamRef to allow free roaming
+            if (!canRoamRef.current) {
+              return;
+            }
+            idleTicks -= 1;
+            if (idleTicks <= 0) {
+              // Throttle: don't start new hop if max frogs are already in motion
+              if (currentHoppingCount >= maxConcurrentHops) {
+                idleTicks = 12 + Math.floor(Math.random() * 20);
+                return;
+              }
+
+              // Pick a new destination spot on stage to hop toward
+              const travelDistance = 10 + Math.random() * 18;
+              let newDir = dir;
+
+              if (x < 18) {
+                newDir = 1;
+              } else if (x > 82) {
+                newDir = -1;
+              } else {
+                newDir = Math.random() > 0.5 ? 1 : -1;
+              }
+
+              let nextX = x + newDir * travelDistance;
+              nextX = Math.max(12, Math.min(88, nextX));
+
+              const nextY = 65 + Math.random() * 16; // 65% to 81%
+
+              targetX = nextX;
+              targetY = nextY;
+              dir = targetX >= x ? 1 : -1;
+              speed = 0.36 + Math.random() * 0.18; // dynamic, energetic hop speed!
+              isHopping = true;
+              currentHoppingCount++;
+              hasChanges = true;
+            }
+          }
+
+          next[id] = {
+            x,
+            y,
+            targetX,
+            targetY,
+            dir,
+            speed,
+            scale,
+            isHopping,
+            isCelebrating,
+            celebrateTicks,
+            idleTicks
+          };
+        });
+
+        return hasChanges ? next : prev;
       });
     }, 60);
 
     return () => clearInterval(interval);
-  }, [allCharacters, newRegistrant]);
+  }, [allCharacters]);
 
-  // Filter characters
-  const filtered = allCharacters.filter(c => {
-    const matchRole = selectedRole === 'ALL' || c.role === selectedRole;
-    const matchSearch = 
-      c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      c.wish.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchRole && matchSearch;
-  });
+  // Filter characters for Stage Floor (Mobile-adaptive density)
+  const filtered = useMemo(() => {
+    const matched = allCharacters.filter(c => {
+      const matchRole = selectedRole === 'ALL' || c.role === selectedRole;
+      const matchSearch = 
+        c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        c.wish.toLowerCase().includes(searchTerm.toLowerCase());
+      return matchRole && matchSearch;
+    });
+
+    // On mobile (< 640px) when not searching, show a comfortable group of 8 frogs
+    // ensuring stage is spacious and 60fps fast, while guaranteeing Top 1, active speaker & user frog are included
+    if (isMobile && matched.length > 8 && !searchTerm) {
+      const stageSet: MascotFrog[] = [];
+      const seen = new Set<string>();
+
+      const addCandidate = (id?: string | null) => {
+        if (!id || seen.has(id)) return;
+        const candidate = matched.find(m => m.id === id);
+        if (candidate) {
+          stageSet.push(candidate);
+          seen.add(id);
+        }
+      };
+
+      if (newRegistrant) addCandidate(`frog-${newRegistrant.id}`);
+      addCandidate(topHeartedId);
+      addCandidate(activeSpeakerId);
+
+      for (const item of matched) {
+        if (stageSet.length >= 8) break;
+        if (!seen.has(item.id)) {
+          stageSet.push(item);
+          seen.add(item.id);
+        }
+      }
+      return stageSet;
+    }
+
+    return matched;
+  }, [allCharacters, selectedRole, searchTerm, isMobile, topHeartedId, activeSpeakerId, newRegistrant]);
 
   const handleCharacterClick = (c: MascotFrog, e: React.MouseEvent) => {
     e.stopPropagation();
     setActiveCharacter(c);
+    setActiveSpeakerId(c.id);
+
+    // Trigger high celebration jump
+    setPositions(prev => {
+      if (!prev[c.id]) return prev;
+      return {
+        ...prev,
+        [c.id]: {
+          ...prev[c.id],
+          isCelebrating: true,
+          celebrateTicks: 14
+        }
+      };
+    });
+
     triggerConfettiBlast(e);
   };
 
   // Main stage body
   const stageContent = (
     <div className="w-full h-full flex flex-col flex-1 overflow-hidden">
-      {/* Sleek Edge-to-Edge Top Navigation Bar */}
-      <div className="w-full h-14 sm:h-12 bg-[#1A1816] border-b-2 border-[#F4C542] px-3 sm:px-6 flex items-center justify-between gap-2 sm:gap-3 shrink-0 z-40 select-none shadow-md pt-[env(safe-area-inset-top)]">
-        {/* Left: Brand Identity / Registrant Greeting */}
-        <div className="flex items-center gap-2 sm:gap-2.5 min-w-0 shrink-0">
-          <span className="w-8 h-8 rounded-sm bg-[#F4C542] border border-[#20231F] flex items-center justify-center text-lg shrink-0 shadow-xs">
-            <FrogIcon size={18} />
+      {/* Refined Theatrical Ambient Top Bar */}
+      <div className="w-full h-13 sm:h-14 bg-[#14100C]/95 backdrop-blur-md border-b border-white/10 px-3 sm:px-6 flex items-center justify-between gap-3 shrink-0 z-40 select-none shadow-sm pt-[env(safe-area-inset-top)]">
+        {/* Left: Brand Identity & Subdued Count */}
+        <div className="flex items-center gap-2.5 shrink-0">
+          <span className="w-8 h-8 rounded-full bg-amber-400/15 border border-amber-400/30 flex items-center justify-center text-amber-300 shrink-0">
+            <FrogIcon size={17} />
           </span>
-          <div className="min-w-0 flex items-center gap-2">
-            <span className="font-display font-black text-sm sm:text-base tracking-wider text-white uppercase whitespace-nowrap">
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="font-display font-bold text-xs sm:text-sm tracking-wide text-white uppercase whitespace-nowrap">
               SÂN KHẤU CÓC 17Y
             </span>
-            {newRegistrant ? (
-              <span className="text-xs font-mono text-[#F4C542] truncate hidden md:inline">
-                • Chào mừng <strong>{newRegistrant.honorific} {newRegistrant.fullName}</strong> ({newRegistrant.role === 'ALUMNI' ? 'Cựu TV' : 'Thành viên'})!
-              </span>
-            ) : (
-              <span className="px-1.5 py-0.5 rounded-xs text-[9px] font-mono font-bold bg-[#F4C542] text-[#20231F] hidden sm:inline-block tracking-wider uppercase">
-                LIVE 3D
-              </span>
-            )}
+            <span className="text-[11px] font-mono text-white/45 hidden sm:inline">
+              • {allCharacters.length} lời chúc
+            </span>
           </div>
         </div>
 
-        {/* Center: Controls (Filters, Search, Effects) */}
-        <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto py-1 font-mono text-xs no-scrollbar overscroll-contain">
-          {/* Role Filters */}
-          <div className="flex items-center gap-1 bg-[#2D2A26] p-0.5 rounded-sm border border-white/10 shrink-0">
-            <button
-              type="button"
-              onClick={() => setSelectedRole('ALL')}
-              className={`px-3 py-2 sm:py-1 min-h-[44px] sm:min-h-0 rounded-xs font-bold transition-all whitespace-nowrap text-xs active:scale-95 flex items-center ${
-                selectedRole === 'ALL'
-                  ? 'bg-[#F4C542] text-[#20231F] shadow-xs'
-                  : 'text-white/70 hover:text-white'
-              }`}
-            >
-              Tất cả ({allCharacters.length})
-            </button>
-            <button
-              type="button"
-              onClick={() => setSelectedRole('ALUMNI')}
-              className={`px-3 py-2 sm:py-1 min-h-[44px] sm:min-h-0 rounded-xs font-bold transition-all whitespace-nowrap text-xs active:scale-95 flex items-center gap-1.5 ${
-                selectedRole === 'ALUMNI'
-                  ? 'bg-[#F4C542] text-[#20231F] shadow-xs'
-                  : 'text-white/70 hover:text-white'
-              }`}
-            >
-              <GraduationCapIcon size={14} className="shrink-0" />
-              <span>Cựu TV ({allCharacters.filter(c => c.role === 'ALUMNI').length})</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setSelectedRole('ACTIVE')}
-              className={`px-3 py-2 sm:py-1 min-h-[44px] sm:min-h-0 rounded-xs font-bold transition-all whitespace-nowrap text-xs active:scale-95 flex items-center gap-1.5 ${
-                selectedRole === 'ACTIVE'
-                  ? 'bg-[#F4C542] text-[#20231F] shadow-xs'
-                  : 'text-white/70 hover:text-white'
-              }`}
-            >
-              <BoltIcon size={14} className="shrink-0" />
-              <span>Thành viên ({allCharacters.filter(c => c.role === 'ACTIVE').length})</span>
-            </button>
-          </div>
-
-          {/* Quick Search */}
-          <div className="relative w-32 sm:w-52 shrink-0">
-            <SearchIcon size={14} className="text-white/40 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-            <input
-              type="text"
-              placeholder="Tìm tên hoặc lời chúc..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-8 pr-2.5 py-2 sm:py-1 min-h-[44px] sm:min-h-0 bg-[#2D2A26] rounded-xs border border-white/15 text-xs text-white placeholder-white/40 focus:outline-none focus:border-[#F4C542]"
-            />
-          </div>
-
-          {/* FX Triggers */}
+        {/* Center: Clean Segmented Role Filter */}
+        <div className="flex items-center bg-white/5 p-1 rounded-full border border-white/10 text-xs shrink-0 font-mono">
           <button
             type="button"
-            onClick={() => triggerConfettiBlast()}
-            className="px-3 py-2 sm:py-1 min-h-[44px] sm:min-h-0 rounded-xs bg-[#F4C542] hover:bg-[#E5B532] text-[#20231F] font-bold text-xs uppercase flex items-center gap-1.5 shadow-xs whitespace-nowrap transition-colors active:scale-95 shrink-0"
-            title="Bắn pháo hoa ăn mừng"
-          >
-            <PartyIcon size={14} className="shrink-0" />
-            <span className="hidden sm:inline">Pháo Hoa</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setStageLightsOn(!stageLightsOn)}
-            className={`px-3 py-2 sm:py-1 min-h-[44px] sm:min-h-0 rounded-xs font-bold text-xs transition-all border flex items-center gap-1.5 whitespace-nowrap active:scale-95 shrink-0 ${
-              stageLightsOn
-                ? 'bg-[#2D2A26] text-[#F4C542] border-[#F4C542]'
-                : 'bg-[#2D2A26] text-white/60 border-white/15 hover:border-white/40'
+            onClick={() => setSelectedRole('ALL')}
+            className={`px-3 py-1 rounded-full transition-all text-[11px] sm:text-xs ${
+              selectedRole === 'ALL'
+                ? 'bg-amber-400 text-[#1C140D] font-bold shadow-xs'
+                : 'text-white/60 hover:text-white'
             }`}
-            title={stageLightsOn ? 'Tắt đèn sân khấu' : 'Bật đèn sân khấu'}
           >
-            <BulbIcon size={14} className={stageLightsOn ? 'text-[#F4C542]' : 'text-white/40'} />
-            <span className="hidden sm:inline">{stageLightsOn ? 'ĐÈN: BẬT' : 'ĐÈN: TẮT'}</span>
+            Tất cả
           </button>
-
           <button
             type="button"
-            onClick={() => setSoundEnabled(!soundEnabled)}
-            className="p-2 sm:p-1 min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0 rounded-xs bg-[#2D2A26] border border-white/15 hover:border-white/40 text-white transition-colors active:scale-95 flex items-center justify-center shrink-0"
-            title={soundEnabled ? 'Tắt âm thanh' : 'Bật âm thanh'}
+            onClick={() => setSelectedRole('ALUMNI')}
+            className={`px-3 py-1 rounded-full transition-all text-[11px] sm:text-xs ${
+              selectedRole === 'ALUMNI'
+                ? 'bg-amber-400 text-[#1C140D] font-bold shadow-xs'
+                : 'text-white/60 hover:text-white'
+            }`}
           >
-            {soundEnabled ? <Volume2Icon size={14} className="text-[#F4C542]" /> : <VolumeXIcon size={14} className="text-rose-400" />}
+            Cựu TV
+          </button>
+          <button
+            type="button"
+            onClick={() => setSelectedRole('ACTIVE')}
+            className={`px-3 py-1 rounded-full transition-all text-[11px] sm:text-xs ${
+              selectedRole === 'ACTIVE'
+                ? 'bg-amber-400 text-[#1C140D] font-bold shadow-xs'
+                : 'text-white/60 hover:text-white'
+            }`}
+          >
+            Thành viên
           </button>
         </div>
 
-        {/* Right: Exit / Return to Homepage */}
-        {onClose && (
+        {/* Right: Sổ Lời Chúc + Utilities + Close */}
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+          {/* Sổ Lời Chúc Drawer Trigger */}
           <button
             type="button"
-            onClick={onClose}
-            className="px-2.5 sm:px-3 py-1.5 min-h-[44px] min-w-[44px] rounded-sm bg-[#B94D35] hover:bg-[#A03C26] text-white font-mono font-bold text-xs uppercase transition-colors flex items-center justify-center gap-1.5 shadow-sm whitespace-nowrap shrink-0 active:scale-95"
-            title="Thoát ra trang chủ"
+            onClick={() => setIsWishDrawerOpen(true)}
+            className="px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/15 border border-white/15 text-white hover:text-amber-300 font-mono text-[11px] sm:text-xs flex items-center gap-1.5 transition-all active:scale-95 shadow-xs"
+            title="Mở toàn bộ sổ lời chúc"
           >
-            <CloseIcon size={16} />
-            <span className="hidden sm:inline">VỀ TRANG CHỦ</span>
+            <BookOpenIcon size={14} className="text-amber-400" />
+            <span className="hidden sm:inline">Sổ lời chúc</span>
+            <span className="text-[10px] text-amber-300 font-bold">({allCharacters.length})</span>
           </button>
-        )}
+
+          {/* Grouped Utilities */}
+          <div className="flex items-center bg-white/5 rounded-full p-0.5 border border-white/10">
+            <button
+              type="button"
+              onClick={() => triggerConfettiBlast()}
+              className="p-1.5 rounded-full text-white/70 hover:text-amber-300 hover:bg-white/10 transition-colors"
+              title="Bắn pháo hoa"
+            >
+              <PartyIcon size={14} />
+            </button>
+            <button
+              type="button"
+              onClick={() => setStageLightsOn(!stageLightsOn)}
+              className={`p-1.5 rounded-full transition-colors ${
+                stageLightsOn ? 'text-amber-400 hover:bg-white/10' : 'text-white/40 hover:bg-white/10'
+              }`}
+              title={stageLightsOn ? 'Tắt đèn sân khấu' : 'Bật đèn sân khấu'}
+            >
+              <BulbIcon size={14} />
+            </button>
+            <button
+              type="button"
+              onClick={() => setSoundEnabled(!soundEnabled)}
+              className="p-1.5 rounded-full text-white/70 hover:text-amber-300 hover:bg-white/10 transition-colors"
+              title={soundEnabled ? 'Tắt âm thanh' : 'Bật âm thanh'}
+            >
+              {soundEnabled ? <Volume2Icon size={14} className="text-amber-400" /> : <VolumeXIcon size={14} className="text-rose-400" />}
+            </button>
+          </div>
+
+          {/* Exit Modal Button */}
+          {onClose && (
+            <button
+              type="button"
+              onClick={onClose}
+              className="w-8 h-8 rounded-full bg-white/10 hover:bg-rose-500 text-white/80 hover:text-white transition-colors flex items-center justify-center shrink-0 ml-1"
+              title="Đóng sân khấu"
+            >
+              <CloseIcon size={16} />
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Theatrical Stage Canvas - Full Screen 100% Widescreen */}
@@ -583,6 +865,61 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
 
         </div>
 
+        {/* Shared Mascot SVG Symbol Definition (Compiled once in GPU cache, reused by all frogs) */}
+        <svg className="hidden pointer-events-none" aria-hidden="true" style={{ position: 'absolute', width: 0, height: 0 }}>
+          <defs>
+            <g id="csg-frog-mascot-vector">
+              {/* Frog Body */}
+              <ellipse cx="50" cy="58" rx="30" ry="26" fill="#10B981" stroke="#20231F" strokeWidth="2.5" />
+              <ellipse cx="50" cy="62" rx="20" ry="16" fill="#34D399" opacity="0.4" />
+
+              {/* Eyes */}
+              <circle cx="34" cy="32" r="14" fill="#10B981" stroke="#20231F" strokeWidth="2.5" />
+              <circle cx="66" cy="32" r="14" fill="#10B981" stroke="#20231F" strokeWidth="2.5" />
+              <circle cx="34" cy="32" r="10" fill="#FFFFFF" />
+              <circle cx="66" cy="32" r="10" fill="#FFFFFF" />
+              
+              {/* Pupils */}
+              <circle cx="36" cy="32" r="5" fill="#20231F" />
+              <circle cx="68" cy="32" r="5" fill="#20231F" />
+              <circle cx="38" cy="30" r="2" fill="#FFFFFF" />
+              <circle cx="70" cy="30" r="2" fill="#FFFFFF" />
+
+              {/* Mouth */}
+              <path d="M 38 46 Q 50 56 62 46" fill="none" stroke="#20231F" strokeWidth="3" strokeLinecap="round" />
+              {/* Cheeks */}
+              <ellipse cx="30" cy="46" rx="5" ry="3" fill="#F43F5E" opacity="0.6" />
+              <ellipse cx="70" cy="46" rx="5" ry="3" fill="#F43F5E" opacity="0.6" />
+
+              {/* Yellow Shirt */}
+              <path 
+                d="M 27 58 Q 50 52 73 58 L 75 79 Q 50 83 25 79 Z" 
+                fill="#F4C542" 
+                stroke="#20231F" 
+                strokeWidth="2.5" 
+              />
+              {/* Collar */}
+              <path d="M 42 56 L 50 64 L 58 56 Z" fill="#B94D35" stroke="#20231F" strokeWidth="1.5" />
+              {/* Logo Text */}
+              <text 
+                x="50" 
+                y="74" 
+                textAnchor="middle" 
+                fontSize="9" 
+                fontWeight="900" 
+                fontFamily="monospace" 
+                fill="#20231F"
+              >
+                CSG 17Y
+              </text>
+
+              {/* Feet */}
+              <ellipse cx="32" cy="85" rx="8" ry="4" fill="#059669" stroke="#20231F" strokeWidth="2" />
+              <ellipse cx="68" cy="85" rx="8" ry="4" fill="#059669" stroke="#20231F" strokeWidth="2" />
+            </g>
+          </defs>
+        </svg>
+
         {/* Mascot Frogs On Stage */}
         {filtered.map((c) => {
           const pos = positions[c.id] || { x: c.x || 50, y: c.y || 75, dir: 1, scale: c.scale || 1 };
@@ -612,6 +949,10 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
           const baseZ = Math.round(pos.y);
           const computedZ = (isUserFrog ? 60 : baseZ) + (isHovered ? 150 : (showBubble ? 120 : 0));
 
+          const isTopHearted = c.id === topHeartedId;
+          const isHeartedByMe = userHeartedWishId === c.id;
+          const charHearts = heartsCount[c.id] !== undefined ? heartsCount[c.id] : getInitialHearts(c.id, c.name);
+
           return (
             <div
               key={c.id}
@@ -622,129 +963,120 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
               style={{
                 left: `${pos.x}%`,
                 top: `${pos.y}%`,
-                transform: 'translate(-50%, -50%)',
-                zIndex: computedZ
+                transform: 'translate3d(-50%, -50%, 0)',
+                willChange: pos.isHopping ? 'left, top' : 'auto',
+                zIndex: computedZ,
+                transition: pos.isHopping ? 'left 70ms linear, top 70ms linear' : 'none'
               }}
-              className="absolute cursor-pointer transition-transform duration-75 group select-none flex flex-col items-center"
+              className="absolute cursor-pointer select-none flex flex-col items-center"
               title={`Nhấp để xem lời chúc của ${c.name}`}
             >
-              {/* Highlight Halo for New Registrant */}
-              {isUserFrog && (
-                <div className="absolute -inset-6 rounded-full bg-[#F4C542]/30 border-2 border-dashed border-[#B94D35] animate-spin -z-10" style={{ animationDuration: '8s' }} />
+              {/* Subtle Floor Glow for Top 1 Frog */}
+              {isTopHearted && (
+                <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-20 h-6 bg-amber-400/25 rounded-full blur-md -z-10 pointer-events-none" />
               )}
 
-              {/* Compact Name Tag (Visible when speech bubble is NOT shown - clean & zero clutter) */}
+              {/* Refined Name Tag (Visible when speech bubble is NOT shown) */}
               {!showBubble && (
                 <div 
-                  className={`absolute -top-7 sm:-top-8 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full border text-[10px] sm:text-[11px] font-bold font-display shadow-xs flex items-center gap-1 whitespace-nowrap pointer-events-none group-hover:scale-105 transition-transform ${
-                    isUserFrog
-                      ? 'bg-[#F4C542] text-[#20231F] border-[#B94D35] ring-2 ring-[#F4C542]/50 font-black'
-                      : 'bg-white/95 text-[#20231F] border-[#20231F]'
+                  className={`absolute -top-6 left-1/2 -translate-x-1/2 px-2.5 py-0.5 rounded-full text-[10px] font-sans font-medium whitespace-nowrap shadow-xs pointer-events-none flex items-center gap-1 transition-all ${
+                    isTopHearted
+                      ? 'bg-amber-400 text-amber-950 font-bold border border-amber-300/80 shadow-[0_0_8px_rgba(245,158,11,0.25)]'
+                      : isUserFrog
+                      ? 'bg-rose-500 text-white font-bold border border-rose-400/60 shadow-[0_0_8px_rgba(244,63,94,0.25)]'
+                      : 'bg-black/60 backdrop-blur-xs text-white/90 border border-white/10'
                   }`}
                 >
-                  {isUserFrog && <span>✨</span>}
-                  <span className="truncate max-w-[95px] sm:max-w-[130px] whitespace-nowrap">{c.name}</span>
-                  <span className={`text-[8px] sm:text-[9px] font-mono px-1 rounded whitespace-nowrap shrink-0 font-bold ${
-                    c.role === 'ALUMNI' ? 'bg-amber-100 text-amber-900 border border-amber-300' : 'bg-emerald-100 text-emerald-900 border border-emerald-300'
-                  }`}>
-                    {c.role === 'ALUMNI' ? 'Cựu' : 'TV'}
-                  </span>
+                  {isTopHearted && <SparklesIcon size={9} className="text-amber-950 shrink-0" />}
+                  <span className="truncate max-w-[110px]">{c.name}</span>
                 </div>
               )}
 
-              {/* Speech Bubble (Upright, smoothly shown for active speakers) */}
+              {/* Speech Bubble (Art-Directed Warm Anniversary Card) */}
               {showBubble && (
                 <div 
-                  className={`absolute -top-24 sm:-top-28 ${bubbleAlignClass} w-48 sm:w-56 max-w-[82vw] p-2.5 rounded-sm bg-white border-2 text-left shadow-poster transition-all duration-200 animate-fadeIn z-50 ${
-                    isUserFrog 
-                      ? 'border-[#B94D35] ring-2 ring-[#F4C542]' 
-                      : isHovered 
-                        ? 'border-[#F4C542] ring-2 ring-[#20231F]' 
-                        : 'border-[#20231F]'
-                  }`}
+                  className={`absolute bottom-[110%] ${bubbleAlignClass} w-52 sm:w-60 max-w-[85vw] p-3 rounded-lg bg-[#FFFDF9] border border-stone-200/90 text-left shadow-xl transition-all duration-200 animate-fadeIn z-50`}
+                  onClick={(e) => e.stopPropagation()}
                 >
-                  {isUserFrog && (
-                    <span className="bg-[#B94D35] text-white font-mono font-bold text-[8px] sm:text-[9px] px-1.5 py-0.5 rounded-full uppercase tracking-wider block text-center mb-1 animate-pulse whitespace-nowrap">
-                      ✨ BẠN Ở ĐÂY NÈ! ✨
-                    </span>
+                  {/* Top 1 badge if applicable */}
+                  {isTopHearted && (
+                    <div className="flex items-center gap-1 text-[9px] font-mono font-bold text-amber-700 uppercase tracking-wider mb-1">
+                      <SparklesIcon size={10} className="text-amber-600" />
+                      <span>Top 1 Yêu Thích Nhất</span>
+                    </div>
                   )}
-                  <div className="flex items-center justify-between gap-1.5 mb-1">
-                    <span className="text-xs font-bold text-[#20231F] font-display truncate">
+
+                  {/* Author Name and Role */}
+                  <div className="flex items-center justify-between gap-1 mb-1">
+                    <span className="text-xs font-bold text-[#1C140D] font-display truncate">
                       {c.name}
                     </span>
-                    <span className={`text-[8px] sm:text-[9px] font-mono px-1.5 py-0.5 rounded border shrink-0 whitespace-nowrap font-bold ${
-                      c.role === 'ALUMNI'
-                        ? 'bg-amber-100 text-amber-900 border-amber-300'
-                        : 'bg-emerald-100 text-emerald-900 border-emerald-300'
-                    }`}>
+                    <span className="text-[9px] font-mono text-stone-500 shrink-0">
                       {c.role === 'ALUMNI' ? 'Cựu TV' : 'Thành viên'}
                     </span>
                   </div>
-                  <p className="text-[10px] sm:text-[11px] text-[#20231F]/90 font-serif italic line-clamp-2 leading-snug break-words">
+
+                  {/* The Wish Quote */}
+                  <p className="text-[11px] sm:text-xs text-stone-700 font-sans italic line-clamp-3 leading-relaxed break-words">
                     "{c.wish}"
                   </p>
+
+                  {/* Heart Action Bar */}
+                  <div className="mt-2 pt-1.5 border-t border-stone-100 flex items-center justify-between">
+                    <span className="text-[10px] font-mono text-stone-400">
+                      Cóc Sài Gòn 17Y
+                    </span>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleToggleHeart(c.id);
+                      }}
+                      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full font-mono text-[9px] font-bold border transition-all active:scale-90 ${
+                        isHeartedByMe
+                          ? 'bg-rose-500 text-white border-rose-600 shadow-xs'
+                          : 'bg-stone-50 hover:bg-rose-50 text-rose-600 border-stone-200'
+                      }`}
+                      title={isHeartedByMe ? 'Bỏ tim' : 'Thả tim lời chúc này'}
+                    >
+                      <HeartIcon 
+                        size={10} 
+                        className={isHeartedByMe ? 'text-white fill-current' : 'text-rose-500'} 
+                      />
+                      <span>{charHearts} lượt tim</span>
+                    </button>
+                  </div>
+
                   {/* Pointer */}
-                  <div className={`absolute -bottom-2 ${pointerAlignClass} w-0 h-0 border-x-4 border-x-transparent border-t-8 border-t-[#20231F]`} />
+                  <div className={`absolute -bottom-1.5 ${pointerAlignClass} w-2.5 h-2.5 bg-[#FFFDF9] border-r border-b border-stone-200/90 rotate-45`} />
                 </div>
               )}
 
               {/* The Iconic Yellow-Shirt Cóc Sài Gòn 2D Vector Mascot */}
               <div 
                 style={{ transform: `scale(${pos.scale || 1}) scaleX(${pos.dir})` }}
-                className="relative w-14 h-14 sm:w-16 sm:h-16 animate-float-gentle transition-transform"
+                className="relative w-14 h-14 sm:w-16 sm:h-16 transition-transform duration-200"
               >
-                <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-md">
-                  {/* Frog Body */}
-                  <ellipse cx="50" cy="58" rx="30" ry="26" fill="#10B981" stroke="#20231F" strokeWidth="2.5" />
-                  <ellipse cx="50" cy="62" rx="20" ry="16" fill="#34D399" opacity="0.4" />
+                <div
+                  className={`w-full h-full relative ${
+                    pos.isCelebrating 
+                      ? 'animate-frog-celebrating' 
+                      : pos.isHopping 
+                        ? 'animate-frog-hopping' 
+                        : 'animate-frog-idling'
+                  }`}
+                >
+                  <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-md">
+                    <use href="#csg-frog-mascot-vector" />
+                  </svg>
 
-                  {/* Eyes */}
-                  <circle cx="34" cy="32" r="14" fill="#10B981" stroke="#20231F" strokeWidth="2.5" />
-                  <circle cx="66" cy="32" r="14" fill="#10B981" stroke="#20231F" strokeWidth="2.5" />
-                  <circle cx="34" cy="32" r="10" fill="#FFFFFF" />
-                  <circle cx="66" cy="32" r="10" fill="#FFFFFF" />
-                  
-                  {/* Pupils */}
-                  <circle cx="36" cy="32" r="5" fill="#20231F" />
-                  <circle cx="68" cy="32" r="5" fill="#20231F" />
-                  <circle cx="38" cy="30" r="2" fill="#FFFFFF" />
-                  <circle cx="70" cy="30" r="2" fill="#FFFFFF" />
-
-                  {/* Mouth */}
-                  <path d="M 38 46 Q 50 56 62 46" fill="none" stroke="#20231F" strokeWidth="3" strokeLinecap="round" />
-                  {/* Cheeks */}
-                  <ellipse cx="30" cy="46" rx="5" ry="3" fill="#F43F5E" opacity="0.6" />
-                  <ellipse cx="70" cy="46" rx="5" ry="3" fill="#F43F5E" opacity="0.6" />
-
-                  {/* Yellow Shirt */}
-                  <path 
-                    d="M 27 58 Q 50 52 73 58 L 75 79 Q 50 83 25 79 Z" 
-                    fill="#F4C542" 
-                    stroke="#20231F" 
-                    strokeWidth="2.5" 
+                  {/* Soft Natural Ground Contact Shadow */}
+                  <div 
+                    className={`absolute -bottom-1 left-1/2 -translate-x-1/2 w-11 h-2 bg-black/25 rounded-full blur-[3px] -z-10 transition-all ${
+                      pos.isHopping ? 'scale-75 opacity-30' : 'scale-100 opacity-70'
+                    }`} 
                   />
-                  {/* Collar */}
-                  <path d="M 42 56 L 50 64 L 58 56 Z" fill="#B94D35" stroke="#20231F" strokeWidth="1.5" />
-                  {/* Logo Text */}
-                  <text 
-                    x="50" 
-                    y="74" 
-                    textAnchor="middle" 
-                    fontSize="9" 
-                    fontWeight="900" 
-                    fontFamily="monospace" 
-                    fill="#20231F"
-                  >
-                    CSG 17Y
-                  </text>
-
-                  {/* Feet */}
-                  <ellipse cx="32" cy="85" rx="8" ry="4" fill="#059669" stroke="#20231F" strokeWidth="2" />
-                  <ellipse cx="68" cy="85" rx="8" ry="4" fill="#059669" stroke="#20231F" strokeWidth="2" />
-                </svg>
-
-                {/* Ground Shadow */}
-                <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-14 h-3 bg-[#20231F]/25 rounded-full blur-[2px] -z-10" />
+                </div>
               </div>
             </div>
           );
@@ -753,22 +1085,23 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
         {/* Empty Search State */}
         {filtered.length === 0 && (
           <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center z-10">
-            <span className="text-4xl mb-2">🔍</span>
+            <SearchIcon size={36} className="text-[#20231F]/40 mb-2" />
             <p className="font-display font-bold text-[#20231F] text-sm">Không tìm thấy Cóc nào khớp với từ khóa</p>
             <p className="text-xs text-[#20231F]/60 font-mono mt-1">Hãy thử xóa bộ lọc hoặc tìm tên khác bạn nhé.</p>
           </div>
         )}
 
-        {/* Join CTA if not yet registered and onOpenRegister is available */}
+        {/* Ambient Floating Join CTA */}
         {!newRegistrant && onOpenRegister && (
-          <div className="absolute bottom-4 right-4 z-30">
+          <div className="absolute bottom-4 right-4 sm:bottom-6 sm:right-6 z-30">
             <button
               type="button"
               onClick={onOpenRegister}
-              className="btn-editorial-primary px-4 py-2.5 rounded-sm text-xs font-display font-black uppercase tracking-wider shadow-poster-sm flex items-center gap-2"
+              className="group px-4 py-2 rounded-full bg-[#1C140D]/85 hover:bg-[#1C140D] backdrop-blur-md text-amber-200 hover:text-amber-100 border border-amber-400/30 hover:border-amber-400/60 text-xs font-mono font-medium tracking-wide shadow-lg flex items-center gap-2 transition-all hover:-translate-y-0.5 active:translate-y-0"
             >
-              <span>Tham Gia Sân Khấu Ngay</span>
-              <SparklesIcon size={14} />
+              <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse shrink-0" />
+              <span>Gửi lời chúc lên sân khấu</span>
+              <ArrowRightIcon size={13} className="text-amber-400 group-hover:translate-x-0.5 transition-transform" />
             </button>
           </div>
         )}
@@ -776,73 +1109,307 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
     </div>
   );
 
-  // Dedicated Portal Modal for Clicked Frog Wish to prevent any z-index or stacking context clipping
+  // Dedicated Portal Modal for Clicked Frog Wish - Warm Keepsake Card
   const renderKeepsakeModal = () => {
     if (!activeCharacter) return null;
     if (typeof document === 'undefined') return null;
 
+    const isHearted = userHeartedWishId === activeCharacter.id;
+    const charHearts = heartsCount[activeCharacter.id] !== undefined 
+      ? heartsCount[activeCharacter.id] 
+      : getInitialHearts(activeCharacter.id, activeCharacter.name);
+    const isTop = activeCharacter.id === topHeartedId;
+
     return createPortal(
       <div 
-        className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-[#20231F]/80 backdrop-blur-md animate-fadeIn"
+        className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn"
         onClick={() => setActiveCharacter(null)}
       >
         <div 
-          className="relative w-full max-w-md bg-[#F4EEDF] rounded-sm border-2 border-[#20231F] p-6 shadow-poster-lg animate-paper-unfold z-10"
+          className="relative w-full max-w-md bg-[#FFFDF9] rounded-2xl border border-amber-200/80 p-6 sm:p-7 shadow-2xl text-[#20231F] animate-fadeIn z-10"
           onClick={(e) => e.stopPropagation()}
         >
+          {/* Subtle Close Button */}
           <button
             type="button"
             onClick={() => setActiveCharacter(null)}
-            className="absolute top-4 right-4 p-2 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-sm border-2 border-[#20231F] bg-white hover:bg-[#B94D35] hover:text-white text-[#20231F] transition-colors shadow-xs active:scale-95"
+            className="absolute top-4 right-4 p-2 rounded-full text-stone-400 hover:text-stone-700 hover:bg-stone-100 transition-colors active:scale-95"
             title="Đóng lời chúc"
           >
-            <CloseIcon size={20} />
+            <CloseIcon size={18} />
           </button>
 
-          <div className="flex items-center gap-3.5 mb-4 pr-10">
-            <div className="w-12 h-12 rounded-sm bg-[#F4C542] border-2 border-[#20231F] flex items-center justify-center shadow-sm shrink-0">
-              <FrogIcon size={24} />
+          {/* Eyebrow */}
+          <div className="text-[10px] font-mono tracking-widest text-amber-800/80 uppercase font-semibold text-center mb-3">
+            SỔ LƯU NIỆM CÓC SÀI GÒN 17Y
+          </div>
+
+          {/* Member Profile */}
+          <div className="text-center mb-4">
+            <div className="w-14 h-14 rounded-full bg-amber-50 border border-amber-200/70 mx-auto flex items-center justify-center mb-2.5 shadow-xs">
+              <FrogIcon size={28} className="text-amber-800" />
             </div>
-            <div>
-              <h3 className="font-display font-black text-xl text-[#20231F] leading-tight">
-                {activeCharacter.name}
-              </h3>
-              <div className="flex items-center gap-2 mt-1">
-                <span className="stamp-seal text-[9px] bg-white">
-                  {activeCharacter.role === 'ALUMNI' ? 'CỰU THÀNH VIÊN' : 'THÀNH VIÊN ĐƯƠNG NHIỆM'}
+            <h3 className="font-editorial font-bold text-2xl text-[#1C140D] leading-tight">
+              {activeCharacter.name}
+            </h3>
+            <div className="flex items-center justify-center gap-1.5 text-xs font-mono text-stone-500 mt-1">
+              <span>{activeCharacter.role === 'ALUMNI' ? 'Cựu thành viên' : 'Thành viên đương nhiệm'}</span>
+              {isTop && (
+                <span className="inline-flex items-center gap-1 text-amber-700 font-bold ml-1">
+                  • <SparklesIcon size={11} className="text-amber-600 inline" /> Top 1 Yêu Thích
                 </span>
-                <span className="text-[11px] font-mono text-[#20231F]/70">
-                  Cóc Sài Gòn 17Y
-                </span>
-              </div>
+              )}
             </div>
           </div>
 
-          <div className="p-4 rounded-sm bg-white border-2 border-[#20231F] mb-4 relative shadow-poster-sm">
-            <span className="text-xs font-mono font-bold text-[#B94D35] block mb-1.5">
-              LỜI CHÚC SINH NHẬT 17Y:
-            </span>
-            <p className="font-editorial italic text-base sm:text-lg text-[#20231F] leading-relaxed">
+          {/* The Commemorative Wish */}
+          <div className="relative py-4 px-3 sm:px-4 my-2 text-center border-y border-stone-100">
+            <p className="font-editorial italic text-base sm:text-lg text-stone-800 leading-relaxed">
               "{activeCharacter.wish}"
             </p>
           </div>
 
-          <div className="flex items-center justify-between pt-3 border-t border-[#20231F]/20 gap-3">
-            <span className="text-[11px] font-mono text-[#20231F]/60">
-              CLB Truyền Thông CSG
-            </span>
+          {/* Action Footer */}
+          <div className="flex items-center justify-between pt-4 gap-3">
+            <button
+              type="button"
+              onClick={() => handleToggleHeart(activeCharacter.id)}
+              className={`px-4 py-2 rounded-full border text-xs font-mono font-bold transition-all flex items-center gap-1.5 active:scale-95 ${
+                isHearted
+                  ? 'bg-rose-50 border-rose-300 text-rose-600 shadow-xs'
+                  : 'bg-stone-50 border-stone-200 text-stone-600 hover:text-rose-600 hover:border-rose-300 hover:bg-rose-50/50'
+              }`}
+            >
+              <HeartIcon size={14} className={isHearted ? 'text-rose-500 fill-current' : 'text-rose-500'} />
+              <span>{charHearts} lượt tim</span>
+            </button>
+
             <button
               type="button"
               onClick={() => {
                 triggerConfettiBlast();
-                setActiveCharacter(null);
               }}
-              className="px-4 py-2.5 min-h-[44px] rounded-sm bg-[#20231F] text-white font-bold text-xs uppercase hover:bg-[#B94D35] transition-colors shadow-sm flex items-center gap-1.5 active:scale-95 shrink-0"
+              className="px-4 py-2 rounded-full bg-amber-500 hover:bg-amber-600 text-white font-mono font-bold text-xs flex items-center gap-1.5 transition-all shadow-sm active:scale-95"
             >
-              <span>Gửi Tim Chúc Mừng</span>
-              <HeartIcon size={14} className="text-[#F4C542]" />
+              <SparklesIcon size={14} />
+              <span>Chúc mừng</span>
             </button>
           </div>
+        </div>
+      </div>,
+      document.body
+    );
+  };
+
+  // Dedicated Slide-out Drawer for All Birthday Wishes in DB
+  const renderWishDrawer = () => {
+    if (!isWishDrawerOpen) return null;
+    if (typeof document === 'undefined') return null;
+
+    const drawerWishes = allCharacters.filter(c => {
+      const matchRole = selectedRole === 'ALL' || c.role === selectedRole;
+      const matchSearch =
+        c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        c.wish.toLowerCase().includes(searchTerm.toLowerCase());
+      return matchRole && matchSearch;
+    });
+
+    return createPortal(
+      <div 
+        className="fixed inset-0 z-[9990] flex justify-end bg-black/60 backdrop-blur-xs animate-fadeIn"
+        onClick={() => setIsWishDrawerOpen(false)}
+      >
+        <div 
+          className="relative w-full max-w-lg h-full bg-[#181614] border-l border-amber-400/20 shadow-2xl flex flex-col z-[9991] text-white animate-fadeIn"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* Drawer Header */}
+          <div className="p-4 sm:p-5 border-b border-white/10 flex items-center justify-between gap-3 bg-[#201D1A]">
+            <div className="flex items-center gap-2.5">
+              <span className="w-8 h-8 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/30 flex items-center justify-center font-bold">
+                <BookOpenIcon size={16} />
+              </span>
+              <div>
+                <h3 className="font-display font-black text-sm sm:text-base uppercase tracking-wider text-white">
+                  SỔ LỜI CHÚC CÓC SÀI GÒN 17Y
+                </h3>
+                <span className="text-[11px] font-mono text-amber-300/80">
+                  {allCharacters.length} lời chúc từ các thế hệ thành viên
+                </span>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => setIsWishDrawerOpen(false)}
+              className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 text-white/70 hover:text-white transition-colors active:scale-95"
+              title="Đóng sổ lời chúc"
+            >
+              <CloseIcon size={18} />
+            </button>
+          </div>
+
+          {/* Search & Filter within Drawer */}
+          <div className="p-4 border-b border-white/10 bg-[#1C1A18] space-y-3">
+            <div className="relative">
+              <SearchIcon size={14} className="text-white/40 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <input
+                type="text"
+                placeholder="Tìm lời chúc theo tên hoặc nội dung..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-9 pr-3.5 py-2 bg-[#262320] rounded-full border border-white/15 text-xs text-white placeholder-white/40 focus:outline-none focus:border-amber-400/60"
+              />
+            </div>
+            <div className="flex items-center gap-1.5 text-xs font-mono">
+              <button
+                type="button"
+                onClick={() => setSelectedRole('ALL')}
+                className={`px-3 py-1 rounded-full font-bold transition-all text-xs ${
+                  selectedRole === 'ALL'
+                    ? 'bg-amber-400 text-[#1C140D]'
+                    : 'bg-[#262320] text-white/70 hover:text-white'
+                }`}
+              >
+                Tất cả ({allCharacters.length})
+              </button>
+              <button
+                type="button"
+                onClick={() => setSelectedRole('ALUMNI')}
+                className={`px-3 py-1 rounded-full font-bold transition-all text-xs ${
+                  selectedRole === 'ALUMNI'
+                    ? 'bg-amber-400 text-[#1C140D]'
+                    : 'bg-[#262320] text-white/70 hover:text-white'
+                }`}
+              >
+                Cựu TV ({allCharacters.filter(c => c.role === 'ALUMNI').length})
+              </button>
+              <button
+                type="button"
+                onClick={() => setSelectedRole('ACTIVE')}
+                className={`px-3 py-1 rounded-full font-bold transition-all text-xs ${
+                  selectedRole === 'ACTIVE'
+                    ? 'bg-amber-400 text-[#1C140D]'
+                    : 'bg-[#262320] text-white/70 hover:text-white'
+                }`}
+              >
+                Thành viên ({allCharacters.filter(c => c.role === 'ACTIVE').length})
+              </button>
+            </div>
+          </div>
+
+          {/* Wishes List */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-3">
+            {drawerWishes.map((c) => {
+              const isHearted = userHeartedWishId === c.id;
+              const charHearts = heartsCount[c.id] !== undefined ? heartsCount[c.id] : getInitialHearts(c.id, c.name);
+              const isTop = c.id === topHeartedId;
+
+              return (
+                <div 
+                  key={c.id} 
+                  className={`p-3.5 rounded-xl transition-all flex flex-col gap-2 group ${
+                    isTop 
+                      ? 'border border-amber-400/50 bg-[#25201A] ring-1 ring-amber-400/30 shadow-[0_0_12px_rgba(245,158,11,0.12)]' 
+                      : 'border border-white/10 bg-[#201D1A] hover:border-white/20'
+                  }`}
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className="w-6 h-6 rounded-full bg-amber-400/15 border border-amber-400/30 flex items-center justify-center shrink-0">
+                        <FrogIcon size={14} className="text-amber-400" />
+                      </span>
+                      <span className="font-display font-bold text-sm text-white truncate">
+                        {c.name}
+                      </span>
+                      {isTop && (
+                        <span className="px-2 py-0.5 rounded-full bg-amber-400 text-amber-950 font-mono font-bold text-[9px] uppercase tracking-wider flex items-center gap-1 shadow-xs shrink-0">
+                          <SparklesIcon size={10} className="text-amber-950" />
+                          <span>TOP 1</span>
+                        </span>
+                      )}
+                    </div>
+                    <span className={`text-[10px] font-mono px-2 py-0.5 rounded-full border shrink-0 ${
+                      c.role === 'ALUMNI'
+                        ? 'bg-amber-950/60 text-amber-300 border-amber-700/40'
+                        : 'bg-emerald-950/60 text-emerald-300 border-emerald-700/40'
+                    }`}>
+                      {c.role === 'ALUMNI' ? 'Cựu TV' : 'Thành viên'}
+                    </span>
+                  </div>
+                  <p className="font-editorial italic text-xs sm:text-sm text-white/90 leading-relaxed bg-[#191715] p-2.5 rounded-lg border border-white/5">
+                    "{c.wish}"
+                  </p>
+                  <div className="flex items-center justify-between pt-1">
+                    {/* Heart Button */}
+                    <button
+                      type="button"
+                      onClick={() => handleToggleHeart(c.id)}
+                      className={`flex items-center gap-1.5 px-3 py-1 min-h-[30px] rounded-full border text-[11px] font-mono font-bold transition-all active:scale-95 ${
+                        isHearted
+                          ? 'bg-rose-950/70 border-rose-500 text-rose-300 shadow-xs'
+                          : 'bg-[#191715] border-white/15 text-white/75 hover:text-rose-400 hover:border-rose-400/50'
+                      }`}
+                      title={isHearted ? 'Bỏ tim' : 'Thả tim lời chúc này'}
+                    >
+                      <HeartIcon size={13} className={isHearted ? 'text-rose-400 fill-rose-400' : 'text-rose-400'} />
+                      <span>{charHearts} lượt tim</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsWishDrawerOpen(false);
+                        setActiveSpeakerId(c.id);
+                        setActiveCharacter(c);
+                        setPositions(prev => {
+                          if (!prev[c.id]) return prev;
+                          return {
+                            ...prev,
+                            [c.id]: {
+                              ...prev[c.id],
+                              isCelebrating: true,
+                              celebrateTicks: 30
+                            }
+                          };
+                        });
+                        triggerConfettiBlast();
+                      }}
+                      className="text-[11px] font-mono text-amber-300/80 hover:text-white flex items-center gap-1 transition-colors group-hover:translate-x-0.5"
+                    >
+                      <span>Xem trên sân khấu</span>
+                      <ArrowRightIcon size={12} />
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+
+            {drawerWishes.length === 0 && (
+              <div className="text-center py-12 text-white/50 font-mono text-xs">
+                Không tìm thấy lời chúc nào khớp với tìm kiếm.
+              </div>
+            )}
+          </div>
+
+          {/* Drawer Footer */}
+          {onOpenRegister && (
+            <div className="p-4 border-t border-white/10 bg-[#201D1A] flex items-center justify-between gap-3">
+              <span className="text-[11px] font-mono text-white/60">
+                Bạn chưa gửi lời chúc?
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsWishDrawerOpen(false);
+                  onOpenRegister();
+                }}
+                className="px-4 py-2 min-h-[40px] rounded-full bg-amber-400 hover:bg-amber-300 text-[#1C140D] font-mono font-bold text-xs uppercase flex items-center gap-1.5 transition-colors active:scale-95 shadow-sm"
+              >
+                <span>Gửi lời chúc của bạn</span>
+                <SparklesIcon size={14} />
+              </button>
+            </div>
+          )}
         </div>
       </div>,
       document.body
@@ -855,6 +1422,7 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
       <div className="fixed inset-0 z-50 w-full h-[100dvh] max-h-[100dvh] bg-[#1C140D] flex flex-col overflow-hidden animate-fadeIn">
         {stageContent}
         {renderKeepsakeModal()}
+        {renderWishDrawer()}
       </div>
     );
   }
@@ -864,6 +1432,7 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
     <div className="w-full h-full flex flex-col flex-1 overflow-hidden">
       {stageContent}
       {renderKeepsakeModal()}
+      {renderWishDrawer()}
     </div>
   );
 };

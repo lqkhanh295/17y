@@ -663,8 +663,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                                   <div className="font-bold text-white">{r.fullName}</div>
                                   <div className="text-[11px] font-mono text-[#F5C400]">{r.mssv}</div>
                                   {r.allergies?.length > 0 && (
-                                    <span className="text-[10px] text-[#D94C2B] block">
-                                      ⚠️ {r.allergies.join(', ')}
+                                    <span className="text-[10px] text-[#D94C2B] flex items-center gap-1">
+                                      <AlertTriangleIcon size={12} className="shrink-0" />
+                                      <span>{r.allergies.join(', ')}</span>
                                     </span>
                                   )}
                                 </td>

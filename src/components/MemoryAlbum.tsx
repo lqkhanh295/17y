@@ -14,73 +14,73 @@ export const ALBUM_PHOTOS: MemoryPhoto[] = [
   // 1. Gala Banquet - The main gathering
   {
     id: 'alb-1',
-    url: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=1800&q=85',
-    alt: 'Bàn tiệc hội ngộ dưới ánh đèn vàng',
-    caption: 'Bàn tiệc hội ngộ dưới ánh đèn vàng',
-    handwrittenNote: 'Đêm hoàng kim — 12-13.12.2026',
+    url: '/images/csg/IMG_9688.JPG',
+    alt: 'Đại hội Cóc Sài Gòn 2023 — Song Hành',
+    caption: 'Đại hội Cóc Sài Gòn 2023 — Song Hành',
+    handwrittenNote: 'Đêm hoàng kim hội ngộ — Mười bảy năm một mái nhà',
     tape: true
   },
-  // 2. Early camera lens / Campus field work
+  // 2. Departure road trip
   {
     id: 'alb-2',
-    url: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=1000&q=85',
-    alt: 'Góc máy tác nghiệp sân trường',
-    caption: 'Góc máy tác nghiệp sân trường',
-    handwrittenNote: 'Chiếc máy ảnh mượn và những ngày rong ruổi',
+    url: '/images/csg/IMG_9695.JPG',
+    alt: 'Xuất phát hành trình cùng màu áo vàng',
+    caption: 'Xuất phát hành trình cùng màu áo vàng',
+    handwrittenNote: 'Chuyến xe tuổi trẻ khởi hành',
     tape: true
   },
-  // 3. Creative table
+  // 3. Online workshop & talk
   {
     id: 'alb-3',
-    url: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=1200&q=85',
-    alt: 'Bàn tròn ý tưởng và dựng bài',
-    caption: 'Bàn tròn ý tưởng và dựng bài',
-    handwrittenNote: 'Những đêm thức trắng bên nhau',
+    url: '/images/csg/IMG_9682.JPG',
+    alt: 'SaiGon Talk — Kết nối trực tuyến vượt mùa dịch',
+    caption: 'SaiGon Talk — Kết nối trực tuyến vượt mùa dịch',
+    handwrittenNote: 'Những buổi gặp gỡ không khoảng cách',
     tape: false
   },
-  // 4. Yellow shirts by the beach
+  // 4. Yellow shirts by the sea
   {
     id: 'alb-4',
-    url: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1800&q=85',
-    alt: 'Những chuyến đi sắc áo vàng bên bờ biển',
-    caption: 'Những chuyến đi sắc áo vàng bên bờ biển',
-    handwrittenNote: 'Sóng biển, nắng vàng và tuổi trẻ',
+    url: '/images/csg/IMG_9699.JPG',
+    alt: 'Cóc Sài Gòn đón gió biển bên bờ kè đá',
+    caption: 'Cóc Sài Gòn đón gió biển bên bờ kè đá',
+    handwrittenNote: 'Sóng biển, nắng vàng và thanh xuân',
     tape: true
   },
-  // 5. Bonfire night
+  // 5. Da Lat Lam Vien Square
   {
     id: 'alb-5',
-    url: 'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&w=1200&q=85',
-    alt: 'Đêm lửa trại và những câu chuyện',
-    caption: 'Đêm lửa trại và những câu chuyện',
-    handwrittenNote: 'Tàn tro bay nhưng lòng vẫn ấm',
+    url: '/images/csg/IMG_9697.JPG',
+    alt: 'Quảng trường Lâm Viên cùng cờ Cóc Vàng',
+    caption: 'Quảng trường Lâm Viên cùng cờ Cóc Vàng',
+    handwrittenNote: 'Đà Lạt sương mù nhưng lòng luôn ấm áp',
     tape: false
   },
   // 6. Live stage
   {
     id: 'alb-6',
-    url: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1400&q=85',
-    alt: 'Sân khấu âm nhạc và ánh sáng',
-    caption: 'Sân khấu âm nhạc và ánh sáng',
-    handwrittenNote: 'Hát khan cả cổ nhưng chẳng ai chịu về',
+    url: '/images/csg/IMG_9690.JPG',
+    alt: 'Sân khấu Tổng kết kỳ — Phá Kén',
+    caption: 'Sân khấu Tổng kết kỳ — Phá Kén',
+    handwrittenNote: 'Cháy hết mình dưới ánh đèn sân khấu Cóc',
     tape: true
   },
-  // 7. Toast & cake
+  // 7. Vong Tien 2022
   {
     id: 'alb-7',
-    url: 'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?auto=format&fit=crop&w=1200&q=85',
-    alt: 'Khoảnh khắc nâng ly và thổi nến',
-    caption: 'Khoảnh khắc nâng ly và thổi nến',
-    handwrittenNote: 'Mừng tuổi mới Cóc Sài Gòn',
+    url: '/images/csg/IMG_9686.PNG',
+    alt: 'Đại hội Cóc Sài Gòn 2022 — Vọng Tiến',
+    caption: 'Đại hội Cóc Sài Gòn 2022 — Vọng Tiến',
+    handwrittenNote: 'Tự hào ghi nhận cống hiến các thế hệ',
     tape: false
   },
-  // 8. Celebration crowd
+  // 8. Grand Pine Forest Gathering
   {
     id: 'alb-8',
-    url: 'https://images.unsplash.com/photo-1528605248644-14dd04022da1?auto=format&fit=crop&w=1600&q=85',
-    alt: 'Những nụ cười thanh xuân',
-    caption: 'Những nụ cười thanh xuân',
-    handwrittenNote: 'Nơi những người xa lạ thành anh em',
+    url: '/images/csg/IMG_9693.JPG',
+    alt: 'Đại gia đình Cóc Sài Gòn giữa rừng thông Đà Lạt',
+    caption: 'Đại gia đình Cóc Sài Gòn giữa rừng thông Đà Lạt',
+    handwrittenNote: 'Nơi những người xa lạ thành anh em một nhà',
     tape: true
   }
 ];

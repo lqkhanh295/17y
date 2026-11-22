@@ -339,7 +339,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                 <span className="text-xs font-mono font-bold tracking-widest text-[#B94D35] uppercase">
                   01 / 05 · IDENTITY VERIFICATION
                 </span>
-                <h3 className="text-3xl sm:text-5xl font-display uppercase tracking-tight text-[#20231F]">
+                <h3 className="text-2xl sm:text-4xl font-display uppercase tracking-tight text-[#20231F]">
                   LET'S SEE WHO YOU ARE.
                 </h3>
                 <p className="text-sm text-[#20231F]/75 leading-relaxed">
@@ -425,7 +425,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
               {/* Dynamic Personalized Letter */}
               {isAlumni ? (
                 <div className="space-y-4">
-                  <h3 className="text-3xl sm:text-5xl font-display uppercase tracking-tight text-[#20231F] leading-tight">
+                  <h3 className="text-2xl sm:text-4xl font-display uppercase tracking-tight text-[#20231F] leading-tight">
                     WELCOME BACK HOME,
                     <br />
                     <span className="text-[#B94D35] underline decoration-[#F4C542] decoration-4">
@@ -440,13 +440,13 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                       "Có những nơi dù đã đi qua, vẫn luôn có một chỗ dành cho mình để trở về. 17 năm Cóc Sài Gòn, tụi em mong được gặp lại {identifiedMember.honorific.toLowerCase()} trong đêm hội ngộ đặc biệt này."
                     </p>
                     <div className="pt-2 border-t border-[#20231F]/15 text-xs text-[#20231F]/60 font-mono truncate">
-                      📍 Điểm danh: {identifiedMember.department || 'Cựu thành viên'}
+                      Điểm danh: {identifiedMember.department || 'Cựu thành viên'}
                     </div>
                   </div>
                 </div>
               ) : (
                 <div className="space-y-4">
-                  <h3 className="text-3xl sm:text-5xl font-display uppercase tracking-tight text-[#20231F] leading-tight">
+                  <h3 className="text-2xl sm:text-4xl font-display uppercase tracking-tight text-[#20231F] leading-tight">
                     HEY, {identifiedMember.fullName.toUpperCase()}!
                     <br />
                     <span className="text-[#B94D35] underline decoration-[#F4C542] decoration-4">
@@ -461,7 +461,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                       "Sẵn sàng cho một đêm cháy hết mình chưa? Sinh nhật 17 tuổi của Cóc Sài Gòn nhất định phải có mặt bạn để cùng thổi nến và quẩy tung nóc nhà!"
                     </p>
                     <div className="pt-2 border-t border-[#20231F]/15 text-xs text-[#20231F]/60 font-mono truncate">
-                      ⚡ Đội ngũ: {identifiedMember.department || 'Thành viên'}
+                      Đội ngũ: {identifiedMember.department || 'Thành viên'}
                     </div>
                   </div>
                 </div>
@@ -981,7 +981,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
               </div>
 
               <div className="p-3 rounded-sm bg-amber-50 border border-[#F4C542] text-xs text-[#20231F]/80">
-                🔒 Thông tin đăng ký và xác nhận đóng phí tham gia sẽ được Ban Tổ Chức kiểm tra và liên hệ thông báo sớm nhất đến bạn.
+                Thông tin đăng ký và xác nhận đóng phí tham gia sẽ được Ban Tổ Chức kiểm tra và liên hệ thông báo sớm nhất đến bạn.
               </div>
 
               <div className="flex gap-3 pt-2">
