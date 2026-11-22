@@ -22,6 +22,10 @@ dist-ssr/
 .temp/
 *.log
 
+# Heavy Source Raw Media
+/Music/
+/picture/
+
 # Editor & OS files
 .DS_Store
 Thumbs.db
