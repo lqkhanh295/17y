@@ -443,7 +443,7 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
                 THƯ MỜI HỘI NGỘ • KỶ NIỆM 17 NĂM
               </span>
               <span className="text-csg-black/50">
-                {GALA_EVENT_DETAILS.rsvpDeadline ? `Hạn chót: ${GALA_EVENT_DETAILS.rsvpDeadline}` : '19.12.2026'}
+                {GALA_EVENT_DETAILS.rsvpDeadline ? `Hạn chót: ${GALA_EVENT_DETAILS.rsvpDeadline}` : '10.12.2026'}
               </span>
             </div>
 

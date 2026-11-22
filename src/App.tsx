@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { ShieldCheck } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { AudioPlayerToggle } from './components/AudioPlayerToggle';
 import { CinematicFilmOpening } from './components/CinematicFilmOpening';
@@ -192,21 +191,26 @@ export const App: React.FC = () => {
     setIsStageOpen(false);
   };
 
-  // Sync initial URL on mount and handle Back/Forward browser navigation
+  // Sync initial URL on mount, handle Back/Forward navigation, Hash and Admin shortcuts
   useEffect(() => {
     const handleLocationChange = () => {
-      const path = window.location.pathname;
-      if (path.startsWith('/register')) {
+      const path = window.location.pathname.toLowerCase();
+      const hash = window.location.hash.toLowerCase();
+      const search = window.location.search.toLowerCase();
+
+      const isAdmin = path.startsWith('/admin') || hash === '#admin' || search.includes('admin');
+
+      if (path.startsWith('/register') || hash === '#register') {
         setIsRegisterOpen(true);
         setIsLookupOpen(false);
         setIsAdminOpen(false);
         setIsStageOpen(false);
-      } else if (path.startsWith('/portal')) {
+      } else if (path.startsWith('/portal') || hash === '#portal') {
         setIsLookupOpen(true);
         setIsRegisterOpen(false);
         setIsAdminOpen(false);
         setIsStageOpen(false);
-      } else if (path.startsWith('/admin')) {
+      } else if (isAdmin) {
         setIsAdminOpen(true);
         setIsRegisterOpen(false);
         setIsLookupOpen(false);
@@ -219,9 +223,24 @@ export const App: React.FC = () => {
       }
     };
 
+    // Secret Admin keyboard shortcut: Ctrl+Shift+A (or Cmd+Shift+A)
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
+        e.preventDefault();
+        openAdmin();
+      }
+    };
+
     handleLocationChange();
     window.addEventListener('popstate', handleLocationChange);
-    return () => window.removeEventListener('popstate', handleLocationChange);
+    window.addEventListener('hashchange', handleLocationChange);
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('popstate', handleLocationChange);
+      window.removeEventListener('hashchange', handleLocationChange);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
   }, []);
 
   // Handle new registration completed
@@ -345,16 +364,6 @@ export const App: React.FC = () => {
       <footer className="relative z-10 bg-csg-surface border-t border-csg-black/25 py-6 px-4 sm:px-8 mt-12">
         <div className="max-w-[1360px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 font-mono text-xs text-csg-black/65 text-center sm:text-left">
           <span>CLB TRUYỀN THÔNG CÓC SÀI GÒN • 2009 — 2026 • ĐẠI TIỆC GALA 17Y TẠI ĐỒI SỨ VILLA</span>
-
-          <div className="flex items-center gap-4">
-            <button
-              onClick={openAdmin}
-              className="hover:text-csg-red flex items-center gap-1 transition-colors"
-            >
-              <ShieldCheck className="w-3.5 h-3.5 text-csg-red" />
-              <span>Cổng Quản Trị BTC</span>
-            </button>
-          </div>
         </div>
       </footer>
 

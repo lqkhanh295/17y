@@ -245,6 +245,46 @@
   ],
   "registrations": [
     {
+      "id": "CSG26-546909",
+      "memberId": "custom",
+      "fullName": "Test Storage User",
+      "mssv": "SE999999",
+      "role": "ACTIVE",
+      "honorific": "Bạn",
+      "gmail": "test.storage@gmail.com",
+      "personalPhone": "0988888888",
+      "emergencyPhone": "0977777777",
+      "allergies": [],
+      "allergyNote": "",
+      "package": "ACTIVE",
+      "totalRequired": 349000,
+      "paidAmount": 349000,
+      "remainingAmount": 0,
+      "plan": "FULL",
+      "paymentPlan": "FULL",
+      "status": "PENDING",
+      "paymentStatus": "PENDING",
+      "isApproved100": false,
+      "isPublicConsent": true,
+      "receiptPhase1Url": "https://kjqhqdidbhbaajuyazpw.supabase.co/storage/v1/object/public/receipts/rec_phase1_SE999999_1795336153319_x86u0.png",
+      "receiptPhase2Url": null,
+      "ticketCode": "CSG17Y-9999-209",
+      "ticketToken": "TKT-1913F33C",
+      "createdAt": "2026-11-22T08:29:13.707Z",
+      "paymentHistory": [
+        {
+          "id": "pay-1795336153674",
+          "phase": 1,
+          "amount": 349000,
+          "receiptUrl": "https://kjqhqdidbhbaajuyazpw.supabase.co/storage/v1/object/public/receipts/rec_phase1_SE999999_1795336153319_x86u0.png",
+          "submittedAt": "2026-11-22T08:29:13.674Z",
+          "status": "PENDING"
+        }
+      ],
+      "verifiedBy": null,
+      "verifiedAt": null
+    },
+    {
       "id": "CSG26-293921",
       "memberId": "m-custom-1795334721593",
       "fullName": "Thành viên Cóc Sài Gòn",
@@ -495,6 +535,16 @@
   ],
   "wishes": [
     {
+      "id": "w-1795336153879",
+      "registrationId": "CSG26-546909",
+      "authorName": "Bạn Test Storage User",
+      "role": "ACTIVE",
+      "content": "Test Chúc mừng CSG 17Y!",
+      "isPublic": true,
+      "moderationStatus": "APPROVED",
+      "createdAt": "2026-11-22T08:29:13.879Z"
+    },
+    {
       "id": "w-1795334786781",
       "registrationId": "CSG26-293921",
       "authorName": "Bạn Thành viên Cóc Sài Gòn",
@@ -556,6 +606,17 @@
     }
   ],
   "characters": [
+    {
+      "id": "char-1795336153880",
+      "registrationId": "CSG26-546909",
+      "name": "Test Storage User",
+      "honorific": "Bạn",
+      "role": "ACTIVE",
+      "wish": "Test Chúc mừng CSG 17Y!",
+      "x": 49,
+      "y": 78,
+      "direction": 1
+    },
     {
       "id": "char-1795334786781",
       "registrationId": "CSG26-293921",

@@ -338,7 +338,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 type="password"
                 value={pin}
                 onChange={(e) => setPin(e.target.value)}
-                placeholder="Nhập mã PIN BTC (Mặc định: csg17y)"
+                placeholder="Nhập mã PIN Ban Tổ Chức..."
                 className="w-full px-4 py-3 rounded-xl bg-[#181818] border-2 border-[#383838] text-white text-center font-mono text-lg focus:outline-none focus:border-[#F5C400] tracking-widest"
                 autoFocus
               />

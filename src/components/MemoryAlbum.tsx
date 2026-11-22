@@ -17,7 +17,7 @@ export const ALBUM_PHOTOS: MemoryPhoto[] = [
     url: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=1800&q=85',
     alt: 'Bàn tiệc hội ngộ dưới ánh đèn vàng',
     caption: 'Bàn tiệc hội ngộ dưới ánh đèn vàng',
-    handwrittenNote: 'Đêm hoàng kim — 19.12.2026',
+    handwrittenNote: 'Đêm hoàng kim — 12-13.12.2026',
     tape: true
   },
   // 2. Early camera lens / Campus field work

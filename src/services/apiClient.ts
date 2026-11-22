@@ -30,6 +30,42 @@ function normalizeVN(str: string): string {
 }
 
 export const apiClient = {
+  // Helper: Upload base64 image to Supabase Storage bucket 'receipts'
+  async uploadReceiptToStorage(fileOrDataUrl: string, prefix = 'receipt'): Promise<string> {
+    if (!fileOrDataUrl || typeof fileOrDataUrl !== 'string' || !fileOrDataUrl.startsWith('data:image/')) {
+      return fileOrDataUrl;
+    }
+
+    try {
+      const matches = fileOrDataUrl.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
+      if (!matches) return fileOrDataUrl;
+
+      const contentType = matches[1];
+      const ext = contentType.split('/')[1]?.replace('jpeg', 'jpg') || 'jpg';
+      const byteCharacters = atob(matches[2]);
+      const byteNumbers = new Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([byteArray], { type: contentType });
+
+      const fileName = `${prefix}_${Date.now()}_${Math.random().toString(36).substring(2, 7)}.${ext}`;
+      const { data, error } = await supabase.storage.from('receipts').upload(fileName, blob, {
+        contentType,
+        upsert: true
+      });
+
+      if (!error && data) {
+        const { data: pubData } = supabase.storage.from('receipts').getPublicUrl(fileName);
+        return pubData.publicUrl;
+      }
+    } catch (err) {
+      console.error('Storage upload error, falling back:', err);
+    }
+    return fileOrDataUrl;
+  },
+
   // 1. Memories (From API or Supabase directly)
   async getMemories() {
     const res = await safeFetchJson<{ success: boolean; data: any[] }>(`${API_BASE}/memories`);
@@ -119,12 +155,17 @@ export const apiClient = {
 
   // 3. Create registration
   async createRegistration(data: Partial<RegistrationRecord> & { receiptImage: string }) {
+    // 1. Upload receipt to Supabase Storage first if it's base64
+    const mssvClean = (data.mssv || 'VIP').trim().toUpperCase();
+    const storedReceiptUrl = await this.uploadReceiptToStorage(data.receiptImage, `rec_phase1_${mssvClean}`);
+    const payload = { ...data, receiptImage: storedReceiptUrl };
+
     const res = await safeFetchJson<{ success: boolean; data: RegistrationRecord; message?: string }>(
       `${API_BASE}/registrations`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
+        body: JSON.stringify(payload)
       }
     );
 
@@ -151,14 +192,13 @@ export const apiClient = {
     }
 
     const regId = 'CSG26-' + Math.floor(100000 + Math.random() * 900000);
-    const mssvClean = (data.mssv || 'VIP').trim().toUpperCase();
     const ticketCode = `CSG17Y-${mssvClean.slice(-4)}-${Math.floor(100 + Math.random() * 900)}`;
 
     const initialPaymentSubmission = {
       id: 'pay-' + Date.now(),
       phase: 1,
       amount: paidAmount,
-      receiptUrl: data.receiptImage || '',
+      receiptUrl: storedReceiptUrl,
       submittedAt: new Date().toISOString(),
       status: 'PENDING'
     };
@@ -181,7 +221,7 @@ export const apiClient = {
       totalRequired,
       paidAmount,
       remainingAmount,
-      receiptPhase1Url: data.receiptImage || '',
+      receiptPhase1Url: storedReceiptUrl,
       receiptPhase2Url: undefined,
       status: paymentStatus as any,
       paymentStatus: paymentStatus as any,
@@ -264,12 +304,14 @@ export const apiClient = {
 
   // 5. Submit Phase 2 payment
   async submitBalancePayment(id: string, receiptPhase2Url: string) {
+    const storedReceipt = await this.uploadReceiptToStorage(receiptPhase2Url, `rec_phase2_${id}`);
+
     const res = await safeFetchJson<{ success: boolean; data: RegistrationRecord; message?: string }>(
       `${API_BASE}/registrations/${id}/balance-payment`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ receiptPhase2Url })
+        body: JSON.stringify({ receiptPhase2Url: storedReceipt })
       }
     );
 
@@ -290,13 +332,13 @@ export const apiClient = {
       id: 'pay-' + Date.now(),
       phase: 2,
       amount: phase2Amount,
-      receiptUrl: receiptPhase2Url,
+      receiptUrl: storedReceipt,
       submittedAt: new Date().toISOString(),
       status: 'PENDING'
     });
 
     const updates = {
-      receiptPhase2Url,
+      receiptPhase2Url: storedReceipt,
       paymentHistory: history,
       status: 'PENDING',
       paymentStatus: 'PENDING'
@@ -352,18 +394,32 @@ export const apiClient = {
 
   // 7. Admin API
   async adminLogin(pin: string) {
+    if (!pin || !pin.trim()) {
+      throw new Error('Vui lòng nhập mã PIN quản trị.');
+    }
+
+    const cleanPin = pin.trim();
+
+    // 1. Try backend API first
     const res = await safeFetchJson<{ success: boolean; message?: string }>(`${API_BASE}/admin/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ pin })
+      body: JSON.stringify({ pin: cleanPin })
     });
 
     if (res && res.success) return res;
 
-    if (pin.trim() === '1912' || pin.trim() === '1717' || pin.trim() === '2026' || pin.trim() === 'csg17y') {
-      return { success: true, message: 'Đăng nhập quản trị thành công.' };
+    // 2. Direct Supabase DB verification (RPC verify_admin_pin)
+    try {
+      const { data: isValid, error } = await (supabase as any).rpc('verify_admin_pin', { input_pin: cleanPin });
+      if (!error && isValid) {
+        return { success: true, message: 'Đăng nhập quản trị thành công từ Database.' };
+      }
+    } catch {
+      // ignore
     }
-    throw new Error('Mã PIN sai. Vui lòng thử lại.');
+
+    throw new Error('Mã PIN không chính xác. Quyền truy cập bị từ chối.');
   },
 
   async getAdminRegistrations() {

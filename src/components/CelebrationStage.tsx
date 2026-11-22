@@ -148,132 +148,132 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
 
   // Main stage body
   const stageContent = (
-    <div className="w-full h-full flex flex-col flex-1 space-y-2">
-      {/* New Registrant Celebration Banner */}
-      {!hideBanner && newRegistrant && (
-        <div className="p-2 sm:p-2.5 rounded-sm bg-[#F4C542] border-2 border-[#20231F] shadow-poster-sm flex flex-col sm:flex-row items-center justify-between gap-2 animate-fadeIn shrink-0">
-          <div className="flex items-center gap-2.5 text-left w-full sm:w-auto min-w-0">
-            <span className="w-8 h-8 rounded-sm bg-white border border-[#20231F] flex items-center justify-center text-lg shrink-0 shadow-xs animate-bounce">
-              🐸
+    <div className="w-full h-full flex flex-col flex-1 overflow-hidden">
+      {/* Sleek Edge-to-Edge Top Navigation Bar */}
+      <div className="w-full h-12 bg-[#1A1816] border-b-2 border-[#F4C542] px-3 sm:px-6 flex items-center justify-between gap-3 shrink-0 z-40 select-none shadow-md">
+        {/* Left: Brand Identity / Registrant Greeting */}
+        <div className="flex items-center gap-2.5 min-w-0">
+          <span className="w-8 h-8 rounded-sm bg-[#F4C542] border border-[#20231F] flex items-center justify-center text-lg shrink-0 shadow-xs">
+            🐸
+          </span>
+          <div className="min-w-0 flex items-center gap-2">
+            <span className="font-display font-black text-sm sm:text-base tracking-wider text-white uppercase whitespace-nowrap">
+              SÂN KHẤU CÓC 17Y
             </span>
-            <div className="min-w-0">
-              <div className="flex items-center gap-1.5">
-                <h4 className="font-display font-black text-sm uppercase text-[#20231F] leading-tight truncate">
-                  BẠN ĐÃ LÊN SÂN KHẤU KỶ NIỆM 17Y!
-                </h4>
-                <span className="stamp-seal text-[8px] bg-white">OFFICIAL</span>
-              </div>
-              <p className="text-[11px] text-[#20231F]/80 font-mono truncate">
-                Chào mừng <strong>{newRegistrant.honorific} {newRegistrant.fullName}</strong> ({newRegistrant.role === 'ALUMNI' ? 'Cựu Thành Viên' : 'Thành Viên'}) • Đã đăng ký thành công đại tiệc 17Y! 🎉
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2 w-full sm:w-auto justify-end shrink-0">
-            {onClose && (
-              <button
-                type="button"
-                onClick={onClose}
-                className="btn-editorial-primary px-3 py-1 rounded-sm text-xs font-display text-sm uppercase flex items-center justify-center gap-1 shadow-xs"
-              >
-                <ArrowLeft className="w-3.5 h-3.5" />
-                <span>Thoát ra trang chủ</span>
-              </button>
+            {newRegistrant ? (
+              <span className="text-xs font-mono text-[#F4C542] truncate hidden md:inline">
+                • Chào mừng <strong>{newRegistrant.honorific} {newRegistrant.fullName}</strong> ({newRegistrant.role === 'ALUMNI' ? 'Cựu TV' : 'Thành viên'})! 🎉
+              </span>
+            ) : (
+              <span className="px-1.5 py-0.5 rounded-xs text-[9px] font-mono font-bold bg-[#F4C542] text-[#20231F] hidden sm:inline-block tracking-wider uppercase">
+                LIVE 3D
+              </span>
             )}
           </div>
         </div>
-      )}
 
-      {/* Control Bar: Filters, Search, Sound, Confetti */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-2 bg-white px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-sm border-2 border-[#20231F] shadow-poster-sm shrink-0">
-        {/* Role Filters */}
-        <div className="flex items-center gap-1 w-full sm:w-auto overflow-x-auto pb-0.5 sm:pb-0 font-mono text-xs">
-          <button
-            type="button"
-            onClick={() => setSelectedRole('ALL')}
-            className={`px-2.5 py-1 rounded-sm font-bold transition-all whitespace-nowrap border-2 ${
-              selectedRole === 'ALL'
-                ? 'bg-[#20231F] text-white border-[#20231F]'
-                : 'bg-[#F4EEDF] text-[#20231F] border-[#20231F]/30 hover:border-[#20231F]'
-            }`}
-          >
-            Tất cả ({allCharacters.length})
-          </button>
-          <button
-            type="button"
-            onClick={() => setSelectedRole('ALUMNI')}
-            className={`px-2.5 py-1 rounded-sm font-bold transition-all whitespace-nowrap border-2 ${
-              selectedRole === 'ALUMNI'
-                ? 'bg-[#20231F] text-white border-[#20231F]'
-                : 'bg-[#F4EEDF] text-[#20231F] border-[#20231F]/30 hover:border-[#20231F]'
-            }`}
-          >
-            🎓 Cựu TV ({allCharacters.filter(c => c.role === 'ALUMNI').length})
-          </button>
-          <button
-            type="button"
-            onClick={() => setSelectedRole('ACTIVE')}
-            className={`px-2.5 py-1 rounded-sm font-bold transition-all whitespace-nowrap border-2 ${
-              selectedRole === 'ACTIVE'
-                ? 'bg-[#20231F] text-white border-[#20231F]'
-                : 'bg-[#F4EEDF] text-[#20231F] border-[#20231F]/30 hover:border-[#20231F]'
-            }`}
-          >
-            ⚡ Thành viên ({allCharacters.filter(c => c.role === 'ACTIVE').length})
-          </button>
-        </div>
+        {/* Center: Controls (Filters, Search, Effects) */}
+        <div className="flex items-center gap-2 overflow-x-auto py-1 font-mono text-xs">
+          {/* Role Filters */}
+          <div className="flex items-center gap-1 bg-[#2D2A26] p-0.5 rounded-sm border border-white/10 shrink-0">
+            <button
+              type="button"
+              onClick={() => setSelectedRole('ALL')}
+              className={`px-2.5 py-1 rounded-xs font-bold transition-all whitespace-nowrap text-xs ${
+                selectedRole === 'ALL'
+                  ? 'bg-[#F4C542] text-[#20231F] shadow-xs'
+                  : 'text-white/70 hover:text-white'
+              }`}
+            >
+              Tất cả ({allCharacters.length})
+            </button>
+            <button
+              type="button"
+              onClick={() => setSelectedRole('ALUMNI')}
+              className={`px-2 py-1 rounded-xs font-bold transition-all whitespace-nowrap text-xs ${
+                selectedRole === 'ALUMNI'
+                  ? 'bg-[#F4C542] text-[#20231F] shadow-xs'
+                  : 'text-white/70 hover:text-white'
+              }`}
+            >
+              🎓 Cựu TV ({allCharacters.filter(c => c.role === 'ALUMNI').length})
+            </button>
+            <button
+              type="button"
+              onClick={() => setSelectedRole('ACTIVE')}
+              className={`px-2 py-1 rounded-xs font-bold transition-all whitespace-nowrap text-xs ${
+                selectedRole === 'ACTIVE'
+                  ? 'bg-[#F4C542] text-[#20231F] shadow-xs'
+                  : 'text-white/70 hover:text-white'
+              }`}
+            >
+              ⚡ Thành viên ({allCharacters.filter(c => c.role === 'ACTIVE').length})
+            </button>
+          </div>
 
-        {/* Search & Actions */}
-        <div className="flex items-center gap-1.5 w-full sm:w-auto">
-          <div className="relative flex-1 sm:w-48">
-            <Search className="w-3.5 h-3.5 text-[#20231F]/40 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+          {/* Quick Search */}
+          <div className="relative w-36 sm:w-52 shrink-0">
+            <Search className="w-3.5 h-3.5 text-white/40 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="text"
               placeholder="Tìm tên hoặc lời chúc..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-8 pr-2.5 py-1 bg-[#F4EEDF] rounded-sm border border-[#20231F] text-xs font-mono text-[#20231F] placeholder-[#20231F]/40 focus:outline-none focus:ring-1 focus:ring-[#F4C542]"
+              className="w-full pl-8 pr-2.5 py-1 bg-[#2D2A26] rounded-xs border border-white/15 text-xs text-white placeholder-white/40 focus:outline-none focus:border-[#F4C542]"
             />
           </div>
 
+          {/* FX Triggers */}
           <button
             type="button"
             onClick={() => triggerConfettiBlast()}
-            className="btn-editorial-primary px-2.5 py-1 rounded-sm text-xs font-bold uppercase flex items-center gap-1 shadow-xs whitespace-nowrap"
+            className="px-2.5 py-1 rounded-xs bg-[#F4C542] hover:bg-[#E5B532] text-[#20231F] font-bold text-xs uppercase flex items-center gap-1 shadow-xs whitespace-nowrap transition-colors"
             title="Bắn pháo hoa ăn mừng"
           >
             <PartyPopper className="w-3.5 h-3.5" />
-            <span>Pháo Hoa 🎉</span>
+            <span className="hidden sm:inline">Pháo Hoa</span> 🎉
           </button>
 
-          {/* Toggle Gala Stage Lighting */}
           <button
             type="button"
             onClick={() => setStageLightsOn(!stageLightsOn)}
-            className={`px-2.5 py-1 rounded-sm text-xs font-bold font-mono transition-all border-2 flex items-center gap-1 whitespace-nowrap ${
+            className={`px-2.5 py-1 rounded-xs font-bold text-xs transition-all border flex items-center gap-1 whitespace-nowrap ${
               stageLightsOn
-                ? 'bg-[#20231F] text-[#F4C542] border-[#20231F]'
-                : 'bg-[#F4EEDF] text-[#20231F] border-[#20231F]/40 hover:border-[#20231F]'
+                ? 'bg-[#2D2A26] text-[#F4C542] border-[#F4C542]'
+                : 'bg-[#2D2A26] text-white/60 border-white/15 hover:border-white/40'
             }`}
-            title={stageLightsOn ? 'Tắt hiệu ứng đèn sân khấu' : 'Bật hiệu ứng đèn sân khấu'}
+            title={stageLightsOn ? 'Tắt đèn sân khấu' : 'Bật đèn sân khấu'}
           >
-            <Lightbulb className={`w-3.5 h-3.5 ${stageLightsOn ? 'text-[#F4C542]' : 'text-[#20231F]/50'}`} />
-            <span>{stageLightsOn ? 'ĐÈN: BẬT' : 'ĐÈN: TẮT'}</span>
+            <Lightbulb className={`w-3.5 h-3.5 ${stageLightsOn ? 'text-[#F4C542]' : 'text-white/40'}`} />
+            <span className="hidden sm:inline">{stageLightsOn ? 'ĐÈN: BẬT' : 'ĐÈN: TẮT'}</span>
           </button>
 
           <button
             type="button"
             onClick={() => setSoundEnabled(!soundEnabled)}
-            className="p-1 rounded-sm bg-white border border-[#20231F] hover:bg-[#F4EEDF] text-[#20231F] transition-colors"
+            className="p-1 rounded-xs bg-[#2D2A26] border border-white/15 hover:border-white/40 text-white transition-colors"
             title={soundEnabled ? 'Tắt âm thanh' : 'Bật âm thanh'}
           >
-            {soundEnabled ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5 text-[#B94D35]" />}
+            {soundEnabled ? <Volume2 className="w-3.5 h-3.5 text-[#F4C542]" /> : <VolumeX className="w-3.5 h-3.5 text-rose-400" />}
           </button>
         </div>
+
+        {/* Right: Exit / Return to Homepage */}
+        {onClose && (
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-3 py-1.5 rounded-sm bg-[#B94D35] hover:bg-[#A03C26] text-white font-mono font-bold text-xs uppercase transition-colors flex items-center gap-1.5 shadow-sm whitespace-nowrap shrink-0"
+            title="Thoát ra trang chủ"
+          >
+            <X className="w-4 h-4" />
+            <span className="hidden sm:inline">VỀ TRANG CHỦ</span>
+          </button>
+        )}
       </div>
 
-      {/* Theatrical Stage Canvas - Tái hiện 3D hội trường thực tế từ ảnh chụp */}
-      <div className="relative w-full flex-1 min-h-[380px] sm:min-h-[440px] max-h-[calc(95vh-110px)] rounded-sm bg-[#1C140D] border-2 border-[#20231F] overflow-hidden shadow-poster select-none perspective-[1000px]">
+      {/* Theatrical Stage Canvas - Full Screen 100% Widescreen */}
+      <div className="relative w-full flex-1 h-full bg-[#1C140D] overflow-hidden select-none perspective-[1000px]">
         
         {/* ========================================================================= */}
         {/* 1. TRẦN HỘI TRƯỜNG & ĐÈN DOWNLIGHT HẮT SÁNG                               */}
@@ -314,7 +314,7 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
         {/* ========================================================================= */}
         {/* 3. MÀN HÌNH LED MÀU ĐEN 16:9 CHÍNH GIỮA (CENTER BLACK 16:9 LED SCREEN)     */}
         {/* ========================================================================= */}
-        <div className="absolute top-12 sm:top-14 left-1/2 -translate-x-1/2 w-[62%] sm:w-[50%] max-w-[430px] aspect-[16/9] z-20 pointer-events-none">
+        <div className="absolute top-12 sm:top-14 left-1/2 -translate-x-1/2 w-[64%] sm:w-[52%] md:w-[45%] max-w-[580px] aspect-[16/9] z-20 pointer-events-none">
           {/* Ambient Wall Drop Shadow */}
           <div className="absolute -inset-1.5 bg-black/60 rounded-xs blur-md -z-10" />
 
@@ -395,7 +395,7 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
             />
 
             {/* ĐÈN KATANA (Thanh LED Batten chạy pixel phía trên màn hình LED) */}
-            <div className="absolute top-9 left-1/2 -translate-x-1/2 w-[48%] max-w-[380px] z-25 flex flex-col items-center">
+            <div className="absolute top-9 left-1/2 -translate-x-1/2 w-[50%] md:w-[44%] max-w-[520px] z-25 flex flex-col items-center">
               <div className="w-full h-2 rounded-xs bg-[#090A0D] border border-[#2D3342] p-0.5 overflow-hidden shadow-[0_0_12px_rgba(244,197,66,0.6)]">
                 <div className="w-full h-full stage-katana-chase rounded-xs" />
               </div>
@@ -669,51 +669,11 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
     );
   };
 
-  // If in modal mode, wrap inside a fixed overlay
+  // Full-screen modal mode (w-screen h-screen fixed inset-0)
   if (isModal) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-[#20231F]/90 backdrop-blur-md overflow-hidden animate-fadeIn">
-        <div 
-          className="relative w-full max-w-6xl h-[95vh] max-h-[95vh] bg-[#F4EEDF] border-2 border-[#20231F] rounded-sm shadow-poster-lg overflow-hidden my-auto flex flex-col animate-paper-unfold"
-          onClick={(e) => e.stopPropagation()}
-        >
-          {/* Header Bar */}
-          <div className="flex items-center justify-between px-3 sm:px-5 py-2 sm:py-2.5 border-b-2 border-[#20231F] bg-white shrink-0">
-            <div className="flex items-center gap-2.5">
-              <span className="w-8 h-8 rounded-sm bg-[#F4C542] border-2 border-[#20231F] flex items-center justify-center text-lg shadow-sm">
-                🐸
-              </span>
-              <div>
-                <div className="flex items-center gap-2">
-                  <h3 className="font-display text-base sm:text-lg font-black tracking-wider text-[#20231F] uppercase">
-                    SÂN KHẤU KỶ NIỆM 17 NĂM CÓC SÀI GÒN
-                  </h3>
-                  <span className="stamp-seal text-[9px]">LIVE STAGE</span>
-                </div>
-                <p className="text-[11px] font-mono text-[#20231F]/70 hidden sm:block">
-                  Hội ngộ các thế hệ Cóc Áo Vàng • Không gian kỷ niệm chung
-                </p>
-              </div>
-            </div>
-
-            {onClose && (
-              <button
-                type="button"
-                onClick={onClose}
-                className="px-3 py-1.5 rounded-sm bg-[#20231F] text-white hover:bg-[#B94D35] text-xs font-mono font-bold uppercase transition-colors flex items-center gap-1.5 shadow-sm"
-              >
-                <X className="w-4 h-4" />
-                <span className="hidden sm:inline">VỀ TRANG CHỦ</span>
-              </button>
-            )}
-          </div>
-
-          {/* Modal Stage Content */}
-          <div className="p-2 sm:p-2.5 overflow-hidden flex-1 flex flex-col font-body">
-            {stageContent}
-          </div>
-        </div>
-
+      <div className="fixed inset-0 z-50 w-screen h-screen bg-[#1C140D] flex flex-col overflow-hidden animate-fadeIn">
+        {stageContent}
         {renderKeepsakeModal()}
       </div>
     );
@@ -721,7 +681,7 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
 
   // Non-modal inline rendering (e.g. inside Screen 6 of RegistrationModal)
   return (
-    <div className="w-full">
+    <div className="w-full h-full flex flex-col flex-1 overflow-hidden">
       {stageContent}
       {renderKeepsakeModal()}
     </div>

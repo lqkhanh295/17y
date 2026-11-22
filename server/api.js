@@ -3,6 +3,7 @@ import cors from 'cors';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import crypto from 'crypto';
 import { supabase } from './supabase.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -56,6 +57,38 @@ function sanitizeText(str) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;');
+}
+
+// Helper: Upload base64 image to Supabase Storage bucket 'receipts'
+async function uploadBase64ToStorage(base64Data, filenamePrefix = 'receipt') {
+  if (!base64Data || typeof base64Data !== 'string' || !base64Data.startsWith('data:image/')) {
+    return base64Data;
+  }
+  if (!supabase) return base64Data;
+
+  try {
+    const matches = base64Data.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
+    if (!matches) return base64Data;
+
+    const contentType = matches[1];
+    const buffer = Buffer.from(matches[2], 'base64');
+    const ext = contentType.split('/')[1]?.replace('jpeg', 'jpg') || 'jpg';
+    const fileName = `${filenamePrefix}_${Date.now()}_${Math.random().toString(36).substring(2, 7)}.${ext}`;
+
+    const { data, error } = await supabase.storage.from('receipts').upload(fileName, buffer, {
+      contentType,
+      upsert: true
+    });
+
+    if (!error && data) {
+      const { data: pubData } = supabase.storage.from('receipts').getPublicUrl(fileName);
+      console.log(`[Storage] Uploaded ${fileName} -> ${pubData.publicUrl}`);
+      return pubData.publicUrl;
+    }
+  } catch (err) {
+    console.error('Failed to upload image to Supabase Storage:', err);
+  }
+  return base64Data;
 }
 
 /* ================= 1. PUBLIC MEMORIES ================= */
@@ -236,11 +269,14 @@ app.post('/api/registrations', async (req, res) => {
   const regId = 'CSG26-' + Math.floor(100000 + Math.random() * 900000);
   const ticketCode = 'CSG17Y-' + cleanMssv.slice(-4) + '-' + Math.floor(100 + Math.random() * 900);
 
+  // Upload receipt image to Supabase Storage
+  const storedReceiptUrl = await uploadBase64ToStorage(receiptImage, `rec_phase1_${cleanMssv}`);
+
   const initialPaymentSubmission = {
     id: 'pay-' + Date.now(),
     phase: 1,
     amount: paidAmount,
-    receiptUrl: receiptImage,
+    receiptUrl: storedReceiptUrl,
     submittedAt: new Date().toISOString(),
     status: 'PENDING'
   };
@@ -267,7 +303,7 @@ app.post('/api/registrations', async (req, res) => {
     paymentStatus,
     isApproved100: false,
     isPublicConsent: isPublicConsent !== false,
-    receiptPhase1Url: receiptImage,
+    receiptPhase1Url: storedReceiptUrl,
     receiptPhase2Url: null,
     ticketCode,
     ticketToken: 'TKT-' + Math.random().toString(36).substring(2, 10).toUpperCase(),
@@ -417,7 +453,9 @@ app.post('/api/registrations/:id/balance-payment', async (req, res) => {
     return res.status(404).json({ success: false, message: 'Không tìm thấy hồ sơ đăng ký.' });
   }
 
-  reg.receiptPhase2Url = receiptPhase2Url;
+  const storedReceiptPhase2Url = await uploadBase64ToStorage(receiptPhase2Url, `rec_phase2_${id}`);
+
+  reg.receiptPhase2Url = storedReceiptPhase2Url;
   const phase2Amount = (reg.remainingAmount && reg.remainingAmount > 0) 
     ? reg.remainingAmount 
     : (reg.totalRequired - reg.paidAmount);
@@ -427,13 +465,13 @@ app.post('/api/registrations/:id/balance-payment', async (req, res) => {
     id: 'pay-' + Date.now(),
     phase: 2,
     amount: phase2Amount,
-    receiptUrl: receiptPhase2Url,
+    receiptUrl: storedReceiptPhase2Url,
     submittedAt: new Date().toISOString(),
     status: 'PENDING'
   });
 
   const updateFields = {
-    receiptPhase2Url,
+    receiptPhase2Url: storedReceiptPhase2Url,
     paymentHistory,
     status: 'PENDING',
     paymentStatus: 'PENDING'
@@ -503,11 +541,39 @@ app.get('/api/characters/stage', async (req, res) => {
 });
 
 /* ================= 7. ADMIN ENDPOINTS ================= */
-app.post('/api/admin/login', (req, res) => {
+app.post('/api/admin/login', async (req, res) => {
   const { pin } = req.body;
-  if (pin === 'csg17y' || pin === '1717' || pin === 'btc' || pin === '1912' || pin === '2026') {
-    return res.json({ success: true, token: 'btc-auth-token-17y', user: 'BTC_Admin' });
+  if (!pin || typeof pin !== 'string' || !pin.trim()) {
+    return res.status(400).json({ success: false, message: 'Vui lòng cung cấp mã PIN Ban Tổ Chức.' });
   }
+
+  const cleanPin = pin.trim();
+
+  // 1. Verify against Supabase DB
+  if (supabase) {
+    try {
+      // Try DB RPC function first
+      const { data: isValid, error: rpcErr } = await supabase.rpc('verify_admin_pin', { input_pin: cleanPin });
+      if (!rpcErr && isValid) {
+        return res.json({ success: true, token: 'btc-auth-token-17y', user: 'BTC_Admin' });
+      }
+
+      // Try checking admin_users table directly with SHA-256 hash
+      const pinHash = crypto.createHash('sha256').update(cleanPin).digest('hex');
+      const { data: adminMatch } = await supabase
+        .from('admin_users')
+        .select('*')
+        .or(`pin_hash.eq.${pinHash},pin_hash.eq.${cleanPin}`)
+        .maybeSingle();
+
+      if (adminMatch) {
+        return res.json({ success: true, token: 'btc-auth-token-17y', user: adminMatch.username || 'BTC_Admin' });
+      }
+    } catch (err) {
+      console.error('Supabase admin login verify error:', err);
+    }
+  }
+
   return res.status(401).json({ success: false, message: 'Mã PIN Ban Tổ Chức không chính xác.' });
 });
 
