@@ -361,22 +361,24 @@ export const App: React.FC = () => {
       </main>
 
       {/* ================= QUIET COLOPHON FOOTER ================= */}
-      <footer className="relative z-10 bg-csg-surface border-t border-csg-black/25 py-6 px-4 sm:px-8 mt-12">
+      <footer className="relative z-10 bg-csg-surface border-t border-csg-black/25 pt-6 pb-24 sm:pb-6 px-4 sm:px-8 mt-12">
         <div className="max-w-[1360px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 font-mono text-xs text-csg-black/65 text-center sm:text-left">
           <span>CLB TRUYỀN THÔNG CÓC SÀI GÒN • 2009 — 2026 • ĐẠI TIỆC GALA 17Y TẠI ĐỒI SỨ VILLA</span>
         </div>
       </footer>
 
       {/* ================= MOBILE STICKY CTA PILL ================= */}
-      <div className="sm:hidden fixed bottom-5 right-5 z-40 animate-fadeIn">
-        <button
-          onClick={openRegister}
-          className="btn-editorial-primary px-4 py-2.5 font-display font-extrabold text-xs uppercase shadow-poster flex items-center gap-1.5"
-          aria-label="Đăng ký tham gia 17Y"
-        >
-          <span>ĐĂNG KÝ 17Y ↗</span>
-        </button>
-      </div>
+      {!isRegisterOpen && !isStageOpen && !isLookupOpen && !isAdminOpen && !showCinematicIntro && (
+        <div className="sm:hidden fixed bottom-4 right-4 z-40 animate-fadeIn pb-[env(safe-area-inset-bottom)]">
+          <button
+            onClick={openRegister}
+            className="btn-editorial-primary px-3.5 py-2.5 font-display font-extrabold text-xs uppercase shadow-poster flex items-center gap-1.5"
+            aria-label="Đăng ký tham gia 17Y"
+          >
+            <span>ĐĂNG KÝ 17Y ↗</span>
+          </button>
+        </div>
+      )}
 
       {/* ================= FUNCTIONAL MODALS ================= */}
       <RegistrationModal
