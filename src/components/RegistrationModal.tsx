@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import confetti from 'canvas-confetti';
 import {
-  X, CheckCircle, ArrowRight, ArrowLeft, Upload,
-  Copy, Check, Sparkles, AlertCircle, HeartHandshake,
-  UserCheck, ShieldAlert, FileText, Cake, Edit3, MessageSquare,
-  HelpCircle, ExternalLink, Ticket
-} from 'lucide-react';
+  CloseIcon, AlertCircleIcon, SparklesIcon, UploadIcon,
+  EditIcon, ArrowLeftIcon, ArrowRightIcon, ArrowUpRightIcon,
+  FrogIcon, BoltIcon
+} from 'naive-icons';
 import { MemberDirectoryItem, PaymentPlan, RegistrationRecord, MascotFrog } from '../types';
 import { apiClient } from '../services/apiClient';
 import { audioService } from '../services/audioService';
@@ -244,8 +243,8 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
         {/* Header Bar */}
         <div className="flex items-center justify-between px-4 sm:px-6 py-3 border-b-2 border-[#20231F] bg-[#FFFFFF] shrink-0">
           <div className="flex items-center gap-3">
-            <span className="w-10 h-10 rounded-sm bg-[#F4C542] border-2 border-[#20231F] flex items-center justify-center text-xl shadow-poster-sm shrink-0">
-              🐸
+            <span className="w-10 h-10 rounded-sm bg-[#F4C542] border-2 border-[#20231F] flex items-center justify-center shadow-poster-sm shrink-0">
+              <FrogIcon size={22} />
             </span>
             <div>
               <div className="flex items-center gap-2">
@@ -267,7 +266,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
             className="px-3 py-1.5 min-h-[44px] min-w-[44px] rounded-sm bg-[#20231F] text-white hover:bg-[#B94D35] text-xs font-mono font-bold uppercase transition-colors flex items-center justify-center gap-1.5 shadow-sm active:scale-95"
             title="Thoát ra trang chủ"
           >
-            <X className="w-4 h-4" />
+            <CloseIcon size={16} />
             <span className="hidden sm:inline">VỀ TRANG CHỦ</span>
           </button>
         </div>
@@ -323,15 +322,16 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                   {searchError && (
                     <div className="mt-2 p-3 rounded-lg bg-red-50 border-2 border-[#B94D35] text-[#B94D35] text-xs space-y-2">
                       <div className="flex items-center gap-2">
-                        <AlertCircle className="w-4 h-4 shrink-0" />
+                        <AlertCircleIcon size={16} className="shrink-0" />
                         <span>{searchError}</span>
                       </div>
                       <button
                         type="button"
                         onClick={() => handleQuickBypass()}
-                        className="w-full py-2.5 min-h-[44px] px-3 bg-[#B94D35] text-white font-bold rounded-sm text-center hover:bg-[#20231F] transition-colors active:scale-[0.98]"
+                        className="w-full py-2.5 min-h-[44px] px-3 bg-[#B94D35] text-white font-bold rounded-sm text-center hover:bg-[#20231F] transition-colors active:scale-[0.98] flex items-center justify-center gap-1.5"
                       >
-                        Tiếp tục đăng ký với tên "{query.trim() || 'Khách mời'}" ↗
+                        <span>Tiếp tục đăng ký với tên "{query.trim() || 'Khách mời'}"</span>
+                        <ArrowUpRightIcon size={14} />
                       </button>
                     </div>
                   )}
@@ -342,7 +342,8 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                   disabled={isVerifying || !query.trim()}
                   className="btn-editorial-primary w-full py-3.5 min-h-[48px] rounded-sm font-display text-xl tracking-wider uppercase flex items-center justify-center gap-2 disabled:opacity-50 active:scale-[0.98]"
                 >
-                  <span>{isVerifying ? 'ĐANG ĐỐI CHIẾU...' : 'TÌM TÊN CỦA BẠN ↗'}</span>
+                  <span>{isVerifying ? 'ĐANG ĐỐI CHIẾU...' : 'TÌM TÊN CỦA BẠN'}</span>
+                  {!isVerifying && <ArrowUpRightIcon size={18} />}
                 </button>
 
                 <div className="pt-2 text-center space-y-2.5">
@@ -351,8 +352,12 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                     onClick={() => handleQuickBypass()}
                     className="w-full py-3 min-h-[44px] px-4 rounded-sm border-2 border-dashed border-[#20231F]/40 bg-[#FFFFFF]/80 hover:bg-[#FFFFFF] text-xs font-mono font-bold uppercase tracking-wider text-[#20231F] hover:border-[#20231F] transition-all flex items-center justify-center gap-2 shadow-poster-sm active:scale-[0.98]"
                   >
-                    <Sparkles className="w-4 h-4 text-[#B94D35]" />
-                    <span>⚡ Bỏ qua tra cứu · Đăng ký tự do ngay ↗</span>
+                    <SparklesIcon size={16} className="text-[#B94D35]" />
+                    <span className="flex items-center gap-1">
+                      <BoltIcon size={14} />
+                      <span>Bỏ qua tra cứu · Đăng ký tự do ngay</span>
+                      <ArrowUpRightIcon size={14} />
+                    </span>
                   </button>
 
                   <p className="text-[11px] text-[#20231F]/65 font-body">
@@ -442,16 +447,18 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                 <button
                   type="button"
                   onClick={() => setScreen(1)}
-                  className="btn-editorial-secondary flex-1 py-3.5 min-h-[44px] rounded-sm font-bold text-xs uppercase active:scale-[0.98] flex items-center justify-center"
+                  className="btn-editorial-secondary flex-1 py-3.5 min-h-[44px] rounded-sm font-bold text-xs uppercase active:scale-[0.98] flex items-center justify-center gap-1.5"
                 >
-                  ← Đổi người khác
+                  <ArrowLeftIcon size={14} />
+                  <span>Đổi người khác</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setScreen(3)}
                   className="btn-editorial-primary flex-2 py-3.5 min-h-[48px] px-6 rounded-sm font-display text-xl tracking-wider uppercase flex items-center justify-center gap-2 active:scale-[0.98]"
                 >
-                  <span>TIẾP TỤC ĐẾN BUỔI TIỆC ↗</span>
+                  <span>TIẾP TỤC ĐẾN BUỔI TIỆC</span>
+                  <ArrowUpRightIcon size={18} />
                 </button>
               </div>
             </div>
@@ -607,7 +614,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                       </div>
                     ) : (
                       <label className="border-2 border-dashed border-[#20231F] p-4 min-h-[84px] bg-white flex flex-col items-center justify-center gap-1.5 cursor-pointer hover:bg-[#F4EEDF] transition-colors active:scale-[0.99]">
-                        <Upload className="w-5 h-5 text-[#20231F]" />
+                        <UploadIcon size={20} className="text-[#20231F]" />
                         <span className="text-xs font-bold text-[#20231F] text-center">
                           Nhấp để tải lên ảnh chụp màn hình chuyển khoản
                         </span>
@@ -634,9 +641,10 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                 <button
                   type="button"
                   onClick={() => setScreen(2)}
-                  className="btn-editorial-secondary flex-1 py-3 min-h-[44px] rounded-sm font-bold text-xs uppercase active:scale-[0.98] flex items-center justify-center"
+                  className="btn-editorial-secondary flex-1 py-3 min-h-[44px] rounded-sm font-bold text-xs uppercase active:scale-[0.98] flex items-center justify-center gap-1.5"
                 >
-                  ← Quay lại
+                  <ArrowLeftIcon size={14} />
+                  <span>Quay lại</span>
                 </button>
                 <button
                   type="button"
@@ -645,9 +653,10 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                       setScreen(4); // Go to participant info
                     }
                   }}
-                  className="btn-editorial-primary flex-2 py-3 min-h-[48px] rounded-sm font-display text-xl uppercase tracking-wider active:scale-[0.98] flex items-center justify-center"
+                  className="btn-editorial-primary flex-2 py-3 min-h-[48px] rounded-sm font-display text-xl uppercase tracking-wider active:scale-[0.98] flex items-center justify-center gap-2"
                 >
-                  ĐIỀN THÔNG TIN THAM DỰ →
+                  <span>ĐIỀN THÔNG TIN THAM DỰ</span>
+                  <ArrowRightIcon size={18} />
                 </button>
               </div>
             </div>
@@ -792,9 +801,10 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                 <button
                   type="button"
                   onClick={() => setScreen(3)}
-                  className="btn-editorial-secondary flex-1 py-3 min-h-[44px] rounded-sm font-bold text-xs uppercase active:scale-[0.98] flex items-center justify-center"
+                  className="btn-editorial-secondary flex-1 py-3 min-h-[44px] rounded-sm font-bold text-xs uppercase active:scale-[0.98] flex items-center justify-center gap-1.5"
                 >
-                  ← Chọn lại thanh toán
+                  <ArrowLeftIcon size={14} />
+                  <span>Chọn lại thanh toán</span>
                 </button>
                 <button
                   type="button"
@@ -803,9 +813,10 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                       setScreen(5); // Go to review
                     }
                   }}
-                  className="btn-editorial-primary flex-2 py-3 min-h-[48px] rounded-sm font-display text-xl uppercase tracking-wider active:scale-[0.98] flex items-center justify-center"
+                  className="btn-editorial-primary flex-2 py-3 min-h-[48px] rounded-sm font-display text-xl uppercase tracking-wider active:scale-[0.98] flex items-center justify-center gap-2"
                 >
-                  XEM LẠI & XÁC NHẬN →
+                  <span>XEM LẠI & XÁC NHẬN</span>
+                  <ArrowRightIcon size={18} />
                 </button>
               </div>
             </div>
@@ -836,7 +847,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                     onClick={() => setScreen(1)}
                     className="px-2.5 py-2 min-h-[44px] min-w-[60px] rounded-lg border border-[#20231F] hover:bg-[#F4EEDF] flex items-center justify-center gap-1 text-[11px] font-bold active:scale-95 shrink-0"
                   >
-                    <Edit3 className="w-3.5 h-3.5" />
+                    <EditIcon size={14} />
                     <span>Sửa</span>
                   </button>
                 </div>
@@ -857,7 +868,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                     onClick={() => setScreen(3)}
                     className="px-2.5 py-2 min-h-[44px] min-w-[60px] rounded-lg border border-[#20231F] hover:bg-[#F4EEDF] flex items-center justify-center gap-1 text-[11px] font-bold active:scale-95 shrink-0"
                   >
-                    <Edit3 className="w-3.5 h-3.5" />
+                    <EditIcon size={14} />
                     <span>Sửa</span>
                   </button>
                 </div>
@@ -877,7 +888,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                     onClick={() => setScreen(4)}
                     className="px-2.5 py-2 min-h-[44px] min-w-[60px] rounded-lg border border-[#20231F] hover:bg-[#F4EEDF] flex items-center justify-center gap-1 text-[11px] font-bold active:scale-95 shrink-0"
                   >
-                    <Edit3 className="w-3.5 h-3.5" />
+                    <EditIcon size={14} />
                     <span>Sửa</span>
                   </button>
                 </div>
@@ -899,9 +910,10 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                 <button
                   type="button"
                   onClick={() => setScreen(4)}
-                  className="btn-editorial-secondary flex-1 py-3.5 min-h-[44px] rounded-sm font-bold text-xs uppercase active:scale-[0.98] flex items-center justify-center"
+                  className="btn-editorial-secondary flex-1 py-3.5 min-h-[44px] rounded-sm font-bold text-xs uppercase active:scale-[0.98] flex items-center justify-center gap-1.5"
                 >
-                  ← Sửa thông tin
+                  <ArrowLeftIcon size={14} />
+                  <span>Sửa thông tin</span>
                 </button>
                 <button
                   type="button"
@@ -909,7 +921,8 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                   onClick={handleFinalSubmit}
                   className="btn-editorial-primary flex-2 py-3.5 min-h-[48px] px-6 rounded-sm font-display text-xl sm:text-2xl tracking-wider uppercase flex items-center justify-center gap-2 active:scale-[0.98]"
                 >
-                  <span>{isSubmitting ? 'ĐANG GỬI HỒ SƠ...' : 'HOÀN TẤT ĐĂNG KÝ ↗'}</span>
+                  <span>{isSubmitting ? 'ĐANG GỬI HỒ SƠ...' : 'HOÀN TẤT ĐĂNG KÝ'}</span>
+                  {!isSubmitting && <ArrowUpRightIcon size={18} />}
                 </button>
               </div>
             </div>

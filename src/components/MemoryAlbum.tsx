@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { X, ChevronLeft, ChevronRight, ZoomIn } from 'lucide-react';
+import { CloseIcon, ChevronLeftIcon, ChevronRightIcon, ZoomInIcon } from 'naive-icons';
 
 interface MemoryPhoto {
   id: string;
@@ -212,7 +212,7 @@ export const MemoryAlbum: React.FC = () => {
               loading="lazy"
             />
             <div className="absolute bottom-3 right-3 bg-csg-paper/90 border border-csg-black px-2.5 py-1 font-mono text-[11px] font-bold text-csg-black opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 shadow-sm">
-              <ZoomIn className="w-3.5 h-3.5 text-csg-red" />
+              <ZoomInIcon size={14} className="text-csg-red" />
               <span>XEM RÕ HƠN</span>
             </div>
           </div>
@@ -345,7 +345,7 @@ export const MemoryAlbum: React.FC = () => {
             className="absolute top-6 right-6 z-30 p-2.5 bg-[#201E1A] hover:bg-csg-red text-[#F4EEDF] transition-colors border border-white/10"
             aria-label="Đóng xem chi tiết (Esc)"
           >
-            <X className="w-5 h-5" />
+            <CloseIcon size={20} />
           </button>
 
           {/* Photo Stage */}
@@ -366,7 +366,7 @@ export const MemoryAlbum: React.FC = () => {
                 className="p-1 hover:text-csg-yellow transition-colors flex items-center gap-1"
                 aria-label="Ảnh trước"
               >
-                <ChevronLeft className="w-4 h-4" />
+                <ChevronLeftIcon size={16} />
                 <span>TRƯỚC</span>
               </button>
 
@@ -380,7 +380,7 @@ export const MemoryAlbum: React.FC = () => {
                 aria-label="Ảnh sau"
               >
                 <span>TIẾP</span>
-                <ChevronRight className="w-4 h-4" />
+                <ChevronRightIcon size={16} />
               </button>
             </div>
           </div>

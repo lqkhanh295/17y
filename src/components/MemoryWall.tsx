@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { ZoomIn, X, ChevronLeft, ChevronRight, Folder, Bookmark } from 'lucide-react';
+import { ZoomInIcon, CloseIcon, ChevronLeftIcon, ChevronRightIcon, BookmarkIcon } from 'naive-icons';
 
 export interface PhotobookItem {
   id: string;
@@ -238,7 +238,7 @@ export const MemoryWall: React.FC = () => {
 
                   {/* Discrete Zoom Hint */}
                   <div className="absolute bottom-3 right-3 bg-csg-paper/90 border border-csg-black px-2 py-1 text-[10px] font-mono font-bold flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <ZoomIn className="w-3 h-3 text-csg-red" />
+                    <ZoomInIcon size={12} className="text-csg-red" />
                     <span>PHÓNG TO</span>
                   </div>
                 </div>
@@ -254,7 +254,7 @@ export const MemoryWall: React.FC = () => {
                         className="hover:text-csg-red transition-colors"
                         title={isBookmarked ? 'Bỏ lưu' : 'Đánh dấu'}
                       >
-                        <Bookmark className={`w-3.5 h-3.5 ${isBookmarked ? 'fill-csg-red text-csg-red' : ''}`} />
+                        <BookmarkIcon size={14} className={isBookmarked ? 'fill-csg-red text-csg-red' : ''} />
                       </button>
                     </div>
                   </div>
@@ -298,7 +298,7 @@ export const MemoryWall: React.FC = () => {
               className="absolute top-4 right-4 z-20 p-2 bg-[#2A2722] hover:bg-[#B94D35] text-[#F4EEDF] transition-colors"
               aria-label="Đóng xem chi tiết"
             >
-              <X className="w-5 h-5" />
+              <CloseIcon size={20} />
             </button>
 
             {/* High-Res Photograph */}
@@ -358,7 +358,7 @@ export const MemoryWall: React.FC = () => {
                   onClick={handlePrev}
                   className="px-3 py-1.5 bg-[#25221D] hover:bg-[#F4C542] hover:text-[#20231F] text-[#F4EEDF] transition-colors flex items-center gap-1"
                 >
-                  <ChevronLeft className="w-4 h-4" />
+                  <ChevronLeftIcon size={16} />
                   <span>TRƯỚC</span>
                 </button>
                 <span className="text-[#DCD5C4]/60">
@@ -369,7 +369,7 @@ export const MemoryWall: React.FC = () => {
                   className="px-3 py-1.5 bg-[#25221D] hover:bg-[#F4C542] hover:text-[#20231F] text-[#F4EEDF] transition-colors flex items-center gap-1"
                 >
                   <span>TIẾP</span>
-                  <ChevronRight className="w-4 h-4" />
+                  <ChevronRightIcon size={16} />
                 </button>
               </div>
             </div>

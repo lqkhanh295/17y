@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Volume2, VolumeX, Music } from 'lucide-react';
+import { Volume2Icon, VolumeXIcon, MusicIcon } from 'naive-icons';
 import { audioService } from '../services/audioService';
 
 export const AudioPlayerToggle: React.FC = () => {
@@ -16,7 +16,7 @@ export const AudioPlayerToggle: React.FC = () => {
     <div className="fixed bottom-4 left-4 sm:bottom-6 sm:left-6 z-40 flex items-center gap-3 select-none pb-[env(safe-area-inset-bottom)]">
       {!hasInteracted && !isPlaying && (
         <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-medium animate-bounce shadow-lg shadow-black/50">
-          <Music className="w-3.5 h-3.5 text-amber-400" />
+          <MusicIcon size={14} className="text-amber-400" />
           <span>Bật nhạc tiệc sinh nhật!</span>
         </div>
       )}
@@ -35,10 +35,10 @@ export const AudioPlayerToggle: React.FC = () => {
           <div className="relative flex items-center justify-center">
             {/* Spinning ring animation */}
             <span className="absolute -inset-1.5 rounded-full border-2 border-dashed border-amber-400/60 animate-spin" />
-            <Volume2 className="w-5 h-5 text-black" />
+            <Volume2Icon size={20} className="text-black" color="currentColor" />
           </div>
         ) : (
-          <VolumeX className="w-5 h-5 transition-transform group-hover:scale-110" />
+          <VolumeXIcon size={20} className="transition-transform group-hover:scale-110" color="currentColor" />
         )}
 
         {/* Visualizer wave bars when playing */}

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { X, ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react';
+import { CloseIcon, ChevronLeftIcon, ChevronRightIcon, ArrowRightIcon } from 'naive-icons';
 import { PHOTOBOOK_IMAGES, ALL_PHOTOBOOK_IMAGES, PhotobookImage, GALA_EVENT_DETAILS } from '../data/photobookData';
 
 interface PhotobookFlowProps {
@@ -89,9 +89,10 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
         <div className="flex items-center gap-4 font-mono text-xs">
           <button
             onClick={onOpenRegister}
-            className="text-csg-black/80 hover:text-csg-red underline underline-offset-4 tracking-wider uppercase transition-colors font-bold"
+            className="text-csg-black/80 hover:text-csg-red underline underline-offset-4 tracking-wider uppercase transition-colors font-bold inline-flex items-center gap-1.5"
           >
-            Đăng ký tham gia Gala 17Y →
+            <span>Đăng ký tham gia Gala 17Y</span>
+            <ArrowRightIcon size={14} className="shrink-0" />
           </button>
         </div>
       </header>
@@ -476,7 +477,7 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
                 className="btn-editorial-primary w-full py-4 min-h-[50px] font-display font-extrabold text-sm sm:text-base uppercase tracking-wider flex items-center justify-center gap-2 shadow-poster active:scale-[0.98]"
               >
                 <span>ĐĂNG KÝ THAM GIA GALA 17Y</span>
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRightIcon size={16} className="shrink-0" />
               </button>
 
               <div className="text-center font-mono text-xs pt-1">
@@ -510,7 +511,7 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
             className="absolute top-4 right-4 sm:top-6 sm:right-6 z-30 p-2.5 min-h-[44px] min-w-[44px] flex items-center justify-center bg-[#1F1E1B] hover:bg-csg-red text-white transition-colors border border-white/10 active:scale-95"
             aria-label="Đóng xem ảnh (Esc)"
           >
-            <X className="w-5 h-5" />
+            <CloseIcon size={20} />
           </button>
 
           {/* Photo Frame */}
@@ -531,7 +532,7 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
                 className="px-3 py-2 min-h-[44px] min-w-[70px] hover:text-csg-yellow transition-colors flex items-center justify-center gap-1 active:scale-95"
                 aria-label="Ảnh trước"
               >
-                <ChevronLeft className="w-4 h-4" />
+                <ChevronLeftIcon size={16} />
                 <span>TRƯỚC</span>
               </button>
 
@@ -545,7 +546,7 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
                 aria-label="Ảnh sau"
               >
                 <span>TIẾP</span>
-                <ChevronRight className="w-4 h-4" />
+                <ChevronRightIcon size={16} />
               </button>
             </div>
           </div>

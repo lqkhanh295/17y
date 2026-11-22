@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import confetti from 'canvas-confetti';
+import { FrogIcon, ArrowUpRightIcon } from 'naive-icons';
 import { AudioPlayerToggle } from './components/AudioPlayerToggle';
 import { CinematicFilmOpening } from './components/CinematicFilmOpening';
 import { PhotobookFlow } from './components/PhotobookFlow';
@@ -329,10 +330,10 @@ export const App: React.FC = () => {
           <nav className="flex items-center gap-1.5 sm:gap-6 font-mono text-xs uppercase tracking-wider text-csg-black/80 font-medium shrink-0">
             <button
               onClick={() => setIsStageOpen(true)}
-              className="hover:text-csg-red transition-colors font-bold px-2 py-1.5 min-h-[44px] min-w-[44px] flex items-center justify-center gap-1 active:scale-95 text-xs rounded-sm"
+              className="hover:text-csg-red transition-colors font-bold px-2 py-1.5 min-h-[44px] min-w-[44px] flex items-center justify-center gap-1.5 active:scale-95 text-xs rounded-sm"
               title="Xem sân khấu kỷ niệm 17Y"
             >
-              <span className="text-base">🐸</span>
+              <FrogIcon size={16} className="shrink-0" />
               <span className="hidden sm:inline">SÂN KHẤU CÓC</span>
             </button>
             <button
@@ -346,7 +347,8 @@ export const App: React.FC = () => {
               onClick={openRegister}
               className="btn-editorial-primary px-3 sm:px-3.5 py-2 sm:py-1.5 font-display font-bold text-xs uppercase flex items-center gap-1 shadow-sm min-h-[44px] active:scale-95 whitespace-nowrap"
             >
-              <span>ĐĂNG KÝ <span className="hidden sm:inline">THAM GIA</span> ↗</span>
+              <span>ĐĂNG KÝ <span className="hidden sm:inline">THAM GIA</span></span>
+              <ArrowUpRightIcon size={14} className="shrink-0" />
             </button>
           </nav>
         </div>
@@ -363,8 +365,8 @@ export const App: React.FC = () => {
       </main>
 
       {/* ================= QUIET COLOPHON FOOTER ================= */}
-      <footer className="relative z-10 bg-csg-surface border-t border-csg-black/25 pt-6 pb-28 sm:pb-8 px-4 sm:px-8 mt-12">
-        <div className="max-w-[1360px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 font-mono text-xs text-csg-black/65 text-center sm:text-left leading-relaxed">
+      <footer className="relative z-10 bg-csg-surface border-t border-csg-black/25 pt-6 pb-28 sm:pb-8 pl-4 pr-36 sm:px-8 mt-12">
+        <div className="max-w-[1360px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 font-mono text-xs text-csg-black/65 text-left leading-relaxed">
           <span>CLB TRUYỀN THÔNG CÓC SÀI GÒN • 2009 — 2026 • ĐẠI TIỆC GALA 17Y TẠI ĐỒI SỨ VILLA</span>
         </div>
       </footer>
@@ -377,7 +379,8 @@ export const App: React.FC = () => {
             className="btn-editorial-primary px-4 py-3 font-display font-extrabold text-xs uppercase shadow-poster flex items-center gap-1.5 min-h-[48px] active:scale-95"
             aria-label="Đăng ký tham gia 17Y"
           >
-            <span>ĐĂNG KÝ 17Y ↗</span>
+            <span>ĐĂNG KÝ 17Y</span>
+            <ArrowUpRightIcon size={14} className="shrink-0" />
           </button>
         </div>
       )}

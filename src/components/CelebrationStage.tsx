@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { 
-  Sparkles, Search, Volume2, VolumeX, PartyPopper, 
-  X, CheckCircle, ArrowLeft, ExternalLink, Ticket, Lightbulb
-} from 'lucide-react';
+  SparklesIcon, SearchIcon, Volume2Icon, VolumeXIcon, PartyIcon, 
+  CloseIcon, BulbIcon, FrogIcon, GraduationCapIcon, BoltIcon, HeartIcon
+} from 'naive-icons';
 import confetti from 'canvas-confetti';
 import { MascotFrog, MemberRole, RegistrationRecord } from '../types';
 import { audioService } from '../services/audioService';
@@ -65,10 +65,21 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
     return [myFrog, ...characters];
   }, [characters, newRegistrant]);
 
-  // Positions for stage walk simulation
-  const [positions, setPositions] = useState<{ [id: string]: { x: number; y: number; dir: number; speed: number; laneY: number; scale: number } }>({});
+  // Positions and non-overlapping slot allocation for stage walk simulation
+  const [positions, setPositions] = useState<{ 
+    [id: string]: { 
+      x: number; 
+      y: number; 
+      dir: number; 
+      speed: number; 
+      laneY: number; 
+      scale: number;
+      minX: number;
+      maxX: number;
+    } 
+  }>({});
   const [hoveredId, setHoveredId] = useState<string | null>(null);
-  const [ambientSpeakerId, setAmbientSpeakerId] = useState<string | null>(null);
+  const [activeSpeakerId, setActiveSpeakerId] = useState<string | null>(null);
 
   // Confetti blast trigger
   const triggerConfettiBlast = (e?: React.MouseEvent) => {
@@ -86,59 +97,133 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
     });
   };
 
-  // Ambient speaker rotation - every 4.5s cycle through frogs so only ONE speaks at a time
+  // Strictly ONE speech bubble active at a time - rotating smoothly without clutter or collision
   useEffect(() => {
     if (allCharacters.length === 0) return;
-    const candidateFrogs = allCharacters.filter(c => {
-      const isUser = newRegistrant && (c.id === `frog-${newRegistrant.id}` || c.name.includes(newRegistrant.fullName));
-      return !isUser;
-    });
-    if (candidateFrogs.length === 0) return;
 
-    let idx = 0;
+    const userFrog = newRegistrant 
+      ? allCharacters.find(c => c.id === `frog-${newRegistrant.id}` || c.name.includes(newRegistrant.fullName)) 
+      : null;
+
+    // If newly registered, give user's frog the celebratory spotlight for 6s
+    if (userFrog) {
+      setActiveSpeakerId(userFrog.id);
+    } else {
+      setActiveSpeakerId(allCharacters[0]?.id || null);
+    }
+
+    let currentIndex = userFrog ? allCharacters.indexOf(userFrog) : 0;
+    const initialDelay = userFrog ? 6000 : 2500;
+
+    let intervalId: NodeJS.Timeout | null = null;
     const initialTimer = setTimeout(() => {
-      setAmbientSpeakerId(candidateFrogs[0]?.id || null);
-    }, 1200);
-
-    const interval = setInterval(() => {
-      idx = (idx + 1) % candidateFrogs.length;
-      setAmbientSpeakerId(candidateFrogs[idx]?.id || null);
-    }, 4800);
+      // Start cycling one frog at a time every 4.8s
+      intervalId = setInterval(() => {
+        currentIndex = (currentIndex + 1) % allCharacters.length;
+        setActiveSpeakerId(allCharacters[currentIndex]?.id || null);
+      }, 4800);
+    }, initialDelay);
 
     return () => {
       clearTimeout(initialTimer);
-      clearInterval(interval);
+      if (intervalId) clearInterval(intervalId);
     };
   }, [allCharacters, newRegistrant]);
 
+  // Non-overlapping dedicated slot layout: frogs pace strictly in their own dedicated sector
   useEffect(() => {
-    // Generate initial stage floor positions with staggered lanes and depths
-    const pos: { [id: string]: { x: number; y: number; dir: number; speed: number; laneY: number; scale: number } } = {};
-    
-    // Four distinct lanes to prevent clumping
-    const lanes = [
-      { x: 18, y: 64, dir: 1, speed: 0.08, scale: 0.88 },
-      { x: 38, y: 78, dir: -1, speed: 0.1, scale: 1.05 },
-      { x: 62, y: 67, dir: 1, speed: 0.07, scale: 0.92 },
-      { x: 82, y: 76, dir: -1, speed: 0.09, scale: 1.02 }
-    ];
+    if (allCharacters.length === 0) return;
 
-    allCharacters.forEach((c, idx) => {
-      const isNewUser = newRegistrant && (c.id === `frog-${newRegistrant.id}` || c.name.includes(newRegistrant.fullName));
-      const lane = lanes[idx % lanes.length];
-      const startX = isNewUser ? 50 : (c.x || lane.x);
-      const startY = isNewUser ? 72 : (c.y || lane.y);
-      const startScale = isNewUser ? 1.15 : (c.scale || lane.scale);
+    const pos: { 
+      [id: string]: { 
+        x: number; 
+        y: number; 
+        dir: number; 
+        speed: number; 
+        laneY: number; 
+        scale: number;
+        minX: number;
+        maxX: number;
+      } 
+    } = {};
 
-      pos[c.id] = {
-        x: startX,
-        y: startY,
-        laneY: startY,
-        dir: c.direction || lane.dir,
-        speed: isNewUser ? 0.04 : lane.speed,
-        scale: startScale
+    const userFrogId = newRegistrant ? `frog-${newRegistrant.id}` : null;
+    const otherFrogs = allCharacters.filter(c => c.id !== userFrogId && !c.name.includes(newRegistrant?.fullName || '___none___'));
+    const userFrog = allCharacters.find(c => c.id === userFrogId || (newRegistrant && c.name.includes(newRegistrant.fullName)));
+
+    if (userFrog) {
+      // User frog is the center star at 50%
+      const userX = 50;
+      const userY = 74;
+      pos[userFrog.id] = {
+        x: userX,
+        y: userY,
+        laneY: userY,
+        dir: 1,
+        speed: 0.03,
+        scale: 1.18,
+        minX: 47.5,
+        maxX: 52.5
       };
-    });
+
+      // Split other frogs between left (18% - 38%) and right (62% - 82%)
+      const leftCount = Math.ceil(otherFrogs.length / 2);
+      const leftFrogs = otherFrogs.slice(0, leftCount);
+      const rightFrogs = otherFrogs.slice(leftCount);
+
+      leftFrogs.forEach((c, idx) => {
+        const step = leftFrogs.length > 1 ? 20 / (leftFrogs.length - 1) : 0;
+        const anchorX = leftFrogs.length > 1 ? 18 + idx * step : 28;
+        const laneY = idx % 2 === 0 ? 66 : 78;
+        const scale = laneY === 66 ? 0.92 : 1.05;
+        pos[c.id] = {
+          x: anchorX,
+          y: laneY,
+          laneY,
+          dir: idx % 2 === 0 ? 1 : -1,
+          speed: 0.035,
+          scale,
+          minX: anchorX - 2.8,
+          maxX: anchorX + 2.8
+        };
+      });
+
+      rightFrogs.forEach((c, idx) => {
+        const step = rightFrogs.length > 1 ? 20 / (rightFrogs.length - 1) : 0;
+        const anchorX = rightFrogs.length > 1 ? 62 + idx * step : 72;
+        const laneY = idx % 2 === 0 ? 78 : 66;
+        const scale = laneY === 66 ? 0.92 : 1.05;
+        pos[c.id] = {
+          x: anchorX,
+          y: laneY,
+          laneY,
+          dir: idx % 2 === 0 ? -1 : 1,
+          speed: 0.035,
+          scale,
+          minX: anchorX - 2.8,
+          maxX: anchorX + 2.8
+        };
+      });
+    } else {
+      // Standard distribution across 18% to 82%
+      allCharacters.forEach((c, idx) => {
+        const step = allCharacters.length > 1 ? 64 / (allCharacters.length - 1) : 0;
+        const anchorX = allCharacters.length > 1 ? 18 + idx * step : 50;
+        const laneY = idx % 2 === 0 ? 66 : 78;
+        const scale = laneY === 66 ? 0.92 : 1.05;
+        pos[c.id] = {
+          x: anchorX,
+          y: laneY,
+          laneY,
+          dir: idx % 2 === 0 ? 1 : -1,
+          speed: 0.035,
+          scale,
+          minX: anchorX - 3,
+          maxX: anchorX + 3
+        };
+      });
+    }
+
     setPositions(pos);
 
     // Initial confetti celebration if new registrant just joined
@@ -146,27 +231,22 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
       triggerConfettiBlast();
     }
 
-    // Subtle ambient walking drift across the real stage floor
+    // Gentle natural walking drift strictly within each frog's non-overlapping slot
     const interval = setInterval(() => {
       setPositions(prev => {
         const next = { ...prev };
-        allCharacters.forEach(c => {
-          if (!next[c.id]) return;
-          let { x, y, dir, speed, laneY, scale } = next[c.id];
-          const isCenter = newRegistrant && (c.id === `frog-${newRegistrant.id}` || c.name.includes(newRegistrant.fullName));
-          
-          x += dir * (speed || (isCenter ? 0.04 : 0.08));
-
-          // Confine walking across the stage floor
-          if (x > 84) {
-            x = 84;
+        Object.keys(next).forEach(id => {
+          if (!next[id]) return;
+          let { x, y, dir, speed, laneY, scale, minX, maxX } = next[id];
+          x += dir * speed;
+          if (x >= maxX) {
+            x = maxX;
             dir = -1;
-          } else if (x < 16) {
-            x = 16;
+          } else if (x <= minX) {
+            x = minX;
             dir = 1;
           }
-
-          next[c.id] = { x, y: laneY || y, dir, speed, laneY: laneY || y, scale: scale || 1 };
+          next[id] = { x, y: laneY, laneY, dir, speed, scale, minX, maxX };
         });
         return next;
       });
@@ -198,7 +278,7 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
         {/* Left: Brand Identity / Registrant Greeting */}
         <div className="flex items-center gap-2 sm:gap-2.5 min-w-0 shrink-0">
           <span className="w-8 h-8 rounded-sm bg-[#F4C542] border border-[#20231F] flex items-center justify-center text-lg shrink-0 shadow-xs">
-            🐸
+            <FrogIcon size={18} />
           </span>
           <div className="min-w-0 flex items-center gap-2">
             <span className="font-display font-black text-sm sm:text-base tracking-wider text-white uppercase whitespace-nowrap">
@@ -206,7 +286,7 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
             </span>
             {newRegistrant ? (
               <span className="text-xs font-mono text-[#F4C542] truncate hidden md:inline">
-                • Chào mừng <strong>{newRegistrant.honorific} {newRegistrant.fullName}</strong> ({newRegistrant.role === 'ALUMNI' ? 'Cựu TV' : 'Thành viên'})! 🎉
+                • Chào mừng <strong>{newRegistrant.honorific} {newRegistrant.fullName}</strong> ({newRegistrant.role === 'ALUMNI' ? 'Cựu TV' : 'Thành viên'})!
               </span>
             ) : (
               <span className="px-1.5 py-0.5 rounded-xs text-[9px] font-mono font-bold bg-[#F4C542] text-[#20231F] hidden sm:inline-block tracking-wider uppercase">
@@ -234,30 +314,32 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
             <button
               type="button"
               onClick={() => setSelectedRole('ALUMNI')}
-              className={`px-3 py-2 sm:py-1 min-h-[44px] sm:min-h-0 rounded-xs font-bold transition-all whitespace-nowrap text-xs active:scale-95 flex items-center ${
+              className={`px-3 py-2 sm:py-1 min-h-[44px] sm:min-h-0 rounded-xs font-bold transition-all whitespace-nowrap text-xs active:scale-95 flex items-center gap-1.5 ${
                 selectedRole === 'ALUMNI'
                   ? 'bg-[#F4C542] text-[#20231F] shadow-xs'
                   : 'text-white/70 hover:text-white'
               }`}
             >
-              🎓 Cựu TV ({allCharacters.filter(c => c.role === 'ALUMNI').length})
+              <GraduationCapIcon size={14} className="shrink-0" />
+              <span>Cựu TV ({allCharacters.filter(c => c.role === 'ALUMNI').length})</span>
             </button>
             <button
               type="button"
               onClick={() => setSelectedRole('ACTIVE')}
-              className={`px-3 py-2 sm:py-1 min-h-[44px] sm:min-h-0 rounded-xs font-bold transition-all whitespace-nowrap text-xs active:scale-95 flex items-center ${
+              className={`px-3 py-2 sm:py-1 min-h-[44px] sm:min-h-0 rounded-xs font-bold transition-all whitespace-nowrap text-xs active:scale-95 flex items-center gap-1.5 ${
                 selectedRole === 'ACTIVE'
                   ? 'bg-[#F4C542] text-[#20231F] shadow-xs'
                   : 'text-white/70 hover:text-white'
               }`}
             >
-              ⚡ Thành viên ({allCharacters.filter(c => c.role === 'ACTIVE').length})
+              <BoltIcon size={14} className="shrink-0" />
+              <span>Thành viên ({allCharacters.filter(c => c.role === 'ACTIVE').length})</span>
             </button>
           </div>
 
           {/* Quick Search */}
           <div className="relative w-32 sm:w-52 shrink-0">
-            <Search className="w-3.5 h-3.5 text-white/40 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <SearchIcon size={14} className="text-white/40 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="text"
               placeholder="Tìm tên hoặc lời chúc..."
@@ -271,24 +353,24 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
           <button
             type="button"
             onClick={() => triggerConfettiBlast()}
-            className="px-3 py-2 sm:py-1 min-h-[44px] sm:min-h-0 rounded-xs bg-[#F4C542] hover:bg-[#E5B532] text-[#20231F] font-bold text-xs uppercase flex items-center gap-1 shadow-xs whitespace-nowrap transition-colors active:scale-95 shrink-0"
+            className="px-3 py-2 sm:py-1 min-h-[44px] sm:min-h-0 rounded-xs bg-[#F4C542] hover:bg-[#E5B532] text-[#20231F] font-bold text-xs uppercase flex items-center gap-1.5 shadow-xs whitespace-nowrap transition-colors active:scale-95 shrink-0"
             title="Bắn pháo hoa ăn mừng"
           >
-            <PartyPopper className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Pháo Hoa</span> 🎉
+            <PartyIcon size={14} className="shrink-0" />
+            <span className="hidden sm:inline">Pháo Hoa</span>
           </button>
 
           <button
             type="button"
             onClick={() => setStageLightsOn(!stageLightsOn)}
-            className={`px-3 py-2 sm:py-1 min-h-[44px] sm:min-h-0 rounded-xs font-bold text-xs transition-all border flex items-center gap-1 whitespace-nowrap active:scale-95 shrink-0 ${
+            className={`px-3 py-2 sm:py-1 min-h-[44px] sm:min-h-0 rounded-xs font-bold text-xs transition-all border flex items-center gap-1.5 whitespace-nowrap active:scale-95 shrink-0 ${
               stageLightsOn
                 ? 'bg-[#2D2A26] text-[#F4C542] border-[#F4C542]'
                 : 'bg-[#2D2A26] text-white/60 border-white/15 hover:border-white/40'
             }`}
             title={stageLightsOn ? 'Tắt đèn sân khấu' : 'Bật đèn sân khấu'}
           >
-            <Lightbulb className={`w-3.5 h-3.5 ${stageLightsOn ? 'text-[#F4C542]' : 'text-white/40'}`} />
+            <BulbIcon size={14} className={stageLightsOn ? 'text-[#F4C542]' : 'text-white/40'} />
             <span className="hidden sm:inline">{stageLightsOn ? 'ĐÈN: BẬT' : 'ĐÈN: TẮT'}</span>
           </button>
 
@@ -298,7 +380,7 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
             className="p-2 sm:p-1 min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0 rounded-xs bg-[#2D2A26] border border-white/15 hover:border-white/40 text-white transition-colors active:scale-95 flex items-center justify-center shrink-0"
             title={soundEnabled ? 'Tắt âm thanh' : 'Bật âm thanh'}
           >
-            {soundEnabled ? <Volume2 className="w-3.5 h-3.5 text-[#F4C542]" /> : <VolumeX className="w-3.5 h-3.5 text-rose-400" />}
+            {soundEnabled ? <Volume2Icon size={14} className="text-[#F4C542]" /> : <VolumeXIcon size={14} className="text-rose-400" />}
           </button>
         </div>
 
@@ -310,7 +392,7 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
             className="px-2.5 sm:px-3 py-1.5 min-h-[44px] min-w-[44px] rounded-sm bg-[#B94D35] hover:bg-[#A03C26] text-white font-mono font-bold text-xs uppercase transition-colors flex items-center justify-center gap-1.5 shadow-sm whitespace-nowrap shrink-0 active:scale-95"
             title="Thoát ra trang chủ"
           >
-            <X className="w-4 h-4" />
+            <CloseIcon size={16} />
             <span className="hidden sm:inline">VỀ TRANG CHỦ</span>
           </button>
         )}
@@ -506,29 +588,29 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
           const pos = positions[c.id] || { x: c.x || 50, y: c.y || 75, dir: 1, scale: c.scale || 1 };
           const isUserFrog = newRegistrant && (c.id === `frog-${newRegistrant.id}` || c.name.includes(newRegistrant.fullName));
           const isHovered = hoveredId === c.id;
-          const isAmbient = ambientSpeakerId === c.id;
 
-          // Only user frog, hovered frog, or the 1 ambient rotating speaker show a speech bubble
-          const showBubble = isUserFrog || isHovered || isAmbient;
+          // Strictly ONE speech bubble active at a time across the entire stage
+          const currentSpeakerId = hoveredId || activeSpeakerId;
+          const showBubble = c.id === currentSpeakerId;
 
           // Dynamic horizontal positioning to prevent bubble edge clipping
           const bubbleAlignClass = 
-            pos.x < 24 
+            pos.x < 30 
               ? 'left-0 translate-x-0' 
-              : pos.x > 76 
+              : pos.x > 70 
                 ? 'right-0 left-auto translate-x-0' 
                 : 'left-1/2 -translate-x-1/2';
 
           const pointerAlignClass = 
-            pos.x < 24 
+            pos.x < 30 
               ? 'left-6 -translate-x-1/2' 
-              : pos.x > 76 
+              : pos.x > 70 
                 ? 'right-6 -translate-x-1/2' 
                 : 'left-1/2 -translate-x-1/2';
 
-          // Depth-based z-index: front row (larger y) rendered above back row
+          // Depth-based z-index: front row (larger y) rendered above back row, active speaker elevated
           const baseZ = Math.round(pos.y);
-          const computedZ = (isUserFrog ? 60 : baseZ) + (isHovered ? 150 : (showBubble ? 30 : 0));
+          const computedZ = (isUserFrog ? 60 : baseZ) + (isHovered ? 150 : (showBubble ? 120 : 0));
 
           return (
             <div
@@ -555,9 +637,14 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
               {!showBubble && (
                 <div 
                   style={{ transform: `scaleX(${pos.dir})` }}
-                  className="absolute -top-7 sm:-top-8 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full bg-white/95 border border-[#20231F] text-[#20231F] text-[10px] sm:text-[11px] font-bold font-display shadow-xs flex items-center gap-1 whitespace-nowrap pointer-events-none group-hover:scale-105 transition-transform"
+                  className={`absolute -top-7 sm:-top-8 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full border text-[10px] sm:text-[11px] font-bold font-display shadow-xs flex items-center gap-1 whitespace-nowrap pointer-events-none group-hover:scale-105 transition-transform ${
+                    isUserFrog
+                      ? 'bg-[#F4C542] text-[#20231F] border-[#B94D35] ring-2 ring-[#F4C542]/50 font-black'
+                      : 'bg-white/95 text-[#20231F] border-[#20231F]'
+                  }`}
                 >
-                  <span className="truncate max-w-[85px] sm:max-w-[120px]">{c.name}</span>
+                  {isUserFrog && <span>✨</span>}
+                  <span className="truncate max-w-[85px] sm:max-w-[125px]">{c.name}</span>
                   <span className={`text-[8px] font-mono px-1 rounded ${
                     c.role === 'ALUMNI' ? 'bg-amber-100 text-amber-900 border border-amber-300' : 'bg-emerald-100 text-emerald-900 border border-emerald-300'
                   }`}>
@@ -570,7 +657,7 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
               {showBubble && (
                 <div 
                   style={{ transform: `scaleX(${pos.dir})` }}
-                  className={`absolute -top-24 sm:-top-28 ${bubbleAlignClass} w-44 sm:w-56 p-2 sm:p-2.5 rounded-sm bg-white border-2 text-left shadow-poster transition-all duration-200 animate-fadeIn ${
+                  className={`absolute -top-24 sm:-top-28 ${bubbleAlignClass} w-48 sm:w-60 max-w-[82vw] p-2 sm:p-2.5 rounded-sm bg-white border-2 text-left shadow-poster transition-all duration-200 animate-fadeIn z-50 ${
                     isUserFrog 
                       ? 'border-[#B94D35] ring-2 ring-[#F4C542]' 
                       : isHovered 
@@ -683,7 +770,7 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
               className="btn-editorial-primary px-4 py-2.5 rounded-sm text-xs font-display font-black uppercase tracking-wider shadow-poster-sm flex items-center gap-2"
             >
               <span>Tham Gia Sân Khấu Ngay</span>
-              <Sparkles className="w-3.5 h-3.5" />
+              <SparklesIcon size={14} />
             </button>
           </div>
         )}
@@ -711,12 +798,12 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
             className="absolute top-4 right-4 p-2 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-sm border-2 border-[#20231F] bg-white hover:bg-[#B94D35] hover:text-white text-[#20231F] transition-colors shadow-xs active:scale-95"
             title="Đóng lời chúc"
           >
-            <X className="w-5 h-5" />
+            <CloseIcon size={20} />
           </button>
 
           <div className="flex items-center gap-3.5 mb-4 pr-10">
-            <div className="w-12 h-12 rounded-sm bg-[#F4C542] border-2 border-[#20231F] flex items-center justify-center text-2xl shadow-sm shrink-0">
-              🐸
+            <div className="w-12 h-12 rounded-sm bg-[#F4C542] border-2 border-[#20231F] flex items-center justify-center shadow-sm shrink-0">
+              <FrogIcon size={24} />
             </div>
             <div>
               <h3 className="font-display font-black text-xl text-[#20231F] leading-tight">
@@ -755,7 +842,7 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
               className="px-4 py-2.5 min-h-[44px] rounded-sm bg-[#20231F] text-white font-bold text-xs uppercase hover:bg-[#B94D35] transition-colors shadow-sm flex items-center gap-1.5 active:scale-95 shrink-0"
             >
               <span>Gửi Tim Chúc Mừng</span>
-              <span>💛</span>
+              <HeartIcon size={14} className="text-[#F4C542]" />
             </button>
           </div>
         </div>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { ZoomIn, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ZoomInIcon, CloseIcon, ChevronLeftIcon, ChevronRightIcon } from 'naive-icons';
 
 export interface ExhibitionPhoto {
   id: string;
@@ -145,7 +145,7 @@ export const ExhibitionArchive: React.FC = () => {
               loading="lazy"
             />
             <div className="absolute bottom-4 right-4 bg-csg-paper/90 border border-csg-black px-3 py-1 font-mono text-xs font-bold text-csg-black flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
-              <ZoomIn className="w-3.5 h-3.5 text-csg-red" />
+              <ZoomInIcon size={14} className="text-csg-red" />
               <span>XEM LỚN</span>
             </div>
           </div>
@@ -327,7 +327,7 @@ export const ExhibitionArchive: React.FC = () => {
             className="absolute top-6 right-6 z-30 p-2.5 bg-[#201E1A] hover:bg-csg-red text-[#F4EEDF] transition-colors border border-white/10"
             aria-label="Đóng xem chi tiết (Esc)"
           >
-            <X className="w-5 h-5" />
+            <CloseIcon size={20} />
           </button>
 
           {/* Main Photo Stage */}
@@ -358,7 +358,7 @@ export const ExhibitionArchive: React.FC = () => {
                   className="p-1 hover:text-csg-yellow transition-colors"
                   aria-label="Ảnh trước"
                 >
-                  <ChevronLeft className="w-5 h-5" />
+                  <ChevronLeftIcon size={20} />
                 </button>
                 <span>{activePhotoIndex + 1} / {EXHIBITION_PHOTOS.length}</span>
                 <button
@@ -366,7 +366,7 @@ export const ExhibitionArchive: React.FC = () => {
                   className="p-1 hover:text-csg-yellow transition-colors"
                   aria-label="Ảnh sau"
                 >
-                  <ChevronRight className="w-5 h-5" />
+                  <ChevronRightIcon size={20} />
                 </button>
               </div>
             </div>

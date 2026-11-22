@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { 
-  X, Search, CheckCircle, Upload, Copy, Check, AlertCircle, 
-  Clock, Calendar, ExternalLink, QrCode, FileText, ShieldAlert,
-  ArrowRight, RefreshCw, CreditCard, Ticket as TicketIcon, AlertTriangle
-} from 'lucide-react';
+  CloseIcon, SearchIcon, CheckCircleIcon, UploadIcon, AlertCircleIcon, 
+  CalendarIcon, ExternalLinkIcon, CreditCardIcon, TicketIcon, AlertTriangleIcon,
+  ArrowRightIcon, ArrowUpRightIcon
+} from 'naive-icons';
 import { RegistrationRecord, PaymentSubmission } from '../types';
 import { apiClient } from '../services/apiClient';
 
@@ -169,7 +169,7 @@ END:VCALENDAR`;
             className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg border-2 border-[#20231F] hover:bg-[#F4EEDF] text-[#20231F] transition-colors active:scale-95 shrink-0"
             title="Đóng cửa sổ"
           >
-            <X className="w-5 h-5" />
+            <CloseIcon size={20} />
           </button>
         </div>
 
@@ -177,7 +177,7 @@ END:VCALENDAR`;
         <div className="p-3.5 sm:p-6 bg-[#FFFFFF] border-b-2 border-[#20231F] shrink-0">
           <form onSubmit={handleSearch} className="flex gap-2">
             <div className="relative flex-1">
-              <Search className="w-4 h-4 text-[#20231F]/50 absolute left-3 top-1/2 -translate-y-1/2" />
+              <SearchIcon size={16} className="text-[#20231F]/50 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
                 type="text"
                 value={searchTerm}
@@ -193,14 +193,14 @@ END:VCALENDAR`;
               disabled={isLoading || !searchTerm.trim()}
               className="btn-editorial-primary px-4 sm:px-5 py-2.5 min-h-[44px] rounded-sm font-display text-base sm:text-lg uppercase tracking-wider flex items-center justify-center gap-1.5 shrink-0 active:scale-95"
             >
-              <Search className="w-4 h-4" />
+              <SearchIcon size={16} />
               <span>{isLoading ? 'Đang tra...' : 'TRA CỨU'}</span>
             </button>
           </form>
 
           {searchError && (
             <div className="mt-3 p-3 rounded-lg bg-red-50 border-2 border-[#B94D35] text-[#B94D35] text-xs flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 shrink-0" />
+              <AlertCircleIcon size={16} className="shrink-0" />
               <span>{searchError}</span>
             </div>
           )}
@@ -270,7 +270,7 @@ END:VCALENDAR`;
                       : 'bg-[#FFFFFF] border border-[#20231F] text-[#20231F] hover:bg-[#F4EEDF]'
                   }`}
                 >
-                  <TicketIcon className="w-3.5 h-3.5" />
+                  <TicketIcon size={14} />
                   <span>Vé Check-in QR</span>
                 </button>
               </div>
@@ -313,7 +313,7 @@ END:VCALENDAR`;
                   {foundRecord.status === 'REJECTED' && (
                     <div className="p-4 rounded-sm bg-red-50 border-2 border-[#B94D35] text-xs space-y-1">
                       <div className="flex items-center gap-2 font-bold text-[#B94D35]">
-                        <AlertTriangle className="w-4 h-4 shrink-0" />
+                        <AlertTriangleIcon size={16} className="shrink-0" />
                         <span>Biên lai thanh toán chưa được xác nhận bởi Ban Tổ Chức</span>
                       </div>
                       <p className="text-[#20231F]/80 pl-6">
@@ -323,9 +323,10 @@ END:VCALENDAR`;
                         <button
                           type="button"
                           onClick={() => setActiveTab('PAY_PHASE2')}
-                          className="px-3 py-1.5 rounded-lg bg-[#B94D35] text-white font-bold text-[11px] uppercase"
+                          className="px-3 py-1.5 rounded-lg bg-[#B94D35] text-white font-bold text-[11px] uppercase inline-flex items-center gap-1.5"
                         >
-                          Tải lại biên lai hợp lệ ngay →
+                          <span>Tải lại biên lai hợp lệ ngay</span>
+                          <ArrowRightIcon size={12} />
                         </button>
                       </div>
                     </div>
@@ -384,8 +385,9 @@ END:VCALENDAR`;
                           onClick={() => setActiveTab('PAY_PHASE2')}
                           className="btn-editorial-primary px-4 py-2 rounded-sm text-xs font-bold uppercase flex items-center gap-1.5"
                         >
-                          <CreditCard className="w-3.5 h-3.5" />
-                          <span>Đóng nốt {remainingDue.toLocaleString('vi-VN')}đ tại đây →</span>
+                          <CreditCardIcon size={14} />
+                          <span>Đóng nốt {remainingDue.toLocaleString('vi-VN')}đ tại đây</span>
+                          <ArrowRightIcon size={12} />
                         </button>
                       </div>
                     )}
@@ -489,7 +491,7 @@ END:VCALENDAR`;
                 <div className="space-y-4">
                   {successSubmitted ? (
                     <div className="p-6 rounded-sm bg-emerald-50 border-2 border-[#3D6B45] text-center space-y-3">
-                      <CheckCircle className="w-12 h-12 text-[#3D6B45] mx-auto" />
+                      <CheckCircleIcon size={48} className="text-[#3D6B45] mx-auto" />
                       <h4 className="font-display text-2xl text-[#20231F] uppercase">
                         ĐÃ GỬI BIÊN LAI ĐỢT 2 THÀNH CÔNG!
                       </h4>
@@ -552,7 +554,7 @@ END:VCALENDAR`;
                               TẢI LÊN BIÊN LAI ĐỢT 2 *
                             </label>
                             <label className="border-2 border-dashed border-[#20231F] rounded-sm p-3 bg-white flex items-center justify-center gap-2 cursor-pointer hover:bg-[#F4EEDF] transition-colors">
-                              <Upload className="w-4 h-4 text-[#20231F]" />
+                              <UploadIcon size={16} className="text-[#20231F]" />
                               <span className="text-xs font-bold text-[#20231F]">
                                 {receiptPhase2 ? '✓ Đã chọn ảnh biên lai đợt 2' : 'Chọn ảnh biên lai giao dịch'}
                               </span>
@@ -572,9 +574,10 @@ END:VCALENDAR`;
                           type="button"
                           disabled={isSubmitting || !receiptPhase2}
                           onClick={handleSubmitPhase2}
-                          className="btn-editorial-primary px-6 py-3 rounded-sm font-display text-xl uppercase tracking-wider disabled:opacity-50"
+                          className="btn-editorial-primary px-6 py-3 rounded-sm font-display text-xl uppercase tracking-wider disabled:opacity-50 flex items-center gap-2"
                         >
-                          {isSubmitting ? 'ĐANG GỬI...' : 'XÁC NHẬN GỬI BIÊN LAI ĐỢT 2 ↗'}
+                          <span>{isSubmitting ? 'ĐANG GỬI...' : 'XÁC NHẬN GỬI BIÊN LAI ĐỢT 2'}</span>
+                          {!isSubmitting && <ArrowUpRightIcon size={18} />}
                         </button>
                       </div>
                     </div>
@@ -648,7 +651,7 @@ END:VCALENDAR`;
                           rel="noreferrer"
                           className="flex-1 py-2.5 px-3 min-h-[44px] rounded-sm bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-colors active:scale-[0.98]"
                         >
-                          <ExternalLink className="w-3.5 h-3.5" />
+                          <ExternalLinkIcon size={14} />
                           <span>Lưu Google Calendar</span>
                         </a>
                         <button
@@ -656,7 +659,7 @@ END:VCALENDAR`;
                           onClick={() => downloadIcsFile(foundRecord)}
                           className="btn-editorial-primary flex-1 py-2.5 px-3 min-h-[44px] rounded-sm font-bold text-xs flex items-center justify-center gap-1.5 active:scale-[0.98]"
                         >
-                          <Calendar className="w-3.5 h-3.5" />
+                          <CalendarIcon size={14} />
                           <span>Tải tệp Apple/Outlook (.ics)</span>
                         </button>
                       </div>
