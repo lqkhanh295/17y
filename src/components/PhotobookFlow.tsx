@@ -467,10 +467,6 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
                 <span className="text-csg-black/60 uppercase">ĐỊA ĐIỂM:</span>
                 <span className="font-bold text-csg-black text-right">{GALA_EVENT_DETAILS.venue}</span>
               </div>
-              <div className="flex justify-between py-2.5">
-                <span className="text-csg-black/60 uppercase">TRANG PHỤC:</span>
-                <span className="font-bold text-csg-black">{GALA_EVENT_DETAILS.dressCode}</span>
-              </div>
             </div>
 
             {/* Direct Instant RSVP Action */}

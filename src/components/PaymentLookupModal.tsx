@@ -635,7 +635,6 @@ END:VCALENDAR`;
                       <div className="text-xs text-[#20231F] space-y-1">
                         <p>🗓️ <strong>18:00, Thứ Bảy, 19/12/2026</strong></p>
                         <p>📍 <strong>Đồi Sứ Villa</strong></p>
-                        <p className="text-[11px] text-[#20231F]/70 italic">Dress code: Áo vàng truyền thống CSG / Smart Casual</p>
                       </div>
 
                       {/* Calendar Sync Buttons */}
