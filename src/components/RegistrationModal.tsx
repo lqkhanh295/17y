@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import confetti from 'canvas-confetti';
 import { 
   X, CheckCircle, ArrowRight, ArrowLeft, Upload, 
   Copy, Check, Sparkles, AlertCircle, HeartHandshake,
   UserCheck, ShieldAlert, FileText, Cake, Edit3, MessageSquare,
-  HelpCircle, ExternalLink
+  HelpCircle, ExternalLink, Ticket
 } from 'lucide-react';
 import { MemberDirectoryItem, PaymentPlan, RegistrationRecord, MascotFrog } from '../types';
 import { apiClient } from '../services/apiClient';
@@ -60,6 +60,14 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
   // Screen 6: Completed state
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [completedRecord, setCompletedRecord] = useState<RegistrationRecord | null>(null);
+  const screensContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (screensContainerRef.current) {
+      screensContainerRef.current.scrollTop = 0;
+    }
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }, [screen]);
 
   if (!isOpen) return null;
 
@@ -212,52 +220,104 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-5 bg-[#20231F]/90 backdrop-blur-md overflow-y-auto animate-fadeIn">
+    <div className={`fixed inset-0 z-50 flex items-center justify-center ${screen === 6 ? 'p-1 sm:p-3' : 'p-2 sm:p-5'} bg-[#20231F]/90 backdrop-blur-md overflow-hidden animate-fadeIn`}>
       <div 
-        className={`relative w-full ${screen === 6 ? 'max-w-6xl' : 'max-w-2xl'} bg-[#F4EEDF] border-2 border-[#20231F] rounded-sm shadow-poster-lg overflow-hidden my-3 sm:my-6 flex flex-col max-h-[95vh] animate-paper-unfold`}
+        className={`relative w-full ${screen === 6 ? 'max-w-6xl h-[95vh] max-h-[95vh] my-auto' : 'max-w-2xl max-h-[95vh] my-3 sm:my-6'} bg-[#F4EEDF] border-2 border-[#20231F] rounded-sm shadow-poster-lg overflow-hidden flex flex-col animate-paper-unfold`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header Bar */}
-        <div className="flex items-center justify-between px-5 sm:px-6 py-3.5 border-b-2 border-[#20231F] bg-[#FFFFFF]">
-          <div className="flex items-center gap-3">
-            <span className="w-10 h-10 rounded-sm bg-[#F4C542] border-2 border-[#20231F] flex items-center justify-center text-xl shadow-poster-sm">
-              🐸
-            </span>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="font-display text-lg tracking-wider text-[#20231F] uppercase">
-                  CÓC SÀI GÒN 17Y
-                </span>
-                <span className="stamp-seal text-[9px]">
-                  {screen === 6 ? 'SÂN KHẤU CÓC' : `BƯỚC 0${screen} / 06`}
-                </span>
+        {screen === 6 && completedRecord ? (
+          <div className="flex items-center justify-between px-3 sm:px-5 py-2 sm:py-2.5 border-b-2 border-[#20231F] bg-[#F4C542] shrink-0">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <span className="w-8 h-8 rounded-sm bg-white border-2 border-[#20231F] flex items-center justify-center text-lg shadow-xs shrink-0 animate-bounce">
+                🐸
+              </span>
+              <div className="min-w-0">
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <span className="font-display font-black text-sm sm:text-base tracking-wider text-[#20231F] uppercase truncate">
+                    BẠN ĐÃ LÊN SÂN KHẤU 17Y!
+                  </span>
+                  <span className="stamp-seal text-[8px] bg-white">OFFICIAL</span>
+                </div>
+                <p className="text-[11px] font-mono text-[#20231F]/90 truncate">
+                  Chào mừng <strong>{completedRecord.honorific} {completedRecord.fullName}</strong> ({completedRecord.role === 'ALUMNI' ? 'Cựu TV' : 'Thành viên'}) • Mã vé: <strong className="bg-white/90 px-1 py-0.5 rounded border border-[#20231F]/40">{completedRecord.ticketCode || completedRecord.id}</strong> • Đã nộp: <strong>{completedRecord.paidAmount.toLocaleString('vi-VN')} đ</strong>
+                </p>
               </div>
-              <p className="text-[11px] font-body text-[#20231F]/70">
-                {screen === 6 ? 'Linh vật đại diện cho bạn đã lên sân khấu kỷ niệm 17 năm!' : 'Đại tiệc kỷ niệm 17 năm • Đăng ký tham dự chính thức'}
-              </p>
+            </div>
+
+            <div className="flex items-center gap-2 shrink-0 ml-2">
+              {onOpenPortal && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    onClose();
+                    onOpenPortal();
+                  }}
+                  className="px-2.5 py-1.5 rounded-sm bg-white border-2 border-[#20231F] hover:bg-[#F4EEDF] text-xs font-mono font-bold uppercase transition-colors flex items-center gap-1 shadow-xs"
+                  title="Tra cứu vé & lịch sự kiện"
+                >
+                  <Ticket className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Tra cứu vé</span>
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={onClose}
+                className="px-2.5 py-1.5 rounded-sm bg-[#20231F] text-white hover:bg-[#B94D35] text-xs font-mono font-bold uppercase transition-colors flex items-center gap-1 shadow-xs"
+                title="Thoát ra trang chủ"
+              >
+                <X className="w-4 h-4" />
+                <span className="hidden sm:inline">VỀ TRANG CHỦ</span>
+              </button>
             </div>
           </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="px-3 py-1.5 rounded-sm bg-[#20231F] text-white hover:bg-[#B94D35] text-xs font-mono font-bold uppercase transition-colors flex items-center gap-1.5 shadow-sm"
-            title="Thoát ra trang chủ"
-          >
-            <X className="w-4 h-4" />
-            <span className="hidden sm:inline">VỀ TRANG CHỦ</span>
-          </button>
-        </div>
+        ) : (
+          <div className="flex items-center justify-between px-5 sm:px-6 py-3.5 border-b-2 border-[#20231F] bg-[#FFFFFF] shrink-0">
+            <div className="flex items-center gap-3">
+              <span className="w-10 h-10 rounded-sm bg-[#F4C542] border-2 border-[#20231F] flex items-center justify-center text-xl shadow-poster-sm">
+                🐸
+              </span>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="font-display text-lg tracking-wider text-[#20231F] uppercase">
+                    CÓC SÀI GÒN 17Y
+                  </span>
+                  <span className="stamp-seal text-[9px]">
+                    {`BƯỚC 0${screen} / 06`}
+                  </span>
+                </div>
+                <p className="text-[11px] font-body text-[#20231F]/70">
+                  Đại tiệc kỷ niệm 17 năm • Đăng ký tham dự chính thức
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-3 py-1.5 rounded-sm bg-[#20231F] text-white hover:bg-[#B94D35] text-xs font-mono font-bold uppercase transition-colors flex items-center gap-1.5 shadow-sm"
+              title="Thoát ra trang chủ"
+            >
+              <X className="w-4 h-4" />
+              <span className="hidden sm:inline">VỀ TRANG CHỦ</span>
+            </button>
+          </div>
+        )}
 
-        {/* Progress Bar */}
-        <div className="w-full bg-[#EAE4D6] h-1.5 border-b border-[#20231F]/20">
-          <div 
-            className="bg-[#F4C542] h-full transition-all duration-300"
-            style={{ width: `${(screen / 6) * 100}%` }}
-          />
-        </div>
+        {/* Progress Bar (Only during registration steps 1-5) */}
+        {screen < 6 && (
+          <div className="w-full bg-[#EAE4D6] h-1.5 border-b border-[#20231F]/20 shrink-0">
+            <div 
+              className="bg-[#F4C542] h-full transition-all duration-300"
+              style={{ width: `${(screen / 6) * 100}%` }}
+            />
+          </div>
+        )}
 
         {/* Wizard Screens Container */}
-        <div className="p-6 sm:p-8 overflow-y-auto flex-1 font-body">
+        <div 
+          ref={screensContainerRef} 
+          className={`${screen === 6 ? 'p-2 sm:p-2.5 overflow-hidden flex-1 flex flex-col h-full' : 'p-6 sm:p-8 overflow-y-auto flex-1 font-body'}`}
+        >
 
           {/* ================= SCREEN 01: IDENTITY VERIFICATION ================= */}
           {screen === 1 && (
@@ -899,10 +959,11 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
 
           {/* ================= SCREEN 06: REGISTRATION SUCCESS & CELEBRATION STAGE ================= */}
           {screen === 6 && completedRecord && (
-            <div className="space-y-4 animate-fadeIn">
+            <div className="w-full h-full flex flex-col flex-1 animate-fadeIn overflow-hidden">
               <CelebrationStage
                 characters={stageCharacters}
                 newRegistrant={completedRecord}
+                hideBanner={true}
                 onClose={onClose}
                 onOpenPortal={() => {
                   onClose();

@@ -14,6 +14,7 @@ export interface CelebrationStageProps {
   onClose?: () => void;
   newRegistrant?: RegistrationRecord | null;
   onOpenPortal?: () => void;
+  hideBanner?: boolean;
 }
 
 export const CelebrationStage: React.FC<CelebrationStageProps> = ({
@@ -22,7 +23,8 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
   isModal = false,
   onClose,
   newRegistrant,
-  onOpenPortal
+  onOpenPortal,
+  hideBanner = false
 }) => {
   const [selectedRole, setSelectedRole] = useState<'ALL' | MemberRole>('ALL');
   const [searchTerm, setSearchTerm] = useState('');
@@ -134,33 +136,33 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
 
   // Main stage body
   const stageContent = (
-    <div className="w-full space-y-4">
+    <div className="w-full h-full flex flex-col flex-1 space-y-2">
       {/* New Registrant Celebration Banner */}
-      {newRegistrant && (
-        <div className="p-4 sm:p-5 rounded-sm bg-[#F4C542] border-2 border-[#20231F] shadow-poster-sm flex flex-col md:flex-row items-center justify-between gap-4 animate-fadeIn">
-          <div className="flex items-center gap-3.5 text-left w-full md:w-auto">
-            <span className="w-12 h-12 rounded-sm bg-white border-2 border-[#20231F] flex items-center justify-center text-2xl shrink-0 shadow-sm animate-bounce">
+      {!hideBanner && newRegistrant && (
+        <div className="p-2 sm:p-2.5 rounded-sm bg-[#F4C542] border-2 border-[#20231F] shadow-poster-sm flex flex-col sm:flex-row items-center justify-between gap-2 animate-fadeIn shrink-0">
+          <div className="flex items-center gap-2.5 text-left w-full sm:w-auto min-w-0">
+            <span className="w-8 h-8 rounded-sm bg-white border border-[#20231F] flex items-center justify-center text-lg shrink-0 shadow-xs animate-bounce">
               🐸
             </span>
-            <div>
-              <div className="flex items-center gap-2">
-                <h4 className="font-display font-black text-lg sm:text-xl uppercase text-[#20231F] leading-tight">
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5">
+                <h4 className="font-display font-black text-sm uppercase text-[#20231F] leading-tight truncate">
                   BẠN ĐÃ LÊN SÂN KHẤU KỶ NIỆM 17Y!
                 </h4>
-                <span className="stamp-seal text-[9px]">OFFICIAL</span>
+                <span className="stamp-seal text-[8px] bg-white">OFFICIAL</span>
               </div>
-              <p className="text-xs text-[#20231F]/80 font-mono mt-1">
-                Chào mừng <strong>{newRegistrant.honorific} {newRegistrant.fullName}</strong> ({newRegistrant.role === 'ALUMNI' ? 'Cựu Thành Viên' : 'Thành Viên'}) • Mã vé: <strong className="bg-white px-1.5 py-0.5 rounded border border-[#20231F]">{newRegistrant.id}</strong> • Đã nộp: <strong>{newRegistrant.paidAmount.toLocaleString('vi-VN')} đ</strong>
+              <p className="text-[11px] text-[#20231F]/80 font-mono truncate">
+                Chào mừng <strong>{newRegistrant.honorific} {newRegistrant.fullName}</strong> ({newRegistrant.role === 'ALUMNI' ? 'Cựu Thành Viên' : 'Thành Viên'}) • Mã vé: <strong className="bg-white px-1 py-0.5 rounded border border-[#20231F]">{newRegistrant.ticketCode || newRegistrant.id}</strong> • Đã nộp: <strong>{newRegistrant.paidAmount.toLocaleString('vi-VN')} đ</strong>
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2.5 w-full md:w-auto justify-end">
+          <div className="flex items-center gap-2 w-full sm:w-auto justify-end shrink-0">
             {onOpenPortal && (
               <button
                 type="button"
                 onClick={onOpenPortal}
-                className="btn-editorial-secondary px-4 py-2.5 rounded-sm text-xs font-bold uppercase flex items-center justify-center gap-1.5 flex-1 md:flex-initial"
+                className="btn-editorial-secondary px-3 py-1 rounded-sm text-xs font-bold uppercase flex items-center justify-center gap-1"
               >
                 <Ticket className="w-3.5 h-3.5" />
                 <span>Tra cứu vé</span>
@@ -170,9 +172,9 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
               <button
                 type="button"
                 onClick={onClose}
-                className="btn-editorial-primary px-5 py-2.5 rounded-sm text-xs font-display text-base uppercase flex items-center justify-center gap-1.5 flex-1 md:flex-initial shadow-sm"
+                className="btn-editorial-primary px-3 py-1 rounded-sm text-xs font-display text-sm uppercase flex items-center justify-center gap-1 shadow-xs"
               >
-                <ArrowLeft className="w-4 h-4" />
+                <ArrowLeft className="w-3.5 h-3.5" />
                 <span>Thoát ra trang chủ</span>
               </button>
             )}
@@ -181,13 +183,13 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
       )}
 
       {/* Control Bar: Filters, Search, Sound, Confetti */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-white p-3 rounded-sm border-2 border-[#20231F] shadow-poster-sm">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-2 bg-white px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-sm border-2 border-[#20231F] shadow-poster-sm shrink-0">
         {/* Role Filters */}
-        <div className="flex items-center gap-1.5 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0 font-mono">
+        <div className="flex items-center gap-1 w-full sm:w-auto overflow-x-auto pb-0.5 sm:pb-0 font-mono text-xs">
           <button
             type="button"
             onClick={() => setSelectedRole('ALL')}
-            className={`px-3 py-1.5 rounded-sm text-xs font-bold transition-all whitespace-nowrap border-2 ${
+            className={`px-2.5 py-1 rounded-sm font-bold transition-all whitespace-nowrap border-2 ${
               selectedRole === 'ALL'
                 ? 'bg-[#20231F] text-white border-[#20231F]'
                 : 'bg-[#F4EEDF] text-[#20231F] border-[#20231F]/30 hover:border-[#20231F]'
@@ -198,7 +200,7 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
           <button
             type="button"
             onClick={() => setSelectedRole('ALUMNI')}
-            className={`px-3 py-1.5 rounded-sm text-xs font-bold transition-all whitespace-nowrap border-2 ${
+            className={`px-2.5 py-1 rounded-sm font-bold transition-all whitespace-nowrap border-2 ${
               selectedRole === 'ALUMNI'
                 ? 'bg-[#20231F] text-white border-[#20231F]'
                 : 'bg-[#F4EEDF] text-[#20231F] border-[#20231F]/30 hover:border-[#20231F]'
@@ -209,7 +211,7 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
           <button
             type="button"
             onClick={() => setSelectedRole('ACTIVE')}
-            className={`px-3 py-1.5 rounded-sm text-xs font-bold transition-all whitespace-nowrap border-2 ${
+            className={`px-2.5 py-1 rounded-sm font-bold transition-all whitespace-nowrap border-2 ${
               selectedRole === 'ACTIVE'
                 ? 'bg-[#20231F] text-white border-[#20231F]'
                 : 'bg-[#F4EEDF] text-[#20231F] border-[#20231F]/30 hover:border-[#20231F]'
@@ -220,25 +222,25 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
         </div>
 
         {/* Search & Actions */}
-        <div className="flex items-center gap-2 w-full sm:w-auto">
-          <div className="relative flex-1 sm:w-60">
-            <Search className="w-4 h-4 text-[#20231F]/40 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+        <div className="flex items-center gap-1.5 w-full sm:w-auto">
+          <div className="relative flex-1 sm:w-48">
+            <Search className="w-3.5 h-3.5 text-[#20231F]/40 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="text"
               placeholder="Tìm tên hoặc lời chúc..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-9 pr-3 py-1.5 bg-[#F4EEDF] rounded-sm border border-[#20231F] text-xs font-mono text-[#20231F] placeholder-[#20231F]/40 focus:outline-none focus:ring-1 focus:ring-[#F4C542]"
+              className="w-full pl-8 pr-2.5 py-1 bg-[#F4EEDF] rounded-sm border border-[#20231F] text-xs font-mono text-[#20231F] placeholder-[#20231F]/40 focus:outline-none focus:ring-1 focus:ring-[#F4C542]"
             />
           </div>
 
           <button
             type="button"
             onClick={() => triggerConfettiBlast()}
-            className="btn-editorial-primary px-3.5 py-1.5 rounded-sm text-xs font-bold uppercase flex items-center gap-1.5 shadow-sm whitespace-nowrap"
+            className="btn-editorial-primary px-2.5 py-1 rounded-sm text-xs font-bold uppercase flex items-center gap-1 shadow-xs whitespace-nowrap"
             title="Bắn pháo hoa ăn mừng"
           >
-            <PartyPopper className="w-4 h-4" />
+            <PartyPopper className="w-3.5 h-3.5" />
             <span>Pháo Hoa 🎉</span>
           </button>
 
@@ -246,7 +248,7 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
           <button
             type="button"
             onClick={() => setStageLightsOn(!stageLightsOn)}
-            className={`px-3 py-1.5 rounded-sm text-xs font-bold font-mono transition-all border-2 flex items-center gap-1.5 whitespace-nowrap ${
+            className={`px-2.5 py-1 rounded-sm text-xs font-bold font-mono transition-all border-2 flex items-center gap-1 whitespace-nowrap ${
               stageLightsOn
                 ? 'bg-[#20231F] text-[#F4C542] border-[#20231F]'
                 : 'bg-[#F4EEDF] text-[#20231F] border-[#20231F]/40 hover:border-[#20231F]'
@@ -260,16 +262,16 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
           <button
             type="button"
             onClick={() => setSoundEnabled(!soundEnabled)}
-            className="p-1.5 rounded-sm bg-white border border-[#20231F] hover:bg-[#F4EEDF] text-[#20231F] transition-colors"
+            className="p-1 rounded-sm bg-white border border-[#20231F] hover:bg-[#F4EEDF] text-[#20231F] transition-colors"
             title={soundEnabled ? 'Tắt âm thanh' : 'Bật âm thanh'}
           >
-            {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4 text-[#B94D35]" />}
+            {soundEnabled ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5 text-[#B94D35]" />}
           </button>
         </div>
       </div>
 
       {/* Theatrical Stage Canvas - Tái hiện 3D hội trường thực tế từ ảnh chụp */}
-      <div className="relative w-full h-[520px] sm:h-[600px] rounded-sm bg-[#1C140D] border-2 border-[#20231F] overflow-hidden shadow-poster select-none perspective-[1000px]">
+      <div className="relative w-full flex-1 min-h-[380px] sm:min-h-[440px] max-h-[calc(95vh-110px)] rounded-sm bg-[#1C140D] border-2 border-[#20231F] overflow-hidden shadow-poster select-none perspective-[1000px]">
         
         {/* ========================================================================= */}
         {/* 1. TRẦN HỘI TRƯỜNG & ĐÈN DOWNLIGHT HẮT SÁNG                               */}
@@ -595,15 +597,15 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
   // If in modal mode, wrap inside a fixed overlay
   if (isModal) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-[#20231F]/90 backdrop-blur-md overflow-y-auto animate-fadeIn">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-[#20231F]/90 backdrop-blur-md overflow-hidden animate-fadeIn">
         <div 
-          className="relative w-full max-w-6xl bg-[#F4EEDF] border-2 border-[#20231F] rounded-sm shadow-poster-lg overflow-hidden my-auto flex flex-col max-h-[95vh] animate-paper-unfold"
+          className="relative w-full max-w-6xl h-[95vh] max-h-[95vh] bg-[#F4EEDF] border-2 border-[#20231F] rounded-sm shadow-poster-lg overflow-hidden my-auto flex flex-col animate-paper-unfold"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header Bar */}
-          <div className="flex items-center justify-between px-5 sm:px-6 py-3.5 border-b-2 border-[#20231F] bg-white">
-            <div className="flex items-center gap-3">
-              <span className="w-9 h-9 rounded-sm bg-[#F4C542] border-2 border-[#20231F] flex items-center justify-center text-xl shadow-sm">
+          <div className="flex items-center justify-between px-3 sm:px-5 py-2 sm:py-2.5 border-b-2 border-[#20231F] bg-white shrink-0">
+            <div className="flex items-center gap-2.5">
+              <span className="w-8 h-8 rounded-sm bg-[#F4C542] border-2 border-[#20231F] flex items-center justify-center text-lg shadow-sm">
                 🐸
               </span>
               <div>
@@ -623,7 +625,7 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
               <button
                 type="button"
                 onClick={onClose}
-                className="px-3.5 py-1.5 rounded-sm bg-[#20231F] text-white hover:bg-[#B94D35] text-xs font-mono font-bold uppercase transition-colors flex items-center gap-1.5 shadow-sm"
+                className="px-3 py-1.5 rounded-sm bg-[#20231F] text-white hover:bg-[#B94D35] text-xs font-mono font-bold uppercase transition-colors flex items-center gap-1.5 shadow-sm"
               >
                 <X className="w-4 h-4" />
                 <span className="hidden sm:inline">VỀ TRANG CHỦ</span>
@@ -632,7 +634,7 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
           </div>
 
           {/* Modal Stage Content */}
-          <div className="p-4 sm:p-6 overflow-y-auto flex-1 font-body">
+          <div className="p-2 sm:p-2.5 overflow-hidden flex-1 flex flex-col font-body">
             {stageContent}
           </div>
         </div>

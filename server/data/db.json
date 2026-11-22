@@ -245,6 +245,46 @@
   ],
   "registrations": [
     {
+      "id": "CSG26-293921",
+      "memberId": "m-custom-1795334721593",
+      "fullName": "Thành viên Cóc Sài Gòn",
+      "mssv": "SE170123",
+      "role": "ACTIVE",
+      "honorific": "Bạn",
+      "gmail": "cocsaigon17y@gmail.com",
+      "personalPhone": "0901234567",
+      "emergencyPhone": "0912345678",
+      "allergies": [],
+      "allergyNote": "",
+      "package": "ACTIVE",
+      "totalRequired": 349000,
+      "paidAmount": 349000,
+      "remainingAmount": 0,
+      "plan": "FULL",
+      "paymentPlan": "FULL",
+      "status": "PENDING",
+      "paymentStatus": "PENDING",
+      "isApproved100": false,
+      "isPublicConsent": true,
+      "receiptPhase1Url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==",
+      "receiptPhase2Url": null,
+      "ticketCode": "CSG17Y-0123-596",
+      "ticketToken": "TKT-G7Y4QB05",
+      "createdAt": "2026-11-22T08:06:24.170Z",
+      "paymentHistory": [
+        {
+          "id": "pay-1795334784170",
+          "phase": 1,
+          "amount": 349000,
+          "receiptUrl": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==",
+          "submittedAt": "2026-11-22T08:06:24.170Z",
+          "status": "PENDING"
+        }
+      ],
+      "verifiedBy": null,
+      "verifiedAt": null
+    },
+    {
       "id": "CSG26-291276",
       "memberId": "m-custom-1795333677605",
       "fullName": "Bạn Mới Của Cóc Sài Gòn",
@@ -455,6 +495,16 @@
   ],
   "wishes": [
     {
+      "id": "w-1795334786781",
+      "registrationId": "CSG26-293921",
+      "authorName": "Bạn Thành viên Cóc Sài Gòn",
+      "role": "ACTIVE",
+      "content": "Chúc mừng sinh nhật 17 năm Cóc Sài Gòn rực rỡ và phát triển!",
+      "isPublic": true,
+      "moderationStatus": "APPROVED",
+      "createdAt": "2026-11-22T08:06:26.781Z"
+    },
+    {
       "id": "w-1795283174531",
       "registrationId": "CSG26-637159",
       "authorName": "Bạn gay",
@@ -506,6 +556,17 @@
     }
   ],
   "characters": [
+    {
+      "id": "char-1795334786781",
+      "registrationId": "CSG26-293921",
+      "name": "Thành viên Cóc Sài Gòn",
+      "honorific": "Bạn",
+      "role": "ACTIVE",
+      "wish": "Chúc mừng sinh nhật 17 năm Cóc Sài Gòn rực rỡ và phát triển!",
+      "x": 25,
+      "y": 78,
+      "direction": -1
+    },
     {
       "id": "char-1",
       "registrationId": "reg-001",
