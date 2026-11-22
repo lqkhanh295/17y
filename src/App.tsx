@@ -313,38 +313,40 @@ export const App: React.FC = () => {
       <AudioPlayerToggle />
 
       {/* ================= EDITORIAL ART-BOOK MASTHEAD ================= */}
-      <header className="sticky top-0 z-40 bg-csg-paper/95 backdrop-blur-md border-b border-csg-black/20">
-        <div className="max-w-[1360px] mx-auto px-4 sm:px-8 h-14 flex items-center justify-between">
+      <header className="sticky top-0 z-40 bg-csg-paper/95 backdrop-blur-md border-b border-csg-black/20 pt-[env(safe-area-inset-top)]">
+        <div className="max-w-[1360px] mx-auto px-4 sm:px-8 h-14 sm:h-16 flex items-center justify-between">
           {/* Identity */}
-          <a href="/" onClick={(e) => { e.preventDefault(); closeModals(); }} className="flex items-baseline gap-2 group">
-            <span className="font-display font-extrabold text-base tracking-tight text-csg-black uppercase">
+          <a href="/" onClick={(e) => { e.preventDefault(); closeModals(); }} className="flex items-baseline gap-2 group min-h-[44px] items-center shrink-0">
+            <span className="font-display font-extrabold text-base tracking-tight text-csg-black uppercase whitespace-nowrap">
               CÓC SÀI GÒN <span className="font-editorial italic font-normal text-csg-red lowercase text-lg">17 năm</span>
             </span>
-            <span className="hidden sm:inline font-mono text-[10px] text-csg-black/40 uppercase tracking-widest pl-2">
+            <span className="hidden md:inline font-mono text-[10px] text-csg-black/40 uppercase tracking-widest pl-2">
               Photobook // 2009 — 2026
             </span>
           </a>
 
           {/* Minimal Quick Actions */}
-          <nav className="flex items-center gap-5 sm:gap-7 font-mono text-xs uppercase tracking-wider text-csg-black/80 font-medium">
+          <nav className="flex items-center gap-1.5 sm:gap-6 font-mono text-xs uppercase tracking-wider text-csg-black/80 font-medium shrink-0">
             <button
               onClick={() => setIsStageOpen(true)}
-              className="hover:text-csg-red transition-colors hidden md:inline font-bold"
+              className="hover:text-csg-red transition-colors font-bold px-2 py-1.5 min-h-[44px] min-w-[44px] flex items-center justify-center gap-1 active:scale-95 text-xs rounded-sm"
+              title="Xem sân khấu kỷ niệm 17Y"
             >
-              SÂN KHẤU CÓC
+              <span className="text-base">🐸</span>
+              <span className="hidden sm:inline">SÂN KHẤU CÓC</span>
             </button>
             <button
               onClick={() => setShowCinematicIntro(true)}
-              className="hover:text-csg-red transition-colors hidden sm:inline"
+              className="hover:text-csg-red transition-colors hidden md:inline min-h-[44px] flex items-center"
               title="Xem lại thước phim cuộn 35mm"
             >
               THƯỚC PHIM 17Y
             </button>
             <button
               onClick={openRegister}
-              className="btn-editorial-primary px-3.5 py-1.5 font-display font-bold text-xs uppercase flex items-center gap-1 shadow-sm"
+              className="btn-editorial-primary px-3 sm:px-3.5 py-2 sm:py-1.5 font-display font-bold text-xs uppercase flex items-center gap-1 shadow-sm min-h-[44px] active:scale-95 whitespace-nowrap"
             >
-              <span>ĐĂNG KÝ THAM GIA ↗</span>
+              <span>ĐĂNG KÝ <span className="hidden sm:inline">THAM GIA</span> ↗</span>
             </button>
           </nav>
         </div>
@@ -361,8 +363,8 @@ export const App: React.FC = () => {
       </main>
 
       {/* ================= QUIET COLOPHON FOOTER ================= */}
-      <footer className="relative z-10 bg-csg-surface border-t border-csg-black/25 pt-6 pb-24 sm:pb-6 px-4 sm:px-8 mt-12">
-        <div className="max-w-[1360px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 font-mono text-xs text-csg-black/65 text-center sm:text-left">
+      <footer className="relative z-10 bg-csg-surface border-t border-csg-black/25 pt-6 pb-28 sm:pb-8 px-4 sm:px-8 mt-12">
+        <div className="max-w-[1360px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 font-mono text-xs text-csg-black/65 text-center sm:text-left leading-relaxed">
           <span>CLB TRUYỀN THÔNG CÓC SÀI GÒN • 2009 — 2026 • ĐẠI TIỆC GALA 17Y TẠI ĐỒI SỨ VILLA</span>
         </div>
       </footer>
@@ -372,7 +374,7 @@ export const App: React.FC = () => {
         <div className="sm:hidden fixed bottom-4 right-4 z-40 animate-fadeIn pb-[env(safe-area-inset-bottom)]">
           <button
             onClick={openRegister}
-            className="btn-editorial-primary px-3.5 py-2.5 font-display font-extrabold text-xs uppercase shadow-poster flex items-center gap-1.5"
+            className="btn-editorial-primary px-4 py-3 font-display font-extrabold text-xs uppercase shadow-poster flex items-center gap-1.5 min-h-[48px] active:scale-95"
             aria-label="Đăng ký tham gia 17Y"
           >
             <span>ĐĂNG KÝ 17Y ↗</span>

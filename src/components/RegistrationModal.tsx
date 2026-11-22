@@ -236,20 +236,20 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-5 bg-[#20231F]/90 backdrop-blur-md overflow-hidden animate-fadeIn">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-5 bg-[#20231F]/90 backdrop-blur-md overflow-hidden animate-fadeIn pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)]">
       <div
-        className="relative w-full max-w-2xl max-h-[95vh] my-3 sm:my-6 bg-[#F4EEDF] border-2 border-[#20231F] rounded-sm shadow-poster-lg overflow-hidden flex flex-col animate-paper-unfold"
+        className="relative w-full max-w-2xl max-h-[96dvh] sm:max-h-[95vh] my-auto bg-[#F4EEDF] border-2 border-[#20231F] rounded-sm shadow-poster-lg overflow-hidden flex flex-col animate-paper-unfold"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header Bar */}
-        <div className="flex items-center justify-between px-5 sm:px-6 py-3.5 border-b-2 border-[#20231F] bg-[#FFFFFF] shrink-0">
+        <div className="flex items-center justify-between px-4 sm:px-6 py-3 border-b-2 border-[#20231F] bg-[#FFFFFF] shrink-0">
           <div className="flex items-center gap-3">
-            <span className="w-10 h-10 rounded-sm bg-[#F4C542] border-2 border-[#20231F] flex items-center justify-center text-xl shadow-poster-sm">
+            <span className="w-10 h-10 rounded-sm bg-[#F4C542] border-2 border-[#20231F] flex items-center justify-center text-xl shadow-poster-sm shrink-0">
               🐸
             </span>
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-display text-lg tracking-wider text-[#20231F] uppercase">
+                <span className="font-display text-base sm:text-lg tracking-wider text-[#20231F] uppercase">
                   CÓC SÀI GÒN 17Y
                 </span>
                 <span className="stamp-seal text-[9px]">
@@ -264,7 +264,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="px-3 py-1.5 rounded-sm bg-[#20231F] text-white hover:bg-[#B94D35] text-xs font-mono font-bold uppercase transition-colors flex items-center gap-1.5 shadow-sm"
+            className="px-3 py-1.5 min-h-[44px] min-w-[44px] rounded-sm bg-[#20231F] text-white hover:bg-[#B94D35] text-xs font-mono font-bold uppercase transition-colors flex items-center justify-center gap-1.5 shadow-sm active:scale-95"
             title="Thoát ra trang chủ"
           >
             <X className="w-4 h-4" />
@@ -283,7 +283,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
         {/* Wizard Screens Container */}
         <div
           ref={screensContainerRef}
-          className="p-6 sm:p-8 overflow-y-auto flex-1 font-body"
+          className="p-4 sm:p-8 overflow-y-auto flex-1 font-body overscroll-contain"
         >
 
           {/* ================= SCREEN 01: IDENTITY VERIFICATION ================= */}
@@ -291,12 +291,12 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
             <div className="space-y-6 animate-fadeIn">
               <div className="text-center max-w-md mx-auto space-y-2">
                 <span className="text-xs font-mono font-bold tracking-widest text-[#B94D35] uppercase">
-                  01 / 06 · IDENTITY VERIFICATION
+                  01 / 05 · IDENTITY VERIFICATION
                 </span>
-                <h3 className="text-4xl sm:text-5xl font-display uppercase tracking-tight text-[#20231F]">
+                <h3 className="text-3xl sm:text-5xl font-display uppercase tracking-tight text-[#20231F]">
                   LET'S SEE WHO YOU ARE.
                 </h3>
-                <p className="text-sm text-[#20231F]/75">
+                <p className="text-sm text-[#20231F]/75 leading-relaxed">
                   Nhập Mã số sinh viên (MSSV) hoặc Họ và tên để chúng mình tìm lại vị trí của bạn trong gia đình Cóc Sài Gòn.
                 </p>
               </div>
@@ -313,8 +313,11 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                       setQuery(e.target.value);
                       if (searchError) setSearchError('');
                     }}
+                    autoComplete="name"
+                    autoCapitalize="characters"
+                    inputMode="text"
                     placeholder="VD: SE120101 hoặc Nguyễn Tiến Cường"
-                    className="w-full px-4 py-3.5 rounded-sm bg-white border-2 border-[#20231F] text-[#20231F] font-mono text-base focus:outline-none focus:ring-2 focus:ring-[#F4C542] shadow-poster-sm"
+                    className="w-full px-4 py-3 min-h-[48px] rounded-sm bg-white border-2 border-[#20231F] text-[#20231F] font-mono text-base focus:outline-none focus:ring-2 focus:ring-[#F4C542] shadow-poster-sm"
                     autoFocus
                   />
                   {searchError && (
@@ -326,7 +329,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                       <button
                         type="button"
                         onClick={() => handleQuickBypass()}
-                        className="w-full py-2 px-3 bg-[#B94D35] text-white font-bold rounded-sm text-center hover:bg-[#20231F] transition-colors"
+                        className="w-full py-2.5 min-h-[44px] px-3 bg-[#B94D35] text-white font-bold rounded-sm text-center hover:bg-[#20231F] transition-colors active:scale-[0.98]"
                       >
                         Tiếp tục đăng ký với tên "{query.trim() || 'Khách mời'}" ↗
                       </button>
@@ -337,7 +340,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                 <button
                   type="submit"
                   disabled={isVerifying || !query.trim()}
-                  className="btn-editorial-primary w-full py-4 rounded-sm font-display text-xl tracking-wider uppercase flex items-center justify-center gap-2 disabled:opacity-50"
+                  className="btn-editorial-primary w-full py-3.5 min-h-[48px] rounded-sm font-display text-xl tracking-wider uppercase flex items-center justify-center gap-2 disabled:opacity-50 active:scale-[0.98]"
                 >
                   <span>{isVerifying ? 'ĐANG ĐỐI CHIẾU...' : 'TÌM TÊN CỦA BẠN ↗'}</span>
                 </button>
@@ -346,7 +349,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                   <button
                     type="button"
                     onClick={() => handleQuickBypass()}
-                    className="w-full py-2.5 px-4 rounded-sm border-2 border-dashed border-[#20231F]/40 bg-[#FFFFFF]/80 hover:bg-[#FFFFFF] text-xs font-mono font-bold uppercase tracking-wider text-[#20231F] hover:border-[#20231F] transition-all flex items-center justify-center gap-2 shadow-poster-sm"
+                    className="w-full py-3 min-h-[44px] px-4 rounded-sm border-2 border-dashed border-[#20231F]/40 bg-[#FFFFFF]/80 hover:bg-[#FFFFFF] text-xs font-mono font-bold uppercase tracking-wider text-[#20231F] hover:border-[#20231F] transition-all flex items-center justify-center gap-2 shadow-poster-sm active:scale-[0.98]"
                   >
                     <Sparkles className="w-4 h-4 text-[#B94D35]" />
                     <span>⚡ Bỏ qua tra cứu · Đăng ký tự do ngay ↗</span>
@@ -364,24 +367,24 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
           {screen === 2 && identifiedMember && (
             <div className="space-y-6 animate-fadeIn text-center max-w-lg mx-auto">
               <span className="text-xs font-mono font-bold tracking-widest text-[#B94D35] uppercase">
-                02 / 06 · WELCOME HOME
+                02 / 05 · WELCOME HOME
               </span>
 
               {/* Dynamic Personalized Letter */}
               {isAlumni ? (
                 <div className="space-y-4">
-                  <h3 className="text-4xl sm:text-5xl font-display uppercase tracking-tight text-[#20231F] leading-none">
+                  <h3 className="text-3xl sm:text-5xl font-display uppercase tracking-tight text-[#20231F] leading-tight">
                     WELCOME BACK HOME,
                     <br />
                     <span className="text-[#B94D35] underline decoration-[#F4C542] decoration-4">
                       {identifiedMember.honorific} {identifiedMember.fullName}!
                     </span>
                   </h3>
-                  <div className="p-6 rounded-sm bg-[#FFFFFF] border-2 border-[#20231F] shadow-poster text-left space-y-3 relative">
+                  <div className="p-4 sm:p-6 rounded-sm bg-[#FFFFFF] border-2 border-[#20231F] shadow-poster text-left space-y-3 relative">
                     <span className="stamp-seal text-[10px] absolute -top-3 right-4">
                       CỰU THÀNH VIÊN · KHÓA {identifiedMember.generation || 'K14'}
                     </span>
-                    <p className="font-handwriting text-2xl text-[#20231F] leading-relaxed pt-2">
+                    <p className="font-handwriting text-xl sm:text-2xl text-[#20231F] leading-relaxed pt-2">
                       "Có những nơi dù đã đi qua, vẫn luôn có một chỗ dành cho mình để trở về. 17 năm Cóc Sài Gòn, tụi em mong được gặp lại {identifiedMember.honorific.toLowerCase()} trong đêm hội ngộ đặc biệt này."
                     </p>
                     <div className="pt-2 border-t border-[#20231F]/15 text-xs text-[#20231F]/60 font-mono">
@@ -391,18 +394,18 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                 </div>
               ) : (
                 <div className="space-y-4">
-                  <h3 className="text-4xl sm:text-5xl font-display uppercase tracking-tight text-[#20231F] leading-none">
+                  <h3 className="text-3xl sm:text-5xl font-display uppercase tracking-tight text-[#20231F] leading-tight">
                     HEY, {identifiedMember.fullName.toUpperCase()}!
                     <br />
                     <span className="text-[#B94D35] underline decoration-[#F4C542] decoration-4">
                       YOU'RE STILL ONE OF US.
                     </span>
                   </h3>
-                  <div className="p-6 rounded-sm bg-[#FFFFFF] border-2 border-[#20231F] shadow-poster text-left space-y-3 relative">
+                  <div className="p-4 sm:p-6 rounded-sm bg-[#FFFFFF] border-2 border-[#20231F] shadow-poster text-left space-y-3 relative">
                     <span className="stamp-seal text-[10px] absolute -top-3 right-4">
                       THÀNH VIÊN ĐƯƠNG NHIỆM
                     </span>
-                    <p className="font-handwriting text-2xl text-[#20231F] leading-relaxed pt-2">
+                    <p className="font-handwriting text-xl sm:text-2xl text-[#20231F] leading-relaxed pt-2">
                       "Sẵn sàng cho một đêm cháy hết mình chưa? Sinh nhật 17 tuổi của Cóc Sài Gòn nhất định phải có mặt bạn để cùng thổi nến và quẩy tung nóc nhà!"
                     </p>
                     <div className="pt-2 border-t border-[#20231F]/15 text-xs text-[#20231F]/60 font-mono">
@@ -417,18 +420,18 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                 <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#20231F]/70 block">
                   XÁC NHẬN VAI TRÒ CỦA BẠN:
                 </span>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <button
                     type="button"
                     onClick={() => setIdentifiedMember(prev => prev ? { ...prev, role: 'ALUMNI', honorific: prev.honorific === 'Chị' ? 'Chị' : 'Anh' } : null)}
-                    className={`py-2 px-2 rounded-sm text-xs font-mono font-bold border-2 transition-all text-center ${isAlumni ? 'bg-[#20231F] text-white border-[#20231F] shadow-sm' : 'bg-[#F4EEDF] text-[#20231F] border-[#20231F]/30 hover:border-[#20231F]'}`}
+                    className={`py-2.5 px-3 min-h-[44px] rounded-sm text-xs font-mono font-bold border-2 transition-all text-center flex items-center justify-center active:scale-[0.98] ${isAlumni ? 'bg-[#20231F] text-white border-[#20231F] shadow-sm' : 'bg-[#F4EEDF] text-[#20231F] border-[#20231F]/30 hover:border-[#20231F]'}`}
                   >
                     Cựu Thành Viên (449k)
                   </button>
                   <button
                     type="button"
                     onClick={() => setIdentifiedMember(prev => prev ? { ...prev, role: 'ACTIVE', honorific: 'Bạn' } : null)}
-                    className={`py-2 px-2 rounded-sm text-xs font-mono font-bold border-2 transition-all text-center ${!isAlumni ? 'bg-[#20231F] text-white border-[#20231F] shadow-sm' : 'bg-[#F4EEDF] text-[#20231F] border-[#20231F]/30 hover:border-[#20231F]'}`}
+                    className={`py-2.5 px-3 min-h-[44px] rounded-sm text-xs font-mono font-bold border-2 transition-all text-center flex items-center justify-center active:scale-[0.98] ${!isAlumni ? 'bg-[#20231F] text-white border-[#20231F] shadow-sm' : 'bg-[#F4EEDF] text-[#20231F] border-[#20231F]/30 hover:border-[#20231F]'}`}
                   >
                     Thành Viên / Khách Mời (349k)
                   </button>
@@ -439,14 +442,14 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                 <button
                   type="button"
                   onClick={() => setScreen(1)}
-                  className="btn-editorial-secondary flex-1 py-3.5 rounded-sm font-bold text-xs uppercase"
+                  className="btn-editorial-secondary flex-1 py-3.5 min-h-[44px] rounded-sm font-bold text-xs uppercase active:scale-[0.98] flex items-center justify-center"
                 >
                   ← Đổi người khác
                 </button>
                 <button
                   type="button"
                   onClick={() => setScreen(3)}
-                  className="btn-editorial-primary flex-2 py-3.5 px-6 rounded-sm font-display text-xl tracking-wider uppercase flex items-center justify-center gap-2"
+                  className="btn-editorial-primary flex-2 py-3.5 min-h-[48px] px-6 rounded-sm font-display text-xl tracking-wider uppercase flex items-center justify-center gap-2 active:scale-[0.98]"
                 >
                   <span>TIẾP TỤC ĐẾN BUỔI TIỆC ↗</span>
                 </button>
@@ -460,9 +463,9 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
               <div className="border-b-2 border-[#20231F] pb-3 flex items-end justify-between">
                 <div>
                   <span className="text-xs font-mono font-bold tracking-widest text-[#B94D35] uppercase">
-                    03 / 06 · PAYMENT SELECTION
+                    03 / 05 · PAYMENT SELECTION
                   </span>
-                  <h3 className="text-3xl sm:text-4xl font-display uppercase tracking-tight text-[#20231F]">
+                  <h3 className="text-2xl sm:text-4xl font-display uppercase tracking-tight text-[#20231F]">
                     CHỌN HÌNH THỨC ĐÓNG PHÍ
                   </h3>
                 </div>
@@ -480,7 +483,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <div
                   onClick={() => setPlan('FULL')}
-                  className={`p-4 rounded-sm border-2 cursor-pointer transition-all ${plan === 'FULL'
+                  className={`p-4 rounded-sm border-2 cursor-pointer transition-all active:scale-[0.99] min-h-[80px] ${plan === 'FULL'
                     ? 'bg-[#F4C542] border-[#20231F] shadow-poster-sm'
                     : 'bg-white border-[#20231F] hover:bg-[#F4EEDF]'
                     }`}
@@ -495,7 +498,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
 
                 <div
                   onClick={() => setPlan('DEPOSIT_150')}
-                  className={`p-4 rounded-sm border-2 cursor-pointer transition-all ${plan === 'DEPOSIT_150'
+                  className={`p-4 rounded-sm border-2 cursor-pointer transition-all active:scale-[0.99] min-h-[80px] ${plan === 'DEPOSIT_150'
                     ? 'bg-[#F4C542] border-[#20231F] shadow-poster-sm'
                     : 'bg-white border-[#20231F] hover:bg-[#F4EEDF]'
                     }`}
@@ -510,7 +513,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
               </div>
 
               {/* VietQR & Banking Split */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 rounded-sm bg-white border-2 border-[#20231F] shadow-poster-sm">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-3 sm:p-4 rounded-sm bg-white border-2 border-[#20231F] shadow-poster-sm">
                 {/* QR Code Container */}
                 <div className="text-center flex flex-col items-center justify-center p-3 bg-[#F4EEDF] rounded-sm border-2 border-[#20231F]">
                   <span className="text-xs font-mono font-bold text-[#20231F] uppercase mb-2">
@@ -543,7 +546,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                     <button
                       type="button"
                       onClick={() => copyToClipboard(ACCOUNT_NO)}
-                      className="px-2.5 py-1 rounded bg-[#20231F] text-white text-[11px] font-bold"
+                      className="px-3 py-2 min-h-[44px] min-w-[70px] rounded bg-[#20231F] text-white text-[11px] font-bold active:scale-95 flex items-center justify-center"
                     >
                       {copiedBank ? 'Đã chép' : 'Sao chép'}
                     </button>
@@ -557,7 +560,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                     <button
                       type="button"
                       onClick={() => copyToClipboard(transferContent)}
-                      className="px-2.5 py-1 rounded bg-[#B94D35] text-white text-[11px] font-bold"
+                      className="px-3 py-2 min-h-[44px] min-w-[70px] rounded bg-[#B94D35] text-white text-[11px] font-bold active:scale-95 flex items-center justify-center"
                     >
                       {copiedBank ? 'Đã chép' : 'Sao chép'}
                     </button>
@@ -584,7 +587,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                         </div>
 
                         <div className="flex items-center gap-2">
-                          <label className="px-2.5 py-1.5 bg-[#EAE4D6] hover:bg-[#F4EEDF] border border-[#20231F] text-xs font-bold cursor-pointer transition-colors">
+                          <label className="px-3 py-2 min-h-[44px] bg-[#EAE4D6] hover:bg-[#F4EEDF] border border-[#20231F] text-xs font-bold cursor-pointer transition-colors active:scale-95 flex items-center justify-center">
                             <span>Thay ảnh</span>
                             <input
                               type="file"
@@ -596,19 +599,19 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                           <button
                             type="button"
                             onClick={() => setReceiptImage('')}
-                            className="px-2.5 py-1.5 bg-red-100 hover:bg-red-200 text-[#B94D35] border border-[#B94D35] text-xs font-bold transition-colors"
+                            className="px-3 py-2 min-h-[44px] bg-red-100 hover:bg-red-200 text-[#B94D35] border border-[#B94D35] text-xs font-bold transition-colors active:scale-95 flex items-center justify-center"
                           >
                             Xóa
                           </button>
                         </div>
                       </div>
                     ) : (
-                      <label className="border-2 border-dashed border-[#20231F] p-4 bg-white flex flex-col items-center justify-center gap-1.5 cursor-pointer hover:bg-[#F4EEDF] transition-colors">
+                      <label className="border-2 border-dashed border-[#20231F] p-4 min-h-[84px] bg-white flex flex-col items-center justify-center gap-1.5 cursor-pointer hover:bg-[#F4EEDF] transition-colors active:scale-[0.99]">
                         <Upload className="w-5 h-5 text-[#20231F]" />
-                        <span className="text-xs font-bold text-[#20231F]">
+                        <span className="text-xs font-bold text-[#20231F] text-center">
                           Nhấp để tải lên ảnh chụp màn hình chuyển khoản
                         </span>
-                        <span className="text-[10px] font-mono text-[#20231F]/60">
+                        <span className="text-[10px] font-mono text-[#20231F]/60 text-center">
                           Hỗ trợ định dạng JPG, PNG, WEBP (Tối đa 10MB)
                         </span>
                         <input
@@ -631,7 +634,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                 <button
                   type="button"
                   onClick={() => setScreen(2)}
-                  className="btn-editorial-secondary flex-1 py-3 rounded-sm font-bold text-xs uppercase"
+                  className="btn-editorial-secondary flex-1 py-3 min-h-[44px] rounded-sm font-bold text-xs uppercase active:scale-[0.98] flex items-center justify-center"
                 >
                   ← Quay lại
                 </button>
@@ -642,7 +645,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                       setScreen(4); // Go to participant info
                     }
                   }}
-                  className="btn-editorial-primary flex-2 py-3 rounded-sm font-display text-xl uppercase tracking-wider"
+                  className="btn-editorial-primary flex-2 py-3 min-h-[48px] rounded-sm font-display text-xl uppercase tracking-wider active:scale-[0.98] flex items-center justify-center"
                 >
                   ĐIỀN THÔNG TIN THAM DỰ →
                 </button>
@@ -655,16 +658,16 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
             <div className="space-y-6 animate-fadeIn">
               <div className="border-b-2 border-[#20231F] pb-3">
                 <span className="text-xs font-mono font-bold tracking-widest text-[#B94D35] uppercase">
-                  04 / 06 · PARTICIPANT DETAILS
+                  04 / 05 · PARTICIPANT DETAILS
                 </span>
-                <h3 className="text-3xl sm:text-4xl font-display uppercase tracking-tight text-[#20231F]">
+                <h3 className="text-2xl sm:text-4xl font-display uppercase tracking-tight text-[#20231F]">
                   THÔNG TIN CÁ NHÂN & LỜI CHÚC
                 </h3>
               </div>
 
               <div className="space-y-4">
                 {/* Block 1: About You */}
-                <div className="p-4 rounded-sm bg-white border-2 border-[#20231F] space-y-3">
+                <div className="p-3.5 sm:p-4 rounded-sm bg-white border-2 border-[#20231F] space-y-3">
                   <h4 className="text-xs font-mono font-bold text-[#20231F] uppercase border-b border-[#20231F]/15 pb-1.5">
                     1. VỀ BẠN (ABOUT YOU)
                   </h4>
@@ -677,8 +680,10 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                         type="text"
                         value={identifiedMember?.fullName || ''}
                         onChange={(e) => setIdentifiedMember(prev => prev ? { ...prev, fullName: e.target.value } : null)}
+                        autoComplete="name"
+                        autoCapitalize="words"
                         placeholder="Họ và tên của bạn"
-                        className="w-full px-3 py-2 rounded-lg bg-white border border-[#20231F] text-xs font-bold text-[#20231F] focus:outline-none focus:ring-1 focus:ring-[#F4C542]"
+                        className="w-full px-3.5 py-2.5 min-h-[44px] rounded-lg bg-white border border-[#20231F] text-base sm:text-xs font-bold text-[#20231F] focus:outline-none focus:ring-1 focus:ring-[#F4C542]"
                       />
                     </div>
                     <div>
@@ -689,8 +694,11 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                         type="email"
                         value={gmail}
                         onChange={(e) => setGmail(e.target.value)}
+                        autoComplete="email"
+                        autoCapitalize="none"
+                        inputMode="email"
                         placeholder="tenban@gmail.com"
-                        className="w-full px-3 py-2 rounded-lg bg-white border border-[#20231F] text-xs font-mono text-[#20231F] focus:outline-none focus:ring-1 focus:ring-[#F4C542]"
+                        className="w-full px-3.5 py-2.5 min-h-[44px] rounded-lg bg-white border border-[#20231F] text-base sm:text-xs font-mono text-[#20231F] focus:outline-none focus:ring-1 focus:ring-[#F4C542]"
                       />
                       {infoErrors.gmail && <p className="text-[10px] text-[#B94D35] font-bold mt-0.5">{infoErrors.gmail}</p>}
                     </div>
@@ -702,8 +710,10 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                         type="tel"
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
+                        autoComplete="tel"
+                        inputMode="tel"
                         placeholder="0901234567"
-                        className="w-full px-3 py-2 rounded-lg bg-white border border-[#20231F] text-xs font-mono text-[#20231F] focus:outline-none focus:ring-1 focus:ring-[#F4C542]"
+                        className="w-full px-3.5 py-2.5 min-h-[44px] rounded-lg bg-white border border-[#20231F] text-base sm:text-xs font-mono text-[#20231F] focus:outline-none focus:ring-1 focus:ring-[#F4C542]"
                       />
                       {infoErrors.phone && <p className="text-[10px] text-[#B94D35] font-bold mt-0.5">{infoErrors.phone}</p>}
                     </div>
@@ -711,7 +721,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                 </div>
 
                 {/* Block 2: Just in Case */}
-                <div className="p-4 rounded-sm bg-white border-2 border-[#20231F] space-y-3">
+                <div className="p-3.5 sm:p-4 rounded-sm bg-white border-2 border-[#20231F] space-y-3">
                   <h4 className="text-xs font-mono font-bold text-[#B94D35] uppercase border-b border-[#20231F]/15 pb-1.5 flex items-center justify-between">
                     <span>2. GIÚP BTC HIỂU BẠN HƠN</span>
                   </h4>
@@ -723,8 +733,10 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                       type="tel"
                       value={emergencyPhone}
                       onChange={(e) => setEmergencyPhone(e.target.value)}
+                      autoComplete="tel"
+                      inputMode="tel"
                       placeholder="SĐT bạn cùng phòng, người yêu hoặc gia đình..."
-                      className="w-full px-3 py-2 rounded-lg bg-white border border-[#20231F] text-xs font-mono text-[#20231F] focus:outline-none focus:ring-1 focus:ring-[#F4C542]"
+                      className="w-full px-3.5 py-2.5 min-h-[44px] rounded-lg bg-white border border-[#20231F] text-base sm:text-xs font-mono text-[#20231F] focus:outline-none focus:ring-1 focus:ring-[#F4C542]"
                     />
                     {infoErrors.emergencyPhone && <p className="text-[10px] text-[#B94D35] font-bold mt-0.5">{infoErrors.emergencyPhone}</p>}
                   </div>
@@ -739,13 +751,13 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                       value={allergyNote}
                       onChange={(e) => setAllergyNote(e.target.value)}
                       placeholder="Ghi chú dị ứng cụ thể khác nếu có..."
-                      className="w-full px-3 py-1.5 rounded-lg bg-white border border-[#20231F] text-xs text-[#20231F]"
+                      className="w-full px-3.5 py-2.5 min-h-[44px] rounded-lg bg-white border border-[#20231F] text-base sm:text-xs text-[#20231F]"
                     />
                   </div>
                 </div>
 
                 {/* Block 3: A Little Note (Birthday Wish) */}
-                <div className="p-4 rounded-sm bg-white border-2 border-[#20231F] space-y-2">
+                <div className="p-3.5 sm:p-4 rounded-sm bg-white border-2 border-[#20231F] space-y-2">
                   <div className="flex items-center justify-between border-b border-[#20231F]/15 pb-1.5">
                     <h4 className="text-xs font-mono font-bold text-[#20231F] uppercase">
                       3. LỜI CHÚC GỬI CÓC SÀI GÒN (A LITTLE NOTE)
@@ -760,16 +772,16 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                     value={wishes}
                     onChange={(e) => setWishes(e.target.value)}
                     placeholder="Gửi một lời chúc mừng sinh nhật 17 năm tới CLB. Lời chúc sẽ xuất hiện cùng chú Cóc Áo Vàng đại diện của bạn trên Sân Khấu Kỷ Niệm!"
-                    className="w-full px-3 py-2 rounded-lg bg-[#F4EEDF] border border-[#20231F] text-xs text-[#20231F] font-body focus:outline-none focus:ring-1 focus:ring-[#F4C542]"
+                    className="w-full px-3.5 py-2.5 min-h-[80px] rounded-lg bg-[#F4EEDF] border border-[#20231F] text-base sm:text-xs text-[#20231F] font-body focus:outline-none focus:ring-1 focus:ring-[#F4C542] leading-relaxed"
                   />
-                  <label className="flex items-center gap-2 cursor-pointer pt-1">
+                  <label className="flex items-center gap-2.5 cursor-pointer pt-2 min-h-[44px] select-none">
                     <input
                       type="checkbox"
                       checked={isPublicConsent}
                       onChange={(e) => setIsPublicConsent(e.target.checked)}
-                      className="rounded border-[#20231F] text-[#F4C542] focus:ring-[#F4C542]"
+                      className="w-5 h-5 rounded border-[#20231F] text-[#F4C542] focus:ring-[#F4C542] shrink-0"
                     />
-                    <span className="text-[11px] text-[#20231F]/80">
+                    <span className="text-xs sm:text-[11px] text-[#20231F]/90 leading-snug">
                       Đồng ý hiển thị lời chúc công khai tại Sân khấu Kỷ niệm 17Y
                     </span>
                   </label>
@@ -780,7 +792,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                 <button
                   type="button"
                   onClick={() => setScreen(3)}
-                  className="btn-editorial-secondary flex-1 py-3 rounded-sm font-bold text-xs uppercase"
+                  className="btn-editorial-secondary flex-1 py-3 min-h-[44px] rounded-sm font-bold text-xs uppercase active:scale-[0.98] flex items-center justify-center"
                 >
                   ← Chọn lại thanh toán
                 </button>
@@ -791,7 +803,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                       setScreen(5); // Go to review
                     }
                   }}
-                  className="btn-editorial-primary flex-2 py-3 rounded-sm font-display text-xl uppercase tracking-wider"
+                  className="btn-editorial-primary flex-2 py-3 min-h-[48px] rounded-sm font-display text-xl uppercase tracking-wider active:scale-[0.98] flex items-center justify-center"
                 >
                   XEM LẠI & XÁC NHẬN →
                 </button>
@@ -804,36 +816,36 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
             <div className="space-y-6 animate-fadeIn">
               <div className="border-b-2 border-[#20231F] pb-3">
                 <span className="text-xs font-mono font-bold tracking-widest text-[#B94D35] uppercase">
-                  05 / 06 · REVIEW & CONFIRM
+                  05 / 05 · REVIEW & CONFIRM
                 </span>
-                <h3 className="text-3xl sm:text-4xl font-display uppercase tracking-tight text-[#20231F]">
+                <h3 className="text-2xl sm:text-4xl font-display uppercase tracking-tight text-[#20231F]">
                   XÁC NHẬN THÔNG TIN ĐĂNG KÝ
                 </h3>
               </div>
 
               <div className="space-y-3 text-xs">
                 {/* Identity Review */}
-                <div className="p-3.5 rounded-sm bg-white border-2 border-[#20231F] flex items-center justify-between">
-                  <div>
+                <div className="p-3.5 rounded-sm bg-white border-2 border-[#20231F] flex items-center justify-between gap-2">
+                  <div className="min-w-0">
                     <span className="text-[10px] font-mono text-[#20231F]/60 uppercase block">Người tham dự</span>
-                    <span className="font-bold text-sm text-[#20231F]">{identifiedMember?.honorific} {identifiedMember?.fullName}</span>
+                    <span className="font-bold text-sm text-[#20231F] truncate block">{identifiedMember?.honorific} {identifiedMember?.fullName}</span>
                     <span className="text-xs text-[#20231F]/70 block font-mono">MSSV: {identifiedMember?.mssv} • {isAlumni ? 'Cựu thành viên' : 'Thành viên'}</span>
                   </div>
                   <button
                     type="button"
                     onClick={() => setScreen(1)}
-                    className="p-1.5 rounded-lg border border-[#20231F] hover:bg-[#F4EEDF] flex items-center gap-1 text-[11px] font-bold"
+                    className="px-2.5 py-2 min-h-[44px] min-w-[60px] rounded-lg border border-[#20231F] hover:bg-[#F4EEDF] flex items-center justify-center gap-1 text-[11px] font-bold active:scale-95 shrink-0"
                   >
-                    <Edit3 className="w-3 h-3" />
+                    <Edit3 className="w-3.5 h-3.5" />
                     <span>Sửa</span>
                   </button>
                 </div>
 
                 {/* Payment Review */}
-                <div className="p-3.5 rounded-sm bg-white border-2 border-[#20231F] flex items-center justify-between">
-                  <div>
+                <div className="p-3.5 rounded-sm bg-white border-2 border-[#20231F] flex items-center justify-between gap-2">
+                  <div className="min-w-0">
                     <span className="text-[10px] font-mono text-[#20231F]/60 uppercase block">Gói & Biên lai thanh toán</span>
-                    <span className="font-bold text-sm text-[#B94D35]">
+                    <span className="font-bold text-sm text-[#B94D35] truncate block">
                       {plan === 'FULL' ? 'Đóng trọn gói 100%' : 'Đặt cọc giữ chỗ 150.000đ'}
                     </span>
                     <span className="text-xs text-[#20231F]/70 block">
@@ -843,19 +855,19 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                   <button
                     type="button"
                     onClick={() => setScreen(3)}
-                    className="p-1.5 rounded-lg border border-[#20231F] hover:bg-[#F4EEDF] flex items-center gap-1 text-[11px] font-bold"
+                    className="px-2.5 py-2 min-h-[44px] min-w-[60px] rounded-lg border border-[#20231F] hover:bg-[#F4EEDF] flex items-center justify-center gap-1 text-[11px] font-bold active:scale-95 shrink-0"
                   >
-                    <Edit3 className="w-3 h-3" />
+                    <Edit3 className="w-3.5 h-3.5" />
                     <span>Sửa</span>
                   </button>
                 </div>
 
                 {/* Contact Review */}
-                <div className="p-3.5 rounded-sm bg-white border-2 border-[#20231F] flex items-center justify-between">
-                  <div className="space-y-0.5">
+                <div className="p-3.5 rounded-sm bg-white border-2 border-[#20231F] flex items-center justify-between gap-2">
+                  <div className="space-y-0.5 min-w-0">
                     <span className="text-[10px] font-mono text-[#20231F]/60 uppercase block">Thông tin liên lạc</span>
-                    <p>Gmail: <span className="font-mono font-bold">{gmail}</span></p>
-                    <p>SĐT: <span className="font-mono font-bold">{phone}</span> • Người thân đón về: <span className="font-mono font-bold text-[#B94D35]">{emergencyPhone}</span></p>
+                    <p className="truncate">Gmail: <span className="font-mono font-bold">{gmail}</span></p>
+                    <p className="truncate">SĐT: <span className="font-mono font-bold">{phone}</span> • Người thân: <span className="font-mono font-bold text-[#B94D35]">{emergencyPhone}</span></p>
                     {allergies.length > 0 && (
                       <p className="text-[#B94D35]">Dị ứng: {allergies.join(', ')} {allergyNote ? `(${allergyNote})` : ''}</p>
                     )}
@@ -863,9 +875,9 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                   <button
                     type="button"
                     onClick={() => setScreen(4)}
-                    className="p-1.5 rounded-lg border border-[#20231F] hover:bg-[#F4EEDF] flex items-center gap-1 text-[11px] font-bold"
+                    className="px-2.5 py-2 min-h-[44px] min-w-[60px] rounded-lg border border-[#20231F] hover:bg-[#F4EEDF] flex items-center justify-center gap-1 text-[11px] font-bold active:scale-95 shrink-0"
                   >
-                    <Edit3 className="w-3 h-3" />
+                    <Edit3 className="w-3.5 h-3.5" />
                     <span>Sửa</span>
                   </button>
                 </div>
@@ -887,7 +899,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                 <button
                   type="button"
                   onClick={() => setScreen(4)}
-                  className="btn-editorial-secondary flex-1 py-3.5 rounded-sm font-bold text-xs uppercase"
+                  className="btn-editorial-secondary flex-1 py-3.5 min-h-[44px] rounded-sm font-bold text-xs uppercase active:scale-[0.98] flex items-center justify-center"
                 >
                   ← Sửa thông tin
                 </button>
@@ -895,7 +907,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                   type="button"
                   disabled={isSubmitting}
                   onClick={handleFinalSubmit}
-                  className="btn-editorial-primary flex-2 py-3.5 px-6 rounded-sm font-display text-2xl tracking-wider uppercase flex items-center justify-center gap-2"
+                  className="btn-editorial-primary flex-2 py-3.5 min-h-[48px] px-6 rounded-sm font-display text-xl sm:text-2xl tracking-wider uppercase flex items-center justify-center gap-2 active:scale-[0.98]"
                 >
                   <span>{isSubmitting ? 'ĐANG GỬI HỒ SƠ...' : 'HOÀN TẤT ĐĂNG KÝ ↗'}</span>
                 </button>

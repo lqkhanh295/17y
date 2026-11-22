@@ -473,7 +473,7 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
             <div className="space-y-3 pt-1">
               <button
                 onClick={onOpenRegister}
-                className="btn-editorial-primary w-full py-4 font-display font-extrabold text-sm sm:text-base uppercase tracking-wider flex items-center justify-center gap-2 shadow-poster"
+                className="btn-editorial-primary w-full py-4 min-h-[50px] font-display font-extrabold text-sm sm:text-base uppercase tracking-wider flex items-center justify-center gap-2 shadow-poster active:scale-[0.98]"
               >
                 <span>ĐĂNG KÝ THAM GIA GALA 17Y</span>
                 <ArrowRight className="w-4 h-4" />
@@ -507,7 +507,7 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
           {/* Close Button */}
           <button
             onClick={() => setSelectedPhoto(null)}
-            className="absolute top-6 right-6 z-30 p-2.5 bg-[#1F1E1B] hover:bg-csg-red text-white transition-colors border border-white/10"
+            className="absolute top-4 right-4 sm:top-6 sm:right-6 z-30 p-2.5 min-h-[44px] min-w-[44px] flex items-center justify-center bg-[#1F1E1B] hover:bg-csg-red text-white transition-colors border border-white/10 active:scale-95"
             aria-label="Đóng xem ảnh (Esc)"
           >
             <X className="w-5 h-5" />
@@ -528,20 +528,20 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
             <div className="w-full max-w-xs mt-4 flex items-center justify-between text-xs font-mono text-white/70">
               <button
                 onClick={handlePrev}
-                className="p-1 hover:text-csg-yellow transition-colors flex items-center gap-1"
+                className="px-3 py-2 min-h-[44px] min-w-[70px] hover:text-csg-yellow transition-colors flex items-center justify-center gap-1 active:scale-95"
                 aria-label="Ảnh trước"
               >
                 <ChevronLeft className="w-4 h-4" />
                 <span>TRƯỚC</span>
               </button>
 
-              <span>
+              <span className="font-bold text-white/90">
                 {ALL_PHOTOBOOK_IMAGES.findIndex(img => img.id === selectedPhoto.id) + 1} / {ALL_PHOTOBOOK_IMAGES.length}
               </span>
 
               <button
                 onClick={handleNext}
-                className="p-1 hover:text-csg-yellow transition-colors flex items-center gap-1"
+                className="px-3 py-2 min-h-[44px] min-w-[70px] hover:text-csg-yellow transition-colors flex items-center justify-center gap-1 active:scale-95"
                 aria-label="Ảnh sau"
               >
                 <span>TIẾP</span>

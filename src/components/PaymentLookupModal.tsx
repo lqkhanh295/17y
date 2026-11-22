@@ -139,20 +139,20 @@ END:VCALENDAR`;
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-[#20231F]/85 backdrop-blur-md overflow-y-auto animate-fadeIn">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-6 bg-[#20231F]/85 backdrop-blur-md overflow-y-auto animate-fadeIn pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)]">
       <div 
-        className="relative w-full max-w-3xl bg-[#F4EEDF] border-2 border-[#20231F] rounded-sm shadow-poster-lg overflow-hidden my-6 flex flex-col max-h-[92vh] animate-paper-unfold font-body"
+        className="relative w-full max-w-3xl bg-[#F4EEDF] border-2 border-[#20231F] rounded-sm shadow-poster-lg overflow-hidden my-auto sm:my-6 flex flex-col max-h-[96dvh] sm:max-h-[92vh] animate-paper-unfold font-body"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header Bar */}
-        <div className="flex items-center justify-between px-6 py-4 border-b-2 border-[#20231F] bg-[#FFFFFF]">
+        <div className="flex items-center justify-between px-4 sm:px-6 py-3.5 sm:py-4 border-b-2 border-[#20231F] bg-[#FFFFFF] shrink-0">
           <div className="flex items-center gap-3">
-            <span className="w-10 h-10 rounded-sm bg-[#F4C542] border-2 border-[#20231F] flex items-center justify-center text-xl shadow-poster-sm">
+            <span className="w-10 h-10 rounded-sm bg-[#F4C542] border-2 border-[#20231F] flex items-center justify-center text-xl shadow-poster-sm shrink-0">
               🎫
             </span>
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-display text-lg tracking-wider text-[#20231F] uppercase">
+                <span className="font-display text-base sm:text-lg tracking-wider text-[#20231F] uppercase">
                   PARTICIPANT PORTAL
                 </span>
                 <span className="stamp-seal text-[9px]">
@@ -166,14 +166,15 @@ END:VCALENDAR`;
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg border-2 border-[#20231F] hover:bg-[#F4EEDF] text-[#20231F] transition-colors"
+            className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg border-2 border-[#20231F] hover:bg-[#F4EEDF] text-[#20231F] transition-colors active:scale-95 shrink-0"
+            title="Đóng cửa sổ"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Search Bar */}
-        <div className="p-4 sm:p-6 bg-[#FFFFFF] border-b-2 border-[#20231F]">
+        <div className="p-3.5 sm:p-6 bg-[#FFFFFF] border-b-2 border-[#20231F] shrink-0">
           <form onSubmit={handleSearch} className="flex gap-2">
             <div className="relative flex-1">
               <Search className="w-4 h-4 text-[#20231F]/50 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -181,14 +182,16 @@ END:VCALENDAR`;
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
+                autoCapitalize="characters"
+                inputMode="text"
                 placeholder="Nhập MSSV (VD: SE120101) hoặc Số điện thoại, Mã CSG26..."
-                className="w-full pl-9 pr-3 py-2.5 rounded-sm bg-[#F4EEDF] border-2 border-[#20231F] text-xs font-mono text-[#20231F] focus:outline-none focus:ring-2 focus:ring-[#F4C542]"
+                className="w-full pl-9 pr-3 py-2.5 min-h-[44px] rounded-sm bg-[#F4EEDF] border-2 border-[#20231F] text-base sm:text-xs font-mono text-[#20231F] focus:outline-none focus:ring-2 focus:ring-[#F4C542]"
               />
             </div>
             <button
               type="submit"
               disabled={isLoading || !searchTerm.trim()}
-              className="btn-editorial-primary px-5 py-2.5 rounded-sm font-display text-lg uppercase tracking-wider flex items-center gap-1.5 shrink-0"
+              className="btn-editorial-primary px-4 sm:px-5 py-2.5 min-h-[44px] rounded-sm font-display text-base sm:text-lg uppercase tracking-wider flex items-center justify-center gap-1.5 shrink-0 active:scale-95"
             >
               <Search className="w-4 h-4" />
               <span>{isLoading ? 'Đang tra...' : 'TRA CỨU'}</span>
@@ -643,7 +646,7 @@ END:VCALENDAR`;
                           href={getGoogleCalendarUrl(foundRecord)}
                           target="_blank"
                           rel="noreferrer"
-                          className="flex-1 py-2.5 px-3 rounded-sm bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-colors"
+                          className="flex-1 py-2.5 px-3 min-h-[44px] rounded-sm bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-colors active:scale-[0.98]"
                         >
                           <ExternalLink className="w-3.5 h-3.5" />
                           <span>Lưu Google Calendar</span>
@@ -651,7 +654,7 @@ END:VCALENDAR`;
                         <button
                           type="button"
                           onClick={() => downloadIcsFile(foundRecord)}
-                          className="btn-editorial-primary flex-1 py-2.5 px-3 rounded-sm font-bold text-xs flex items-center justify-center gap-1.5"
+                          className="btn-editorial-primary flex-1 py-2.5 px-3 min-h-[44px] rounded-sm font-bold text-xs flex items-center justify-center gap-1.5 active:scale-[0.98]"
                         >
                           <Calendar className="w-3.5 h-3.5" />
                           <span>Tải tệp Apple/Outlook (.ics)</span>
