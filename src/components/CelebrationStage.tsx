@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { 
   Sparkles, Search, Volume2, VolumeX, PartyPopper, 
   X, CheckCircle, ArrowLeft, ExternalLink, Ticket, Lightbulb
@@ -31,6 +32,17 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
   const [activeCharacter, setActiveCharacter] = useState<MascotFrog | null>(null);
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [stageLightsOn, setStageLightsOn] = useState(true);
+
+  // Close wish popup on Escape key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && activeCharacter) {
+        setActiveCharacter(null);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [activeCharacter]);
 
   // Combine external characters with newRegistrant if provided
   const allCharacters = useMemo(() => {
@@ -584,6 +596,79 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
     </div>
   );
 
+  // Dedicated Portal Modal for Clicked Frog Wish to prevent any z-index or stacking context clipping
+  const renderKeepsakeModal = () => {
+    if (!activeCharacter) return null;
+    if (typeof document === 'undefined') return null;
+
+    return createPortal(
+      <div 
+        className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-[#20231F]/80 backdrop-blur-md animate-fadeIn"
+        onClick={() => setActiveCharacter(null)}
+      >
+        <div 
+          className="relative w-full max-w-md bg-[#F4EEDF] rounded-sm border-2 border-[#20231F] p-6 shadow-poster-lg animate-paper-unfold z-10"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <button
+            type="button"
+            onClick={() => setActiveCharacter(null)}
+            className="absolute top-4 right-4 p-1.5 rounded-sm border-2 border-[#20231F] bg-white hover:bg-[#B94D35] hover:text-white text-[#20231F] transition-colors shadow-xs"
+            title="Đóng lời chúc"
+          >
+            <X className="w-5 h-5" />
+          </button>
+
+          <div className="flex items-center gap-3.5 mb-4 pr-8">
+            <div className="w-12 h-12 rounded-sm bg-[#F4C542] border-2 border-[#20231F] flex items-center justify-center text-2xl shadow-sm shrink-0">
+              🐸
+            </div>
+            <div>
+              <h3 className="font-display font-black text-xl text-[#20231F] leading-tight">
+                {activeCharacter.name}
+              </h3>
+              <div className="flex items-center gap-2 mt-1">
+                <span className="stamp-seal text-[9px] bg-white">
+                  {activeCharacter.role === 'ALUMNI' ? 'CỰU THÀNH VIÊN' : 'THÀNH VIÊN ĐƯƠNG NHIỆM'}
+                </span>
+                <span className="text-[11px] font-mono text-[#20231F]/70">
+                  Cóc Sài Gòn 17Y
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div className="p-4 rounded-sm bg-white border-2 border-[#20231F] mb-4 relative shadow-poster-sm">
+            <span className="text-xs font-mono font-bold text-[#B94D35] block mb-1.5">
+              LỜI CHÚC SINH NHẬT 17Y:
+            </span>
+            <p className="font-editorial italic text-base sm:text-lg text-[#20231F] leading-relaxed">
+              "{activeCharacter.wish}"
+            </p>
+          </div>
+
+          <div className="flex items-center justify-between pt-3 border-t border-[#20231F]/20">
+            <span className="text-[11px] font-mono text-[#20231F]/60">
+              CLB Truyền Thông Cóc Sài Gòn
+            </span>
+            <button
+              type="button"
+              onClick={() => {
+                triggerConfettiBlast();
+                setActiveCharacter(null);
+              }}
+              className="px-4 py-2 rounded-sm bg-[#20231F] text-white font-bold text-xs uppercase hover:bg-[#B94D35] transition-colors shadow-sm flex items-center gap-1.5"
+            >
+              <span>Gửi Tim Chúc Mừng</span>
+              <span>💛</span>
+            </button>
+          </div>
+        </div>
+      </div>,
+      document.body
+    );
+  };
+
   // If in modal mode, wrap inside a fixed overlay
   if (isModal) {
     return (
@@ -629,64 +714,7 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
           </div>
         </div>
 
-        {/* Keepsake Modal for Clicked Frog */}
-        {activeCharacter && (
-          <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
-            <div className="relative w-full max-w-md bg-[#F4EEDF] rounded-sm border-2 border-[#20231F] p-6 shadow-poster-lg animate-paper-unfold">
-              <button
-                type="button"
-                onClick={() => setActiveCharacter(null)}
-                className="absolute top-4 right-4 p-1.5 rounded-sm border border-[#20231F] hover:bg-white text-[#20231F] transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
-
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 rounded-sm bg-[#F4C542] border-2 border-[#20231F] flex items-center justify-center text-2xl shadow-sm">
-                  🐸
-                </div>
-                <div>
-                  <h3 className="font-display font-black text-xl text-[#20231F]">
-                    {activeCharacter.name}
-                  </h3>
-                  <div className="flex items-center gap-2 mt-0.5">
-                    <span className="stamp-seal text-[10px]">
-                      {activeCharacter.role === 'ALUMNI' ? 'CỰU THÀNH VIÊN' : 'THÀNH VIÊN ĐƯƠNG NHIỆM'}
-                    </span>
-                    <span className="text-[11px] font-mono text-[#20231F]/60">
-                      Sắc Áo Vàng 17Y
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="p-4 rounded-sm bg-white border-2 border-[#20231F] mb-4 relative shadow-poster-sm">
-                <span className="text-xs font-mono font-bold text-[#B94D35] block mb-1">
-                  LỜI CHÚC SINH NHẬT 17Y:
-                </span>
-                <p className="font-serif italic text-sm text-[#20231F] leading-relaxed">
-                  "{activeCharacter.wish}"
-                </p>
-              </div>
-
-              <div className="flex items-center justify-between pt-2 border-t border-[#20231F]/20">
-                <span className="text-[11px] font-mono text-[#20231F]/60">
-                  CLB Truyền Thông Cóc Sài Gòn
-                </span>
-                <button
-                  type="button"
-                  onClick={() => {
-                    triggerConfettiBlast();
-                    setActiveCharacter(null);
-                  }}
-                  className="px-4 py-2 rounded-sm bg-[#20231F] text-white font-bold text-xs uppercase hover:bg-[#B94D35] transition-colors shadow-sm"
-                >
-                  Gửi Tim Chúc Mừng 💛
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+        {renderKeepsakeModal()}
       </div>
     );
   }
@@ -695,65 +723,7 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
   return (
     <div className="w-full">
       {stageContent}
-
-      {/* Keepsake Modal for Clicked Frog */}
-      {activeCharacter && (
-        <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
-          <div className="relative w-full max-w-md bg-[#F4EEDF] rounded-sm border-2 border-[#20231F] p-6 shadow-poster-lg animate-paper-unfold">
-            <button
-              type="button"
-              onClick={() => setActiveCharacter(null)}
-              className="absolute top-4 right-4 p-1.5 rounded-sm border border-[#20231F] hover:bg-white text-[#20231F] transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
-
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 rounded-sm bg-[#F4C542] border-2 border-[#20231F] flex items-center justify-center text-2xl shadow-sm">
-                🐸
-              </div>
-              <div>
-                <h3 className="font-display font-black text-xl text-[#20231F]">
-                  {activeCharacter.name}
-                </h3>
-                <div className="flex items-center gap-2 mt-0.5">
-                  <span className="stamp-seal text-[10px]">
-                    {activeCharacter.role === 'ALUMNI' ? 'CỰU THÀNH VIÊN' : 'THÀNH VIÊN ĐƯƠNG NHIỆM'}
-                  </span>
-                  <span className="text-[11px] font-mono text-[#20231F]/60">
-                    Sắc Áo Vàng 17Y
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <div className="p-4 rounded-sm bg-white border-2 border-[#20231F] mb-4 relative shadow-poster-sm">
-              <span className="text-xs font-mono font-bold text-[#B94D35] block mb-1">
-                LỜI CHÚC SINH NHẬT 17Y:
-              </span>
-              <p className="font-serif italic text-sm text-[#20231F] leading-relaxed">
-                "{activeCharacter.wish}"
-              </p>
-            </div>
-
-            <div className="flex items-center justify-between pt-2 border-t border-[#20231F]/20">
-              <span className="text-[11px] font-mono text-[#20231F]/60">
-                CLB Truyền Thông Cóc Sài Gòn
-              </span>
-              <button
-                type="button"
-                onClick={() => {
-                  triggerConfettiBlast();
-                  setActiveCharacter(null);
-                }}
-                className="px-4 py-2 rounded-sm bg-[#20231F] text-white font-bold text-xs uppercase hover:bg-[#B94D35] transition-colors shadow-sm"
-              >
-                Gửi Tim Chúc Mừng 💛
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {renderKeepsakeModal()}
     </div>
   );
 };
