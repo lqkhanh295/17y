@@ -14,7 +14,13 @@ export const CinematicFilmOpening: React.FC<CinematicFilmOpeningProps> = ({ onCo
   const handleFinish = () => {
     sessionStorage.setItem('csg17y_film_intro_viewed', 'true');
     setIsDismissed(true);
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    }
     const endTimer = window.setTimeout(() => {
+      if (typeof window !== 'undefined') {
+        window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+      }
       onComplete();
     }, 400);
     timersRef.current.push(endTimer);
@@ -24,13 +30,24 @@ export const CinematicFilmOpening: React.FC<CinematicFilmOpeningProps> = ({ onCo
     if (e) e.stopPropagation();
     timersRef.current.forEach(t => clearTimeout(t));
     timersRef.current = [];
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    }
     handleFinish();
   };
 
   useEffect(() => {
+    // Lock scroll and force top position while intro is active
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+      document.body.style.overflow = 'hidden';
+    }
+
     // 1. Accessibility: reduced motion skip
     if (typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       sessionStorage.setItem('csg17y_film_intro_viewed', 'true');
+      document.body.style.overflow = 'unset';
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
       onComplete();
       return;
     }
@@ -62,6 +79,10 @@ export const CinematicFilmOpening: React.FC<CinematicFilmOpeningProps> = ({ onCo
     timersRef.current.push(t1, t2, t3);
 
     return () => {
+      if (typeof window !== 'undefined') {
+        document.body.style.overflow = 'unset';
+        window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+      }
       window.removeEventListener('keydown', onKeyDown);
       timersRef.current.forEach(t => clearTimeout(t));
     };

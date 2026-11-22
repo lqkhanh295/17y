@@ -190,7 +190,20 @@ export const App: React.FC = () => {
     setIsLookupOpen(false);
     setIsAdminOpen(false);
     setIsStageOpen(false);
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    }
   };
+
+  // Disable browser scroll restoration so page always starts fresh from the beginning
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      if ('scrollRestoration' in window.history) {
+        window.history.scrollRestoration = 'manual';
+      }
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    }
+  }, []);
 
   // Sync initial URL on mount, handle Back/Forward navigation, Hash and Admin shortcuts
   useEffect(() => {
@@ -307,7 +320,14 @@ export const App: React.FC = () => {
       
       {/* Cinematic 35mm Analog Film Opening */}
       {showCinematicIntro && (
-        <CinematicFilmOpening onComplete={() => setShowCinematicIntro(false)} />
+        <CinematicFilmOpening 
+          onComplete={() => {
+            setShowCinematicIntro(false);
+            if (typeof window !== 'undefined') {
+              window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+            }
+          }} 
+        />
       )}
 
       {/* Floating Audio Controller */}
