@@ -245,6 +245,46 @@
   ],
   "registrations": [
     {
+      "id": "CSG26-445592",
+      "memberId": "m-custom-1795346174078",
+      "fullName": "Lê Quốc Mobile",
+      "mssv": "CSG-143064",
+      "role": "ACTIVE",
+      "honorific": "Bạn",
+      "gmail": "testmobile@csg.vn",
+      "personalPhone": "0901234567",
+      "emergencyPhone": "0909999999",
+      "allergies": [],
+      "allergyNote": "",
+      "package": "ACTIVE",
+      "totalRequired": 349000,
+      "paidAmount": 349000,
+      "remainingAmount": 0,
+      "plan": "FULL",
+      "paymentPlan": "FULL",
+      "status": "PENDING",
+      "paymentStatus": "PENDING",
+      "isApproved100": false,
+      "isPublicConsent": true,
+      "receiptPhase1Url": "https://kjqhqdidbhbaajuyazpw.supabase.co/storage/v1/object/public/receipts/rec_phase1_CSG-143064_1795346254763_dhthq.png",
+      "receiptPhase2Url": null,
+      "ticketCode": "CSG17Y-3064-281",
+      "ticketToken": "TKT-E7AHDIPA",
+      "createdAt": "2026-11-22T11:17:35.173Z",
+      "paymentHistory": [
+        {
+          "id": "pay-1795346255173",
+          "phase": 1,
+          "amount": 349000,
+          "receiptUrl": "https://kjqhqdidbhbaajuyazpw.supabase.co/storage/v1/object/public/receipts/rec_phase1_CSG-143064_1795346254763_dhthq.png",
+          "submittedAt": "2026-11-22T11:17:35.173Z",
+          "status": "PENDING"
+        }
+      ],
+      "verifiedBy": null,
+      "verifiedAt": null
+    },
+    {
       "id": "CSG26-546909",
       "memberId": "custom",
       "fullName": "Test Storage User",
@@ -535,6 +575,16 @@
   ],
   "wishes": [
     {
+      "id": "w-1795346255369",
+      "registrationId": "CSG26-445592",
+      "authorName": "Bạn Lê Quốc Mobile",
+      "role": "ACTIVE",
+      "content": "Chúc Cóc Sài Gòn 17 năm rực rỡ và thành công!",
+      "isPublic": true,
+      "moderationStatus": "APPROVED",
+      "createdAt": "2026-11-22T11:17:35.369Z"
+    },
+    {
       "id": "w-1795336153879",
       "registrationId": "CSG26-546909",
       "authorName": "Bạn Test Storage User",
@@ -606,6 +656,17 @@
     }
   ],
   "characters": [
+    {
+      "id": "char-1795346255369",
+      "registrationId": "CSG26-445592",
+      "name": "Lê Quốc Mobile",
+      "honorific": "Bạn",
+      "role": "ACTIVE",
+      "wish": "Chúc Cóc Sài Gòn 17 năm rực rỡ và thành công!",
+      "x": 54,
+      "y": 72,
+      "direction": -1
+    },
     {
       "id": "char-1795336153880",
       "registrationId": "CSG26-546909",
