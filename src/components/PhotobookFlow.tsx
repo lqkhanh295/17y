@@ -436,37 +436,37 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
         <div className="max-w-2xl mx-auto">
           
           {/* The Gala Keepsake Ticket */}
-          <div className="bg-[#FFFDF8] border-2 border-csg-black p-6 sm:p-8 shadow-poster relative space-y-6">
+          <div className="bg-[#FFFDF8] border-2 border-csg-black p-4 sm:p-8 shadow-poster relative space-y-4 sm:space-y-6">
             
             {/* Perforation Stamp */}
-            <div className="flex items-center justify-between border-b-2 border-dashed border-csg-black/25 pb-3 font-mono text-[11px]">
-              <span className="font-bold uppercase tracking-widest text-csg-red">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 border-b-2 border-dashed border-csg-black/25 pb-2.5 font-mono text-[10px] sm:text-[11px]">
+              <span className="font-bold uppercase tracking-wider sm:tracking-widest text-csg-red whitespace-nowrap">
                 THƯ MỜI HỘI NGỘ • KỶ NIỆM 17 NĂM
               </span>
-              <span className="text-csg-black/50">
+              <span className="text-csg-black/50 whitespace-nowrap">
                 {GALA_EVENT_DETAILS.rsvpDeadline ? `Hạn chót: ${GALA_EVENT_DETAILS.rsvpDeadline}` : '10.12.2026'}
               </span>
             </div>
 
             {/* Event Typography */}
-            <div className="space-y-1.5">
-              <h2 className="text-3xl sm:text-4xl font-display font-extrabold uppercase text-csg-black leading-[1.02] tracking-tight">
+            <div className="space-y-1">
+              <h2 className="text-2xl sm:text-4xl font-display font-extrabold uppercase text-csg-black leading-tight tracking-tight whitespace-nowrap sm:whitespace-normal">
                 {GALA_EVENT_DETAILS.title}
               </h2>
-              <p className="font-editorial italic text-base text-csg-black/75">
+              <p className="font-editorial italic text-sm sm:text-base text-csg-black/75 truncate sm:whitespace-normal">
                 {GALA_EVENT_DETAILS.subtitle}
               </p>
             </div>
 
             {/* Verified Event Schedule Matrix */}
             <div className="font-mono text-xs divide-y divide-csg-black/15 py-1">
-              <div className="flex justify-between py-2.5">
-                <span className="text-csg-black/60 uppercase">THỜI GIAN:</span>
-                <span className="font-bold text-csg-black">{GALA_EVENT_DETAILS.time}</span>
+              <div className="flex items-center justify-between py-2 gap-2">
+                <span className="text-csg-black/60 uppercase whitespace-nowrap shrink-0">THỜI GIAN:</span>
+                <span className="font-bold text-csg-black text-right whitespace-nowrap">{GALA_EVENT_DETAILS.time}</span>
               </div>
-              <div className="flex justify-between py-2.5">
-                <span className="text-csg-black/60 uppercase">ĐỊA ĐIỂM:</span>
-                <span className="font-bold text-csg-black text-right">{GALA_EVENT_DETAILS.venue}</span>
+              <div className="flex items-center justify-between py-2 gap-2">
+                <span className="text-csg-black/60 uppercase whitespace-nowrap shrink-0">ĐỊA ĐIỂM:</span>
+                <span className="font-bold text-csg-black text-right whitespace-nowrap">{GALA_EVENT_DETAILS.venue}</span>
               </div>
             </div>
 
@@ -474,14 +474,14 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
             <div className="space-y-3 pt-1">
               <button
                 onClick={onOpenRegister}
-                className="btn-editorial-primary w-full py-4 min-h-[50px] font-display font-extrabold text-sm sm:text-base uppercase tracking-wider flex items-center justify-center gap-2 shadow-poster active:scale-[0.98]"
+                className="btn-editorial-primary w-full py-3.5 sm:py-4 min-h-[48px] font-display font-extrabold text-sm sm:text-base uppercase tracking-wider flex items-center justify-center gap-2 shadow-poster active:scale-[0.98] whitespace-nowrap"
               >
                 <span>ĐĂNG KÝ THAM GIA GALA 17Y</span>
                 <ArrowRightIcon size={16} className="shrink-0" />
               </button>
 
-              <div className="text-center font-mono text-xs pt-1">
-                <span className="text-csg-black/45 text-[11px]">
+              <div className="text-center font-mono text-xs pt-0.5">
+                <span className="text-csg-black/45 text-[10px] sm:text-[11px] whitespace-nowrap">
                   Dành cho thành viên & cựu thành viên CSG
                 </span>
               </div>

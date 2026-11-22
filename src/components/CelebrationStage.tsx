@@ -677,8 +677,8 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
                   }`}
                 >
                   {isUserFrog && <span>✨</span>}
-                  <span className="truncate max-w-[75px] sm:max-w-[125px]">{c.name}</span>
-                  <span className={`text-[8px] font-mono px-1 rounded ${
+                  <span className="truncate max-w-[95px] sm:max-w-[130px] whitespace-nowrap">{c.name}</span>
+                  <span className={`text-[8px] sm:text-[9px] font-mono px-1 rounded whitespace-nowrap shrink-0 font-bold ${
                     c.role === 'ALUMNI' ? 'bg-amber-100 text-amber-900 border border-amber-300' : 'bg-emerald-100 text-emerald-900 border border-emerald-300'
                   }`}>
                     {c.role === 'ALUMNI' ? 'Cựu' : 'TV'}
@@ -689,7 +689,7 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
               {/* Speech Bubble (Upright, smoothly shown for active speakers) */}
               {showBubble && (
                 <div 
-                  className={`absolute bottom-full mb-2 ${bubbleAlignClass} w-52 sm:w-60 max-w-[85vw] p-2 sm:p-2.5 rounded-sm bg-white border-2 text-left shadow-poster transition-all duration-200 animate-fadeIn z-50 ${
+                  className={`absolute bottom-full mb-2 ${bubbleAlignClass} w-56 sm:w-64 max-w-[88vw] p-2.5 rounded-sm bg-white border-2 text-left shadow-poster transition-all duration-200 animate-fadeIn z-50 ${
                     isUserFrog 
                       ? 'border-[#B94D35] ring-2 ring-[#F4C542]' 
                       : isHovered 
@@ -698,15 +698,15 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
                   }`}
                 >
                   {isUserFrog && (
-                    <span className="bg-[#B94D35] text-white font-mono font-bold text-[8px] sm:text-[9px] px-1.5 py-0.5 rounded-full uppercase tracking-wider block text-center mb-1 animate-pulse">
+                    <span className="bg-[#B94D35] text-white font-mono font-bold text-[8px] sm:text-[9px] px-1.5 py-0.5 rounded-full uppercase tracking-wider block text-center mb-1 animate-pulse whitespace-nowrap">
                       ✨ BẠN Ở ĐÂY NÈ! ✨
                     </span>
                   )}
-                  <div className="flex items-center justify-between gap-1 mb-1">
+                  <div className="flex items-center justify-between gap-1.5 mb-1">
                     <span className="text-xs font-bold text-[#20231F] font-display truncate">
                       {c.name}
                     </span>
-                    <span className={`text-[8px] sm:text-[9px] font-mono px-1 sm:px-1.5 py-0.5 rounded border shrink-0 ${
+                    <span className={`text-[8px] sm:text-[9px] font-mono px-1.5 py-0.5 rounded border shrink-0 whitespace-nowrap font-bold ${
                       c.role === 'ALUMNI'
                         ? 'bg-amber-100 text-amber-900 border-amber-300'
                         : 'bg-emerald-100 text-emerald-900 border-emerald-300'
@@ -714,7 +714,7 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
                       {c.role === 'ALUMNI' ? 'Cựu TV' : 'Thành viên'}
                     </span>
                   </div>
-                  <p className="text-[10px] sm:text-[11px] text-[#20231F]/90 font-serif italic line-clamp-2 leading-tight">
+                  <p className="text-[10px] sm:text-[11px] text-[#20231F]/90 font-serif italic line-clamp-2 leading-snug break-words">
                     "{c.wish}"
                   </p>
                   {/* Pointer */}

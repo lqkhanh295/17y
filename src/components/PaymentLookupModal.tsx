@@ -350,22 +350,22 @@ END:VCALENDAR`;
                       </span>
                     </div>
 
-                    <div className="grid grid-cols-3 gap-3 text-center py-2">
-                      <div className="p-2.5 bg-[#F4EEDF] rounded-sm border border-[#20231F]">
-                        <span className="text-[10px] text-[#20231F]/60 block uppercase font-bold">Tổng chi phí</span>
-                        <span className="text-lg font-display font-bold text-[#20231F]">
+                    <div className="grid grid-cols-3 gap-1.5 sm:gap-3 text-center py-2">
+                      <div className="p-2 sm:p-2.5 bg-[#F4EEDF] rounded-sm border border-[#20231F]">
+                        <span className="text-[9px] sm:text-[10px] text-[#20231F]/60 block uppercase font-bold truncate">Tổng chi phí</span>
+                        <span className="text-sm sm:text-lg font-display font-bold text-[#20231F] whitespace-nowrap block truncate">
                           {foundRecord.totalRequired.toLocaleString('vi-VN')} đ
                         </span>
                       </div>
-                      <div className="p-2.5 bg-emerald-50 rounded-sm border border-[#3D6B45]">
-                        <span className="text-[10px] text-[#3D6B45] block uppercase font-bold">Đã nộp đối soát</span>
-                        <span className="text-lg font-display font-bold text-[#3D6B45]">
+                      <div className="p-2 sm:p-2.5 bg-emerald-50 rounded-sm border border-[#3D6B45]">
+                        <span className="text-[9px] sm:text-[10px] text-[#3D6B45] block uppercase font-bold truncate">Đã nộp</span>
+                        <span className="text-sm sm:text-lg font-display font-bold text-[#3D6B45] whitespace-nowrap block truncate">
                           {foundRecord.paidAmount.toLocaleString('vi-VN')} đ
                         </span>
                       </div>
-                      <div className="p-2.5 bg-amber-50 rounded-sm border border-[#B94D35]">
-                        <span className="text-[10px] text-[#B94D35] block uppercase font-bold">Số dư còn thiếu</span>
-                        <span className="text-lg font-display font-bold text-[#B94D35]">
+                      <div className="p-2 sm:p-2.5 bg-amber-50 rounded-sm border border-[#B94D35]">
+                        <span className="text-[9px] sm:text-[10px] text-[#B94D35] block uppercase font-bold truncate">Còn thiếu</span>
+                        <span className="text-sm sm:text-lg font-display font-bold text-[#B94D35] whitespace-nowrap block truncate">
                           {remainingDue.toLocaleString('vi-VN')} đ
                         </span>
                       </div>
@@ -619,9 +619,9 @@ END:VCALENDAR`;
                   ) : (
                     /* VIP Ticket Card */
                     <div className="p-6 rounded-sm bg-[#FFFFFF] border-2 border-[#20231F] shadow-poster-lg text-center space-y-4 relative overflow-hidden animate-fadeIn">
-                      <div className="flex items-center justify-between text-xs text-[#20231F] font-mono font-bold uppercase border-b-2 border-[#20231F] pb-2">
-                        <span>CLB TRUYỀN THÔNG CÓC SÀI GÒN</span>
-                        <span className="stamp-seal text-[9px]">VÉ CHECK-IN VIP 17Y</span>
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-xs text-[#20231F] font-mono font-bold uppercase border-b-2 border-[#20231F] pb-2">
+                        <span className="truncate whitespace-nowrap">CLB TRUYỀN THÔNG CÓC SÀI GÒN</span>
+                        <span className="stamp-seal text-[9px] whitespace-nowrap w-fit">VÉ CHECK-IN VIP 17Y</span>
                       </div>
 
                       <div>

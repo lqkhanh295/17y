@@ -433,13 +433,13 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                     </span>
                   </h3>
                   <div className="p-4 sm:p-6 rounded-sm bg-[#FFFFFF] border-2 border-[#20231F] shadow-poster text-left space-y-3 relative">
-                    <span className="stamp-seal text-[10px] absolute -top-3 right-4">
+                    <span className="stamp-seal text-[9px] sm:text-[10px] block sm:absolute sm:-top-3 sm:right-4 w-fit mb-1 sm:mb-0 whitespace-nowrap">
                       CỰU THÀNH VIÊN · KHÓA {identifiedMember.generation || 'K14'}
                     </span>
-                    <p className="font-handwriting text-xl sm:text-2xl text-[#20231F] leading-relaxed pt-2">
+                    <p className="font-handwriting text-xl sm:text-2xl text-[#20231F] leading-relaxed pt-1 sm:pt-2">
                       "Có những nơi dù đã đi qua, vẫn luôn có một chỗ dành cho mình để trở về. 17 năm Cóc Sài Gòn, tụi em mong được gặp lại {identifiedMember.honorific.toLowerCase()} trong đêm hội ngộ đặc biệt này."
                     </p>
-                    <div className="pt-2 border-t border-[#20231F]/15 text-xs text-[#20231F]/60 font-mono">
+                    <div className="pt-2 border-t border-[#20231F]/15 text-xs text-[#20231F]/60 font-mono truncate">
                       📍 Điểm danh: {identifiedMember.department || 'Cựu thành viên'}
                     </div>
                   </div>
@@ -454,13 +454,13 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                     </span>
                   </h3>
                   <div className="p-4 sm:p-6 rounded-sm bg-[#FFFFFF] border-2 border-[#20231F] shadow-poster text-left space-y-3 relative">
-                    <span className="stamp-seal text-[10px] absolute -top-3 right-4">
+                    <span className="stamp-seal text-[9px] sm:text-[10px] block sm:absolute sm:-top-3 sm:right-4 w-fit mb-1 sm:mb-0 whitespace-nowrap">
                       THÀNH VIÊN ĐƯƠNG NHIỆM
                     </span>
-                    <p className="font-handwriting text-xl sm:text-2xl text-[#20231F] leading-relaxed pt-2">
+                    <p className="font-handwriting text-xl sm:text-2xl text-[#20231F] leading-relaxed pt-1 sm:pt-2">
                       "Sẵn sàng cho một đêm cháy hết mình chưa? Sinh nhật 17 tuổi của Cóc Sài Gòn nhất định phải có mặt bạn để cùng thổi nến và quẩy tung nóc nhà!"
                     </p>
-                    <div className="pt-2 border-t border-[#20231F]/15 text-xs text-[#20231F]/60 font-mono">
+                    <div className="pt-2 border-t border-[#20231F]/15 text-xs text-[#20231F]/60 font-mono truncate">
                       ⚡ Đội ngũ: {identifiedMember.department || 'Thành viên'}
                     </div>
                   </div>
@@ -476,14 +476,14 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                   <button
                     type="button"
                     onClick={() => setIdentifiedMember(prev => prev ? { ...prev, role: 'ALUMNI', honorific: prev.honorific === 'Chị' ? 'Chị' : 'Anh' } : null)}
-                    className={`py-2.5 px-3 min-h-[44px] rounded-sm text-xs font-mono font-bold border-2 transition-all text-center flex items-center justify-center active:scale-[0.98] ${isAlumni ? 'bg-[#20231F] text-white border-[#20231F] shadow-sm' : 'bg-[#F4EEDF] text-[#20231F] border-[#20231F]/30 hover:border-[#20231F]'}`}
+                    className={`py-2.5 px-3 min-h-[44px] rounded-sm text-xs font-mono font-bold border-2 transition-all text-center flex items-center justify-center active:scale-[0.98] whitespace-nowrap ${isAlumni ? 'bg-[#20231F] text-white border-[#20231F] shadow-sm' : 'bg-[#F4EEDF] text-[#20231F] border-[#20231F]/30 hover:border-[#20231F]'}`}
                   >
                     Cựu Thành Viên (449k)
                   </button>
                   <button
                     type="button"
                     onClick={() => setIdentifiedMember(prev => prev ? { ...prev, role: 'ACTIVE', honorific: 'Bạn' } : null)}
-                    className={`py-2.5 px-3 min-h-[44px] rounded-sm text-xs font-mono font-bold border-2 transition-all text-center flex items-center justify-center active:scale-[0.98] ${!isAlumni ? 'bg-[#20231F] text-white border-[#20231F] shadow-sm' : 'bg-[#F4EEDF] text-[#20231F] border-[#20231F]/30 hover:border-[#20231F]'}`}
+                    className={`py-2.5 px-3 min-h-[44px] rounded-sm text-xs font-mono font-bold border-2 transition-all text-center flex items-center justify-center active:scale-[0.98] whitespace-nowrap ${!isAlumni ? 'bg-[#20231F] text-white border-[#20231F] shadow-sm' : 'bg-[#F4EEDF] text-[#20231F] border-[#20231F]/30 hover:border-[#20231F]'}`}
                   >
                     Thành Viên / Khách Mời (349k)
                   </button>
@@ -537,32 +537,32 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <div
                   onClick={() => setPlan('FULL')}
-                  className={`p-4 rounded-sm border-2 cursor-pointer transition-all active:scale-[0.99] min-h-[80px] ${plan === 'FULL'
+                  className={`p-3.5 sm:p-4 rounded-sm border-2 cursor-pointer transition-all active:scale-[0.99] min-h-[76px] ${plan === 'FULL'
                     ? 'bg-[#F4C542] border-[#20231F] shadow-poster-sm'
                     : 'bg-white border-[#20231F] hover:bg-[#F4EEDF]'
                     }`}
                 >
-                  <div className="flex justify-between items-center mb-1">
-                    <span className="text-xs font-mono font-bold uppercase">100% TRỌN GÓI</span>
-                    <span className="text-[9px] px-1.5 py-0.5 rounded bg-[#20231F] text-[#F4C542] font-bold">KHUYÊN DÙNG</span>
+                  <div className="flex justify-between items-center mb-1 gap-2">
+                    <span className="text-xs font-mono font-bold uppercase whitespace-nowrap">100% TRỌN GÓI</span>
+                    <span className="text-[9px] px-1.5 py-0.5 rounded bg-[#20231F] text-[#F4C542] font-bold whitespace-nowrap">KHUYÊN DÙNG</span>
                   </div>
-                  <div className="text-2xl font-display font-bold">{totalFee.toLocaleString('vi-VN')} đ</div>
-                  <p className="text-[11px] text-[#20231F]/70 mt-1">Hoàn tất ngay</p>
+                  <div className="text-2xl font-display font-bold whitespace-nowrap">{totalFee.toLocaleString('vi-VN')} đ</div>
+                  <p className="text-[11px] text-[#20231F]/70 mt-1 whitespace-nowrap">Hoàn tất ngay toàn bộ chi phí</p>
                 </div>
 
                 <div
                   onClick={() => setPlan('DEPOSIT_150')}
-                  className={`p-4 rounded-sm border-2 cursor-pointer transition-all active:scale-[0.99] min-h-[80px] ${plan === 'DEPOSIT_150'
+                  className={`p-3.5 sm:p-4 rounded-sm border-2 cursor-pointer transition-all active:scale-[0.99] min-h-[76px] ${plan === 'DEPOSIT_150'
                     ? 'bg-[#F4C542] border-[#20231F] shadow-poster-sm'
                     : 'bg-white border-[#20231F] hover:bg-[#F4EEDF]'
                     }`}
                 >
-                  <div className="flex justify-between items-center mb-1">
-                    <span className="text-xs font-mono font-bold uppercase">ĐẶT CỌC GIỮ CHỖ</span>
-                    <span className="text-[9px] px-1.5 py-0.5 rounded bg-[#B94D35] text-white font-bold">CỌC 150K</span>
+                  <div className="flex justify-between items-center mb-1 gap-2">
+                    <span className="text-xs font-mono font-bold uppercase whitespace-nowrap">ĐẶT CỌC GIỮ CHỖ</span>
+                    <span className="text-[9px] px-1.5 py-0.5 rounded bg-[#B94D35] text-white font-bold whitespace-nowrap">CỌC 150K</span>
                   </div>
-                  <div className="text-2xl font-display font-bold">150.000 đ</div>
-                  <p className="text-[11px] text-[#20231F]/70 mt-1">Còn lại: {(totalFee - 150000).toLocaleString('vi-VN')}đ đóng sau trước sự kiện.</p>
+                  <div className="text-2xl font-display font-bold whitespace-nowrap">150.000 đ</div>
+                  <p className="text-[11px] text-[#20231F]/70 mt-1 whitespace-nowrap sm:whitespace-normal">Còn lại: {(totalFee - 150000).toLocaleString('vi-VN')}đ (đóng trước sự kiện)</p>
                 </div>
               </div>
 
@@ -592,29 +592,29 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                     <span className="font-bold text-sm text-[#20231F]">MB Bank (Quân Đội)</span>
                   </div>
 
-                  <div className="p-2.5 bg-[#F4EEDF] rounded-sm border border-[#20231F] flex items-center justify-between">
-                    <div>
-                      <span className="text-[#20231F]/60 block text-[10px] uppercase font-bold">Số tài khoản</span>
-                      <span className="font-mono font-bold text-sm text-[#20231F]">{ACCOUNT_NO}</span>
+                  <div className="p-2.5 bg-[#F4EEDF] rounded-sm border border-[#20231F] flex items-center justify-between gap-2">
+                    <div className="min-w-0 flex-1">
+                      <span className="text-[#20231F]/60 block text-[10px] uppercase font-bold truncate">Số tài khoản</span>
+                      <span className="font-mono font-bold text-sm text-[#20231F] truncate block">{ACCOUNT_NO}</span>
                     </div>
                     <button
                       type="button"
                       onClick={() => copyToClipboard(ACCOUNT_NO)}
-                      className="px-3 py-2 min-h-[44px] min-w-[70px] rounded bg-[#20231F] text-white text-[11px] font-bold active:scale-95 flex items-center justify-center"
+                      className="px-3 py-2 min-h-[44px] min-w-[70px] rounded bg-[#20231F] text-white text-[11px] font-bold active:scale-95 flex items-center justify-center shrink-0 whitespace-nowrap"
                     >
                       {copiedBank ? 'Đã chép' : 'Sao chép'}
                     </button>
                   </div>
 
-                  <div className="p-2.5 bg-[#F4EEDF] rounded-sm border-2 border-[#B94D35] flex items-center justify-between">
-                    <div>
-                      <span className="text-[#B94D35] block text-[10px] uppercase font-bold">Nội dung chuyển khoản (bắt buộc)</span>
-                      <span className="font-mono font-bold text-sm text-[#20231F]">{transferContent}</span>
+                  <div className="p-2.5 bg-[#F4EEDF] rounded-sm border-2 border-[#B94D35] flex items-center justify-between gap-2">
+                    <div className="min-w-0 flex-1">
+                      <span className="text-[#B94D35] block text-[10px] uppercase font-bold truncate">Nội dung chuyển khoản (bắt buộc)</span>
+                      <span className="font-mono font-bold text-sm text-[#20231F] truncate block select-all">{transferContent}</span>
                     </div>
                     <button
                       type="button"
                       onClick={() => copyToClipboard(transferContent)}
-                      className="px-3 py-2 min-h-[44px] min-w-[70px] rounded bg-[#B94D35] text-white text-[11px] font-bold active:scale-95 flex items-center justify-center"
+                      className="px-3 py-2 min-h-[44px] min-w-[70px] rounded bg-[#B94D35] text-white text-[11px] font-bold active:scale-95 flex items-center justify-center shrink-0 whitespace-nowrap"
                     >
                       {copiedBank ? 'Đã chép' : 'Sao chép'}
                     </button>
@@ -910,16 +910,20 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
 
               <div className="space-y-3 text-xs">
                 {/* Identity Review */}
-                <div className="p-3.5 rounded-sm bg-white border-2 border-[#20231F] flex items-center justify-between gap-2">
-                  <div className="min-w-0">
+                <div className="p-3 sm:p-3.5 rounded-sm bg-white border-2 border-[#20231F] flex items-center justify-between gap-2.5">
+                  <div className="min-w-0 flex-1">
                     <span className="text-[10px] font-mono text-[#20231F]/60 uppercase block">Người tham dự</span>
-                    <span className="font-bold text-sm text-[#20231F] truncate block">{identifiedMember?.honorific} {identifiedMember?.fullName}</span>
-                    <span className="text-xs text-[#20231F]/70 block font-mono">MSSV: {identifiedMember?.mssv} • {isAlumni ? 'Cựu thành viên' : 'Thành viên'}</span>
+                    <span className="font-bold text-sm text-[#20231F] truncate block">
+                      {identifiedMember?.honorific} {identifiedMember?.fullName}
+                    </span>
+                    <span className="text-[11px] sm:text-xs text-[#20231F]/70 block font-mono truncate">
+                      MSSV: {identifiedMember?.mssv} • {isAlumni ? 'Cựu thành viên' : 'Thành viên'}
+                    </span>
                   </div>
                   <button
                     type="button"
                     onClick={() => setScreen(1)}
-                    className="px-2.5 py-2 min-h-[44px] min-w-[60px] rounded-lg border border-[#20231F] hover:bg-[#F4EEDF] flex items-center justify-center gap-1 text-[11px] font-bold active:scale-95 shrink-0"
+                    className="px-2.5 py-1.5 min-h-[44px] min-w-[56px] rounded-sm border border-[#20231F] hover:bg-[#F4EEDF] flex items-center justify-center gap-1 text-[11px] font-bold active:scale-95 shrink-0 whitespace-nowrap"
                   >
                     <EditIcon size={14} />
                     <span>Sửa</span>
@@ -927,20 +931,20 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                 </div>
 
                 {/* Payment Review */}
-                <div className="p-3.5 rounded-sm bg-white border-2 border-[#20231F] flex items-center justify-between gap-2">
-                  <div className="min-w-0">
+                <div className="p-3 sm:p-3.5 rounded-sm bg-white border-2 border-[#20231F] flex items-center justify-between gap-2.5">
+                  <div className="min-w-0 flex-1">
                     <span className="text-[10px] font-mono text-[#20231F]/60 uppercase block">Gói & Biên lai thanh toán</span>
                     <span className="font-bold text-sm text-[#B94D35] truncate block">
                       {plan === 'FULL' ? 'Đóng trọn gói 100%' : 'Đặt cọc giữ chỗ 150.000đ'}
                     </span>
-                    <span className="text-xs text-[#20231F]/70 block">
-                      Đã nộp: {currentPayAmount.toLocaleString('vi-VN')}đ {remainingAmount > 0 && `(Còn lại: ${remainingAmount.toLocaleString('vi-VN')}đ)`}
+                    <span className="text-[11px] sm:text-xs text-[#20231F]/70 block truncate">
+                      Đã nộp: {currentPayAmount.toLocaleString('vi-VN')}đ {remainingAmount > 0 ? `• Còn lại: ${remainingAmount.toLocaleString('vi-VN')}đ` : '• Đã đủ 100%'}
                     </span>
                   </div>
                   <button
                     type="button"
                     onClick={() => setScreen(3)}
-                    className="px-2.5 py-2 min-h-[44px] min-w-[60px] rounded-lg border border-[#20231F] hover:bg-[#F4EEDF] flex items-center justify-center gap-1 text-[11px] font-bold active:scale-95 shrink-0"
+                    className="px-2.5 py-1.5 min-h-[44px] min-w-[56px] rounded-sm border border-[#20231F] hover:bg-[#F4EEDF] flex items-center justify-center gap-1 text-[11px] font-bold active:scale-95 shrink-0 whitespace-nowrap"
                   >
                     <EditIcon size={14} />
                     <span>Sửa</span>
@@ -948,19 +952,19 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                 </div>
 
                 {/* Contact Review */}
-                <div className="p-3.5 rounded-sm bg-white border-2 border-[#20231F] flex items-center justify-between gap-2">
-                  <div className="space-y-0.5 min-w-0">
+                <div className="p-3 sm:p-3.5 rounded-sm bg-white border-2 border-[#20231F] flex items-center justify-between gap-2.5">
+                  <div className="space-y-0.5 min-w-0 flex-1">
                     <span className="text-[10px] font-mono text-[#20231F]/60 uppercase block">Thông tin liên lạc</span>
-                    <p className="truncate">Gmail: <span className="font-mono font-bold">{gmail}</span></p>
-                    <p className="truncate">SĐT: <span className="font-mono font-bold">{phone}</span> • Người thân: <span className="font-mono font-bold text-[#B94D35]">{emergencyPhone}</span></p>
+                    <p className="text-[11px] sm:text-xs truncate">Gmail: <span className="font-mono font-bold">{gmail}</span></p>
+                    <p className="text-[11px] sm:text-xs truncate">SĐT: <span className="font-mono font-bold">{phone}</span> • Người thân: <span className="font-mono font-bold text-[#B94D35]">{emergencyPhone}</span></p>
                     {allergies.length > 0 && (
-                      <p className="text-[#B94D35]">Dị ứng: {allergies.join(', ')} {allergyNote ? `(${allergyNote})` : ''}</p>
+                      <p className="text-[11px] sm:text-xs text-[#B94D35] truncate">Dị ứng: {allergies.join(', ')} {allergyNote ? `(${allergyNote})` : ''}</p>
                     )}
                   </div>
                   <button
                     type="button"
                     onClick={() => setScreen(4)}
-                    className="px-2.5 py-2 min-h-[44px] min-w-[60px] rounded-lg border border-[#20231F] hover:bg-[#F4EEDF] flex items-center justify-center gap-1 text-[11px] font-bold active:scale-95 shrink-0"
+                    className="px-2.5 py-1.5 min-h-[44px] min-w-[56px] rounded-sm border border-[#20231F] hover:bg-[#F4EEDF] flex items-center justify-center gap-1 text-[11px] font-bold active:scale-95 shrink-0 whitespace-nowrap"
                   >
                     <EditIcon size={14} />
                     <span>Sửa</span>
