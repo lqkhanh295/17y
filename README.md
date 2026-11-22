@@ -19,7 +19,7 @@ Website trải nghiệm sự kiện sinh nhật 17 tuổi của **CLB Truyền t
 
 ### 1. Public Event Experience (`/`)
 - **Sticky Editorial Header:** Brand identity Cóc Sài Gòn 17Y, điều hướng mượt mà, bộ phát nhạc nền Web Audio synthesizer không phụ thuộc tệp ngoài, và menu trượt di động (Mobile Drawer).
-- **Hero & Poster Composition:** Tiêu đề Display ngoại cỡ (`Bebas Neue`), đồng hồ đếm ngược thời gian thực (Days, Hours, Mins, Secs) không giật khung hình, cụm metadata sự kiện (18:00 Thứ Bảy 15/12/2026 tại Asiana Plaza Tân Phú, TP. HCM).
+- **Hero & Poster Composition:** Tiêu đề Display ngoại cỡ (`Bebas Neue`), đồng hồ đếm ngược thời gian thực (Days, Hours, Mins, Secs) không giật khung hình, cụm metadata sự kiện (18:00 Thứ Bảy 19/12/2026 tại Đồi Sứ Villa).
 - **The Party (Chương Đêm Tiệc 17Y):** Bố cục 2 cột tạp chí giới thiệu ý nghĩa 17 năm, lịch trình 4 chặng đêm tiệc và quy chuẩn trang phục Sắc Áo Vàng truyền thống.
 - **Memory Wall (Photobook Tư Liệu 17Y):** Bộ sưu tập kỷ niệm dạng scrapbook với ảnh nghiêng tự nhiên, tem dán analog, phân loại mùa (16Y, 15Y, 14Y, Teambuilding, Tác nghiệp) kèm **Lightbox Viewer** điều hướng bàn phím (`Esc`, `ArrowLeft`, `ArrowRight`).
 - **Wish Gate (Lưu Bút 17Y):** Khu vực trích dẫn lời chúc chân thành từ các thế hệ Cóc Vàng.

@@ -102,8 +102,8 @@ export const PaymentLookupModal: React.FC<PaymentLookupModalProps> = ({
   // Google Calendar generator
   const getGoogleCalendarUrl = (r: RegistrationRecord) => {
     const title = encodeURIComponent('Đại Tiệc Sinh Nhật 17 Năm CLB Truyền Thông Cóc Sài Gòn');
-    const details = encodeURIComponent(`Chào mừng ${r.fullName} đến với CSG 17Y!\nMã vé Check-in của bạn: ${r.ticketCode}\nĐịa điểm: Trung tâm Hội nghị Asiana Plaza Sài Gòn.`);
-    const location = encodeURIComponent('Asiana Plaza Tân Phú, TP. Hồ Chí Minh');
+    const details = encodeURIComponent(`Chào mừng ${r.fullName} đến với CSG 17Y!\nMã vé Check-in của bạn: ${r.ticketCode}\nĐịa điểm: Đồi Sứ Villa.`);
+    const location = encodeURIComponent('Đồi Sứ Villa');
     const start = '20261215T180000';
     const end = '20261215T220000';
     return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${start}/${end}&details=${details}&location=${location}`;
@@ -117,7 +117,7 @@ CALSCALE:GREGORIAN
 BEGIN:VEVENT
 SUMMARY:Đại Tiệc Sinh Nhật 17 Năm Cóc Sài Gòn (CSG 17Y)
 DESCRIPTION:Vé Check-in: ${r.ticketCode} - Họ Tên: ${r.fullName}\\nĐêm hội ngộ 17 năm thanh xuân áo vàng!
-LOCATION:Asiana Plaza Tân Phú, TP. Hồ Chí Minh
+LOCATION:Đồi Sứ Villa
 DTSTART:20261215T110000Z
 DTEND:20261215T150000Z
 STATUS:CONFIRMED
@@ -633,8 +633,8 @@ END:VCALENDAR`;
                       </div>
 
                       <div className="text-xs text-[#20231F] space-y-1">
-                        <p>🗓️ <strong>18:00, Thứ Bảy, 15/12/2026</strong></p>
-                        <p>📍 <strong>Trung tâm Hội nghị Asiana Plaza Sài Gòn</strong></p>
+                        <p>🗓️ <strong>18:00, Thứ Bảy, 19/12/2026</strong></p>
+                        <p>📍 <strong>Đồi Sứ Villa</strong></p>
                         <p className="text-[11px] text-[#20231F]/70 italic">Dress code: Áo vàng truyền thống CSG / Smart Casual</p>
                       </div>
 

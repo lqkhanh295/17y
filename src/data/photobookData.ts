@@ -80,8 +80,8 @@ export const GALA_EVENT_DETAILS = {
   subtitle: 'Cóc Sài Gòn — Mười Bảy Năm Một Mái Nhà',
   time: '18:00 • Thứ Bảy, 19.12.2026',
   dateIso: '2026-12-19T18:00:00+07:00',
-  venue: 'Asiana Plaza Tân Phú, TP. Hồ Chí Minh',
-  address: '45-47 Vườn Lài, P. Phú Thọ Hòa, Q. Tân Phú, TP. HCM',
+  venue: 'Đồi Sứ Villa',
+  address: 'Đồi Sứ Villa',
   dressCode: 'Sắc Áo Vàng Truyền Thống (Yellow & White Gold)',
   rsvpDeadline: '15.12.2026'
 };

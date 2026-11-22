@@ -350,7 +350,7 @@ export const App: React.FC = () => {
       {/* ================= QUIET COLOPHON FOOTER ================= */}
       <footer className="relative z-10 bg-csg-surface border-t border-csg-black/25 py-6 px-4 sm:px-8 mt-12">
         <div className="max-w-[1360px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 font-mono text-xs text-csg-black/65 text-center sm:text-left">
-          <span>CLB TRUYỀN THÔNG CÓC SÀI GÒN • 2009 — 2026 • ĐẠI TIỆC GALA 17Y TẠI ASIANA PLAZA TÂN PHÚ</span>
+          <span>CLB TRUYỀN THÔNG CÓC SÀI GÒN • 2009 — 2026 • ĐẠI TIỆC GALA 17Y TẠI ĐỒI SỨ VILLA</span>
 
           <div className="flex items-center gap-4">
             <button
