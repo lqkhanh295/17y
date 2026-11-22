@@ -353,8 +353,10 @@ app.post('/api/registrations', async (req, res) => {
 
     try {
       if (supabase) {
-        await supabase.from('wishes').insert(wishObj);
-        await supabase.from('characters').insert(charObj);
+        await Promise.allSettled([
+          supabase.from('wishes').insert(wishObj),
+          supabase.from('characters').insert(charObj)
+        ]);
       }
     } catch (err) {
       console.error('Supabase wish/character insert error:', err);

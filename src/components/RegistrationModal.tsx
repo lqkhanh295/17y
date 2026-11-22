@@ -8,6 +8,7 @@ import {
 import { MemberDirectoryItem, PaymentPlan, RegistrationRecord, MascotFrog } from '../types';
 import { apiClient } from '../services/apiClient';
 import { audioService } from '../services/audioService';
+import { compressImage } from '../utils/imageCompressor';
 import { CelebrationStage } from './CelebrationStage';
 
 interface RegistrationModalProps {
@@ -45,6 +46,9 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
   const [receiptImage, setReceiptImage] = useState<string>('');
   const [copiedBank, setCopiedBank] = useState(false);
   const [paymentErrors, setPaymentErrors] = useState<{ [key: string]: string }>({});
+  const [isCompressingReceipt, setIsCompressingReceipt] = useState(false);
+  const [preuploadedReceiptUrl, setPreuploadedReceiptUrl] = useState<string | null>(null);
+  const bgUploadPromiseRef = useRef<Promise<string> | null>(null);
 
   // Screen 4: Personal info & Wish state
   const [gmail, setGmail] = useState('');
@@ -58,6 +62,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
 
   // Screen 6: Completed state
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatusText, setSubmitStatusText] = useState('');
   const [completedRecord, setCompletedRecord] = useState<RegistrationRecord | null>(null);
   const screensContainerRef = useRef<HTMLDivElement>(null);
 
@@ -125,20 +130,48 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
     }
   };
 
-  // Screen 3: Handle Receipt Image Upload
-  const handleReceiptUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Screen 3: Handle Receipt Image Upload with high-speed client compression and background pre-upload
+  const handleReceiptUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      if (file.size > 10 * 1024 * 1024) {
-        setPaymentErrors(prev => ({ ...prev, receipt: 'Kích thước ảnh tối đa 10MB.' }));
-        return;
-      }
+    if (!file) return;
+
+    if (file.size > 15 * 1024 * 1024) {
+      setPaymentErrors(prev => ({ ...prev, receipt: 'Kích thước ảnh tối đa 15MB.' }));
+      return;
+    }
+
+    setIsCompressingReceipt(true);
+    try {
+      // 1. Instant client-side compression (reduces 10MB down to ~100KB in ~100ms)
+      const compressedDataUrl = await compressImage(file, 1280, 0.82);
+      setReceiptImage(compressedDataUrl);
+      setPaymentErrors(prev => ({ ...prev, receipt: '' }));
+
+      // 2. Proactive Background Upload while user completes Screens 4 and 5
+      setPreuploadedReceiptUrl(null);
+      const mssvClean = (identifiedMember?.mssv || 'VIP').trim().toUpperCase();
+      const uploadPromise = apiClient.uploadReceiptToStorage(compressedDataUrl, `rec_phase1_${mssvClean}`);
+      bgUploadPromiseRef.current = uploadPromise;
+
+      uploadPromise
+        .then(url => {
+          if (url && (url.startsWith('http://') || url.startsWith('https://'))) {
+            setPreuploadedReceiptUrl(url);
+          }
+        })
+        .catch(err => {
+          console.warn('[Background Upload] Will retry on submit:', err);
+        });
+    } catch (err) {
+      console.error('Image compression failed, using fallback:', err);
       const reader = new FileReader();
       reader.onloadend = () => {
         setReceiptImage(reader.result as string);
         setPaymentErrors(prev => ({ ...prev, receipt: '' }));
       };
       reader.readAsDataURL(file);
+    } finally {
+      setIsCompressingReceipt(false);
     }
   };
 
@@ -173,12 +206,25 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
     return Object.keys(errors).length === 0;
   };
 
-  // Final submit on Screen 5
+  // Final submit on Screen 5 with progress states
   const handleFinalSubmit = async () => {
     if (!identifiedMember) return;
 
     setIsSubmitting(true);
+    setSubmitStatusText('Đang xử lý hồ sơ...');
     try {
+      // If background upload is still finishing, wait for it with a short timeout
+      let finalReceipt = preuploadedReceiptUrl || receiptImage;
+      if (!preuploadedReceiptUrl && bgUploadPromiseRef.current) {
+        try {
+          const timeoutPromise = new Promise<string>((_, reject) => setTimeout(() => reject('timeout'), 2500));
+          finalReceipt = await Promise.race([bgUploadPromiseRef.current, timeoutPromise]);
+        } catch {
+          finalReceipt = receiptImage;
+        }
+      }
+
+      setSubmitStatusText('Đang lưu thông tin đăng ký...');
       const record = await apiClient.createRegistration({
         memberId: identifiedMember.id,
         fullName: identifiedMember.fullName,
@@ -192,7 +238,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
         allergyNote,
         plan,
         paymentPlan: plan,
-        receiptImage,
+        receiptImage: finalReceipt,
         wishes: wishes.trim(),
         isPublicConsent
       });
@@ -203,7 +249,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
       // Play audio & Confetti celebration
       audioService.playCelebrationChime();
       confetti({
-        particleCount: 70,
+        particleCount: 75,
         spread: 80,
         origin: { y: 0.6 },
         colors: ['#F4C542', '#B94D35', '#20231F', '#3D6B45', '#F4EEDF']
@@ -215,6 +261,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
       alert(error.message || 'Lỗi khi gửi đăng ký. Vui lòng thử lại.');
     } finally {
       setIsSubmitting(false);
+      setSubmitStatusText('');
     }
   };
 
@@ -589,7 +636,20 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                           />
                           <div>
                             <span className="text-xs font-bold text-emerald-800 block">Đã đính kèm ảnh biên lai</span>
-                            <span className="text-[10px] font-mono text-[#20231F]/60">Sẵn sàng để BTC đối soát</span>
+                            {isCompressingReceipt ? (
+                              <span className="text-[10px] font-mono text-amber-700 flex items-center gap-1">
+                                <span className="w-2.5 h-2.5 border border-amber-600 border-t-transparent rounded-full animate-spin" />
+                                Đang tối ưu dung lượng...
+                              </span>
+                            ) : preuploadedReceiptUrl ? (
+                              <span className="text-[10px] font-mono text-emerald-700 flex items-center gap-1 font-bold">
+                                ✓ Đã sẵn sàng gửi ngay
+                              </span>
+                            ) : (
+                              <span className="text-[10px] font-mono text-[#20231F]/60">
+                                Đã nén tối ưu (sẵn sàng đối soát)
+                              </span>
+                            )}
                           </div>
                         </div>
 
@@ -601,11 +661,15 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                               accept="image/png,image/jpeg,image/webp"
                               onChange={handleReceiptUpload}
                               className="hidden"
+                              disabled={isCompressingReceipt}
                             />
                           </label>
                           <button
                             type="button"
-                            onClick={() => setReceiptImage('')}
+                            onClick={() => {
+                              setReceiptImage('');
+                              setPreuploadedReceiptUrl(null);
+                            }}
                             className="px-3 py-2 min-h-[44px] bg-red-100 hover:bg-red-200 text-[#B94D35] border border-[#B94D35] text-xs font-bold transition-colors active:scale-95 flex items-center justify-center"
                           >
                             Xóa
@@ -614,18 +678,28 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                       </div>
                     ) : (
                       <label className="border-2 border-dashed border-[#20231F] p-4 min-h-[84px] bg-white flex flex-col items-center justify-center gap-1.5 cursor-pointer hover:bg-[#F4EEDF] transition-colors active:scale-[0.99]">
-                        <UploadIcon size={20} className="text-[#20231F]" />
-                        <span className="text-xs font-bold text-[#20231F] text-center">
-                          Nhấp để tải lên ảnh chụp màn hình chuyển khoản
-                        </span>
-                        <span className="text-[10px] font-mono text-[#20231F]/60 text-center">
-                          Hỗ trợ định dạng JPG, PNG, WEBP (Tối đa 10MB)
-                        </span>
+                        {isCompressingReceipt ? (
+                          <div className="flex flex-col items-center gap-2">
+                            <span className="w-6 h-6 border-2 border-[#B94D35] border-t-transparent rounded-full animate-spin" />
+                            <span className="text-xs font-bold text-[#B94D35]">Đang tối ưu dung lượng ảnh...</span>
+                          </div>
+                        ) : (
+                          <>
+                            <UploadIcon size={20} className="text-[#20231F]" />
+                            <span className="text-xs font-bold text-[#20231F] text-center">
+                              Nhấp để tải lên ảnh chụp màn hình chuyển khoản
+                            </span>
+                            <span className="text-[10px] font-mono text-[#20231F]/60 text-center">
+                              Tự động tối ưu dung lượng siêu tốc (Hỗ trợ JPG, PNG, WEBP)
+                            </span>
+                          </>
+                        )}
                         <input
                           type="file"
                           accept="image/png,image/jpeg,image/webp"
                           onChange={handleReceiptUpload}
                           className="hidden"
+                          disabled={isCompressingReceipt}
                         />
                       </label>
                     )}
@@ -919,10 +993,21 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                   type="button"
                   disabled={isSubmitting}
                   onClick={handleFinalSubmit}
-                  className="btn-editorial-primary flex-2 py-3.5 min-h-[48px] px-6 rounded-sm font-display text-xl sm:text-2xl tracking-wider uppercase flex items-center justify-center gap-2 active:scale-[0.98]"
+                  className="btn-editorial-primary flex-2 py-3.5 min-h-[48px] px-4 sm:px-6 rounded-sm font-display text-lg sm:text-2xl tracking-wider uppercase flex items-center justify-center gap-2 active:scale-[0.98] disabled:opacity-85 disabled:cursor-wait"
                 >
-                  <span>{isSubmitting ? 'ĐANG GỬI HỒ SƠ...' : 'HOÀN TẤT ĐĂNG KÝ'}</span>
-                  {!isSubmitting && <ArrowUpRightIcon size={18} />}
+                  {isSubmitting ? (
+                    <div className="flex items-center gap-2">
+                      <span className="w-5 h-5 border-2 border-[#20231F] border-t-transparent rounded-full animate-spin shrink-0" />
+                      <span className="text-xs sm:text-sm font-mono font-bold tracking-normal normal-case">
+                        {submitStatusText || 'Đang xử lý hồ sơ...'}
+                      </span>
+                    </div>
+                  ) : (
+                    <>
+                      <span>HOÀN TẤT ĐĂNG KÝ</span>
+                      <ArrowUpRightIcon size={18} />
+                    </>
+                  )}
                 </button>
               </div>
             </div>

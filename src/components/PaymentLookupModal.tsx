@@ -6,6 +6,7 @@ import {
 } from 'naive-icons';
 import { RegistrationRecord, PaymentSubmission } from '../types';
 import { apiClient } from '../services/apiClient';
+import { compressImage } from '../utils/imageCompressor';
 
 interface PaymentLookupModalProps {
   isOpen: boolean;
@@ -57,14 +58,20 @@ export const PaymentLookupModal: React.FC<PaymentLookupModalProps> = ({
     }
   };
 
-  const handleReceiptUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleReceiptUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setReceiptPhase2(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+      try {
+        const compressed = await compressImage(file, 1280, 0.82);
+        setReceiptPhase2(compressed);
+      } catch (err) {
+        console.error('Compression failed:', err);
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setReceiptPhase2(reader.result as string);
+        };
+        reader.readAsDataURL(file);
+      }
     }
   };
 

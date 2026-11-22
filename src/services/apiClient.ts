@@ -3,16 +3,23 @@ import { supabase } from './supabaseClient';
 
 export const API_BASE = '/api';
 
-// Safe fetch wrapper that handles non-JSON responses (e.g. Vercel 404 HTML pages)
-async function safeFetchJson<T>(url: string, options?: RequestInit): Promise<T | null> {
+// Safe fetch wrapper that handles non-JSON responses and network timeouts
+async function safeFetchJson<T>(url: string, options?: RequestInit, timeoutMs = 7000): Promise<T | null> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
-    const res = await fetch(url, options);
+    const res = await fetch(url, {
+      ...options,
+      signal: controller.signal
+    });
+    clearTimeout(timer);
     const contentType = res.headers.get('content-type') || '';
     if (!res.ok || !contentType.includes('application/json')) {
       return null;
     }
     return (await res.json()) as T;
   } catch {
+    clearTimeout(timer);
     return null;
   }
 }
@@ -30,26 +37,44 @@ function normalizeVN(str: string): string {
 }
 
 export const apiClient = {
-  // Helper: Upload base64 image to Supabase Storage bucket 'receipts'
+  // Helper: Upload image to Supabase Storage bucket 'receipts' with native high-speed blob decoding
   async uploadReceiptToStorage(fileOrDataUrl: string, prefix = 'receipt'): Promise<string> {
-    if (!fileOrDataUrl || typeof fileOrDataUrl !== 'string' || !fileOrDataUrl.startsWith('data:image/')) {
+    if (!fileOrDataUrl || typeof fileOrDataUrl !== 'string') {
+      return fileOrDataUrl;
+    }
+
+    // If already an HTTP/HTTPS URL (e.g. pre-uploaded in background), return immediately
+    if (fileOrDataUrl.startsWith('http://') || fileOrDataUrl.startsWith('https://')) {
+      return fileOrDataUrl;
+    }
+
+    if (!fileOrDataUrl.startsWith('data:image/')) {
       return fileOrDataUrl;
     }
 
     try {
-      const matches = fileOrDataUrl.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
-      if (!matches) return fileOrDataUrl;
+      let blob: Blob;
+      let contentType = 'image/jpeg';
 
-      const contentType = matches[1];
-      const ext = contentType.split('/')[1]?.replace('jpeg', 'jpg') || 'jpg';
-      const byteCharacters = atob(matches[2]);
-      const byteNumbers = new Array(byteCharacters.length);
-      for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      // Fast native conversion in browser C++ layer
+      try {
+        const res = await fetch(fileOrDataUrl);
+        blob = await res.blob();
+        contentType = blob.type || 'image/jpeg';
+      } catch {
+        const matches = fileOrDataUrl.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
+        if (!matches) return fileOrDataUrl;
+        contentType = matches[1];
+        const byteCharacters = atob(matches[2]);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        blob = new Blob([byteArray], { type: contentType });
       }
-      const byteArray = new Uint8Array(byteNumbers);
-      const blob = new Blob([byteArray], { type: contentType });
 
+      const ext = contentType.split('/')[1]?.replace('jpeg', 'jpg') || 'jpg';
       const fileName = `${prefix}_${Date.now()}_${Math.random().toString(36).substring(2, 7)}.${ext}`;
       const { data, error } = await supabase.storage.from('receipts').upload(fileName, blob, {
         contentType,
@@ -253,8 +278,6 @@ export const apiClient = {
         moderationStatus: 'APPROVED',
         createdAt: new Date().toISOString()
       };
-      await supabase.from('wishes').insert(wishObj);
-
       const charObj = {
         id: 'char-' + Date.now(),
         registrationId: regId,
@@ -266,7 +289,12 @@ export const apiClient = {
         y: 72 + Math.floor(Math.random() * 12),
         direction: Math.random() > 0.5 ? 1 : -1
       };
-      await supabase.from('characters').insert(charObj);
+
+      // High-speed parallel insert
+      await Promise.allSettled([
+        supabase.from('wishes').insert(wishObj),
+        supabase.from('characters').insert(charObj)
+      ]);
     }
 
     return newRecord;

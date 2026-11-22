@@ -245,6 +245,46 @@
   ],
   "registrations": [
     {
+      "id": "CSG26-933985",
+      "memberId": "m-custom-1795347052666",
+      "fullName": "Nguyễn Tốc Độ",
+      "mssv": "CSG-940742",
+      "role": "ACTIVE",
+      "honorific": "Bạn",
+      "gmail": "tocdo@csg.vn",
+      "personalPhone": "0912345678",
+      "emergencyPhone": "0988776655",
+      "allergies": [],
+      "allergyNote": "Không",
+      "package": "ACTIVE",
+      "totalRequired": 349000,
+      "paidAmount": 349000,
+      "remainingAmount": 0,
+      "plan": "FULL",
+      "paymentPlan": "FULL",
+      "status": "PENDING",
+      "paymentStatus": "PENDING",
+      "isApproved100": false,
+      "isPublicConsent": true,
+      "receiptPhase1Url": "https://kjqhqdidbhbaajuyazpw.supabase.co/storage/v1/object/public/receipts/rec_phase1_CSG-940742_1795347130651_y9ukx.png",
+      "receiptPhase2Url": null,
+      "ticketCode": "CSG17Y-0742-963",
+      "ticketToken": "TKT-JMVCYPMP",
+      "createdAt": "2026-11-22T11:32:11.191Z",
+      "paymentHistory": [
+        {
+          "id": "pay-1795347131191",
+          "phase": 1,
+          "amount": 349000,
+          "receiptUrl": "https://kjqhqdidbhbaajuyazpw.supabase.co/storage/v1/object/public/receipts/rec_phase1_CSG-940742_1795347130651_y9ukx.png",
+          "submittedAt": "2026-11-22T11:32:11.191Z",
+          "status": "PENDING"
+        }
+      ],
+      "verifiedBy": null,
+      "verifiedAt": null
+    },
+    {
       "id": "CSG26-445592",
       "memberId": "m-custom-1795346174078",
       "fullName": "Lê Quốc Mobile",
@@ -575,6 +615,16 @@
   ],
   "wishes": [
     {
+      "id": "w-1795347131391",
+      "registrationId": "CSG26-933985",
+      "authorName": "Bạn Nguyễn Tốc Độ",
+      "role": "ACTIVE",
+      "content": "Chúc mừng sinh nhật Cóc Sài Gòn 17 năm rực rỡ!",
+      "isPublic": true,
+      "moderationStatus": "APPROVED",
+      "createdAt": "2026-11-22T11:32:11.391Z"
+    },
+    {
       "id": "w-1795346255369",
       "registrationId": "CSG26-445592",
       "authorName": "Bạn Lê Quốc Mobile",
@@ -656,6 +706,17 @@
     }
   ],
   "characters": [
+    {
+      "id": "char-1795347131391",
+      "registrationId": "CSG26-933985",
+      "name": "Nguyễn Tốc Độ",
+      "honorific": "Bạn",
+      "role": "ACTIVE",
+      "wish": "Chúc mừng sinh nhật Cóc Sài Gòn 17 năm rực rỡ!",
+      "x": 45,
+      "y": 72,
+      "direction": 1
+    },
     {
       "id": "char-1795346255369",
       "registrationId": "CSG26-445592",
