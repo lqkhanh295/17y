@@ -7,6 +7,16 @@ export interface EmailContent {
   templateType: 'DEPOSIT_ALUMNI' | 'DEPOSIT_ACTIVE' | 'FULL_100';
 }
 
+export function escapeHtml(str: string): string {
+  if (!str || typeof str !== 'string') return '';
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 /**
  * Generate email payload (subject, html, text, templateType)
  * Khớp 100% chính xác từng dòng theo mẫu BTC cung cấp:
@@ -18,16 +28,16 @@ export function generateEmailContent(
   record: RegistrationRecord,
   explicitTemplate?: 'AUTO' | 'DEPOSIT_ALUMNI' | 'DEPOSIT_ACTIVE' | 'FULL_100'
 ): EmailContent {
-  const fullName = record.fullName || 'Bạn';
-  const role = record.role || 'ACTIVE';
-  const phone = record.personalPhone || '';
-  const ticketCode = record.ticketCode || 'CSG17-VIP';
-  const isApproved100 = Boolean(record.isApproved100);
+  const fullName = String(record?.fullName || 'Bạn').replace(/[\r\n]+/g, ' ').trim();
+  const role = record?.role || 'ACTIVE';
+  const phone = String(record?.personalPhone || '').replace(/[\r\n]+/g, ' ').trim();
+  const ticketCode = String(record?.ticketCode || 'CSG17-VIP').replace(/[\r\n]+/g, ' ').trim();
+  const isApproved100 = Boolean(record?.isApproved100);
 
   let templateType: 'DEPOSIT_ALUMNI' | 'DEPOSIT_ACTIVE' | 'FULL_100';
   if (explicitTemplate && explicitTemplate !== 'AUTO') {
     templateType = explicitTemplate;
-  } else if (isApproved100 || record.status === 'FULLY_PAID' || record.remainingAmount === 0) {
+  } else if (isApproved100 || record?.status === 'FULLY_PAID' || record?.remainingAmount === 0) {
     templateType = 'FULL_100';
   } else if (role === 'ALUMNI' || role === 'GUEST') {
     templateType = 'DEPOSIT_ALUMNI';
@@ -41,7 +51,7 @@ export function generateEmailContent(
 
   const simpleHtml = (bodyText: string) => `
 <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 15px; line-height: 1.7; color: #111111; max-width: 650px; margin: 0 auto; padding: 20px 0; white-space: pre-line;">
-${bodyText}
+${escapeHtml(bodyText)}
 </div>
 `.trim();
 

@@ -969,20 +969,20 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
         {/* ========================================================================= */}
         {/* 2. TƯỜNG SAU HỘI TRƯỜNG (3-TIER ACOUSTIC WOOD WALL STRUCTURE)              */}
         {/* ========================================================================= */}
-        <div className="absolute top-9 sm:top-11 left-0 right-0 h-[52%] overflow-hidden">
+        <div className="absolute top-9 sm:top-11 left-0 right-0 h-[62%] sm:h-[60%] overflow-hidden">
           
           {/* Nửa trên: Ốp gỗ tiêu âm màu sáng (Upper Light Oak Panels) */}
-          <div className="h-[36%] w-full bg-gradient-to-b from-[#DEC7AC] via-[#D5BCA0] to-[#CBB194] border-b border-[#9D7653]/40 relative">
+          <div className="h-[25%] w-full bg-gradient-to-b from-[#DEC7AC] via-[#D5BCA0] to-[#CBB194] border-b border-[#9D7653]/40 relative">
             <div className="w-full h-full opacity-35 bg-[repeating-linear-gradient(90deg,#96724E_0px,#96724E_1.5px,transparent_1.5px,transparent_68px)]" />
           </div>
 
           {/* Dải viền gỗ nâu sẫm chạy ngang (Middle Dark Walnut Horizontal Band) */}
-          <div className="h-[20%] w-full bg-gradient-to-r from-[#4E2713] via-[#61341C] to-[#4E2713] border-y-2 border-[#33170A] shadow-inner relative">
+          <div className="h-[13%] w-full bg-gradient-to-r from-[#4E2713] via-[#61341C] to-[#4E2713] border-y-2 border-[#33170A] shadow-inner relative">
             <div className="w-full h-full opacity-30 bg-[repeating-linear-gradient(0deg,#2D1206_0px,#2D1206_1px,transparent_1px,transparent_6px)]" />
           </div>
 
-          {/* Nửa dưới: Lam gỗ đứng dọc 2 bên màn LED (Lower Vertical Acoustic Slats) */}
-          <div className="h-[44%] w-full bg-[#3D2012] relative overflow-hidden">
+          {/* Nửa dưới: Lam gỗ đứng dọc 2 bên & phía dưới màn LED (Kéo sâu xuống sàn) */}
+          <div className="h-[62%] w-full bg-[#3D2012] relative overflow-hidden">
             {/* Real 3D Vertical Wooden Slats Pattern (Lam gỗ đứng y chang ảnh) */}
             <div className="w-full h-full bg-[repeating-linear-gradient(90deg,#D4B48A_0px,#D4B48A_6px,#2E160A_6px,#2E160A_11px)] shadow-inner" />
           </div>
@@ -991,7 +991,7 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
         {/* ========================================================================= */}
         {/* 3. MÀN HÌNH LED 16:9 CHÍNH GIỮA CHIẾU VIDEO TVC LẶP ĐI LẶP LẠI (CÓ TIẾNG)   */}
         {/* ========================================================================= */}
-        <div className="absolute top-[14%] sm:top-14 left-1/2 -translate-x-1/2 w-[72%] sm:w-[52%] md:w-[45%] max-w-[580px] aspect-[16/9] z-20">
+        <div className="absolute top-[10%] sm:top-12 left-1/2 -translate-x-1/2 w-[68%] sm:w-[48%] md:w-[42%] max-w-[520px] aspect-[16/9] z-20">
           {/* Ambient Wall Drop Shadow & Soft Stage Screen Glow */}
           <div className="absolute -inset-2 bg-amber-500/15 rounded-xs blur-xl -z-10 pointer-events-none" />
           <div className="absolute -inset-1.5 bg-black/70 rounded-xs blur-md -z-10 pointer-events-none" />
@@ -1026,39 +1026,13 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
             <div className="absolute top-1 right-1 w-1 h-1 rounded-full bg-[#11141C] border border-white/20" />
             <div className="absolute bottom-1 left-1 w-1 h-1 rounded-full bg-[#11141C] border border-white/20" />
             <div className="absolute bottom-1 right-1 w-1 h-1 rounded-full bg-[#11141C] border border-white/20" />
-
-            {/* Sound Toggle Pill Overlay on TVC Screen */}
-            <div className="absolute top-2 left-2 z-30 pointer-events-auto">
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setSoundEnabled(!soundEnabled);
-                }}
-                className={`flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-mono font-bold transition-all shadow-md active:scale-95 ${
-                  soundEnabled
-                    ? 'bg-amber-400 text-[#1C140D] border border-amber-300'
-                    : 'bg-black/85 hover:bg-black text-rose-300 border border-rose-500/80 animate-pulse'
-                }`}
-                title={soundEnabled ? 'Tắt tiếng video TVC' : 'Bật tiếng video TVC'}
-              >
-                {soundEnabled ? <Volume2Icon size={12} className="text-[#1C140D]" /> : <VolumeXIcon size={12} className="text-rose-400" />}
-                <span>{soundEnabled ? 'TIẾNG TVC: BẬT' : 'CHẠM ĐỂ BẬT TIẾNG TVC'}</span>
-              </button>
-            </div>
-
-            {/* Live Broadcast Badge */}
-            <div className="absolute bottom-1.5 right-2 flex items-center gap-1.5 px-1.5 py-0.5 rounded-xs bg-black/60 backdrop-blur-xs border border-white/10 opacity-75 pointer-events-none">
-              <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />
-              <span className="font-mono text-[8px] text-white/90 font-bold uppercase tracking-wider">LIVE • TVC 17Y</span>
-            </div>
           </div>
         </div>
 
         {/* ========================================================================= */}
         {/* 4. SÀN SÂN KHẤU MÀU GỖ VÀNG SỒI (HONEY-OAK WOODEN STAGE FLOOR)             */}
         {/* ========================================================================= */}
-        <div className="absolute bottom-0 left-0 right-0 h-[48%] sm:h-[50%] bg-gradient-to-b from-[#E2C79E] via-[#D5B78A] to-[#C19C68] border-t-2 border-[#A2794C] overflow-hidden">
+        <div className="absolute bottom-0 left-0 right-0 h-[38%] sm:h-[40%] bg-gradient-to-b from-[#E2C79E] via-[#D5B78A] to-[#C19C68] border-t-2 border-[#A2794C] overflow-hidden">
           {/* Thớ gỗ ghép ván ngang (Horizontal parquet seams) */}
           <div className="w-full h-full opacity-25 bg-[repeating-linear-gradient(0deg,#70451E_0px,#70451E_1.5px,transparent_1.5px,transparent_24px)]" />
           {/* Thớ gỗ ghép dọc tỏa phối cảnh (Perspective vertical seams) */}
@@ -1111,7 +1085,7 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
             />
 
             {/* ĐÈN KATANA (Thanh LED Batten chạy pixel phía trên màn hình LED) */}
-            <div className="absolute top-9 left-1/2 -translate-x-1/2 w-[50%] md:w-[44%] max-w-[520px] z-25 flex flex-col items-center">
+            <div className="absolute top-7 sm:top-9.5 left-1/2 -translate-x-1/2 w-[50%] md:w-[44%] max-w-[520px] z-25 flex flex-col items-center">
               <div className="w-full h-2 rounded-xs bg-[#090A0D] border border-[#2D3342] p-0.5 overflow-hidden shadow-[0_0_12px_rgba(244,197,66,0.6)]">
                 <div className="w-full h-full stage-katana-chase rounded-xs" />
               </div>

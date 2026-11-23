@@ -15,18 +15,35 @@ const __dirname = path.dirname(__filename);
 const DB_PATH = path.resolve(__dirname, 'data', 'db.json');
 
 const app = express();
+app.set('trust proxy', 1);
 
 // Secure CORS configuration
-const allowedOrigins = process.env.ALLOWED_ORIGINS
-  ? process.env.ALLOWED_ORIGINS.split(',').map(s => s.trim())
-  : ['http://localhost:3000', 'http://localhost:5173'];
+const defaultAllowedOrigins = [
+  'http://localhost:3000',
+  'http://localhost:5173',
+  'http://localhost:4173',
+  'http://127.0.0.1:5173',
+  'http://127.0.0.1:3000'
+];
+
+const configuredOrigins = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(',').map(s => s.trim()).filter(Boolean)
+  : [];
+
+const allAllowedOrigins = new Set([...defaultAllowedOrigins, ...configuredOrigins]);
+
+// Pattern strictly limited to CSG 17Y project Vercel deployments
+const isProjectVercelDomain = (origin) => {
+  return typeof origin === 'string' && /^https:\/\/csg-17y(-[a-z0-9-]+)?\.vercel\.app$/i.test(origin);
+};
 
 app.use(cors({
   origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
+    // Allow same-origin / server-to-server or strictly verified project domains
+    if (!origin || allAllowedOrigins.has(origin) || isProjectVercelDomain(origin)) {
       return callback(null, true);
     }
-    return callback(new Error('CORS policy: Nguồn truy cập không được cấp phép.'));
+    return callback(null, false);
   },
   credentials: true
 }));
@@ -42,6 +59,18 @@ export const loginLimiter = rateLimit({
   message: {
     success: false,
     message: 'Quá nhiều lần thử mã PIN Ban Tổ Chức. Vui lòng chờ 15 phút trước khi thử lại.'
+  }
+});
+
+// Dedicated rate limiter for sending emails to protect Gmail daily quotas and prevent spam
+export const emailSendLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000, // 10 minutes
+  max: 20, // max 20 email sends per 10 minutes
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    message: 'Tốc độ gửi email quá nhanh. Nhằm bảo vệ hạn mức và an toàn tài khoản Gmail CLB, vui lòng chờ ít phút trước khi gửi tiếp.'
   }
 });
 
@@ -145,6 +174,24 @@ function saveDB(data) {
   }
 }
 
+// Helper: Sanitize existing registration record for public responses (prevent leaking phone/email/receipts)
+function sanitizeExistingRecordForPublic(record) {
+  if (!record) return null;
+  return {
+    id: record.id,
+    ticketCode: record.ticketCode,
+    fullName: record.fullName,
+    mssv: record.mssv,
+    role: record.role,
+    status: record.status,
+    paymentStatus: record.paymentStatus,
+    remainingAmount: record.remainingAmount,
+    totalRequired: record.totalRequired,
+    paidAmount: record.paidAmount,
+    isApproved100: record.isApproved100
+  };
+}
+
 // Helper: Normalize Vietnamese text
 function normalizeVN(str) {
   if (!str) return '';
@@ -236,7 +283,7 @@ async function uploadBase64ToStorage(base64Data, filenamePrefix = 'receipt') {
   try {
     const { data, error } = await supabase.storage.from('receipts').upload(fileName, buffer, {
       contentType,
-      upsert: true
+      upsert: false
     });
 
     if (!error && data) {
@@ -343,7 +390,7 @@ app.post('/api/members/verify', async (req, res) => {
             multiple: false,
             data: mssvMatch,
             hasExistingRegistration: !!existing,
-            existingRecord: existing,
+            existingRecord: sanitizeExistingRecordForPublic(existing),
             existingRegistrationId: existing?.id || null,
             message: existing ? `Bạn đã đăng ký tham dự rồi (Mã vé: ${existing.ticketCode || 'Chờ duyệt'}).` : 'Xác thực MSSV thành công.'
           });
@@ -375,7 +422,7 @@ app.post('/api/members/verify', async (req, res) => {
             multiple: false,
             data: singleMatch,
             hasExistingRegistration: !!existing,
-            existingRecord: existing,
+            existingRecord: sanitizeExistingRecordForPublic(existing),
             existingRegistrationId: existing?.id || null,
             message: existing ? `Bạn đã đăng ký tham dự rồi (Mã vé: ${existing.ticketCode || 'Chờ duyệt'}).` : 'Xác thực danh tính thành công từ Supabase.'
           });
@@ -411,7 +458,7 @@ app.post('/api/members/verify', async (req, res) => {
             multiple: false,
             data: singleMatch,
             hasExistingRegistration: !!existing,
-            existingRecord: existing,
+            existingRecord: sanitizeExistingRecordForPublic(existing),
             existingRegistrationId: existing?.id || null,
             message: existing ? `Bạn đã đăng ký tham dự rồi (Mã vé: ${existing.ticketCode || 'Chờ duyệt'}).` : 'Xác thực danh tính thành công từ Supabase.'
           });
@@ -641,7 +688,7 @@ app.post('/api/registrations', generalLimiter, async (req, res) => {
           success: false,
           alreadyRegistered: true,
           conflictField: reason,
-          existingRecord: validDuplicate,
+          existingRecord: sanitizeExistingRecordForPublic(validDuplicate),
           message: `${reason} đã được sử dụng để đăng ký vé trước đó (Mã vé: ${validDuplicate.ticketCode || 'Chờ cấp'}). Vui lòng kiểm tra lại hoặc vào mục Tra cứu vé.`
         });
       }
@@ -672,7 +719,7 @@ app.post('/api/registrations', generalLimiter, async (req, res) => {
       success: false,
       alreadyRegistered: true,
       conflictField: reason,
-      existingRecord: localDup,
+      existingRecord: sanitizeExistingRecordForPublic(localDup),
       message: `${reason} đã được sử dụng để đăng ký vé trước đó (Mã vé: ${localDup.ticketCode || 'Chờ cấp'}). Vui lòng kiểm tra lại hoặc vào mục Tra cứu vé.`
     });
   }
@@ -824,23 +871,19 @@ app.get('/api/registrations/lookup', generalLimiter, async (req, res) => {
 
   try {
     if (supabase) {
-      const { data: allRegs, error } = await supabase.from('registrations').select('*');
-      if (!error && allRegs && allRegs.length > 0) {
-        const found = allRegs.find(r => 
-          (r.mssv && r.mssv.toUpperCase() === qUpper) || 
-          (r.personalPhone && r.personalPhone === qClean) ||
-          (r.gmail && r.gmail.toLowerCase() === qClean) ||
-          (r.ticketCode && r.ticketCode.toUpperCase() === qUpper) ||
-          (r.ticketToken && r.ticketToken.toUpperCase() === qUpper)
-        );
+      const { data: foundRegs, error } = await supabase
+        .from('registrations')
+        .select('*')
+        .or(`mssv.ilike.${qUpper},personalPhone.eq.${qClean},gmail.ilike.${qClean},ticketCode.ilike.${qUpper},ticketToken.eq.${qUpper}`)
+        .limit(1);
 
-        if (found) {
-          const safeData = {
-            ...found,
-            emergencyPhone: maskPhone(found.emergencyPhone)
-          };
-          return res.json({ success: true, found: true, data: safeData });
-        }
+      if (!error && foundRegs && foundRegs.length > 0) {
+        const found = foundRegs[0];
+        const safeData = {
+          ...found,
+          emergencyPhone: maskPhone(found.emergencyPhone)
+        };
+        return res.json({ success: true, found: true, data: safeData });
       }
     }
   } catch (err) {
@@ -902,16 +945,25 @@ app.post('/api/registrations/:id/balance-payment', generalLimiter, async (req, r
     return res.status(404).json({ success: false, message: 'Không tìm thấy hồ sơ đăng ký.' });
   }
 
-  // IDOR Ownership verification: require verification of MSSV or phone
-  if (mssv || phone) {
-    const checkMssv = mssv ? String(mssv).trim().toUpperCase() : null;
-    const checkPhone = phone ? String(phone).trim() : null;
-    const matchesMssv = checkMssv && reg.mssv && reg.mssv.toUpperCase() === checkMssv;
-    const matchesPhone = checkPhone && reg.personalPhone && reg.personalPhone.trim() === checkPhone;
+  // IDOR Ownership verification: REQUIRE either MSSV or phone to match the record
+  const checkMssv = mssv ? String(mssv).trim().toUpperCase() : null;
+  const checkPhone = phone ? String(phone).trim() : null;
 
-    if (!matchesMssv && !matchesPhone) {
-      return res.status(403).json({ success: false, message: 'Xác thực quyền sở hữu hồ sơ không hợp lệ (MSSV hoặc SĐT không khớp).' });
-    }
+  if (!checkMssv && !checkPhone) {
+    return res.status(400).json({ 
+      success: false, 
+      message: 'Xác thực quyền sở hữu thất bại: Vui lòng cung cấp MSSV hoặc Số điện thoại đăng ký.' 
+    });
+  }
+
+  const matchesMssv = Boolean(checkMssv && reg.mssv && reg.mssv.toUpperCase() === checkMssv);
+  const matchesPhone = Boolean(checkPhone && reg.personalPhone && reg.personalPhone.trim() === checkPhone);
+
+  if (!matchesMssv && !matchesPhone) {
+    return res.status(403).json({ 
+      success: false, 
+      message: 'Xác thực quyền sở hữu hồ sơ không hợp lệ (MSSV hoặc SĐT không khớp với hồ sơ gốc).' 
+    });
   }
 
   const storedReceiptPhase2Url = await uploadBase64ToStorage(receiptPhase2Url, `rec_phase2_${id}`);
@@ -1012,13 +1064,17 @@ app.post('/api/admin/login', loginLimiter, async (req, res) => {
   let isAuthenticated = false;
   let adminUsername = 'BTC_Admin';
 
-  // 1. Verify against Supabase DB RPC
-  if (supabase) {
-    try {
-      const { data: isValid, error: rpcErr } = await supabase.rpc('verify_admin_pin', { input_pin: cleanPin });
-      if (!rpcErr && isValid) {
-        isAuthenticated = true;
-      } else {
+  // 1. If ADMIN_PIN is explicitly configured in environment, use it as primary authority
+  const configuredPin = process.env.ADMIN_PIN ? process.env.ADMIN_PIN.trim() : null;
+
+  if (configuredPin) {
+    if (cleanPin.toLowerCase() === configuredPin.toLowerCase()) {
+      isAuthenticated = true;
+    }
+  } else {
+    // 2. Otherwise verify against Supabase DB admin_users
+    if (supabase) {
+      try {
         const pinHash = crypto.createHash('sha256').update(cleanPin).digest('hex');
         const { data: adminMatch } = await supabase
           .from('admin_users')
@@ -1030,16 +1086,10 @@ app.post('/api/admin/login', loginLimiter, async (req, res) => {
           isAuthenticated = true;
           adminUsername = adminMatch.username || 'BTC_Admin';
         }
+      } catch (err) {
+        console.error('Supabase admin login verify error:', err);
       }
-    } catch (err) {
-      console.error('Supabase admin login verify error:', err);
     }
-  }
-
-  // 2. Fallback to process.env.ADMIN_PIN (No hardcoded backup pins)
-  const configuredPin = process.env.ADMIN_PIN || 'csg17y';
-  if (cleanPin.toLowerCase() === configuredPin.toLowerCase()) {
-    isAuthenticated = true;
   }
 
   // Log login attempt in audit_logs
@@ -1183,29 +1233,37 @@ app.put('/api/admin/registrations/:id/status', requireAdminAuth, async (req, res
     }
   }
 
-  // Auto Send Email based on updated status & role
+  // Auto Send Email ONLY on approval actions (DEPOSIT or 100%) and NEVER when rejecting
   let emailResult = null;
-  try {
-    const mergedRecord = { ...reg, ...updates };
-    let selectedTemplate = templateType;
-    if (!selectedTemplate) {
-      if (updates.isApproved100) {
-        selectedTemplate = 'FULL_100';
-      } else if (reg.role === 'ALUMNI' || reg.role === 'GUEST') {
-        selectedTemplate = 'DEPOSIT_ALUMNI';
-      } else {
-        selectedTemplate = 'DEPOSIT_ACTIVE';
-      }
-    }
+  const isApprovalAction = (action === 'APPROVE_DEPOSIT' || 
+                            action === 'APPROVE_100' || 
+                            updates.status === 'DEPOSITED' || 
+                            updates.status === 'FULLY_PAID' || 
+                            updates.isApproved100 === true) && updates.status !== 'REJECTED';
 
-    emailResult = await sendRegistrationEmail(mergedRecord, { templateType: selectedTemplate });
-    if (emailResult && emailResult.sent) {
-      updates.isEmailSent = true;
-      updates.emailSentAt = emailResult.timestamp;
-      updates.lastEmailTemplate = emailResult.templateType;
+  if (isApprovalAction) {
+    try {
+      const mergedRecord = { ...reg, ...updates };
+      let selectedTemplate = templateType;
+      if (!selectedTemplate) {
+        if (updates.isApproved100) {
+          selectedTemplate = 'FULL_100';
+        } else if (reg.role === 'ALUMNI' || reg.role === 'GUEST') {
+          selectedTemplate = 'DEPOSIT_ALUMNI';
+        } else {
+          selectedTemplate = 'DEPOSIT_ACTIVE';
+        }
+      }
+
+      emailResult = await sendRegistrationEmail(mergedRecord, { templateType: selectedTemplate });
+      if (emailResult && emailResult.sent) {
+        updates.isEmailSent = true;
+        updates.emailSentAt = emailResult.timestamp;
+        updates.lastEmailTemplate = emailResult.templateType;
+      }
+    } catch (emailErr) {
+      console.error('[API] Auto send email error on approval:', emailErr);
     }
-  } catch (emailErr) {
-    console.error('[API] Auto send email error on approval:', emailErr);
   }
 
   const emailDetail = updates.isEmailSent ? ` [Đã gửi email ${updates.lastEmailTemplate} tới ${reg.gmail}]` : '';
@@ -1247,7 +1305,7 @@ app.put('/api/admin/registrations/:id/status', requireAdminAuth, async (req, res
 });
 
 // Admin Manually Send / Resend Email
-app.post('/api/admin/registrations/:id/send-email', requireAdminAuth, async (req, res) => {
+app.post('/api/admin/registrations/:id/send-email', requireAdminAuth, emailSendLimiter, async (req, res) => {
   const { id } = req.params;
   const { templateType, adminUser } = req.body;
 
@@ -1447,14 +1505,14 @@ app.post('/api/admin/tickets/checkin', requireAdminAuth, async (req, res) => {
 
   try {
     if (supabase) {
-      const { data: allRegs } = await supabase.from('registrations').select('*');
-      if (allRegs) {
-        reg = allRegs.find(r => 
-          (r.ticketCode && r.ticketCode.toUpperCase() === searchKey) ||
-          (r.ticketToken && r.ticketToken.toUpperCase() === searchKey) ||
-          (r.mssv && r.mssv.toUpperCase() === searchKey) ||
-          r.id === tokenOrCode.trim()
-        );
+      const { data: matchRegs, error } = await supabase
+        .from('registrations')
+        .select('*')
+        .or(`ticketCode.ilike.${searchKey},ticketToken.ilike.${searchKey},mssv.ilike.${searchKey},id.eq.${tokenOrCode.trim()}`)
+        .limit(1);
+
+      if (!error && matchRegs && matchRegs.length > 0) {
+        reg = matchRegs[0];
       }
     }
   } catch (err) {

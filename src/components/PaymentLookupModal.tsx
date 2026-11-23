@@ -589,7 +589,7 @@ export const PaymentLookupModal: React.FC<PaymentLookupModalProps> = ({
                               </span>
                               <input
                                 type="file"
-                                accept="image/*"
+                                accept="image/png,image/jpeg,image/webp"
                                 onChange={handleReceiptUpload}
                                 className="hidden"
                               />

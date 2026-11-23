@@ -136,6 +136,7 @@ export const EmailPreviewModal: React.FC<EmailPreviewModalProps> = ({
               <iframe
                 title="Email Preview"
                 srcDoc={content.html}
+                sandbox="allow-same-origin"
                 className="w-full h-[480px] border-none block"
               />
             </div>

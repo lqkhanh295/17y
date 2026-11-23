@@ -14,10 +14,10 @@ async function safeFetchJson<T>(url: string, options?: RequestInit, timeoutMs = 
     });
     clearTimeout(timer);
     const contentType = res.headers.get('content-type') || '';
-    if (!res.ok || !contentType.includes('application/json')) {
-      return null;
+    if (contentType.includes('application/json')) {
+      return (await res.json()) as T;
     }
-    return (await res.json()) as T;
+    return null;
   } catch {
     clearTimeout(timer);
     return null;
@@ -105,7 +105,7 @@ export const apiClient = {
       const fileName = `${prefix}_${Date.now()}_${Math.random().toString(36).substring(2, 7)}.${ext}`;
       const { data, error } = await supabase.storage.from('receipts').upload(fileName, blob, {
         contentType,
-        upsert: true
+        upsert: false
       });
 
       if (!error && data) {
@@ -421,6 +421,10 @@ export const apiClient = {
       return res.data;
     }
 
+    if (res && res.message) {
+      throw new Error(res.message);
+    }
+
     // Direct Supabase fallback registration
     const isHighTier = (data.role === 'ALUMNI' || data.role === 'GUEST');
     const totalRequired = data.totalRequired || (isHighTier ? 389000 : 349000);
@@ -589,6 +593,10 @@ export const apiClient = {
 
     if (res && res.success && res.data) {
       return res.data;
+    }
+
+    if (res && res.message) {
+      throw new Error(res.message);
     }
     throw new Error(res?.message || 'Không thể cập nhật biên lai thanh toán. Vui lòng kiểm tra lại.');
   },

@@ -12,10 +12,20 @@ export const CSG_EVENT_DETAILS = {
   location: 'Đồi Sứ Villa'
 };
 
+export function escapeHtml(str) {
+  if (!str || typeof str !== 'string') return '';
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 export function createGoogleCalendarUrl(record) {
   const { title, startUtc, endUtc, location, dateFormatted, timeFormatted } = CSG_EVENT_DETAILS;
-  const fullName = record?.fullName || 'Bạn';
-  const ticketCode = record?.ticketCode || 'CSG17';
+  const fullName = String(record?.fullName || 'Bạn').replace(/[\r\n]+/g, ' ').trim();
+  const ticketCode = String(record?.ticketCode || 'CSG17').replace(/[\r\n]+/g, ' ').trim();
   const details = `Đại tiệc sinh nhật Cóc Sài Gòn 17 tuổi: THE NEXT SIGNAL!
 Thời gian: ${timeFormatted} ngày ${dateFormatted}
 Địa điểm: ${location}
@@ -25,7 +35,7 @@ Hẹn gặp bạn tại đêm hội ngộ 17 năm đại gia đình Cóc Sài G�
 
   let url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${startUtc}/${endUtc}&details=${encodeURIComponent(details)}&location=${encodeURIComponent(location)}`;
   if (record?.gmail) {
-    url += `&add=${encodeURIComponent(record.gmail)}`;
+    url += `&add=${encodeURIComponent(String(record.gmail).replace(/[\r\n]+/g, '').trim())}`;
   }
   return url;
 }
@@ -38,15 +48,15 @@ Hẹn gặp bạn tại đêm hội ngộ 17 năm đại gia đình Cóc Sài G�
  * - Không chèn ảnh QR check-in
  */
 export function generateEmailContent(record, explicitTemplate) {
-  const fullName = record.fullName || 'Bạn';
-  const role = record.role || 'ACTIVE';
-  const phone = record.personalPhone || '';
-  const ticketCode = record.ticketCode || 'CSG17-VIP';
-  const isApproved100 = Boolean(record.isApproved100);
+  const fullName = String(record?.fullName || 'Bạn').replace(/[\r\n]+/g, ' ').trim();
+  const role = record?.role || 'ACTIVE';
+  const phone = String(record?.personalPhone || '').replace(/[\r\n]+/g, ' ').trim();
+  const ticketCode = String(record?.ticketCode || 'CSG17-VIP').replace(/[\r\n]+/g, ' ').trim();
+  const isApproved100 = Boolean(record?.isApproved100);
 
   let templateType = explicitTemplate;
   if (!templateType) {
-    if (isApproved100 || record.status === 'FULLY_PAID' || record.remainingAmount === 0) {
+    if (isApproved100 || record?.status === 'FULLY_PAID' || record?.remainingAmount === 0) {
       templateType = 'FULL_100';
     } else if (role === 'ALUMNI' || role === 'GUEST') {
       templateType = 'DEPOSIT_ALUMNI';
@@ -61,7 +71,7 @@ export function generateEmailContent(record, explicitTemplate) {
 
   const simpleHtml = (bodyText) => `
 <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 15px; line-height: 1.7; color: #111111; max-width: 650px; margin: 0 auto; padding: 20px 0; white-space: pre-line;">
-${bodyText}
+${escapeHtml(bodyText)}
 </div>
 `.trim();
 
@@ -169,7 +179,7 @@ function createMailTransporter() {
  * Send email to registrant
  */
 export async function sendRegistrationEmail(record, options = {}) {
-  const toEmail = record.gmail || options.toEmail;
+  const toEmail = record?.gmail || options?.toEmail;
   if (!toEmail) {
     return {
       success: false,
@@ -177,8 +187,21 @@ export async function sendRegistrationEmail(record, options = {}) {
     };
   }
 
+  const safeToEmail = String(toEmail).replace(/[\r\n;,]+/g, '').trim();
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  if (!emailRegex.test(safeToEmail)) {
+    return {
+      success: false,
+      error: `Địa chỉ email "${safeToEmail}" không hợp lệ theo chuẩn.`
+    };
+  }
+
   const { subject, html, text, templateType } = generateEmailContent(record, options.templateType);
   const { transporter, isConfigured, sender } = createMailTransporter();
+
+  const safeFullName = String(record?.fullName || 'Bạn').replace(/[\r\n;,"\\]+/g, ' ').trim();
+  const safeTicketCode = String(record?.ticketCode || 'CSG17').replace(/[\r\n;,"\\]+/g, ' ').trim();
+  const safeSubject = String(subject).replace(/[\r\n]+/g, ' ').trim();
 
   const icsContent = [
     'BEGIN:VCALENDAR',
@@ -192,10 +215,10 @@ export async function sendRegistrationEmail(record, options = {}) {
     'DTSTART:20261212T100000Z',
     'DTEND:20261212T150000Z',
     'SUMMARY:CÓC SÀI GÒN 17th BIRTHDAY: THE NEXT SIGNAL',
-    `DESCRIPTION:Đại tiệc sinh nhật Cóc Sài Gòn 17 tuổi: THE NEXT SIGNAL!\\nThời gian: 17:00 - 22:00 ngày 12.12.2026\\nĐịa điểm: Đồi Sứ Villa\\nHọ và tên: ${record.fullName || 'Bạn'}\\nMã vé: ${record.ticketCode || 'CSG17'}`,
+    `DESCRIPTION:Đại tiệc sinh nhật Cóc Sài Gòn 17 tuổi: THE NEXT SIGNAL!\\nThời gian: 17:00 - 22:00 ngày 12.12.2026\\nĐịa điểm: Đồi Sứ Villa\\nHọ và tên: ${safeFullName}\\nMã vé: ${safeTicketCode}`,
     'LOCATION:Đồi Sứ Villa',
     'STATUS:CONFIRMED',
-    `ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=TRUE;CN=${record.fullName || 'Bạn'}:mailto:${toEmail}`,
+    `ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=TRUE;CN=${safeFullName}:mailto:${safeToEmail}`,
     'BEGIN:VALARM',
     'TRIGGER:-PT2H',
     'ACTION:DISPLAY',
@@ -207,8 +230,8 @@ export async function sendRegistrationEmail(record, options = {}) {
 
   const mailOptions = {
     from: sender,
-    to: toEmail,
-    subject,
+    to: safeToEmail,
+    subject: safeSubject,
     text,
     html,
     icalEvent: {
@@ -253,8 +276,7 @@ export async function sendRegistrationEmail(record, options = {}) {
     console.error(`[EmailService] SMTP error sending to ${toEmail}:`, lastError?.message || 'Unknown error');
     return {
       success: false,
-      error: 'Không thể kết nối đến máy chủ gửi email. Vui lòng thử lại sau.',
-      rawError: lastError?.message,
+      error: 'Không thể kết nối đến máy chủ gửi email. Vui lòng kiểm tra lại cấu hình SMTP hoặc thử lại sau.',
       isConfigured: true,
       templateType,
       to: toEmail,

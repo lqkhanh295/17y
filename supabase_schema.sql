@@ -139,14 +139,15 @@ CREATE POLICY "Allow public read-only on approved wishes" ON public.wishes FOR S
 -- All registration, payment updates, and audit logging must be executed strictly through the Backend server via SUPABASE_SECRET_KEY (service_role).
 
 -- 3. Storage bucket 'receipts' policies for attendee payment receipt uploads
+-- Receipts bucket is strictly append-only (INSERT) for attendees; updates/overwrites are forbidden.
 DROP POLICY IF EXISTS "Allow public uploads to receipts" ON storage.objects;
 CREATE POLICY "Allow public uploads to receipts" ON storage.objects FOR INSERT TO public WITH CHECK (bucket_id = 'receipts');
 
 DROP POLICY IF EXISTS "Allow public read from receipts" ON storage.objects;
 CREATE POLICY "Allow public read from receipts" ON storage.objects FOR SELECT TO public USING (bucket_id = 'receipts');
 
+-- Prevent any public update or overwrite of submitted receipts
 DROP POLICY IF EXISTS "Allow public update in receipts" ON storage.objects;
-CREATE POLICY "Allow public update in receipts" ON storage.objects FOR UPDATE TO public USING (bucket_id = 'receipts');
 
 
 -- SEED MEMBERS
