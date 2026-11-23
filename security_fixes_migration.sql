@@ -10,11 +10,13 @@ GRANT EXECUTE ON FUNCTION public.verify_admin_pin(TEXT) TO service_role;
 ALTER FUNCTION public.verify_admin_pin(TEXT) SET search_path = public, pg_temp;
 
 -- 3. SECURE OTHER SECURITY DEFINER & SEARCH PATH FUNCTIONS
-ALTER FUNCTION public.increment_hearts(TEXT, INTEGER) SET search_path = public, pg_temp;
 ALTER FUNCTION public.search_members(TEXT, INTEGER) SET search_path = public, pg_temp;
 
 -- 4. CAP INCREMENT HEARTS TO PREVENT SPAM (MAX 5 HEARTS PER CALL)
-CREATE OR REPLACE FUNCTION public.increment_hearts(target_id text, amount integer)
+-- Drop existing function first to prevent ERROR 42P13 (cannot remove parameter defaults)
+DROP FUNCTION IF EXISTS public.increment_hearts(text, integer);
+
+CREATE OR REPLACE FUNCTION public.increment_hearts(target_id text, amount integer DEFAULT 1)
 RETURNS integer
 LANGUAGE plpgsql
 SECURITY DEFINER
@@ -22,7 +24,7 @@ SET search_path = public, pg_temp
 AS $$
 DECLARE
   new_count integer := 0;
-  safe_amount integer := LEAST(GREATEST(amount, 1), 5);
+  safe_amount integer := LEAST(GREATEST(COALESCE(amount, 1), 1), 5);
 BEGIN
   -- Try updating characters table first
   UPDATE public.characters 
@@ -47,3 +49,5 @@ BEGIN
   RETURN 0;
 END;
 $$;
+
+GRANT EXECUTE ON FUNCTION public.increment_hearts(text, integer) TO anon, authenticated, service_role;
