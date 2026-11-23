@@ -1,4 +1,5 @@
 import { RegistrationRecord } from '../types';
+import { createGoogleCalendarUrl } from './calendarUtils';
 
 export interface EmailContent {
   subject: string;
@@ -34,6 +35,7 @@ export function generateEmailContent(
   }
 
   const transferSyntax = `CSG17 - ${fullName.toUpperCase()} - ${phone || 'SDT'}`;
+  const googleCalendarUrl = createGoogleCalendarUrl(record);
 
   const emailWrapper = (title: string, bodyContent: string) => `
 <!DOCTYPE html>
@@ -430,6 +432,16 @@ BAN TỔ CHỨC SINH NHẬT CÓC SÀI GÒN 17 TUỔI`;
       <p style="margin: 0; color: #065F46; font-size: 14px;">
         📌 <strong>Lưu ý quan trọng:</strong> Bạn vui lòng lưu lại mã QR này và xuất trình tại khu vực Check-in vào ngày diễn ra sự kiện để Ban Tổ Chức hỗ trợ xác nhận thông tin và đón tiếp bạn nhé!
       </p>
+    </div>
+
+    <!-- Google Calendar Action Button -->
+    <div style="text-align: center; margin: 24px 0 20px;">
+      <a href="${googleCalendarUrl}" target="_blank" style="display: inline-block; background: #1C1917; color: #F5C400; text-decoration: none; padding: 13px 26px; border-radius: 8px; font-weight: 800; font-size: 13px; letter-spacing: 0.5px; border: 2px solid #F5C400; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+        📅 THÊM VÀO GOOGLE CALENDAR (12.12.2026)
+      </a>
+      <div style="font-size: 11px; color: #6B7280; margin-top: 6px;">
+        Tự động lưu sự kiện CÓC SÀI GÒN 17th BIRTHDAY: THE NEXT SIGNAL vào lịch của bạn
+      </div>
     </div>
 
     <p style="margin-top: 24px; color: #374151; line-height: 1.7;">

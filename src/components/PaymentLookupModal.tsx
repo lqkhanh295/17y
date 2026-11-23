@@ -8,6 +8,7 @@ import { RegistrationRecord, PaymentSubmission } from '../types';
 import { apiClient } from '../services/apiClient';
 import { compressImage } from '../utils/imageCompressor';
 import { formatTransferContent } from '../utils/formatters';
+import { createGoogleCalendarUrl, downloadIcsFile } from '../utils/calendarUtils';
 
 interface PaymentLookupModalProps {
   isOpen: boolean;
@@ -109,41 +110,11 @@ export const PaymentLookupModal: React.FC<PaymentLookupModalProps> = ({
 
   // Google Calendar generator
   const getGoogleCalendarUrl = (r: RegistrationRecord) => {
-    const title = encodeURIComponent('Đại Tiệc Sinh Nhật 17 Năm CLB Truyền Thông Cóc Sài Gòn');
-    const details = encodeURIComponent(`Chào mừng ${r.fullName} đến với CSG 17Y!\nMã vé Check-in của bạn: ${r.ticketCode}\nĐịa điểm: Đồi Sứ Villa.`);
-    const location = encodeURIComponent('Đồi Sứ Villa');
-    const start = '20261212T080000';
-    const end = '20261212T220000';
-    return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${start}/${end}&details=${details}&location=${location}`;
+    return createGoogleCalendarUrl(r);
   };
 
-  const downloadIcsFile = (r: RegistrationRecord) => {
-    const icsContent = `BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//Coc Sai Gon//CSG 17Y Event//VI
-CALSCALE:GREGORIAN
-BEGIN:VEVENT
-SUMMARY:Đại Tiệc Sinh Nhật 17 Năm Cóc Sài Gòn (CSG 17Y)
-DESCRIPTION:Vé Check-in: ${r.ticketCode} - Họ Tên: ${r.fullName}\\nĐêm hội ngộ 17 năm thanh xuân áo vàng!
-LOCATION:Đồi Sứ Villa
-DTSTART:20261212T010000Z
-DTEND:20261212T150000Z
-STATUS:CONFIRMED
-BEGIN:VALARM
-TRIGGER:-PT2H
-ACTION:DISPLAY
-DESCRIPTION:Nhắc lịch: Đại tiệc sinh nhật Cóc Sài Gòn 17Y (12.12.2026)!
-END:VALARM
-END:VEVENT
-END:VCALENDAR`;
-
-    const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
-    const link = document.createElement('a');
-    link.href = window.URL.createObjectURL(blob);
-    link.setAttribute('download', `CSG17Y_Ticket_${r.mssv}.ics`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  const handleDownloadIcs = (r: RegistrationRecord) => {
+    downloadIcsFile(r);
   };
 
   return (

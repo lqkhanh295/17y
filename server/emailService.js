@@ -1,5 +1,33 @@
 import nodemailer from 'nodemailer';
 
+export const CSG_EVENT_DETAILS = {
+  title: 'CÓC SÀI GÒN 17th BIRTHDAY: THE NEXT SIGNAL',
+  dateFormatted: '12.12.2026',
+  timeFormatted: '17:00 - 22:00',
+  startUtc: '20261212T100000Z', // 17:00 GMT+7 (Vietnam Time)
+  endUtc: '20261212T150000Z',   // 22:00 GMT+7
+  location: 'Đồi Sứ Villa'
+};
+
+export function createGoogleCalendarUrl(record) {
+  const { title, startUtc, endUtc, location, dateFormatted, timeFormatted } = CSG_EVENT_DETAILS;
+  const fullName = record?.fullName || 'Bạn';
+  const ticketCode = record?.ticketCode || 'CSG17';
+  const details = `Đại tiệc sinh nhật Cóc Sài Gòn 17 tuổi: THE NEXT SIGNAL!
+Thời gian: ${timeFormatted} ngày ${dateFormatted}
+Địa điểm: ${location}
+Họ và tên: ${fullName}
+Mã vé Check-in: ${ticketCode}
+
+Hẹn gặp bạn tại đêm hội ngộ 17 năm đại gia đình Cóc Sài Gòn!`;
+
+  let url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${startUtc}/${endUtc}&details=${encodeURIComponent(details)}&location=${encodeURIComponent(location)}`;
+  if (record?.gmail) {
+    url += `&add=${encodeURIComponent(record.gmail)}`;
+  }
+  return url;
+}
+
 // Formatting helper
 function formatCurrency(amount) {
   if (typeof amount !== 'number') {
@@ -36,6 +64,11 @@ export function generateEmailContent(record, explicitTemplate) {
   }
 
   const transferSyntax = `CSG17 - ${fullName.toUpperCase()} - ${phone || 'SDT'}`;
+  const googleCalendarUrl = createGoogleCalendarUrl({
+    fullName,
+    ticketCode,
+    gmail: record.gmail
+  });
 
   // Shared responsive email wrapper styling
   const emailWrapper = (title, bodyContent) => `
@@ -466,6 +499,16 @@ BAN TỔ CHỨC SINH NHẬT CÓC SÀI GÒN 17 TUỔI`;
       </p>
     </div>
 
+    <!-- Google Calendar Action Button -->
+    <div style="text-align: center; margin: 24px 0 20px;">
+      <a href="${googleCalendarUrl}" target="_blank" style="display: inline-block; background: #1C1917; color: #F5C400; text-decoration: none; padding: 13px 26px; border-radius: 8px; font-weight: 800; font-size: 13px; letter-spacing: 0.5px; border: 2px solid #F5C400; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+        📅 THÊM VÀO GOOGLE CALENDAR (12.12.2026)
+      </a>
+      <div style="font-size: 11px; color: #6B7280; margin-top: 6px;">
+        Tự động lưu sự kiện CÓC SÀI GÒN 17th BIRTHDAY: THE NEXT SIGNAL vào lịch của bạn
+      </div>
+    </div>
+
     <p style="margin-top: 24px; color: #374151; line-height: 1.7;">
       17 năm là hành trình được viết nên bởi nhiều thế hệ, và mỗi người đều mang theo một mảnh ghép thật riêng trong câu chuyện ấy. Dù bạn đã từng đồng hành cùng Cóc từ những ngày đầu hay chỉ vừa mới bắt đầu hành trình của mình, chúng ta đều có chung một điểm hẹn mang tên Cóc Sài Gòn.
     </p>
@@ -495,7 +538,11 @@ MÃ CHECK-IN CỦA BẠN
 Link mã QR: ${qrCheckinUrl}
 Mã vé: ${ticketCode}
 Họ và tên: ${fullName}
-Thời gian: 12.12.2026
+Thời gian: 12.12.2026 (17:00 - 22:00)
+Địa điểm: Đồi Sứ Villa
+
+Thêm vào Google Calendar (12.12.2026):
+${googleCalendarUrl}
 
 Bạn vui lòng lưu lại mã QR này và xuất trình tại khu vực Check-in vào ngày diễn ra sự kiện để Ban Tổ Chức hỗ trợ xác nhận thông tin và đón tiếp bạn nhé!
 
@@ -554,12 +601,42 @@ export async function sendRegistrationEmail(record, options = {}) {
   const { subject, html, text, templateType } = generateEmailContent(record, options.templateType);
   const { transporter, isConfigured, sender } = createMailTransporter();
 
+  const icsContent = [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//Coc Sai Gon//CSG 17Y Event//VI',
+    'CALSCALE:GREGORIAN',
+    'METHOD:REQUEST',
+    'BEGIN:VEVENT',
+    `UID:csg17y-${record.id || Date.now()}@cocsaigon.com`,
+    `DTSTAMP:${new Date().toISOString().replace(/[-:]/g, '').split('.')[0]}Z`,
+    'DTSTART:20261212T100000Z',
+    'DTEND:20261212T150000Z',
+    'SUMMARY:CÓC SÀI GÒN 17th BIRTHDAY: THE NEXT SIGNAL',
+    `DESCRIPTION:Đại tiệc sinh nhật Cóc Sài Gòn 17 tuổi: THE NEXT SIGNAL!\\nThời gian: 17:00 - 22:00 ngày 12.12.2026\\nĐịa điểm: Đồi Sứ Villa\\nHọ và tên: ${record.fullName || 'Bạn'}\\nMã vé: ${record.ticketCode || 'CSG17'}`,
+    'LOCATION:Đồi Sứ Villa',
+    'STATUS:CONFIRMED',
+    `ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=TRUE;CN=${record.fullName || 'Bạn'}:mailto:${toEmail}`,
+    'BEGIN:VALARM',
+    'TRIGGER:-PT2H',
+    'ACTION:DISPLAY',
+    'DESCRIPTION:Nhắc lịch: Đại tiệc sinh nhật Cóc Sài Gòn 17th BIRTHDAY: THE NEXT SIGNAL (12.12.2026)!',
+    'END:VALARM',
+    'END:VEVENT',
+    'END:VCALENDAR'
+  ].join('\r\n');
+
   const mailOptions = {
     from: sender,
     to: toEmail,
     subject,
     text,
-    html
+    html,
+    icalEvent: {
+      filename: 'invite.ics',
+      method: 'REQUEST',
+      content: icsContent
+    }
   };
 
   const timestamp = new Date().toISOString();

@@ -9,6 +9,7 @@ import {
 import { RegistrationRecord } from '../types';
 import { apiClient } from '../services/apiClient';
 import { EmailPreviewModal } from './EmailPreviewModal';
+import { createGoogleCalendarUrl } from '../utils/calendarUtils';
 
 interface AdminDashboardProps {
   isOpen: boolean;
@@ -55,6 +56,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   // Google Sheet Sync state
   const [isSyncingSheets, setIsSyncingSheets] = useState(false);
   const [syncResult, setSyncResult] = useState<string | null>(null);
+
+  // Google Calendar Auto-open State
+  const [autoOpenCalendar, setAutoOpenCalendar] = useState<boolean>(true);
 
   // On-Site Check-in Desk State
   const [checkInCode, setCheckInCode] = useState('');
@@ -173,6 +177,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         verifiedAt: new Date().toISOString()
       } : r));
 
+      // Open Google Calendar if enabled
+      if (autoOpenCalendar) {
+        const calUrl = createGoogleCalendarUrl(reg);
+        window.open(calUrl, '_blank');
+      }
+
       showToast(`✓ Đã duyệt đặt cọc 150k và gửi email xác nhận (${reg.role === 'ALUMNI' ? 'Alumni - 389k' : 'Active - 349k'}) tới ${reg.gmail}!`, 'success');
     } catch (err: unknown) {
       const error = err as Error;
@@ -212,7 +222,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         verifiedAt: new Date().toISOString()
       } : r));
 
-      showToast(`✓ Đã phê duyệt 100% và gửi email kèm mã QR Check-in tới ${reg.gmail}!`, 'success');
+      // Open Google Calendar if enabled
+      if (autoOpenCalendar) {
+        const calUrl = createGoogleCalendarUrl(reg);
+        window.open(calUrl, '_blank');
+      }
+
+      showToast(`✓ Đã phê duyệt 100% & đồng bộ sự kiện Google Calendar tới ${reg.gmail}!`, 'success');
     } catch (err: unknown) {
       const error = err as Error;
       showToast('Lỗi duyệt 100%: ' + error.message, 'error');
@@ -387,6 +403,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           </div>
 
           <div className="flex items-center gap-2">
+            {isAuthenticated && (
+              <label 
+                className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#222222] border border-[#383838] text-[11px] font-mono text-[#F5C400] cursor-pointer hover:bg-[#2a2a2a] select-none transition-colors"
+                title="Tự động mở Google Calendar với tên sự kiện và người tham dự khi bấm duyệt"
+              >
+                <input
+                  type="checkbox"
+                  checked={autoOpenCalendar}
+                  onChange={(e) => setAutoOpenCalendar(e.target.checked)}
+                  className="rounded bg-[#181818] border-[#444] text-[#F5C400] w-3.5 h-3.5 cursor-pointer accent-[#F5C400]"
+                />
+                <span>📅 Tự mở GG Calendar khi duyệt</span>
+              </label>
+            )}
             <button
               onClick={loadAdminData}
               disabled={isLoading}
@@ -1083,6 +1113,19 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                               <span>{currentReviewRecord.isEmailSent ? 'Gửi lại email' : 'Gửi mail ngay'}</span>
                             </button>
                           </div>
+
+                          {/* Direct Google Calendar Link */}
+                          <a
+                            href={createGoogleCalendarUrl(currentReviewRecord)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="w-full py-2.5 rounded-lg bg-[#181818] hover:bg-[#222222] border border-[#383838] text-xs font-mono font-bold text-[#F5C400] flex items-center justify-center gap-2 transition-colors active:scale-[0.98]"
+                            title="Mở Google Calendar để thêm sự kiện hoặc mời người tham dự"
+                          >
+                            <CalendarIcon size={14} />
+                            <span>Thêm vào Google Calendar (12/12)</span>
+                            <ArrowUpRightIcon size={12} />
+                          </a>
                         </div>
                       )}
                     </div>
