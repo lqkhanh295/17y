@@ -171,10 +171,10 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
             </div>
 
             {/* Complementary Workspace Dialogue (Col 5) */}
-            <div className="col-span-5 flex flex-col justify-between h-full space-y-3">
+            <div className="col-span-5 flex flex-col h-full">
               <div
                 onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.workspace)}
-                className={`paper-sheet p-2 sm:p-2.5 pb-3 sm:pb-3.5 cursor-pointer transition-all duration-300 hover:shadow-poster active:scale-[0.99] flex-1 flex flex-col justify-between ${!isAnimationComplete ? 'film-reveal-item' : ''
+                className={`paper-sheet p-2 sm:p-2.5 pb-3 sm:pb-3.5 cursor-pointer transition-all duration-300 hover:shadow-poster active:scale-[0.99] h-full flex flex-col justify-between ${!isAnimationComplete ? 'film-reveal-item' : ''
                   }`}
                 style={{ animationDelay: '200ms' }}
               >
@@ -196,17 +196,6 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
                 </div>
                 <p className="text-[11px] text-csg-black/75 font-body pt-0.5 leading-relaxed">
                   Dù chỉ nhìn nhau qua màn hình máy tính, ngọn lửa của tụi mình chưa một lần nguội lạnh.
-                </p>
-              </div>
-
-              {/* Heartfelt Note */}
-              <div className="p-3 bg-csg-surface/80 border border-csg-black/20 rounded-xs font-mono text-xs space-y-1 shrink-0">
-                <div className="flex items-center gap-1.5 text-csg-red font-bold text-[10px] uppercase">
-                  <HeartIcon size={12} />
-                  <span>MẨU CHUYỆN NHỎ</span>
-                </div>
-                <p className="text-[11px] text-csg-black/75 leading-relaxed font-body italic">
-                  "Cách nhau cả thành phố, nhưng chỉ cần nghe một tiếng 'Cóc ơi' vang lên qua loa là thấy nhà ở đây rồi."
                 </p>
               </div>
             </div>
