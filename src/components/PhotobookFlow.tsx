@@ -269,10 +269,10 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
             </div>
 
             {/* Highland Gathering & Expedition Dispatch (Col 7) */}
-            <div className="col-span-7 flex flex-col justify-between h-full space-y-3">
+            <div className="col-span-7 flex flex-col h-full">
               <div
                 onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.bonfire)}
-                className={`paper-sheet p-2 sm:p-2.5 pb-3 sm:pb-3.5 cursor-pointer transition-all duration-300 hover:shadow-poster active:scale-[0.99] flex-1 flex flex-col justify-between ${!isAnimationComplete ? 'film-reveal-item' : ''
+                className={`paper-sheet p-2 sm:p-2.5 pb-3 sm:pb-3.5 cursor-pointer transition-all duration-300 hover:shadow-poster active:scale-[0.99] h-full flex flex-col justify-between ${!isAnimationComplete ? 'film-reveal-item' : ''
                   }`}
                 style={{ animationDelay: '600ms' }}
               >
@@ -295,20 +295,6 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
                 <p className="text-[11px] text-csg-black/75 font-body pt-0.5 leading-relaxed">
                   Giữa cái lạnh cao nguyên, tụi mình đứng cạnh nhau là thấy ấm ran cả lòng.
                 </p>
-              </div>
-
-              {/* Expedition Log Card to perfectly balance vertical baseline */}
-              <div className="p-3 bg-csg-surface/80 border border-csg-black/20 rounded-xs font-mono text-xs flex items-center justify-between gap-3 shrink-0">
-                <div className="space-y-0.5 min-w-0">
-                  <span className="text-[10px] uppercase font-bold text-csg-red block">CHUYẾN ĐI ĐẦU TIÊN CỦA NHIỀU THẾ HỆ</span>
-                  <p className="text-[11px] text-csg-black/75 font-body italic truncate">
-                    "Lửa trại bập bùng, tiếng ghita hòa lẫn tiếng cười vang vọng khắp thung lũng."
-                  </p>
-                </div>
-                <div className="shrink-0 text-right font-mono text-[10px] text-csg-black/50 border-l border-csg-black/15 pl-3">
-                  <div>48H ĐỒNG HÀNH</div>
-                  <div className="font-bold text-csg-black">100% KỶ NIỆM</div>
-                </div>
               </div>
             </div>
           </div>
