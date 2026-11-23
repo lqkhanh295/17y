@@ -512,11 +512,18 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                       {identifiedMember.fullName.toUpperCase()}!
                     </span>
                   </h3>
-                  <div className="p-4 sm:p-6 rounded-sm bg-[#FFFFFF] border-2 border-[#20231F] shadow-poster text-left space-y-3 relative pt-6 sm:pt-6">
-                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-sm bg-[#B94D35] text-white border-2 border-[#20231F] shadow-sm font-mono font-bold text-xs uppercase tracking-wider block sm:absolute sm:-top-3.5 sm:right-4 w-fit mb-2 sm:mb-0 whitespace-nowrap z-10">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#F4C542]"></span>
-                      <span>CỰU THÀNH VIÊN · KHÓA {identifiedMember.generation || 'K14'}</span>
+                  <div className="p-4 sm:p-6 rounded-sm bg-[#FFFFFF] border-2 border-[#20231F] shadow-poster text-left space-y-3 relative">
+                    {/* High-contrast Role & Gen Header */}
+                    <div className="flex items-center justify-between pb-2.5 border-b border-[#20231F]/15">
+                      <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-sm bg-[#B94D35] text-white border-2 border-[#20231F] shadow-poster-sm font-mono font-bold text-xs uppercase tracking-wider">
+                        <span className="w-2 h-2 rounded-full bg-[#F4C542] shrink-0"></span>
+                        <span>CỰU THÀNH VIÊN · KHÓA {identifiedMember.generation || 'K14'}</span>
+                      </div>
+                      <span className="text-[11px] font-mono text-[#20231F]/60 font-semibold hidden sm:inline">
+                        CSG 17Y GALA
+                      </span>
                     </div>
+
                     <div className="font-handwriting text-lg sm:text-xl text-[#20231F] leading-relaxed pt-1 sm:pt-2 space-y-2">
                       <p className="font-bold text-[#B94D35] text-xl sm:text-2xl">
                         Thương gửi {identifiedMember.fullName},
@@ -539,11 +546,18 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                       BẠN MÃI LÀ MỘT PHẦN CỦA CÓC.
                     </span>
                   </h3>
-                  <div className="p-4 sm:p-6 rounded-sm bg-[#FFFFFF] border-2 border-[#20231F] shadow-poster text-left space-y-3 relative pt-6 sm:pt-6">
-                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-sm bg-[#286640] text-white border-2 border-[#20231F] shadow-sm font-mono font-bold text-xs uppercase tracking-wider block sm:absolute sm:-top-3.5 sm:right-4 w-fit mb-2 sm:mb-0 whitespace-nowrap z-10">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#F4C542]"></span>
-                      <span>THÀNH VIÊN ĐƯƠNG NHIỆM</span>
+                  <div className="p-4 sm:p-6 rounded-sm bg-[#FFFFFF] border-2 border-[#20231F] shadow-poster text-left space-y-3 relative">
+                    {/* High-contrast Role & Gen Header */}
+                    <div className="flex items-center justify-between pb-2.5 border-b border-[#20231F]/15">
+                      <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-sm bg-[#286640] text-white border-2 border-[#20231F] shadow-poster-sm font-mono font-bold text-xs uppercase tracking-wider">
+                        <span className="w-2 h-2 rounded-full bg-[#F4C542] shrink-0"></span>
+                        <span>THÀNH VIÊN ĐƯƠNG NHIỆM</span>
+                      </div>
+                      <span className="text-[11px] font-mono text-[#20231F]/60 font-semibold hidden sm:inline">
+                        CSG 17Y GALA
+                      </span>
                     </div>
+
                     <div className="font-handwriting text-lg sm:text-xl text-[#20231F] leading-relaxed pt-1 sm:pt-2 space-y-2">
                       <p className="font-bold text-[#B94D35] text-xl sm:text-2xl">
                         Thân gửi {identifiedMember.fullName},
