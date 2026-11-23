@@ -340,8 +340,8 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
               </p>
             </div>
 
-            {/* Coastal Toast Feature & Youth Memory Quote (Col 5) */}
-            <div className="col-span-5 flex flex-col space-y-3">
+            {/* Coastal Toast Feature (Col 5) */}
+            <div className="col-span-5 flex flex-col">
               <div
                 onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.celebrationToast)}
                 className={`paper-sheet p-2 sm:p-2.5 pb-3 sm:pb-3.5 cursor-pointer transition-all duration-300 hover:shadow-poster active:scale-[0.99] flex flex-col ${!isAnimationComplete ? 'film-reveal-item' : ''
@@ -366,17 +366,6 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
                 </div>
                 <p className="text-[11px] text-csg-black/75 font-body pt-0.5 leading-relaxed">
                   Ngồi bên bờ kè đón gió biển, cười nói giòn tan những ngày tháng đôi mươi rực rỡ.
-                </p>
-              </div>
-
-              {/* Memory Note to match Card 06 baseline */}
-              <div className="p-3 bg-csg-surface/80 border border-csg-black/20 rounded-xs font-mono text-xs space-y-1 shrink-0">
-                <div className="flex items-center gap-1.5 text-csg-red font-bold text-[10px] uppercase">
-                  <HeartIcon size={12} />
-                  <span>NHẬT KÝ THANH XUÂN</span>
-                </div>
-                <p className="text-[11px] text-csg-black/75 leading-relaxed font-body italic">
-                  "Những đêm chạy sự kiện đến 2 giờ sáng, mệt rã rời nhưng ngước nhìn sân khấu sáng đèn là mọi nhọc nhằn tan biến."
                 </p>
               </div>
             </div>
