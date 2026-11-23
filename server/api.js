@@ -34,7 +34,7 @@ const allAllowedOrigins = new Set([...defaultAllowedOrigins, ...configuredOrigin
 
 // Pattern strictly limited to CSG 17Y project Vercel deployments
 const isProjectVercelDomain = (origin) => {
-  return typeof origin === 'string' && /^https:\/\/csg-17y(-[a-z0-9-]+)?\.vercel\.app$/i.test(origin);
+  return typeof origin === 'string' && /^https:\/\/(csg-17y|17y)(-[a-z0-9-]+)?\.vercel\.app$/i.test(origin);
 };
 
 app.use(cors({
@@ -665,63 +665,69 @@ app.post('/api/registrations', generalLimiter, async (req, res) => {
   }
 
   // Check duplicate registration in Supabase (by MSSV, Gmail, or Phone)
+  let supabaseChecked = false;
   try {
     if (supabase) {
-      const { data: duplicates } = await supabase
+      const { data: duplicates, error: dupErr } = await supabase
         .from('registrations')
         .select('*')
         .or(`mssv.ilike.${cleanMssv},gmail.ilike.${gmail.trim().toLowerCase()},personalPhone.eq.${personalPhone.trim()}`);
 
-      const validDuplicate = duplicates?.find(d => d.status !== 'REJECTED');
+      if (!dupErr) {
+        supabaseChecked = true;
+        const validDuplicate = duplicates?.find(d => d.status !== 'REJECTED');
 
-      if (validDuplicate) {
-        let reason = 'Thông tin này';
-        if (validDuplicate.mssv && validDuplicate.mssv.toUpperCase() === cleanMssv) {
-          reason = `Mã sinh viên "${cleanMssv}"`;
-        } else if (validDuplicate.gmail && validDuplicate.gmail.toLowerCase() === cleanEmail) {
-          reason = `Địa chỉ Gmail "${cleanEmail}"`;
-        } else if (validDuplicate.personalPhone && validDuplicate.personalPhone === cleanPersonalPhone) {
-          reason = `Số điện thoại "${cleanPersonalPhone}"`;
+        if (validDuplicate) {
+          let reason = 'Thông tin này';
+          if (validDuplicate.mssv && validDuplicate.mssv.toUpperCase() === cleanMssv) {
+            reason = `Mã sinh viên "${cleanMssv}"`;
+          } else if (validDuplicate.gmail && validDuplicate.gmail.toLowerCase() === cleanEmail) {
+            reason = `Địa chỉ Gmail "${cleanEmail}"`;
+          } else if (validDuplicate.personalPhone && validDuplicate.personalPhone === cleanPersonalPhone) {
+            reason = `Số điện thoại "${cleanPersonalPhone}"`;
+          }
+
+          return res.status(409).json({
+            success: false,
+            alreadyRegistered: true,
+            conflictField: reason,
+            existingRecord: sanitizeExistingRecordForPublic(validDuplicate),
+            message: `${reason} đã được sử dụng để đăng ký vé trước đó (Mã vé: ${validDuplicate.ticketCode || 'Chờ cấp'}). Vui lòng kiểm tra lại hoặc vào mục Tra cứu vé.`
+          });
         }
-
-        return res.status(409).json({
-          success: false,
-          alreadyRegistered: true,
-          conflictField: reason,
-          existingRecord: sanitizeExistingRecordForPublic(validDuplicate),
-          message: `${reason} đã được sử dụng để đăng ký vé trước đó (Mã vé: ${validDuplicate.ticketCode || 'Chờ cấp'}). Vui lòng kiểm tra lại hoặc vào mục Tra cứu vé.`
-        });
       }
     }
   } catch (err) {
     console.error('Supabase check duplicate error:', err);
   }
 
-  // Check duplicate in local DB
-  const db = getDB();
-  const localDup = (db.registrations || []).find(r => 
-    r.status !== 'REJECTED' && 
-    ((r.mssv && r.mssv.toUpperCase() === cleanMssv) || 
-     (r.gmail && r.gmail.toLowerCase() === cleanEmail) ||
-     (r.personalPhone && r.personalPhone === cleanPersonalPhone))
-  );
-  if (localDup) {
-    let reason = 'Thông tin này';
-    if (localDup.mssv && localDup.mssv.toUpperCase() === cleanMssv) {
-      reason = `Mã sinh viên "${cleanMssv}"`;
-    } else if (localDup.gmail && localDup.gmail.toLowerCase() === cleanEmail) {
-      reason = `Địa chỉ Gmail "${cleanEmail}"`;
-    } else if (localDup.personalPhone && localDup.personalPhone === cleanPersonalPhone) {
-      reason = `Số điện thoại "${cleanPersonalPhone}"`;
-    }
+  // Check duplicate in local DB ONLY IF Supabase was not available
+  if (!supabaseChecked) {
+    const db = getDB();
+    const localDup = (db.registrations || []).find(r => 
+      r.status !== 'REJECTED' && 
+      ((r.mssv && r.mssv.toUpperCase() === cleanMssv) || 
+       (r.gmail && r.gmail.toLowerCase() === cleanEmail) ||
+       (r.personalPhone && r.personalPhone === cleanPersonalPhone))
+    );
+    if (localDup) {
+      let reason = 'Thông tin này';
+      if (localDup.mssv && localDup.mssv.toUpperCase() === cleanMssv) {
+        reason = `Mã sinh viên "${cleanMssv}"`;
+      } else if (localDup.gmail && localDup.gmail.toLowerCase() === cleanEmail) {
+        reason = `Địa chỉ Gmail "${cleanEmail}"`;
+      } else if (localDup.personalPhone && localDup.personalPhone === cleanPersonalPhone) {
+        reason = `Số điện thoại "${cleanPersonalPhone}"`;
+      }
 
-    return res.status(409).json({
-      success: false,
-      alreadyRegistered: true,
-      conflictField: reason,
-      existingRecord: sanitizeExistingRecordForPublic(localDup),
-      message: `${reason} đã được sử dụng để đăng ký vé trước đó (Mã vé: ${localDup.ticketCode || 'Chờ cấp'}). Vui lòng kiểm tra lại hoặc vào mục Tra cứu vé.`
-    });
+      return res.status(409).json({
+        success: false,
+        alreadyRegistered: true,
+        conflictField: reason,
+        existingRecord: sanitizeExistingRecordForPublic(localDup),
+        message: `${reason} đã được sử dụng để đăng ký vé trước đó (Mã vé: ${localDup.ticketCode || 'Chờ cấp'}). Vui lòng kiểm tra lại hoặc vào mục Tra cứu vé.`
+      });
+    }
   }
 
   const isHighTier = (role === 'ALUMNI' || role === 'GUEST');
@@ -877,20 +883,29 @@ app.get('/api/registrations/lookup', generalLimiter, async (req, res) => {
         .or(`mssv.ilike.${qUpper},personalPhone.eq.${qClean},gmail.ilike.${qClean},ticketCode.ilike.${qUpper},ticketToken.eq.${qUpper}`)
         .limit(1);
 
-      if (!error && foundRegs && foundRegs.length > 0) {
-        const found = foundRegs[0];
-        const safeData = {
-          ...found,
-          emergencyPhone: maskPhone(found.emergencyPhone)
-        };
-        return res.json({ success: true, found: true, data: safeData });
+      if (!error) {
+        if (foundRegs && foundRegs.length > 0) {
+          const found = foundRegs[0];
+          const safeData = {
+            ...found,
+            emergencyPhone: maskPhone(found.emergencyPhone)
+          };
+          return res.json({ success: true, found: true, data: safeData });
+        }
+        // Supabase lookup completed with 0 results - do not fallback to stale local DB
+        return res.status(200).json({
+          success: true,
+          found: false,
+          data: null,
+          message: 'Không tìm thấy hồ sơ đăng ký nào trùng khớp.'
+        });
       }
     }
   } catch (err) {
     console.error('Supabase lookup error:', err);
   }
 
-  // Fallback to local DB
+  // Fallback to local DB only when Supabase is completely unavailable
   const db = getDB();
   const reg = (db.registrations || []).find(r => 
     (r.mssv && r.mssv.toUpperCase() === qUpper) || 

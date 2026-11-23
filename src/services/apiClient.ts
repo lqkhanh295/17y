@@ -556,7 +556,12 @@ export const apiClient = {
       `${API_BASE}/registrations/lookup?query=${encodeURIComponent(query.trim())}`
     );
 
-    if (res && res.success && res.data && res.found !== false) return res.data;
+    if (res && res.success) {
+      if (res.data && res.found !== false) return res.data;
+      if (res.found === false) {
+        throw new Error('Không tìm thấy hồ sơ đăng ký khớp với thông tin này.');
+      }
+    }
 
     // Direct Supabase lookup
     const qClean = query.trim().toLowerCase();
