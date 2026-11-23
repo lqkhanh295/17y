@@ -334,13 +334,15 @@ export const App: React.FC = () => {
       )}
 
       {/* ================= FUNCTIONAL MODALS ================= */}
-      <RegistrationModal
-        isOpen={isRegisterOpen}
-        onClose={closeModals}
-        onRegistrationComplete={handleRegistrationComplete}
-        onOpenPortal={openLookup}
-        stageCharacters={stageCharacters}
-      />
+      {isRegisterOpen && (
+        <RegistrationModal
+          isOpen={isRegisterOpen}
+          onClose={closeModals}
+          onRegistrationComplete={handleRegistrationComplete}
+          onOpenPortal={openLookup}
+          stageCharacters={stageCharacters}
+        />
+      )}
 
       {isStageOpen && (
         <CelebrationStage

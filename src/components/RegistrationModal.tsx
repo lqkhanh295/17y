@@ -69,13 +69,36 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
   const screensContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (!isOpen) return;
     if (screensContainerRef.current) {
       screensContainerRef.current.scrollTop = 0;
     }
     window.scrollTo({ top: 0, behavior: 'instant' });
-  }, [screen]);
+  }, [isOpen, screen]);
 
-  if (!isOpen) return null;
+  // Auto-complete suggestion search while typing in Screen 1
+  useEffect(() => {
+    if (!isOpen || screen !== 1) return;
+    const q = query.trim();
+    if (q.length < 2) {
+      setSuggestions([]);
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      setIsSearchingSuggestions(true);
+      try {
+        const list = await apiClient.searchMembers(q);
+        setSuggestions(list);
+      } catch {
+        setSuggestions([]);
+      } finally {
+        setIsSearchingSuggestions(false);
+      }
+    }, 200);
+
+    return () => clearTimeout(timer);
+  }, [isOpen, query, screen]);
 
   // Pricing calculation
   const isAlumni = identifiedMember?.role === 'ALUMNI';
@@ -109,30 +132,6 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
     setSearchError('');
     setScreen(2);
   };
-
-  // Auto-complete suggestion search while typing in Screen 1
-  useEffect(() => {
-    if (screen !== 1) return;
-    const q = query.trim();
-    if (q.length < 2) {
-      setSuggestions([]);
-      return;
-    }
-
-    const timer = setTimeout(async () => {
-      setIsSearchingSuggestions(true);
-      try {
-        const list = await apiClient.searchMembers(q);
-        setSuggestions(list);
-      } catch {
-        setSuggestions([]);
-      } finally {
-        setIsSearchingSuggestions(false);
-      }
-    }, 200);
-
-    return () => clearTimeout(timer);
-  }, [query, screen]);
 
   const handleSelectSuggestion = (member: MemberDirectoryItem) => {
     setIdentifiedMember(member);
@@ -299,6 +298,8 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
       setSubmitStatusText('');
     }
   };
+
+  if (!isOpen) return null;
 
   // When registration is complete, render the 100vw x 100vh full-screen immersive celebration stage
   if (screen === 6 && completedRecord) {
