@@ -436,9 +436,14 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                     <span className="stamp-seal text-[9px] sm:text-[10px] block sm:absolute sm:-top-3 sm:right-4 w-fit mb-1 sm:mb-0 whitespace-nowrap">
                       CỰU THÀNH VIÊN · KHÓA {identifiedMember.generation || 'K14'}
                     </span>
-                    <p className="font-handwriting text-xl sm:text-2xl text-[#20231F] leading-relaxed pt-1 sm:pt-2">
-                      "Có những nơi dù đã đi qua, vẫn luôn có một chỗ dành cho mình để trở về. 17 năm Cóc Sài Gòn, tụi em mong được gặp lại {identifiedMember.honorific.toLowerCase()} trong đêm hội ngộ đặc biệt này."
-                    </p>
+                    <div className="font-handwriting text-lg sm:text-xl text-[#20231F] leading-relaxed pt-1 sm:pt-2 space-y-2">
+                      <p className="font-bold text-[#B94D35] text-xl sm:text-2xl">
+                        Thương gửi {identifiedMember.fullName},
+                      </p>
+                      <p>
+                        Có những hành trình dù đã khép lại, những yêu thương và ký ức vẫn luôn còn ở đó. Cảm ơn bạn vì đã từng góp một phần thanh xuân để viết nên câu chuyện của Cóc Sài Gòn. 17 năm nhìn lại, thật hạnh phúc khi giữa muôn vàn ngã rẽ, chúng ta vẫn có một dịp để trở về, gặp lại những gương mặt thân quen và cùng nhau viết tiếp những kỉ niệm đẹp 💛!
+                      </p>
+                    </div>
                     <div className="pt-2 border-t border-[#20231F]/15 text-xs text-[#20231F]/60 font-mono truncate">
                       Điểm danh: {identifiedMember.department || 'Cựu thành viên'}
                     </div>
@@ -457,9 +462,14 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                     <span className="stamp-seal text-[9px] sm:text-[10px] block sm:absolute sm:-top-3 sm:right-4 w-fit mb-1 sm:mb-0 whitespace-nowrap">
                       THÀNH VIÊN ĐƯƠNG NHIỆM
                     </span>
-                    <p className="font-handwriting text-xl sm:text-2xl text-[#20231F] leading-relaxed pt-1 sm:pt-2">
-                      "Sẵn sàng cho một đêm cháy hết mình chưa? Sinh nhật 17 tuổi của Cóc Sài Gòn nhất định phải có mặt bạn để cùng thổi nến và quẩy tung nóc nhà!"
-                    </p>
+                    <div className="font-handwriting text-lg sm:text-xl text-[#20231F] leading-relaxed pt-1 sm:pt-2 space-y-2">
+                      <p className="font-bold text-[#B94D35] text-xl sm:text-2xl">
+                        Thân gửi {identifiedMember.fullName},
+                      </p>
+                      <p>
+                        Có thể bạn chưa biết, nhưng từ khoảnh khắc trở thành một phần của Cóc, bạn đã góp thêm một nét vẽ vào bức tranh 17 năm đầy màu sắc này. Mỗi câu chuyện, mỗi trải nghiệm và mỗi dấu ấn của bạn đều đang góp phần tạo nên Cóc Sài Gòn của hôm nay. Mong rằng khi nhìn lại, bạn sẽ luôn tự hào vì đã có một thanh xuân mang tên Cóc Sài Gòn 💛!
+                      </p>
+                    </div>
                     <div className="pt-2 border-t border-[#20231F]/15 text-xs text-[#20231F]/60 font-mono truncate">
                       Đội ngũ: {identifiedMember.department || 'Thành viên'}
                     </div>

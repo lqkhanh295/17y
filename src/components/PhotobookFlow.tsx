@@ -125,9 +125,8 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
               {/* Primary Plate Card */}
               <div
                 onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.cover)}
-                className={`paper-sheet p-2 sm:p-2.5 pb-3 sm:pb-3.5 cursor-pointer transition-all duration-300 hover:shadow-poster active:scale-[0.99] ${
-                  !isAnimationComplete ? 'film-reveal-item' : ''
-                }`}
+                className={`paper-sheet p-2 sm:p-2.5 pb-3 sm:pb-3.5 cursor-pointer transition-all duration-300 hover:shadow-poster active:scale-[0.99] ${!isAnimationComplete ? 'film-reveal-item' : ''
+                  }`}
                 style={{ animationDelay: '100ms' }}
               >
                 <div className="overflow-hidden bg-csg-black/5">
@@ -154,9 +153,8 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
               {/* Overlapping Candid Print */}
               <div
                 onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.coverOffset)}
-                className={`absolute -bottom-6 -right-5 w-[38%] z-20 cursor-pointer transition-transform duration-300 hover:scale-[1.04] shadow-poster-sm rotate-2 bg-white p-1.5 pb-2.5 border-2 border-csg-black ${
-                  !isAnimationComplete ? 'film-reveal-item' : ''
-                }`}
+                className={`absolute -bottom-6 -right-5 w-[38%] z-20 cursor-pointer transition-transform duration-300 hover:scale-[1.04] shadow-poster-sm rotate-2 bg-white p-1.5 pb-2.5 border-2 border-csg-black ${!isAnimationComplete ? 'film-reveal-item' : ''
+                  }`}
                 style={{ animationDelay: '300ms' }}
                 title="Nhấp để phóng to khoảnh khắc này"
               >
@@ -176,9 +174,8 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
             <div className="col-span-5 space-y-3">
               <div
                 onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.workspace)}
-                className={`paper-sheet p-2 sm:p-2.5 pb-3 sm:pb-3.5 cursor-pointer transition-all duration-300 hover:shadow-poster active:scale-[0.99] ${
-                  !isAnimationComplete ? 'film-reveal-item' : ''
-                }`}
+                className={`paper-sheet p-2 sm:p-2.5 pb-3 sm:pb-3.5 cursor-pointer transition-all duration-300 hover:shadow-poster active:scale-[0.99] ${!isAnimationComplete ? 'film-reveal-item' : ''
+                  }`}
                 style={{ animationDelay: '200ms' }}
               >
                 <div className="overflow-hidden bg-csg-black/5">
@@ -230,9 +227,8 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
           {/* Panoramic Expedition Feature */}
           <div
             onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.beachPanoramic)}
-            className={`paper-sheet p-2 sm:p-3 pb-3 sm:pb-4 cursor-pointer transition-all duration-300 hover:shadow-poster active:scale-[0.99] ${
-              !isAnimationComplete ? 'film-reveal-item' : ''
-            }`}
+            className={`paper-sheet p-2 sm:p-3 pb-3 sm:pb-4 cursor-pointer transition-all duration-300 hover:shadow-poster active:scale-[0.99] ${!isAnimationComplete ? 'film-reveal-item' : ''
+              }`}
             style={{ animationDelay: '400ms' }}
           >
             <div className="overflow-hidden bg-csg-black/5">
@@ -258,9 +254,8 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
             {/* Vertical Chronology (Col 5) */}
             <div
               onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.camera)}
-              className={`col-span-5 paper-sheet p-2 sm:p-2.5 pb-3 sm:pb-3.5 cursor-pointer transition-all duration-300 hover:shadow-poster active:scale-[0.99] ${
-                !isAnimationComplete ? 'film-reveal-item' : ''
-              }`}
+              className={`col-span-5 paper-sheet p-2 sm:p-2.5 pb-3 sm:pb-3.5 cursor-pointer transition-all duration-300 hover:shadow-poster active:scale-[0.99] ${!isAnimationComplete ? 'film-reveal-item' : ''
+                }`}
               style={{ animationDelay: '500ms' }}
             >
               <div className="overflow-hidden bg-csg-black/5">
@@ -287,9 +282,8 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
             {/* Highland Gathering (Col 7) */}
             <div
               onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.bonfire)}
-              className={`col-span-7 paper-sheet p-2 sm:p-2.5 pb-3 sm:pb-3.5 cursor-pointer transition-all duration-300 hover:shadow-poster active:scale-[0.99] ${
-                !isAnimationComplete ? 'film-reveal-item' : ''
-              }`}
+              className={`col-span-7 paper-sheet p-2 sm:p-2.5 pb-3 sm:pb-3.5 cursor-pointer transition-all duration-300 hover:shadow-poster active:scale-[0.99] ${!isAnimationComplete ? 'film-reveal-item' : ''
+                }`}
               style={{ animationDelay: '600ms' }}
             >
               <div className="overflow-hidden bg-csg-black/5">
@@ -330,9 +324,8 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
             {/* Prominent Stage Feature (Col 7) */}
             <div
               onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.stage)}
-              className={`col-span-7 paper-sheet p-2 sm:p-2.5 pb-3 sm:pb-3.5 cursor-pointer transition-all duration-300 hover:shadow-poster active:scale-[0.99] ${
-                !isAnimationComplete ? 'film-reveal-item' : ''
-              }`}
+              className={`col-span-7 paper-sheet p-2 sm:p-2.5 pb-3 sm:pb-3.5 cursor-pointer transition-all duration-300 hover:shadow-poster active:scale-[0.99] ${!isAnimationComplete ? 'film-reveal-item' : ''
+                }`}
               style={{ animationDelay: '700ms' }}
             >
               <div className="overflow-hidden bg-csg-black/5">
@@ -359,9 +352,8 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
             {/* Coastal Toast Feature (Col 5) */}
             <div
               onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.celebrationToast)}
-              className={`col-span-5 paper-sheet p-2 sm:p-2.5 pb-3 sm:pb-3.5 cursor-pointer transition-all duration-300 hover:shadow-poster active:scale-[0.99] ${
-                !isAnimationComplete ? 'film-reveal-item' : ''
-              }`}
+              className={`col-span-5 paper-sheet p-2 sm:p-2.5 pb-3 sm:pb-3.5 cursor-pointer transition-all duration-300 hover:shadow-poster active:scale-[0.99] ${!isAnimationComplete ? 'film-reveal-item' : ''
+                }`}
               style={{ animationDelay: '800ms' }}
             >
               <div className="overflow-hidden bg-csg-black/5">
@@ -400,9 +392,8 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
 
           <div
             onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.gatheringCrowd)}
-            className={`paper-sheet p-2.5 sm:p-3.5 pb-3 sm:pb-4 max-w-4xl mx-auto cursor-pointer transition-all duration-300 hover:shadow-poster active:scale-[0.99] ${
-              !isAnimationComplete ? 'film-reveal-item' : ''
-            }`}
+            className={`paper-sheet p-2.5 sm:p-3.5 pb-3 sm:pb-4 max-w-4xl mx-auto cursor-pointer transition-all duration-300 hover:shadow-poster active:scale-[0.99] ${!isAnimationComplete ? 'film-reveal-item' : ''
+              }`}
             style={{ animationDelay: '900ms' }}
           >
             <div className="overflow-hidden bg-csg-black/5">
@@ -607,7 +598,7 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
       {/* User Rule: "form trc rồi tới sân khấu cóc sau"                            */}
       {/* ========================================================================= */}
       <section className="pt-10 sm:pt-14 mt-10 sm:mt-14 border-t border-csg-black/20">
-        
+
         {/* Section Header Bar */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 pb-4 mb-6 border-b border-csg-black/15 font-mono text-xs">
           <div className="flex items-center gap-2">
@@ -617,16 +608,16 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
             </span>
           </div>
           <span className="text-csg-black/50 text-[11px]">
-            12 & 13.12.2026 • ĐỒI SỨ VILLA
+            12.12.2026 • ĐỒI SỨ VILLA
           </span>
         </div>
 
         {/* Unified Finale Suite: Form Ticket First (Col 7), Sân Khấu Cóc Companion (Col 5) */}
         <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch">
-          
+
           {/* 1. GALA KEEPSAKE TICKET (FIRST IN DOM & FIRST VISUALLY) */}
           <div className="lg:col-span-7 bg-[#FFFDF8] border-2 border-csg-black p-4 sm:p-6 shadow-poster flex flex-col justify-between space-y-4">
-            
+
             {/* Perforation Stamp */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 border-b-2 border-dashed border-csg-black/25 pb-2.5 font-mono text-[10px] sm:text-[11px]">
               <span className="font-bold uppercase tracking-wider sm:tracking-widest text-csg-red whitespace-nowrap">
@@ -679,7 +670,7 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
           {/* 2. SÂN KHẤU CÓC COMPANION PASSPORT (SECOND / SAU FORM) */}
           {onOpenStage && (
             <div className="lg:col-span-5 bg-csg-surface border-2 border-csg-black p-4 sm:p-6 shadow-poster flex flex-col justify-between space-y-4">
-              
+
               <div className="space-y-3">
                 <div className="flex items-center justify-between gap-2 border-b-2 border-csg-black/15 pb-2.5">
                   <span className="px-2 py-0.5 rounded-xs bg-csg-yellow text-csg-black font-mono font-bold text-[10px] uppercase tracking-wider shadow-xs">
@@ -755,7 +746,7 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
           </button>
 
           {/* Photo Frame */}
-          <div 
+          <div
             className="relative max-w-5xl w-full max-h-[85vh] flex flex-col items-center justify-center"
             onClick={(e) => e.stopPropagation()}
           >

@@ -155,7 +155,36 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
     return () => clearTimeout(timer);
   }, []);
 
-  // Heart / like system: 1 heart per account, with counts per character
+  // Daily Heart Quota System: 12 hearts per day per user ("1 ngày 12 thôi")
+  // Realtime multi-tap claps with optimistic UI + persistent Supabase sync
+  const MAX_DAILY_HEARTS = 12;
+
+  const getTodayString = () => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  };
+
+  const getStoredDailyHeartsUsed = (): number => {
+    try {
+      const raw = localStorage.getItem('csg_daily_hearts');
+      if (!raw) return 0;
+      const parsed = JSON.parse(raw);
+      if (parsed.date === getTodayString()) {
+        return typeof parsed.used === 'number' ? parsed.used : 0;
+      }
+    } catch {}
+    return 0;
+  };
+
+  const storeDailyHeartsUsed = (used: number) => {
+    try {
+      localStorage.setItem('csg_daily_hearts', JSON.stringify({
+        date: getTodayString(),
+        used
+      }));
+    } catch {}
+  };
+
   const getInitialHearts = useCallback((id: string, name: string): number => {
     let hash = 0;
     const str = id + name;
@@ -163,7 +192,7 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
       hash = (hash << 5) - hash + str.charCodeAt(i);
       hash |= 0;
     }
-    return 8 + (Math.abs(hash) % 22);
+    return 10 + (Math.abs(hash) % 15);
   }, []);
 
   const [heartsCount, setHeartsCount] = useState<Record<string, number>>(() => {
@@ -174,67 +203,112 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
     return {};
   });
 
-  const [userHeartedWishId, setUserHeartedWishId] = useState<string | null>(() => {
-    try {
-      return localStorage.getItem('csg_user_hearted_wish_id');
-    } catch {
-      return null;
-    }
+  const [dailyHeartsRemaining, setDailyHeartsRemaining] = useState<number>(() => {
+    return Math.max(0, MAX_DAILY_HEARTS - getStoredDailyHeartsUsed());
   });
 
-  const handleToggleHeart = useCallback((targetId: string) => {
+  const [userHeartedWishIds, setUserHeartedWishIds] = useState<Record<string, boolean>>(() => {
+    try {
+      const saved = localStorage.getItem('csg_user_hearted_ids');
+      if (saved) return JSON.parse(saved);
+    } catch {}
+    return {};
+  });
+
+  const [quotaToast, setQuotaToast] = useState<string | null>(null);
+
+  // Sync initial hearts from real Supabase DB data when allCharacters loads
+  useEffect(() => {
+    if (allCharacters.length > 0) {
+      setHeartsCount(prev => {
+        const next = { ...prev };
+        let hasChanges = false;
+        allCharacters.forEach(c => {
+          if (typeof c.hearts === 'number' && c.hearts > 0 && next[c.id] === undefined) {
+            next[c.id] = c.hearts;
+            hasChanges = true;
+          }
+        });
+        return hasChanges ? next : prev;
+      });
+    }
+  }, [allCharacters]);
+
+  const handleToggleHeart = useCallback((targetId: string, e?: React.MouseEvent) => {
+    if (e) {
+      e.stopPropagation();
+    }
+
+    if (dailyHeartsRemaining <= 0) {
+      setQuotaToast('Hôm nay bạn đã dùng hết 12 lượt tim rồi! Hãy quay lại vào ngày mai nhé 🐸');
+      setTimeout(() => setQuotaToast(null), 3500);
+      return;
+    }
+
+    // 1. Deduct 1 from daily quota
+    const newRemaining = dailyHeartsRemaining - 1;
+    setDailyHeartsRemaining(newRemaining);
+    storeDailyHeartsUsed(MAX_DAILY_HEARTS - newRemaining);
+
+    // 2. Play tactile audio chime
     if (soundEnabled) {
       audioService.playCelebrationChime();
     }
 
-    setHeartsCount(prev => {
-      const next = { ...prev };
-      const currentTargetCount = next[targetId] !== undefined 
-        ? next[targetId] 
-        : getInitialHearts(targetId, targetId);
-
-      if (userHeartedWishId === targetId) {
-        next[targetId] = Math.max(0, currentTargetCount - 1);
-        setUserHeartedWishId(null);
-        try {
-          localStorage.removeItem('csg_user_hearted_wish_id');
-          localStorage.setItem('csg_wishes_hearts', JSON.stringify(next));
-        } catch {}
-      } else {
-        if (userHeartedWishId && next[userHeartedWishId] !== undefined) {
-          next[userHeartedWishId] = Math.max(0, next[userHeartedWishId] - 1);
-        }
-        next[targetId] = currentTargetCount + 1;
-        setUserHeartedWishId(targetId);
-        try {
-          localStorage.setItem('csg_user_hearted_wish_id', targetId);
-          localStorage.setItem('csg_wishes_hearts', JSON.stringify(next));
-        } catch {}
-
-        // Make the frog that received a heart jump up excitedly!
-        setPositions(posPrev => {
-          if (!posPrev[targetId]) return posPrev;
-          return {
-            ...posPrev,
-            [targetId]: {
-              ...posPrev[targetId],
-              isCelebrating: true,
-              celebrateTicks: 30
-            }
-          };
-        });
-
-        confetti({
-          particleCount: 30,
-          spread: 60,
-          origin: { y: 0.6 },
-          colors: ['#F43F5E', '#F4C542', '#B94D35']
-        });
-      }
-
+    // 3. Optimistic heart count increment
+    setUserHeartedWishIds(prev => {
+      const next = { ...prev, [targetId]: true };
+      try {
+        localStorage.setItem('csg_user_hearted_ids', JSON.stringify(next));
+      } catch {}
       return next;
     });
-  }, [soundEnabled, userHeartedWishId, getInitialHearts]);
+
+    setHeartsCount(prev => {
+      const next = { ...prev };
+      const current = next[targetId] !== undefined
+        ? next[targetId]
+        : (allCharacters.find(c => c.id === targetId)?.hearts || getInitialHearts(targetId, targetId));
+      next[targetId] = current + 1;
+      try {
+        localStorage.setItem('csg_wishes_hearts', JSON.stringify(next));
+      } catch {}
+      return next;
+    });
+
+    // 4. Frog jumps with joy on stage
+    setPositions(posPrev => {
+      if (!posPrev[targetId]) return posPrev;
+      return {
+        ...posPrev,
+        [targetId]: {
+          ...posPrev[targetId],
+          isCelebrating: true,
+          celebrateTicks: 30
+        }
+      };
+    });
+
+    // 5. Confetti hearts burst
+    const originX = e ? e.clientX / window.innerWidth : 0.5;
+    const originY = e ? e.clientY / window.innerHeight : 0.65;
+    confetti({
+      particleCount: 22,
+      spread: 45,
+      origin: { x: originX, y: originY },
+      colors: ['#F43F5E', '#FB7185', '#F4C542', '#FDA4AF']
+    });
+
+    // 6. Direct sync to Supabase database (realtime cloud persistence)
+    apiClient.incrementWishHearts(targetId, 1).then((newServerCount: number | null) => {
+      if (typeof newServerCount === 'number') {
+        setHeartsCount(prev => ({
+          ...prev,
+          [targetId]: newServerCount
+        }));
+      }
+    });
+  }, [dailyHeartsRemaining, soundEnabled, allCharacters, getInitialHearts]);
 
   // Find the wish with the most hearts (Top 1)
   const topHeartedId = useMemo(() => {
@@ -245,7 +319,7 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
     allCharacters.forEach(c => {
       const count = heartsCount[c.id] !== undefined 
         ? heartsCount[c.id] 
-        : getInitialHearts(c.id, c.name);
+        : (typeof c.hearts === 'number' && c.hearts > 0 ? c.hearts : getInitialHearts(c.id, c.name));
       if (count > maxCount) {
         maxCount = count;
         topId = c.id;
@@ -950,8 +1024,9 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
           const computedZ = (isUserFrog ? 60 : baseZ) + (isHovered ? 150 : (showBubble ? 120 : 0));
 
           const isTopHearted = c.id === topHeartedId;
-          const isHeartedByMe = userHeartedWishId === c.id;
-          const charHearts = heartsCount[c.id] !== undefined ? heartsCount[c.id] : getInitialHearts(c.id, c.name);
+          const charHearts = heartsCount[c.id] !== undefined 
+            ? heartsCount[c.id] 
+            : (typeof c.hearts === 'number' && c.hearts > 0 ? c.hearts : getInitialHearts(c.id, c.name));
 
           return (
             <div
@@ -1030,20 +1105,19 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
                       type="button"
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleToggleHeart(c.id);
+                        handleToggleHeart(c.id, e);
                       }}
-                      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full font-mono text-[9px] font-bold border transition-all active:scale-90 ${
-                        isHeartedByMe
-                          ? 'bg-rose-500 text-white border-rose-600 shadow-xs'
-                          : 'bg-stone-50 hover:bg-rose-50 text-rose-600 border-stone-200'
-                      }`}
-                      title={isHeartedByMe ? 'Bỏ tim' : 'Thả tim lời chúc này'}
+                      className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full font-mono text-[9px] font-bold border transition-all active:scale-90 bg-rose-50 hover:bg-rose-100 text-rose-600 border-rose-200 shadow-xs cursor-pointer"
+                      title={dailyHeartsRemaining > 0 ? `Thả tim (+1) • Còn ${dailyHeartsRemaining}/12 tim hôm nay` : 'Đã hết 12 lượt tim hôm nay'}
                     >
                       <HeartIcon 
                         size={10} 
-                        className={isHeartedByMe ? 'text-white fill-current' : 'text-rose-500'} 
+                        className="text-rose-500 fill-current animate-pulse" 
                       />
-                      <span>{charHearts} lượt tim</span>
+                      <span>{charHearts} tim</span>
+                      {dailyHeartsRemaining > 0 && (
+                        <span className="text-[8px] px-1 bg-rose-200/60 text-rose-800 rounded-full font-semibold">+1</span>
+                      )}
                     </button>
                   </div>
 
@@ -1114,11 +1188,11 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
     if (!activeCharacter) return null;
     if (typeof document === 'undefined') return null;
 
-    const isHearted = userHeartedWishId === activeCharacter.id;
     const charHearts = heartsCount[activeCharacter.id] !== undefined 
       ? heartsCount[activeCharacter.id] 
-      : getInitialHearts(activeCharacter.id, activeCharacter.name);
+      : (typeof activeCharacter.hearts === 'number' && activeCharacter.hearts > 0 ? activeCharacter.hearts : getInitialHearts(activeCharacter.id, activeCharacter.name));
     const isTop = activeCharacter.id === topHeartedId;
+    const isHearted = !!userHeartedWishIds[activeCharacter.id];
 
     return createPortal(
       <div 
@@ -1170,30 +1244,40 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
           </div>
 
           {/* Action Footer */}
-          <div className="flex items-center justify-between pt-4 gap-3">
-            <button
-              type="button"
-              onClick={() => handleToggleHeart(activeCharacter.id)}
-              className={`px-4 py-2 rounded-full border text-xs font-mono font-bold transition-all flex items-center gap-1.5 active:scale-95 ${
-                isHearted
-                  ? 'bg-rose-50 border-rose-300 text-rose-600 shadow-xs'
-                  : 'bg-stone-50 border-stone-200 text-stone-600 hover:text-rose-600 hover:border-rose-300 hover:bg-rose-50/50'
-              }`}
-            >
-              <HeartIcon size={14} className={isHearted ? 'text-rose-500 fill-current' : 'text-rose-500'} />
-              <span>{charHearts} lượt tim</span>
-            </button>
+          <div className="flex flex-col gap-2.5 pt-4">
+            <div className="flex items-center justify-between gap-3">
+              <button
+                type="button"
+                onClick={(e) => handleToggleHeart(activeCharacter.id, e)}
+                className="px-4 py-2.5 rounded-full border border-rose-300 bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-mono font-bold transition-all flex items-center gap-2 active:scale-95 shadow-sm hover:scale-105 cursor-pointer"
+                title={dailyHeartsRemaining > 0 ? `Bấm để thả tim (+1) • Còn ${dailyHeartsRemaining}/12 tim hôm nay` : 'Đã hết 12 lượt tim hôm nay'}
+              >
+                <HeartIcon size={15} className="text-rose-500 fill-current animate-pulse" />
+                <span>{charHearts} lượt tim</span>
+                {dailyHeartsRemaining > 0 && (
+                  <span className="text-[10px] px-1.5 py-0.2 bg-rose-200/70 text-rose-800 rounded-full font-semibold">+1</span>
+                )}
+              </button>
 
-            <button
-              type="button"
-              onClick={() => {
-                triggerConfettiBlast();
-              }}
-              className="px-4 py-2 rounded-full bg-amber-500 hover:bg-amber-600 text-white font-mono font-bold text-xs flex items-center gap-1.5 transition-all shadow-sm active:scale-95"
-            >
-              <SparklesIcon size={14} />
-              <span>Chúc mừng</span>
-            </button>
+              <button
+                type="button"
+                onClick={(e) => {
+                  triggerConfettiBlast(e);
+                }}
+                className="px-4 py-2.5 rounded-full bg-amber-500 hover:bg-amber-600 text-white font-mono font-bold text-xs flex items-center gap-1.5 transition-all shadow-sm active:scale-95"
+              >
+                <SparklesIcon size={14} />
+                <span>Chúc mừng</span>
+              </button>
+            </div>
+
+            {/* Daily Quota Indicator */}
+            <div className="text-center text-[11px] font-mono text-stone-500 flex items-center justify-center gap-1">
+              <span>Hôm nay bạn còn:</span>
+              <strong className={dailyHeartsRemaining > 0 ? 'text-rose-600 font-bold' : 'text-stone-400 font-bold'}>
+                {dailyHeartsRemaining}/12 lượt tim
+              </strong>
+            </div>
           </div>
         </div>
       </div>,
@@ -1300,9 +1384,11 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
           {/* Wishes List */}
           <div className="flex-1 overflow-y-auto p-4 space-y-3">
             {drawerWishes.map((c) => {
-              const isHearted = userHeartedWishId === c.id;
-              const charHearts = heartsCount[c.id] !== undefined ? heartsCount[c.id] : getInitialHearts(c.id, c.name);
+              const charHearts = heartsCount[c.id] !== undefined 
+                ? heartsCount[c.id] 
+                : (typeof c.hearts === 'number' && c.hearts > 0 ? c.hearts : getInitialHearts(c.id, c.name));
               const isTop = c.id === topHeartedId;
+              const isHearted = !!userHeartedWishIds[c.id];
 
               return (
                 <div 
@@ -1343,16 +1429,19 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
                     {/* Heart Button */}
                     <button
                       type="button"
-                      onClick={() => handleToggleHeart(c.id)}
-                      className={`flex items-center gap-1.5 px-3 py-1 min-h-[30px] rounded-full border text-[11px] font-mono font-bold transition-all active:scale-95 ${
-                        isHearted
-                          ? 'bg-rose-950/70 border-rose-500 text-rose-300 shadow-xs'
-                          : 'bg-[#191715] border-white/15 text-white/75 hover:text-rose-400 hover:border-rose-400/50'
+                      onClick={(e) => handleToggleHeart(c.id, e)}
+                      className={`flex items-center gap-1.5 px-3 py-1 min-h-[30px] rounded-full border text-[11px] font-mono font-bold transition-all active:scale-95 cursor-pointer ${
+                        dailyHeartsRemaining > 0
+                          ? 'border-rose-500/40 bg-rose-950/50 hover:bg-rose-900/80 text-rose-300 shadow-xs'
+                          : 'border-white/10 bg-black/30 text-white/40 cursor-not-allowed'
                       }`}
-                      title={isHearted ? 'Bỏ tim' : 'Thả tim lời chúc này'}
+                      title={dailyHeartsRemaining > 0 ? `Bấm để thả tim (+1) • Còn ${dailyHeartsRemaining}/12 tim hôm nay` : 'Đã hết 12 lượt tim hôm nay'}
                     >
-                      <HeartIcon size={13} className={isHearted ? 'text-rose-400 fill-rose-400' : 'text-rose-400'} />
-                      <span>{charHearts} lượt tim</span>
+                      <HeartIcon size={13} className="text-rose-400 fill-rose-400" />
+                      <span>{charHearts} tim</span>
+                      {dailyHeartsRemaining > 0 && (
+                        <span className="text-[9px] text-rose-300/90 font-mono font-semibold">+1</span>
+                      )}
                     </button>
 
                     <button

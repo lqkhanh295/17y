@@ -112,7 +112,7 @@ export const PaymentLookupModal: React.FC<PaymentLookupModalProps> = ({
     const details = encodeURIComponent(`Chào mừng ${r.fullName} đến với CSG 17Y!\nMã vé Check-in của bạn: ${r.ticketCode}\nĐịa điểm: Đồi Sứ Villa.`);
     const location = encodeURIComponent('Đồi Sứ Villa');
     const start = '20261212T080000';
-    const end = '20261213T220000';
+    const end = '20261212T220000';
     return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${start}/${end}&details=${details}&location=${location}`;
   };
 
@@ -126,12 +126,12 @@ SUMMARY:Đại Tiệc Sinh Nhật 17 Năm Cóc Sài Gòn (CSG 17Y)
 DESCRIPTION:Vé Check-in: ${r.ticketCode} - Họ Tên: ${r.fullName}\\nĐêm hội ngộ 17 năm thanh xuân áo vàng!
 LOCATION:Đồi Sứ Villa
 DTSTART:20261212T010000Z
-DTEND:20261213T150000Z
+DTEND:20261212T150000Z
 STATUS:CONFIRMED
 BEGIN:VALARM
 TRIGGER:-PT2H
 ACTION:DISPLAY
-DESCRIPTION:Nhắc lịch: Đại tiệc sinh nhật Cóc Sài Gòn 17Y (12 & 13.12.2026)!
+DESCRIPTION:Nhắc lịch: Đại tiệc sinh nhật Cóc Sài Gòn 17Y (12.12.2026)!
 END:VALARM
 END:VEVENT
 END:VCALENDAR`;
@@ -646,7 +646,7 @@ END:VCALENDAR`;
                       </div>
 
                       <div className="text-xs text-[#20231F] space-y-1">
-                        <p><CalendarIcon size={14} className="inline mr-1" /> <strong>2 ngày: 12 & 13/12/2026</strong></p>
+                        <p><CalendarIcon size={14} className="inline mr-1" /> <strong>12.12.2026</strong></p>
                         <p><strong>Địa điểm: Đồi Sứ Villa</strong></p>
                       </div>
 

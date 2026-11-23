@@ -78,7 +78,7 @@ export const ALL_PHOTOBOOK_IMAGES = Object.values(PHOTOBOOK_IMAGES);
 export const GALA_EVENT_DETAILS = {
   title: 'ĐẠI TIỆC GALA 17Y',
   subtitle: 'Cóc Sài Gòn — Mười Bảy Năm Một Mái Nhà',
-  time: '2 ngày • 12 & 13.12.2026',
+  time: '12.12.2026',
   dateIso: '2026-12-12T08:00:00+07:00',
   venue: 'Đồi Sứ Villa',
   address: 'Đồi Sứ Villa',

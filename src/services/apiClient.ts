@@ -460,7 +460,8 @@ export const apiClient = {
         x: typeof c.x === 'number' ? c.x : 14 + ((idx * 16) % 72),
         y: typeof c.y === 'number' ? c.y : 66 + ((idx * 6) % 16),
         scale: typeof c.scale === 'number' ? c.scale : 1,
-        direction: c.direction === -1 ? -1 : 1
+        direction: c.direction === -1 ? -1 : 1,
+        hearts: typeof c.hearts === 'number' ? c.hearts : 0
       });
     });
 
@@ -483,12 +484,29 @@ export const apiClient = {
           x: 14 + ((idx * 19) % 72),
           y: 67 + ((idx * 7) % 15),
           scale: 1,
-          direction: idx % 2 === 0 ? 1 : -1
+          direction: idx % 2 === 0 ? 1 : -1,
+          hearts: typeof w.hearts === 'number' ? w.hearts : 0
         });
       }
     });
 
     return Array.from(charMap.values());
+  },
+
+  // 6b. Heart / Clap Sync to Supabase Database
+  async incrementWishHearts(targetId: string, amount = 1): Promise<number | null> {
+    try {
+      const { data, error } = await (supabase as any).rpc('increment_hearts', {
+        target_id: targetId,
+        amount
+      });
+      if (!error && typeof data === 'number') {
+        return data;
+      }
+    } catch (err) {
+      console.warn('incrementWishHearts RPC error:', err);
+    }
+    return null;
   },
 
   // 7. Admin API
