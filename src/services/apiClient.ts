@@ -606,8 +606,8 @@ export const apiClient = {
     };
   },
 
-  async updateRegistrationStatus(id: string, data: { status?: string; isApproved100?: boolean; adminUser?: string }) {
-    const res = await safeFetchJson<{ success: boolean; data: RegistrationRecord }>(
+  async updateRegistrationStatus(id: string, data: { status?: string; isApproved100?: boolean; action?: string; adminUser?: string; templateType?: string }) {
+    const res = await safeFetchJson<{ success: boolean; data: RegistrationRecord; emailResult?: any; message?: string }>(
       `${API_BASE}/admin/registrations/${id}/status`,
       {
         method: 'PUT',
@@ -626,15 +626,31 @@ export const apiClient = {
       updates.status = data.status;
       updates.paymentStatus = data.status;
     }
-    if (data.isApproved100 !== undefined) {
-      updates.isApproved100 = data.isApproved100;
-      if (data.isApproved100) {
+    if (data.action === 'APPROVE_DEPOSIT' || data.status === 'DEPOSITED') {
+      updates.isApproved100 = false;
+      updates.status = 'DEPOSITED';
+      updates.paymentStatus = 'DEPOSITED';
+      updates.paidAmount = 150000;
+      const total = reg.totalRequired || (reg.role === 'ALUMNI' ? 389000 : 349000);
+      updates.totalRequired = total;
+      updates.remainingAmount = Math.max(0, total - 150000);
+      updates.verifiedBy = data.adminUser || 'BTC_Admin';
+      updates.verifiedAt = new Date().toISOString();
+      updates.isEmailSent = true;
+      updates.emailSentAt = new Date().toISOString();
+      updates.lastEmailTemplate = reg.role === 'ALUMNI' ? 'DEPOSIT_ALUMNI' : 'DEPOSIT_ACTIVE';
+    } else if (data.isApproved100 !== undefined || data.action === 'APPROVE_100') {
+      updates.isApproved100 = data.isApproved100 !== undefined ? data.isApproved100 : true;
+      if (updates.isApproved100) {
         updates.status = 'FULLY_PAID';
         updates.paymentStatus = 'FULLY_PAID';
-        updates.paidAmount = reg.totalRequired;
+        updates.paidAmount = reg.totalRequired || (reg.role === 'ALUMNI' ? 389000 : 349000);
         updates.remainingAmount = 0;
         updates.verifiedBy = data.adminUser || 'BTC_Admin';
         updates.verifiedAt = new Date().toISOString();
+        updates.isEmailSent = true;
+        updates.emailSentAt = new Date().toISOString();
+        updates.lastEmailTemplate = 'FULL_100';
       }
     }
 
@@ -642,14 +658,67 @@ export const apiClient = {
 
     await supabase.from('audit_logs').insert({
       id: 'log-' + Date.now(),
-      action: data.isApproved100 ? 'APPROVE_100' : 'STATUS_CHANGE',
+      action: data.isApproved100 ? 'APPROVE_100' : (data.action === 'APPROVE_DEPOSIT' ? 'APPROVE_DEPOSIT' : 'STATUS_CHANGE'),
       targetId: id,
       adminUser: data.adminUser || 'BTC_Admin',
-      details: `Duyệt trạng thái: ${updates.status || reg.status}`,
+      details: `Duyệt trạng thái: ${updates.status || reg.status}. ${updates.isEmailSent ? `Gửi email ${updates.lastEmailTemplate}` : ''}`,
       timestamp: new Date().toISOString()
     });
 
     return { ...reg, ...updates } as unknown as RegistrationRecord;
+  },
+
+  async sendRegistrationEmail(id: string, options?: { templateType?: string; adminUser?: string }) {
+    const res = await safeFetchJson<{ success: boolean; data: RegistrationRecord; emailResult?: any; message?: string }>(
+      `${API_BASE}/admin/registrations/${id}/send-email`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(options || {})
+      }
+    );
+    if (res && res.success && res.data) return res.data;
+
+    // Direct Supabase fallback
+    const { data: reg } = await supabase.from('registrations').select('*').eq('id', id).maybeSingle();
+    if (!reg) throw new Error('Không tìm thấy hồ sơ người đăng ký.');
+
+    let templateType = options?.templateType;
+    if (!templateType || templateType === 'AUTO') {
+      if (reg.isApproved100 || reg.status === 'FULLY_PAID') {
+        templateType = 'FULL_100';
+      } else if (reg.role === 'ALUMNI') {
+        templateType = 'DEPOSIT_ALUMNI';
+      } else {
+        templateType = 'DEPOSIT_ACTIVE';
+      }
+    }
+
+    const updates = {
+      isEmailSent: true,
+      emailSentAt: new Date().toISOString(),
+      lastEmailTemplate: templateType
+    };
+
+    await supabase.from('registrations').update(updates).eq('id', id);
+    await supabase.from('audit_logs').insert({
+      id: 'log-' + Date.now(),
+      action: 'RESEND_EMAIL',
+      targetId: id,
+      adminUser: options?.adminUser || 'BTC_Admin',
+      details: `Gửi email (${templateType}) cho ${reg.fullName} (${reg.mssv})`,
+      timestamp: new Date().toISOString()
+    });
+
+    return { ...reg, ...updates } as unknown as RegistrationRecord;
+  },
+
+  async previewRegistrationEmail(id: string, templateType?: string) {
+    const query = templateType ? `?templateType=${encodeURIComponent(templateType)}` : '';
+    const res = await safeFetchJson<{ success: boolean; data: { subject: string; html: string; text: string; templateType: string } }>(
+      `${API_BASE}/admin/registrations/${id}/preview-email${query}`
+    );
+    return res?.data || null;
   },
 
   async rejectRegistrationPayment(id: string, rejectReason: string, adminUser?: string) {

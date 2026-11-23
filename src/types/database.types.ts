@@ -191,6 +191,8 @@ export type Database = {
           verifiedAt: string | null
           verifiedBy: string | null
           wishes: string | null
+          emailSentAt: string | null
+          lastEmailTemplate: string | null
         }
         Insert: {
           allergies?: Json | null
@@ -230,6 +232,8 @@ export type Database = {
           verifiedAt?: string | null
           verifiedBy?: string | null
           wishes?: string | null
+          emailSentAt?: string | null
+          lastEmailTemplate?: string | null
         }
         Update: {
           allergies?: Json | null
@@ -269,6 +273,8 @@ export type Database = {
           verifiedAt?: string | null
           verifiedBy?: string | null
           wishes?: string | null
+          emailSentAt?: string | null
+          lastEmailTemplate?: string | null
         }
         Relationships: []
       }

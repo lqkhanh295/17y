@@ -76,6 +76,8 @@ export interface RegistrationRecord {
   ticketToken?: string;
   createdAt: string;
   isEmailSent?: boolean;
+  emailSentAt?: string;
+  lastEmailTemplate?: 'DEPOSIT_ALUMNI' | 'DEPOSIT_ACTIVE' | 'FULL_100' | string;
 
   // Check-in state
   isCheckedIn?: boolean;

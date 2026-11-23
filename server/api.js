@@ -5,6 +5,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import crypto from 'crypto';
 import { supabase } from './supabase.js';
+import { sendRegistrationEmail, generateEmailContent } from './emailService.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -676,10 +677,10 @@ app.get('/api/admin/registrations', async (req, res) => {
   });
 });
 
-// Admin Approve Payment (Specific or 100%)
+// Admin Approve Payment (Specific or 100%) & Auto Send Email
 app.put('/api/admin/registrations/:id/status', async (req, res) => {
   const { id } = req.params;
-  const { status, isApproved100, adminUser } = req.body;
+  const { status, isApproved100, action, adminUser, templateType } = req.body;
 
   let reg = null;
   try {
@@ -706,12 +707,35 @@ app.put('/api/admin/registrations/:id/status', async (req, res) => {
     updates.paymentStatus = status;
   }
 
-  if (isApproved100 !== undefined) {
-    updates.isApproved100 = Boolean(isApproved100);
+  // Handle APPROVE_DEPOSIT action
+  if (action === 'APPROVE_DEPOSIT' || status === 'DEPOSITED') {
+    updates.isApproved100 = false;
+    updates.status = 'DEPOSITED';
+    updates.paymentStatus = 'DEPOSITED';
+    updates.paidAmount = 150000;
+    const total = reg.totalRequired || (reg.role === 'ALUMNI' ? 389000 : 349000);
+    updates.totalRequired = total;
+    updates.remainingAmount = Math.max(0, total - 150000);
+    updates.verifiedBy = adminUser || 'BTC_Admin';
+    updates.verifiedAt = new Date().toISOString();
+
+    if (reg.paymentHistory && Array.isArray(reg.paymentHistory)) {
+      updates.paymentHistory = reg.paymentHistory.map(p => ({
+        ...p,
+        status: p.phase === 1 ? 'VERIFIED' : p.status,
+        verifiedBy: adminUser || 'BTC_Admin',
+        verifiedAt: new Date().toISOString()
+      }));
+    }
+  }
+
+  // Handle APPROVE 100%
+  if (isApproved100 !== undefined || action === 'APPROVE_100') {
+    updates.isApproved100 = isApproved100 !== undefined ? Boolean(isApproved100) : true;
     if (updates.isApproved100) {
       updates.status = 'FULLY_PAID';
       updates.paymentStatus = 'FULLY_PAID';
-      updates.paidAmount = reg.totalRequired;
+      updates.paidAmount = reg.totalRequired || (reg.role === 'ALUMNI' ? 389000 : 349000);
       updates.remainingAmount = 0;
       updates.verifiedBy = adminUser || 'BTC_Admin';
       updates.verifiedAt = new Date().toISOString();
@@ -727,12 +751,38 @@ app.put('/api/admin/registrations/:id/status', async (req, res) => {
     }
   }
 
+  // Auto Send Email based on updated status & role
+  let emailResult = null;
+  try {
+    const mergedRecord = { ...reg, ...updates };
+    let selectedTemplate = templateType;
+    if (!selectedTemplate) {
+      if (updates.isApproved100) {
+        selectedTemplate = 'FULL_100';
+      } else if (reg.role === 'ALUMNI') {
+        selectedTemplate = 'DEPOSIT_ALUMNI';
+      } else {
+        selectedTemplate = 'DEPOSIT_ACTIVE';
+      }
+    }
+
+    emailResult = await sendRegistrationEmail(mergedRecord, { templateType: selectedTemplate });
+    if (emailResult && emailResult.sent) {
+      updates.isEmailSent = true;
+      updates.emailSentAt = emailResult.timestamp;
+      updates.lastEmailTemplate = emailResult.templateType;
+    }
+  } catch (emailErr) {
+    console.error('[API] Auto send email error on approval:', emailErr);
+  }
+
+  const emailDetail = updates.isEmailSent ? ` [Đã gửi email ${updates.lastEmailTemplate} tới ${reg.gmail}]` : '';
   const auditEntry = {
     id: 'log-' + Date.now(),
-    action: isApproved100 ? 'APPROVE_100' : 'STATUS_CHANGE',
+    action: updates.isApproved100 ? 'APPROVE_100' : (action === 'APPROVE_DEPOSIT' ? 'APPROVE_DEPOSIT' : 'STATUS_CHANGE'),
     targetId: id,
     adminUser: adminUser || 'BTC_Admin',
-    details: `Duyệt thanh toán cho ${reg.fullName} (${reg.mssv}) -> ${updates.status || reg.status}`,
+    details: `Duyệt thanh toán cho ${reg.fullName} (${reg.mssv}) -> ${updates.status || reg.status}.${emailDetail}`,
     timestamp: new Date().toISOString()
   };
 
@@ -754,7 +804,120 @@ app.put('/api/admin/registrations/:id/status', async (req, res) => {
   }
 
   Object.assign(reg, updates);
-  return res.json({ success: true, data: reg, message: 'Đã cập nhật trạng thái trên Supabase thành công.' });
+  return res.json({
+    success: true,
+    data: reg,
+    emailResult,
+    message: updates.isEmailSent 
+      ? `Đã duyệt thành công và tự động gửi email (${updates.lastEmailTemplate}) tới ${reg.gmail}!`
+      : 'Đã cập nhật trạng thái thành công.'
+  });
+});
+
+// Admin Manually Send / Resend Email
+app.post('/api/admin/registrations/:id/send-email', async (req, res) => {
+  const { id } = req.params;
+  const { templateType, adminUser } = req.body;
+
+  let reg = null;
+  try {
+    if (supabase) {
+      const { data } = await supabase.from('registrations').select('*').eq('id', id).maybeSingle();
+      if (data) reg = data;
+    }
+  } catch (err) {
+    console.error('Supabase send-email lookup error:', err);
+  }
+
+  if (!reg) {
+    const db = getDB();
+    reg = (db.registrations || []).find(r => r.id === id);
+  }
+
+  if (!reg) {
+    return res.status(404).json({ success: false, message: 'Không tìm thấy hồ sơ người đăng ký.' });
+  }
+
+  try {
+    const optTemplate = (templateType && templateType !== 'AUTO') ? templateType : undefined;
+    const emailResult = await sendRegistrationEmail(reg, { templateType: optTemplate });
+
+    if (!emailResult.success) {
+      return res.status(500).json({ success: false, message: emailResult.error || emailResult.message || 'Lỗi gửi email' });
+    }
+
+    const updates = {
+      isEmailSent: true,
+      emailSentAt: emailResult.timestamp,
+      lastEmailTemplate: emailResult.templateType
+    };
+
+    const auditEntry = {
+      id: 'log-' + Date.now(),
+      action: 'RESEND_EMAIL',
+      targetId: id,
+      adminUser: adminUser || 'BTC_Admin',
+      details: `Gửi email thủ công (${emailResult.templateType}) cho ${reg.fullName} (${reg.mssv}) tới ${reg.gmail}`,
+      timestamp: new Date().toISOString()
+    };
+
+    try {
+      if (supabase) {
+        await supabase.from('registrations').update(updates).eq('id', id);
+        await supabase.from('audit_logs').insert(auditEntry);
+      }
+    } catch (dbErr) {
+      console.error('Supabase save email status error:', dbErr);
+    }
+
+    const db = getDB();
+    const localReg = (db.registrations || []).find(r => r.id === id);
+    if (localReg) {
+      Object.assign(localReg, updates);
+      db.auditLogs = [auditEntry, ...(db.auditLogs || [])];
+      saveDB(db);
+    }
+
+    Object.assign(reg, updates);
+    return res.json({
+      success: true,
+      data: reg,
+      emailResult,
+      message: `Đã gửi email (${emailResult.templateType}) thành công tới ${reg.gmail}`
+    });
+  } catch (err) {
+    console.error('Manual email send failed:', err);
+    return res.status(500).json({ success: false, message: 'Lỗi trong quá trình gửi mail: ' + err.message });
+  }
+});
+
+// Admin Preview Email Endpoint
+app.get('/api/admin/registrations/:id/preview-email', async (req, res) => {
+  const { id } = req.params;
+  const { templateType } = req.query;
+
+  let reg = null;
+  try {
+    if (supabase) {
+      const { data } = await supabase.from('registrations').select('*').eq('id', id).maybeSingle();
+      if (data) reg = data;
+    }
+  } catch (err) {
+    console.error('Supabase preview-email lookup error:', err);
+  }
+
+  if (!reg) {
+    const db = getDB();
+    reg = (db.registrations || []).find(r => r.id === id);
+  }
+
+  if (!reg) {
+    return res.status(404).json({ success: false, message: 'Không tìm thấy hồ sơ người đăng ký.' });
+  }
+
+  const optTemplate = (templateType && templateType !== 'AUTO') ? templateType : undefined;
+  const preview = generateEmailContent(reg, optTemplate);
+  return res.json({ success: true, data: preview });
 });
 
 // Admin Reject Payment with Reason
