@@ -167,44 +167,94 @@ app.post('/api/members/verify', async (req, res) => {
       // 1. Prioritize search_members RPC (unaccented, ranked match)
       const { data: candidates, error: rpcErr } = await supabase.rpc('search_members', {
         query_text: query.trim(),
-        max_limit: 5
+        max_limit: 10
       });
 
-      let match = null;
       if (!rpcErr && candidates && candidates.length > 0) {
-        match = candidates[0];
-      } else {
-        // Fallback: direct select
-        const { data: members, error } = await supabase.from('members').select('*');
-        if (!error && members && members.length > 0) {
-          match = members.find(m => m.mssv && m.mssv.toUpperCase() === qUpper);
-          if (!match) {
-            match = members.find(m => normalizeVN(m.fullName) === qNorm);
-          }
-          if (!match) {
-            match = members.find(m => {
-              const nameNorm = normalizeVN(m.fullName);
-              return nameNorm.includes(qNorm) || qNorm.includes(nameNorm);
-            });
-          }
-        }
-      }
+        // 1a. Check exact MSSV match (always unique)
+        const mssvMatch = candidates.find(m => m.mssv && m.mssv.toUpperCase() === qUpper);
+        if (mssvMatch) {
+          const { data: existingRegs } = await supabase
+            .from('registrations')
+            .select('id, mssv')
+            .ilike('mssv', mssvMatch.mssv);
+          const existing = existingRegs && existingRegs.length > 0 ? existingRegs[0] : null;
 
-      if (match) {
+          return res.json({
+            success: true,
+            multiple: false,
+            data: mssvMatch,
+            hasExistingRegistration: !!existing,
+            existingRegistrationId: existing?.id || null,
+            message: 'Xác thực MSSV thành công.'
+          });
+        }
+
+        // 1b. Check multiple exact name matches (name collision case!)
+        const exactNameMatches = candidates.filter(m => normalizeVN(m.fullName) === qNorm);
+        if (exactNameMatches.length > 1) {
+          return res.json({
+            success: true,
+            multiple: true,
+            candidates: exactNameMatches,
+            message: `Tìm thấy ${exactNameMatches.length} thành viên mang tên "${query.trim()}".`
+          });
+        }
+
+        // 1c. Exactly one match
+        const singleMatch = exactNameMatches.length === 1 ? exactNameMatches[0] : candidates[0];
         const { data: existingRegs } = await supabase
           .from('registrations')
           .select('id, mssv')
-          .ilike('mssv', match.mssv);
-
+          .ilike('mssv', singleMatch.mssv);
         const existing = existingRegs && existingRegs.length > 0 ? existingRegs[0] : null;
 
         return res.json({
           success: true,
-          data: match,
+          multiple: false,
+          data: singleMatch,
           hasExistingRegistration: !!existing,
           existingRegistrationId: existing?.id || null,
           message: 'Xác thực danh tính thành công từ Supabase.'
         });
+      }
+
+      // Fallback direct select
+      const { data: members, error } = await supabase.from('members').select('*');
+      if (!error && members && members.length > 0) {
+        const mssvMatch = members.find(m => m.mssv && m.mssv.toUpperCase() === qUpper);
+        if (mssvMatch) {
+          return res.json({
+            success: true,
+            multiple: false,
+            data: mssvMatch,
+            message: 'Xác thực thành công.'
+          });
+        }
+
+        const nameMatches = members.filter(m => normalizeVN(m.fullName) === qNorm);
+        if (nameMatches.length > 1) {
+          return res.json({
+            success: true,
+            multiple: true,
+            candidates: nameMatches,
+            message: `Tìm thấy ${nameMatches.length} thành viên mang tên "${query.trim()}".`
+          });
+        }
+
+        const match = nameMatches[0] || members.find(m => {
+          const nameNorm = normalizeVN(m.fullName);
+          return nameNorm.includes(qNorm) || qNorm.includes(nameNorm);
+        });
+
+        if (match) {
+          return res.json({
+            success: true,
+            multiple: false,
+            data: match,
+            message: 'Xác thực thành công.'
+          });
+        }
       }
     }
   } catch (err) {
@@ -213,12 +263,32 @@ app.post('/api/members/verify', async (req, res) => {
 
   // Fallback to local DB if Supabase search didn't match
   const db = getDB();
-  let match = db.members.find(m => m.mssv && m.mssv.toUpperCase() === qUpper);
-  if (!match) {
-    match = db.members.find(m => normalizeVN(m.fullName) === qNorm);
+  const mssvMatch = (db.members || []).find(m => m.mssv && m.mssv.toUpperCase() === qUpper);
+  if (mssvMatch) {
+    const existing = (db.registrations || []).find(r => r.mssv && r.mssv.toUpperCase() === mssvMatch.mssv.toUpperCase());
+    return res.json({
+      success: true,
+      multiple: false,
+      data: mssvMatch,
+      hasExistingRegistration: !!existing,
+      existingRegistrationId: existing?.id || null,
+      message: 'Xác thực MSSV thành công.'
+    });
   }
+
+  const exactDbMatches = (db.members || []).filter(m => normalizeVN(m.fullName) === qNorm);
+  if (exactDbMatches.length > 1) {
+    return res.json({
+      success: true,
+      multiple: true,
+      candidates: exactDbMatches,
+      message: `Tìm thấy ${exactDbMatches.length} thành viên mang tên "${query.trim()}".`
+    });
+  }
+
+  let match = exactDbMatches[0];
   if (!match) {
-    match = db.members.find(m => {
+    match = (db.members || []).find(m => {
       const nameNorm = normalizeVN(m.fullName);
       return nameNorm === qNorm || nameNorm.includes(qNorm) || qNorm.includes(nameNorm);
     });

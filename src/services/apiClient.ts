@@ -147,15 +147,25 @@ export const apiClient = {
   },
 
   // 2b. Member verification (With failover to Supabase)
-  async verifyMember(query: string) {
+  async verifyMember(query: string): Promise<{
+    success: boolean;
+    multiple?: boolean;
+    candidates?: MemberDirectoryItem[];
+    data?: MemberDirectoryItem;
+    hasExistingRegistration?: boolean;
+    existingRegistrationId?: string;
+    message?: string;
+  }> {
     if (!query || !query.trim()) {
       throw new Error('Vui lòng cung cấp MSSV hoặc Họ tên.');
     }
 
     const res = await safeFetchJson<{
       success: boolean;
-      data: MemberDirectoryItem;
-      hasExistingRegistration: boolean;
+      multiple?: boolean;
+      candidates?: MemberDirectoryItem[];
+      data?: MemberDirectoryItem;
+      hasExistingRegistration?: boolean;
       existingRegistrationId?: string;
       message?: string;
     }>(`${API_BASE}/members/verify`, {
@@ -168,43 +178,102 @@ export const apiClient = {
 
     // Fallback: Direct Supabase directory lookup via search_members RPC
     try {
+      const qNorm = normalizeVN(query);
+      const qUpper = query.trim().toUpperCase();
+
       const { data: candidates, error: rpcErr } = await (supabase as any).rpc('search_members', {
         query_text: query.trim(),
-        max_limit: 5
+        max_limit: 10
       });
 
-      let match: MemberDirectoryItem | null = null;
       if (!rpcErr && candidates && (candidates as any[]).length > 0) {
-        match = (candidates as any[])[0] as MemberDirectoryItem;
-      } else {
-        const qNorm = normalizeVN(query);
-        const qUpper = query.trim().toUpperCase();
-        const { data: members } = await supabase.from('members').select('*');
-        if (members && members.length > 0) {
-          match = (members.find(m => m.mssv && m.mssv.toUpperCase() === qUpper) ||
-                   members.find(m => normalizeVN(m.fullName) === qNorm) ||
-                   members.find(m => {
-                     const nameNorm = normalizeVN(m.fullName);
-                     return nameNorm.includes(qNorm) || qNorm.includes(nameNorm);
-                   })) as MemberDirectoryItem || null;
-        }
-      }
+        const candidateList = candidates as MemberDirectoryItem[];
 
-      if (match) {
+        // 1a. Check exact MSSV match (always unique)
+        const mssvMatch = candidateList.find(m => m.mssv && m.mssv.toUpperCase() === qUpper);
+        if (mssvMatch) {
+          const { data: existingRegs } = await supabase
+            .from('registrations')
+            .select('id, mssv')
+            .ilike('mssv', mssvMatch.mssv || '');
+          const existing = existingRegs && existingRegs.length > 0 ? existingRegs[0] : null;
+
+          return {
+            success: true,
+            multiple: false,
+            data: mssvMatch,
+            hasExistingRegistration: !!existing,
+            existingRegistrationId: existing?.id || undefined,
+            message: 'Xác thực MSSV thành công.'
+          };
+        }
+
+        // 1b. Check multiple exact name matches (collision detection)
+        const exactNameMatches = candidateList.filter(m => normalizeVN(m.fullName) === qNorm);
+        if (exactNameMatches.length > 1) {
+          return {
+            success: true,
+            multiple: true,
+            candidates: exactNameMatches,
+            message: `Tìm thấy ${exactNameMatches.length} thành viên mang tên "${query.trim()}".`
+          };
+        }
+
+        // 1c. Single match
+        const singleMatch = exactNameMatches.length === 1 ? exactNameMatches[0] : candidateList[0];
         const { data: existingRegs } = await supabase
           .from('registrations')
           .select('id, mssv')
-          .ilike('mssv', match.mssv || '');
-
+          .ilike('mssv', singleMatch.mssv || '');
         const existing = existingRegs && existingRegs.length > 0 ? existingRegs[0] : null;
 
         return {
           success: true,
-          data: match,
+          multiple: false,
+          data: singleMatch,
           hasExistingRegistration: !!existing,
           existingRegistrationId: existing?.id || undefined,
           message: 'Xác thực danh tính thành công từ cơ sở dữ liệu.'
         };
+      }
+
+      // Fallback direct select
+      const { data: members } = await supabase.from('members').select('*');
+      if (members && members.length > 0) {
+        const memberList = members as MemberDirectoryItem[];
+        const mssvMatch = memberList.find(m => m.mssv && m.mssv.toUpperCase() === qUpper);
+        if (mssvMatch) {
+          return {
+            success: true,
+            multiple: false,
+            data: mssvMatch,
+            message: 'Xác thực MSSV thành công.'
+          };
+        }
+
+        const exactNameMatches = memberList.filter(m => normalizeVN(m.fullName) === qNorm);
+        if (exactNameMatches.length > 1) {
+          return {
+            success: true,
+            multiple: true,
+            candidates: exactNameMatches,
+            message: `Tìm thấy ${exactNameMatches.length} thành viên mang tên "${query.trim()}".`
+          };
+        }
+
+        const match = exactNameMatches[0] || memberList.find(m => {
+          const nameNorm = normalizeVN(m.fullName);
+          return nameNorm.includes(qNorm) || qNorm.includes(nameNorm);
+        });
+
+        if (match) {
+          return {
+            success: true,
+            multiple: false,
+            data: match,
+            message: 'Xác thực danh tính thành công.'
+          };
+        }
       }
     } catch (err) {
       console.warn('Direct member verification failover error:', err);
@@ -224,6 +293,7 @@ export const apiClient = {
 
     return {
       success: true,
+      multiple: false,
       data: dynamicMember,
       hasExistingRegistration: false,
       message: 'Đã nhận diện người tham dự.'

@@ -39,6 +39,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
   // Screen 1: Lookup state
   const [query, setQuery] = useState('');
   const [identifiedMember, setIdentifiedMember] = useState<MemberDirectoryItem | null>(null);
+  const [collisionCandidates, setCollisionCandidates] = useState<MemberDirectoryItem[]>([]);
   const [searchError, setSearchError] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
 
@@ -116,7 +117,13 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
     setIsVerifying(true);
     try {
       const res = await apiClient.verifyMember(query);
+      if (res.multiple && res.candidates && res.candidates.length > 1) {
+        setCollisionCandidates(res.candidates);
+        return;
+      }
+
       if (res.success && res.data) {
+        setCollisionCandidates([]);
         setIdentifiedMember(res.data);
         setScreen(2); // Personalized welcome
       } else {
@@ -360,6 +367,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                     onChange={(e) => {
                       setQuery(e.target.value);
                       if (searchError) setSearchError('');
+                      if (collisionCandidates.length > 0) setCollisionCandidates([]);
                     }}
                     autoComplete="name"
                     autoCapitalize="characters"
@@ -385,6 +393,98 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                     </div>
                   )}
                 </div>
+
+                {/* Disambiguation: Multiple Members with Same Name */}
+                {collisionCandidates.length > 0 && (
+                  <div className="p-4 sm:p-5 rounded-sm bg-[#FFFFFF] border-2 border-[#20231F] shadow-poster space-y-3.5 animate-fadeIn text-left">
+                    <div className="flex items-start gap-2.5 pb-3 border-b-2 border-[#20231F]">
+                      <span className="w-8 h-8 rounded-sm bg-[#F4C542] border-2 border-[#20231F] flex items-center justify-center shrink-0 font-display text-sm font-bold text-[#20231F] shadow-poster-sm">
+                        ⚡
+                      </span>
+                      <div>
+                        <h4 className="font-display text-base uppercase text-[#20231F] tracking-wide leading-tight">
+                          Phát hiện {collisionCandidates.length} bạn trùng tên
+                        </h4>
+                        <p className="text-xs text-[#20231F]/80 font-body mt-0.5">
+                          CLB có {collisionCandidates.length} thành viên mang tên <strong className="font-bold text-[#B94D35]">"{query.trim()}"</strong>. Vui lòng bấm chọn đúng hồ sơ của bạn:
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2.5">
+                      {collisionCandidates.map((cand, idx) => {
+                        const candIsAlumni = cand.role === 'ALUMNI';
+                        const candGen = cand.generation
+                          ? (cand.generation.toLowerCase().startsWith('k') || cand.generation.toLowerCase().startsWith('gen')
+                              ? cand.generation.toUpperCase()
+                              : `KHÓA ${cand.generation}`)
+                          : 'CÓC SÀI GÒN';
+
+                        return (
+                          <button
+                            key={cand.id || `cand-${cand.mssv}-${idx}`}
+                            type="button"
+                            onClick={() => {
+                              setIdentifiedMember(cand);
+                              setCollisionCandidates([]);
+                              setScreen(2);
+                            }}
+                            className={`w-full text-left p-3 sm:p-3.5 rounded-sm border-2 border-[#20231F] transition-all group active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-poster-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5 cursor-pointer ${
+                              candIsAlumni
+                                ? 'bg-[#FFF8F6] hover:bg-[#FFEAE4]'
+                                : 'bg-[#F6FAF7] hover:bg-[#EBF5EE]'
+                            }`}
+                          >
+                            <div className="space-y-0.5 min-w-0">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <span className="font-display text-base uppercase text-[#20231F] tracking-wide group-hover:text-[#B94D35] transition-colors">
+                                  {cand.fullName}
+                                </span>
+                                <span className="text-[11px] font-mono font-bold px-1.5 py-0.5 rounded-sm bg-white border border-[#20231F]/40 text-[#20231F]">
+                                  {candGen}
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-2 text-xs font-mono text-[#20231F]/70 flex-wrap">
+                                <span className="font-bold text-[#20231F]">MSSV: {cand.mssv}</span>
+                                {cand.department && <span>• {cand.department}</span>}
+                              </div>
+                            </div>
+
+                            <div className="flex items-center justify-between sm:justify-end gap-2 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-[#20231F]/15">
+                              <span
+                                className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-sm text-xs font-mono font-bold uppercase border ${
+                                  candIsAlumni
+                                    ? 'bg-[#B94D35] text-white border-[#20231F]'
+                                    : 'bg-[#286640] text-white border-[#20231F]'
+                                }`}
+                              >
+                                <span>{candIsAlumni ? 'CỰU THÀNH VIÊN' : 'THÀNH VIÊN'}</span>
+                                <span>•</span>
+                                <span>{candIsAlumni ? '389k' : '349k'}</span>
+                              </span>
+                              <span className="w-8 h-8 rounded-sm bg-[#20231F] text-white flex items-center justify-center font-bold text-sm group-hover:bg-[#F4C542] group-hover:text-[#20231F] group-hover:border-2 group-hover:border-[#20231F] transition-all">
+                                →
+                              </span>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    <div className="pt-2 text-center border-t border-[#20231F]/15 space-y-1">
+                      <p className="text-[11px] font-mono text-[#20231F]/60">
+                        💡 Hoặc nhập trực tiếp <span className="font-bold text-[#20231F]">MSSV</span> để chính xác 100%.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => handleQuickBypass()}
+                        className="text-xs font-mono text-[#B94D35] hover:underline font-bold"
+                      >
+                        Không phải bạn ở trên? Tiếp tục đăng ký với tên "{query.trim()}" →
+                      </button>
+                    </div>
+                  </div>
+                )}
 
                 <button
                   type="submit"
