@@ -118,7 +118,7 @@ export const ExhibitionArchive: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-baseline justify-between border-b-2 border-csg-black pb-4 mb-16 sm:mb-24 gap-2">
         <div className="flex items-baseline gap-4">
           <span className="font-mono text-xs sm:text-sm font-bold text-csg-red tracking-widest uppercase">
-            02 // ARCHIVE
+            02 — ARCHIVE
           </span>
           <h2 className="text-2xl sm:text-4xl font-display font-extrabold uppercase tracking-tight text-csg-black">
             Kỷ Yếu Hình Ảnh 17 Năm
@@ -150,7 +150,7 @@ export const ExhibitionArchive: React.FC = () => {
             </div>
           </div>
           <div className="flex items-baseline justify-between font-mono text-xs text-csg-black/70 pt-1">
-            <span className="font-bold text-csg-black">{EXHIBITION_PHOTOS[0].plate} // {EXHIBITION_PHOTOS[0].era}</span>
+            <span className="font-bold text-csg-black">{EXHIBITION_PHOTOS[0].plate} • {EXHIBITION_PHOTOS[0].era}</span>
             <span>{EXHIBITION_PHOTOS[0].title} • {EXHIBITION_PHOTOS[0].year}</span>
           </div>
         </div>
@@ -227,7 +227,7 @@ export const ExhibitionArchive: React.FC = () => {
             </div>
           </div>
           <div className="flex items-baseline justify-between font-mono text-xs text-csg-black/70">
-            <span className="font-bold text-csg-black">{EXHIBITION_PHOTOS[3].plate} // {EXHIBITION_PHOTOS[3].era}</span>
+            <span className="font-bold text-csg-black">{EXHIBITION_PHOTOS[3].plate} • {EXHIBITION_PHOTOS[3].era}</span>
             <span>{EXHIBITION_PHOTOS[3].title} • {EXHIBITION_PHOTOS[3].year}</span>
           </div>
 
