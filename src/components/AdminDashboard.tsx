@@ -304,7 +304,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       setShowRejectModal(false);
     } catch (err: unknown) {
       const error = err as Error;
-      alert('Lỗi từ chối: ' + error.message);
+      setToast({ type: 'error', message: 'Lỗi từ chối: ' + error.message });
     }
   };
 
@@ -354,7 +354,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       loadAdminData();
     } catch (err: unknown) {
       const error = err as Error;
-      alert('Lỗi đồng bộ: ' + error.message);
+      setToast({ type: 'error', message: 'Lỗi đồng bộ: ' + error.message });
     } finally {
       setIsSyncingSheets(false);
     }
@@ -367,7 +367,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       setPublicWishes(prev => prev.map(w => w.id === wishId ? { ...w, moderationStatus: status } : w));
     } catch (err: unknown) {
       const error = err as Error;
-      alert('Lỗi kiểm duyệt: ' + error.message);
+      setToast({ type: 'error', message: 'Lỗi kiểm duyệt: ' + error.message });
     }
   };
 

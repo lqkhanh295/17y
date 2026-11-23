@@ -9,6 +9,7 @@ import { apiClient } from '../services/apiClient';
 import { compressImage } from '../utils/imageCompressor';
 import { formatTransferContent } from '../utils/formatters';
 import { createGoogleCalendarUrl, downloadIcsFile } from '../utils/calendarUtils';
+import { NotificationModal } from './NotificationModal';
 
 interface PaymentLookupModalProps {
   isOpen: boolean;
@@ -35,6 +36,18 @@ export const PaymentLookupModal: React.FC<PaymentLookupModalProps> = ({
   const [copiedBank, setCopiedBank] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successSubmitted, setSuccessSubmitted] = useState(false);
+
+  // In-app notification popup state
+  const [notification, setNotification] = useState<{
+    isOpen: boolean;
+    type?: 'warning' | 'error' | 'info' | 'success';
+    title?: string;
+    message: string;
+  }>({
+    isOpen: false,
+    type: 'error',
+    message: ''
+  });
 
   if (!isOpen) return null;
 
@@ -94,7 +107,12 @@ export const PaymentLookupModal: React.FC<PaymentLookupModalProps> = ({
       if (onPaymentSuccess) onPaymentSuccess();
     } catch (err: unknown) {
       const error = err as Error;
-      alert(error.message || 'Lỗi khi cập nhật biên lai.');
+      setNotification({
+        isOpen: true,
+        type: 'error',
+        title: 'Lỗi cập nhật biên lai',
+        message: error.message || 'Không thể cập nhật biên lai. Vui lòng thử lại sau.'
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -726,6 +744,14 @@ export const PaymentLookupModal: React.FC<PaymentLookupModalProps> = ({
           </div>
         </div>
       </div>
+
+      <NotificationModal
+        isOpen={notification.isOpen}
+        type={notification.type}
+        title={notification.title}
+        message={notification.message}
+        onClose={() => setNotification(prev => ({ ...prev, isOpen: false }))}
+      />
     </div>
   );
 };

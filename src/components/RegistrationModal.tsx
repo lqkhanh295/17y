@@ -11,6 +11,7 @@ import { audioService } from '../services/audioService';
 import { compressImage } from '../utils/imageCompressor';
 import { formatTransferContent } from '../utils/formatters';
 import { CelebrationStage } from './CelebrationStage';
+import { NotificationModal } from './NotificationModal';
 
 interface RegistrationModalProps {
   isOpen: boolean;
@@ -70,6 +71,21 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
   const [submitStatusText, setSubmitStatusText] = useState('');
   const [completedRecord, setCompletedRecord] = useState<RegistrationRecord | null>(null);
   const screensContainerRef = useRef<HTMLDivElement>(null);
+
+  // Custom in-app notification popup state
+  const [notification, setNotification] = useState<{
+    isOpen: boolean;
+    type?: 'warning' | 'error' | 'info' | 'success';
+    title?: string;
+    message: string;
+    confirmText?: string;
+    actionText?: string;
+    onAction?: () => void;
+  }>({
+    isOpen: false,
+    type: 'warning',
+    message: ''
+  });
 
   useEffect(() => {
     if (!isOpen) return;
@@ -269,7 +285,15 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
         try {
           const existingByMssv = await apiClient.lookupRegistration(identifiedMember.mssv.trim());
           if (existingByMssv && existingByMssv.status !== 'REJECTED') {
-            alert(`Mã sinh viên "${identifiedMember.mssv}" đã được dùng để đăng ký vé ${existingByMssv.ticketCode} (Họ tên: ${existingByMssv.fullName}).\n\nMỗi thành viên chỉ được đăng ký một vé.`);
+            setNotification({
+              isOpen: true,
+              type: 'warning',
+              title: 'Mã sinh viên đã được đăng ký',
+              message: `Mã sinh viên "${identifiedMember.mssv}" đã được dùng để đăng ký vé ${existingByMssv.ticketCode} (Họ tên: ${existingByMssv.fullName}).\n\nMỗi thành viên chỉ được đăng ký một vé duy nhất.`,
+              confirmText: 'ĐÃ HIỂU',
+              actionText: onOpenPortal ? 'TRA CỨU VÉ NGAY' : undefined,
+              onAction: onOpenPortal ? () => { onClose(); onOpenPortal(); } : undefined
+            });
             setIsCheckingStep3(false);
             return;
           }
@@ -287,7 +311,15 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
               ...prev,
               gmail: `Địa chỉ Gmail này đã được dùng cho vé ${existingByEmail.ticketCode} (${existingByEmail.fullName}).`
             }));
-            alert(`Địa chỉ Gmail "${gmail.trim()}" đã được dùng để đăng ký vé ${existingByEmail.ticketCode} (Họ tên: ${existingByEmail.fullName}).\n\nVui lòng sử dụng Gmail khác hoặc tra cứu vé đã đăng ký.`);
+            setNotification({
+              isOpen: true,
+              type: 'warning',
+              title: 'Gmail đã được đăng ký',
+              message: `Địa chỉ Gmail "${gmail.trim()}" đã được dùng để đăng ký vé ${existingByEmail.ticketCode} (Họ tên: ${existingByEmail.fullName}).\n\nVui lòng kiểm tra lại địa chỉ Gmail hoặc tra cứu vé đã đăng ký.`,
+              confirmText: 'KIỂM TRA LẠI',
+              actionText: onOpenPortal ? 'TRA CỨU VÉ NGAY' : undefined,
+              onAction: onOpenPortal ? () => { onClose(); onOpenPortal(); } : undefined
+            });
             setIsCheckingStep3(false);
             return;
           }
@@ -305,7 +337,15 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
               ...prev,
               phone: `Số điện thoại này đã được dùng cho vé ${existingByPhone.ticketCode} (${existingByPhone.fullName}).`
             }));
-            alert(`Số điện thoại "${phone.trim()}" đã được dùng để đăng ký vé ${existingByPhone.ticketCode} (Họ tên: ${existingByPhone.fullName}).\n\nVui lòng kiểm tra lại số điện thoại hoặc tra cứu vé đã đăng ký.`);
+            setNotification({
+              isOpen: true,
+              type: 'warning',
+              title: 'Số điện thoại đã được đăng ký',
+              message: `Số điện thoại "${phone.trim()}" đã được dùng để đăng ký vé ${existingByPhone.ticketCode} (Họ tên: ${existingByPhone.fullName}).\n\nVui lòng kiểm tra lại số điện thoại hoặc tra cứu vé đã đăng ký.`,
+              confirmText: 'KIỂM TRA LẠI',
+              actionText: onOpenPortal ? 'TRA CỨU VÉ NGAY' : undefined,
+              onAction: onOpenPortal ? () => { onClose(); onOpenPortal(); } : undefined
+            });
             setIsCheckingStep3(false);
             return;
           }
@@ -387,9 +427,17 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
       const error = err as Error;
       const msg = error.message || 'Lỗi khi gửi đăng ký. Vui lòng thử lại.';
       if (msg.includes('đã được đăng ký') || msg.includes('đã được sử dụng') || msg.includes('trùng lặp') || msg.includes('Conflict')) {
-        alert(msg);
+        setNotification({
+          isOpen: true,
+          type: 'warning',
+          title: 'Thông tin đã được sử dụng',
+          message: msg,
+          confirmText: 'ĐÃ HIỂU',
+          actionText: onOpenPortal ? 'TRA CỨU VÉ NGAY' : undefined,
+          onAction: onOpenPortal ? () => { onClose(); onOpenPortal(); } : undefined
+        });
         apiClient
-          .lookupRegistration(identifiedMember.mssv || gmail || phone)
+          .lookupRegistration(identifiedMember?.mssv || gmail || phone)
           .then((rec) => {
             if (rec && rec.status !== 'REJECTED') {
               setAlreadyRegisteredRecord(rec);
@@ -398,7 +446,13 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
           })
           .catch(() => {});
       } else {
-        alert(msg);
+        setNotification({
+          isOpen: true,
+          type: 'error',
+          title: 'Lỗi gửi đăng ký',
+          message: msg,
+          confirmText: 'ĐÓNG'
+        });
       }
     } finally {
       setIsSubmitting(false);
@@ -425,7 +479,8 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
   }
 
   return (
-    <div className="fixed inset-0 z-[70] flex items-center justify-center p-2 sm:p-5 bg-[#20231F]/90 backdrop-blur-md overflow-hidden animate-fadeIn pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)]">
+    <>
+      <div className="fixed inset-0 z-[70] flex items-center justify-center p-2 sm:p-5 bg-[#20231F]/90 backdrop-blur-md overflow-hidden animate-fadeIn pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)]">
       <div
         className="relative w-full max-w-2xl max-h-[96dvh] sm:max-h-[95vh] my-auto bg-[#F4EEDF] border-2 border-[#20231F] rounded-sm shadow-poster-lg overflow-hidden flex flex-col animate-paper-unfold"
         onClick={(e) => e.stopPropagation()}
@@ -1459,5 +1514,18 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
         </div>
       </div>
     </div>
+
+    {/* Custom Retro Editorial Notification Modal */}
+    <NotificationModal
+      isOpen={notification.isOpen}
+      type={notification.type}
+      title={notification.title}
+      message={notification.message}
+      confirmText={notification.confirmText}
+      actionText={notification.actionText}
+      onAction={notification.onAction}
+      onClose={() => setNotification(prev => ({ ...prev, isOpen: false }))}
+    />
+  </>
   );
 };
