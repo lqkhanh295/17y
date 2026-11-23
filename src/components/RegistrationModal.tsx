@@ -503,19 +503,19 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                 </div>
               </div>
 
-              <div className="flex gap-3 pt-2">
+              <div className="flex flex-col-reverse sm:flex-row gap-2.5 sm:gap-3 pt-2">
                 <button
                   type="button"
                   onClick={() => setScreen(1)}
-                  className="btn-editorial-secondary flex-1 py-3.5 min-h-[44px] rounded-sm font-bold text-xs uppercase active:scale-[0.98] flex items-center justify-center gap-1.5"
+                  className="btn-editorial-secondary w-full sm:w-auto sm:px-6 py-3.5 min-h-[48px] rounded-sm font-display text-base tracking-wider uppercase active:scale-[0.98] flex items-center justify-center gap-2 shrink-0 whitespace-nowrap shadow-poster-sm"
                 >
-                  <ArrowLeftIcon size={14} />
+                  <ArrowLeftIcon size={16} />
                   <span>Đổi người khác</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setScreen(3)}
-                  className="btn-editorial-primary flex-2 py-3.5 min-h-[48px] px-6 rounded-sm font-display text-xl tracking-wider uppercase flex items-center justify-center gap-2 active:scale-[0.98]"
+                  className="btn-editorial-primary flex-1 py-3.5 min-h-[48px] px-6 rounded-sm font-display text-base sm:text-lg tracking-wider uppercase flex items-center justify-center gap-2 active:scale-[0.98] shadow-poster-sm"
                 >
                   <span>TIẾP TỤC ĐẾN BUỔI TIỆC</span>
                   <ArrowUpRightIcon size={18} />
@@ -659,13 +659,13 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                 </div>
               </div>
 
-              <div className="flex gap-3 pt-2">
+              <div className="flex flex-col-reverse sm:flex-row gap-2.5 sm:gap-3 pt-2">
                 <button
                   type="button"
                   onClick={() => setScreen(2)}
-                  className="btn-editorial-secondary flex-1 py-3 min-h-[44px] rounded-sm font-bold text-xs uppercase active:scale-[0.98] flex items-center justify-center gap-1.5"
+                  className="btn-editorial-secondary w-full sm:w-auto sm:px-6 py-3.5 min-h-[48px] rounded-sm font-display text-base tracking-wider uppercase active:scale-[0.98] flex items-center justify-center gap-2 shrink-0 whitespace-nowrap shadow-poster-sm"
                 >
-                  <ArrowLeftIcon size={14} />
+                  <ArrowLeftIcon size={16} />
                   <span>Quay lại</span>
                 </button>
                 <button
@@ -675,7 +675,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                       setScreen(4); // Go to payment
                     }
                   }}
-                  className="btn-editorial-primary flex-2 py-3 min-h-[48px] rounded-sm font-display text-xl uppercase tracking-wider active:scale-[0.98] flex items-center justify-center gap-2"
+                  className="btn-editorial-primary flex-1 py-3.5 min-h-[48px] px-6 rounded-sm font-display text-base sm:text-lg tracking-wider uppercase flex items-center justify-center gap-2 active:scale-[0.98] shadow-poster-sm"
                 >
                   <span>TIẾP TỤC: ĐÓNG PHÍ THAM DỰ</span>
                   <ArrowRightIcon size={18} />
@@ -892,13 +892,13 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                 </div>
               </div>
 
-              <div className="flex gap-3 pt-2">
+              <div className="flex flex-col-reverse sm:flex-row gap-2.5 sm:gap-3 pt-2">
                 <button
                   type="button"
                   onClick={() => setScreen(3)}
-                  className="btn-editorial-secondary flex-1 py-3 min-h-[44px] rounded-sm font-bold text-xs uppercase active:scale-[0.98] flex items-center justify-center gap-1.5"
+                  className="btn-editorial-secondary w-full sm:w-auto sm:px-6 py-3.5 min-h-[48px] rounded-sm font-display text-base tracking-wider uppercase active:scale-[0.98] flex items-center justify-center gap-2 shrink-0 whitespace-nowrap shadow-poster-sm"
                 >
-                  <ArrowLeftIcon size={14} />
+                  <ArrowLeftIcon size={16} />
                   <span>Quay lại</span>
                 </button>
                 <button
@@ -908,7 +908,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                       setScreen(5); // Go to review
                     }
                   }}
-                  className="btn-editorial-primary flex-2 py-3 min-h-[48px] rounded-sm font-display text-xl uppercase tracking-wider active:scale-[0.98] flex items-center justify-center gap-2"
+                  className="btn-editorial-primary flex-1 py-3.5 min-h-[48px] px-6 rounded-sm font-display text-base sm:text-lg tracking-wider uppercase flex items-center justify-center gap-2 active:scale-[0.98] shadow-poster-sm"
                 >
                   <span>KIỂM TRA & XÁC NHẬN</span>
                   <ArrowRightIcon size={18} />
@@ -1005,20 +1005,20 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                 Thông tin đăng ký và xác nhận đóng phí tham gia sẽ được Ban Tổ Chức kiểm tra và liên hệ thông báo sớm nhất đến bạn.
               </div>
 
-              <div className="flex gap-3 pt-2">
+              <div className="flex flex-col-reverse sm:flex-row gap-2.5 sm:gap-3 pt-2">
                 <button
                   type="button"
                   onClick={() => setScreen(4)}
-                  className="btn-editorial-secondary flex-1 py-3.5 min-h-[44px] rounded-sm font-bold text-xs uppercase active:scale-[0.98] flex items-center justify-center gap-1.5"
+                  className="btn-editorial-secondary w-full sm:w-auto sm:px-6 py-3.5 min-h-[48px] rounded-sm font-display text-base tracking-wider uppercase active:scale-[0.98] flex items-center justify-center gap-2 shrink-0 whitespace-nowrap shadow-poster-sm"
                 >
-                  <ArrowLeftIcon size={14} />
+                  <ArrowLeftIcon size={16} />
                   <span>Quay lại</span>
                 </button>
                 <button
                   type="button"
                   disabled={isSubmitting}
                   onClick={handleFinalSubmit}
-                  className="btn-editorial-primary flex-2 py-3.5 min-h-[48px] px-4 sm:px-6 rounded-sm font-display text-lg sm:text-2xl tracking-wider uppercase flex items-center justify-center gap-2 active:scale-[0.98] disabled:opacity-85 disabled:cursor-wait"
+                  className="btn-editorial-primary flex-1 py-3.5 min-h-[48px] px-4 sm:px-6 rounded-sm font-display text-base sm:text-xl tracking-wider uppercase flex items-center justify-center gap-2 active:scale-[0.98] disabled:opacity-85 disabled:cursor-wait shadow-poster-sm"
                 >
                   {isSubmitting ? (
                     <div className="flex items-center gap-2">
