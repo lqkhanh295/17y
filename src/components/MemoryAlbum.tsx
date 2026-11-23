@@ -128,7 +128,7 @@ export const MemoryAlbum: React.FC = () => {
       <div className="relative">
         <div className="flex items-center gap-3 border-b border-csg-black/15 pb-2 mb-8 sm:mb-12">
           <span className="font-mono text-xs uppercase tracking-widest text-csg-black/60 font-semibold">
-            TRANG 01 // NHỮNG BƯỚC CHÂN ĐẦU TIÊN
+            TRANG 01 — NHỮNG BƯỚC CHÂN ĐẦU TIÊN
           </span>
           <span className="text-csg-black/30">•</span>
           <span className="font-handwriting text-xl text-csg-red">
@@ -188,7 +188,7 @@ export const MemoryAlbum: React.FC = () => {
       <div className="relative">
         <div className="flex items-center justify-between border-b border-csg-black/15 pb-2 mb-8 sm:mb-12">
           <span className="font-mono text-xs uppercase tracking-widest text-csg-black/60 font-semibold">
-            TRANG 02 // SẮC ÁO VÀNG QUA NHỮNG MIỀN ĐẤT
+            TRANG 02 — SẮC ÁO VÀNG QUA NHỮNG MIỀN ĐẤT
           </span>
           <span className="px-2.5 py-0.5 bg-csg-yellow text-csg-black border border-csg-black font-mono text-[11px] font-bold uppercase -rotate-1">
             ★ TEAMBUILDING
@@ -231,7 +231,7 @@ export const MemoryAlbum: React.FC = () => {
       <div className="relative">
         <div className="flex items-center gap-3 border-b border-csg-black/15 pb-2 mb-8 sm:mb-12">
           <span className="font-mono text-xs uppercase tracking-widest text-csg-black/60 font-semibold">
-            TRANG 03 // NHỮNG ĐÊM CHÁY HẾT MÌNH
+            TRANG 03 — NHỮNG ĐÊM CHÁY HẾT MÌNH
           </span>
           <span className="text-csg-black/30">•</span>
           <span className="font-handwriting text-xl text-csg-black/75">
@@ -285,7 +285,7 @@ export const MemoryAlbum: React.FC = () => {
       <div className="relative">
         <div className="flex items-center justify-between border-b border-csg-black/15 pb-2 mb-8 sm:mb-12">
           <span className="font-mono text-xs uppercase tracking-widest text-csg-black/60 font-semibold">
-            TRANG 04 // 17 NĂM MỘT MÁI NHÀ
+            TRANG 04 — 17 NĂM MỘT MÁI NHÀ
           </span>
           <span className="font-editorial italic text-sm text-csg-black/60 hidden sm:inline">
             "Những người xa lạ hoá người nhà"
