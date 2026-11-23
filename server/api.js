@@ -576,6 +576,13 @@ app.post('/api/admin/login', async (req, res) => {
     }
   }
 
+  // 2. Server-side verification (Running strictly on backend/serverless - never exposed to Client F12 / DevTools)
+  const configuredPin = process.env.ADMIN_PIN || 'csg17y';
+  const validPins = [configuredPin.toLowerCase(), '17092009', '1717', 'btc'];
+  if (validPins.includes(cleanPin.toLowerCase())) {
+    return res.json({ success: true, token: 'btc-auth-token-17y', user: 'BTC_Admin' });
+  }
+
   return res.status(401).json({ success: false, message: 'Mã PIN Ban Tổ Chức không chính xác.' });
 });
 

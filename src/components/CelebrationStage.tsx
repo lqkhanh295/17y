@@ -696,8 +696,19 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
           </button>
         </div>
 
-        {/* Right: Sổ Lời Chúc + Utilities + Close */}
+        {/* Right: Daily Hearts Quota + Sổ Lời Chúc + Utilities + Close */}
         <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+          {/* Daily Hearts Quota Indicator Pill */}
+          <div 
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-rose-950/70 border border-rose-500/40 text-rose-300 font-mono text-[11px] sm:text-xs shadow-xs"
+            title={`Hôm nay bạn còn ${dailyHeartsRemaining}/12 lượt thả tim • Mỗi ngày được thả tối đa 12 tim`}
+          >
+            <HeartIcon size={13} className="text-rose-400 fill-rose-400 animate-pulse shrink-0" />
+            <span className="hidden sm:inline text-rose-200/80 font-sans text-[11px]">Hôm nay:</span>
+            <span className="font-bold text-rose-300">{dailyHeartsRemaining}/12</span>
+            <span className="hidden md:inline text-rose-300/80">tim</span>
+          </div>
+
           {/* Sổ Lời Chúc Drawer Trigger */}
           <button
             type="button"
@@ -1317,9 +1328,16 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
                 <h3 className="font-display font-black text-sm sm:text-base uppercase tracking-wider text-white">
                   SỔ LỜI CHÚC CÓC SÀI GÒN 17Y
                 </h3>
-                <span className="text-[11px] font-mono text-amber-300/80">
-                  {allCharacters.length} lời chúc từ các thế hệ thành viên
-                </span>
+                <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                  <span className="text-[11px] font-mono text-amber-300/80">
+                    {allCharacters.length} lời chúc
+                  </span>
+                  <span className="text-white/30 text-[10px]">•</span>
+                  <span className="inline-flex items-center gap-1 text-[10px] font-mono text-rose-300 bg-rose-950/60 px-2 py-0.5 rounded-full border border-rose-500/30">
+                    <HeartIcon size={10} className="text-rose-400 fill-rose-400" />
+                    <span>Còn {dailyHeartsRemaining}/12 tim hôm nay</span>
+                  </span>
+                </div>
               </div>
             </div>
             <button
