@@ -14,6 +14,27 @@ export default defineConfig({
   ],
   server: {
     port: 3000,
-    open: true
+    open: true,
+    watch: {
+      ignored: [
+        '**/video/**',
+        '**/Music/**',
+        '**/picture/**',
+        '**/scratch*/**',
+        '**/.git/**',
+        '**/*.mp4',
+        '**/*.mp3',
+        '**/*.wav',
+        '**/*.mov',
+        '**/*.avi',
+        '**/*.ttf',
+        '**/*.otf',
+        '**/*.woff*',
+        '**/*.docx',
+        '**/*.xlsx',
+        '**/*.pdf',
+        '**/*.zip'
+      ]
+    }
   }
 });

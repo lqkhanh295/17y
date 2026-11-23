@@ -106,7 +106,7 @@ export const EmailPreviewModal: React.FC<EmailPreviewModalProps> = ({
                     : 'text-[#A8A8A8] hover:text-white'
                 }`}
               >
-                3. Hoàn Tất 100% (Check-in QR)
+                3. Hoàn Tất 100% (Xác nhận tham dự)
               </button>
             </div>
           </div>

@@ -114,23 +114,39 @@ ALTER TABLE public.wishes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.characters ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.audit_logs ENABLE ROW LEVEL SECURITY;
 
-DROP POLICY IF EXISTS "Public full access on members" ON public.members;
-CREATE POLICY "Public full access on members" ON public.members FOR ALL USING (true) WITH CHECK (true);
+-- HARDENED ROW LEVEL SECURITY POLICIES
+ALTER TABLE public.members ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.memories ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.registrations ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.wishes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.characters ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.audit_logs ENABLE ROW LEVEL SECURITY;
 
-DROP POLICY IF EXISTS "Public full access on memories" ON public.memories;
-CREATE POLICY "Public full access on memories" ON public.memories FOR ALL USING (true) WITH CHECK (true);
+-- 1. Public read-only for directory and public assets
+DROP POLICY IF EXISTS "Allow public read-only on members" ON public.members;
+CREATE POLICY "Allow public read-only on members" ON public.members FOR SELECT TO anon, authenticated USING (true);
 
-DROP POLICY IF EXISTS "Public full access on registrations" ON public.registrations;
-CREATE POLICY "Public full access on registrations" ON public.registrations FOR ALL USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "Allow public read-only on memories" ON public.memories;
+CREATE POLICY "Allow public read-only on memories" ON public.memories FOR SELECT TO anon, authenticated USING (true);
 
-DROP POLICY IF EXISTS "Public full access on wishes" ON public.wishes;
-CREATE POLICY "Public full access on wishes" ON public.wishes FOR ALL USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "Allow public read-only on characters" ON public.characters;
+CREATE POLICY "Allow public read-only on characters" ON public.characters FOR SELECT TO anon, authenticated USING (true);
 
-DROP POLICY IF EXISTS "Public full access on characters" ON public.characters;
-CREATE POLICY "Public full access on characters" ON public.characters FOR ALL USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "Allow public read-only on approved wishes" ON public.wishes;
+CREATE POLICY "Allow public read-only on approved wishes" ON public.wishes FOR SELECT TO anon, authenticated USING ("moderationStatus" = 'APPROVED' AND "isPublic" = true);
 
-DROP POLICY IF EXISTS "Public full access on audit_logs" ON public.audit_logs;
-CREATE POLICY "Public full access on audit_logs" ON public.audit_logs FOR ALL USING (true) WITH CHECK (true);
+-- 2. Sensitive tables (registrations, audit_logs) are completely DENIED for anon/public direct access.
+-- All registration, payment updates, and audit logging must be executed strictly through the Backend server via SUPABASE_SECRET_KEY (service_role).
+
+-- 3. Storage bucket 'receipts' policies for attendee payment receipt uploads
+DROP POLICY IF EXISTS "Allow public uploads to receipts" ON storage.objects;
+CREATE POLICY "Allow public uploads to receipts" ON storage.objects FOR INSERT TO public WITH CHECK (bucket_id = 'receipts');
+
+DROP POLICY IF EXISTS "Allow public read from receipts" ON storage.objects;
+CREATE POLICY "Allow public read from receipts" ON storage.objects FOR SELECT TO public USING (bucket_id = 'receipts');
+
+DROP POLICY IF EXISTS "Allow public update in receipts" ON storage.objects;
+CREATE POLICY "Allow public update in receipts" ON storage.objects FOR UPDATE TO public USING (bucket_id = 'receipts');
 
 
 -- SEED MEMBERS

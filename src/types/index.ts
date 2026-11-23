@@ -1,4 +1,4 @@
-export type MemberRole = 'ACTIVE' | 'ALUMNI';
+export type MemberRole = 'ACTIVE' | 'ALUMNI' | 'GUEST';
 
 export interface MemberDirectoryItem {
   id: string;

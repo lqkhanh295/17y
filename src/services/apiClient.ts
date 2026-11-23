@@ -51,6 +51,18 @@ function deduplicateByMssv<T extends { mssv?: string; id?: string }>(list: T[]):
   return result;
 }
 
+// Helper: Get Admin Authorization headers
+export function getAdminAuthHeaders(): Record<string, string> {
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (typeof window !== 'undefined') {
+    const token = sessionStorage.getItem('csg_admin_token');
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+  }
+  return headers;
+}
+
 export const apiClient = {
   // Helper: Upload image to Supabase Storage bucket 'receipts' with native high-speed blob decoding
   async uploadReceiptToStorage(fileOrDataUrl: string, prefix = 'receipt'): Promise<string> {
@@ -168,6 +180,7 @@ export const apiClient = {
     candidates?: MemberDirectoryItem[];
     data?: MemberDirectoryItem;
     hasExistingRegistration?: boolean;
+    existingRecord?: RegistrationRecord;
     existingRegistrationId?: string;
     message?: string;
   }> {
@@ -181,6 +194,7 @@ export const apiClient = {
       candidates?: MemberDirectoryItem[];
       data?: MemberDirectoryItem;
       hasExistingRegistration?: boolean;
+      existingRecord?: RegistrationRecord;
       existingRegistrationId?: string;
       message?: string;
     }>(`${API_BASE}/members/verify`, {
@@ -209,17 +223,18 @@ export const apiClient = {
         if (mssvMatch) {
           const { data: existingRegs } = await supabase
             .from('registrations')
-            .select('id, mssv')
+            .select('*')
             .ilike('mssv', mssvMatch.mssv || '');
-          const existing = existingRegs && existingRegs.length > 0 ? existingRegs[0] : null;
+          const existing = existingRegs?.find(r => r.status !== 'REJECTED') || null;
 
           return {
             success: true,
             multiple: false,
             data: mssvMatch,
             hasExistingRegistration: !!existing,
+            existingRecord: existing as unknown as RegistrationRecord,
             existingRegistrationId: existing?.id || undefined,
-            message: 'Xác thực MSSV thành công.'
+            message: existing ? 'Hồ sơ này đã đăng ký vé.' : 'Xác thực MSSV thành công.'
           };
         }
 
@@ -240,17 +255,18 @@ export const apiClient = {
           const singleMatch = exactNameMatches[0];
           const { data: existingRegs } = await supabase
             .from('registrations')
-            .select('id, mssv')
+            .select('*')
             .ilike('mssv', singleMatch.mssv || '');
-          const existing = existingRegs && existingRegs.length > 0 ? existingRegs[0] : null;
+          const existing = existingRegs?.find(r => r.status !== 'REJECTED') || null;
 
           return {
             success: true,
             multiple: false,
             data: singleMatch,
             hasExistingRegistration: !!existing,
+            existingRecord: existing as unknown as RegistrationRecord,
             existingRegistrationId: existing?.id || undefined,
-            message: 'Xác thực danh tính thành công từ cơ sở dữ liệu.'
+            message: existing ? 'Hồ sơ này đã đăng ký vé.' : 'Xác thực danh tính thành công từ cơ sở dữ liệu.'
           };
         }
 
@@ -406,8 +422,8 @@ export const apiClient = {
     }
 
     // Direct Supabase fallback registration
-    const isAlumni = (data.role === 'ALUMNI');
-    const totalRequired = data.totalRequired || (isAlumni ? 389000 : 349000);
+    const isHighTier = (data.role === 'ALUMNI' || data.role === 'GUEST');
+    const totalRequired = data.totalRequired || (isHighTier ? 389000 : 349000);
     const plan = data.plan || 'FULL';
     let paidAmount = totalRequired;
     let remainingAmount = 0;
@@ -421,6 +437,27 @@ export const apiClient = {
       paidAmount = 100000;
       remainingAmount = totalRequired - 100000;
       paymentStatus = 'PARTIAL';
+    }
+
+    // Direct duplicate verification
+    try {
+      const gClean = (data.gmail || '').trim().toLowerCase();
+      const pClean = (data.personalPhone || '').trim();
+      const conditions: string[] = [`mssv.ilike.${mssvClean}`];
+      if (gClean) conditions.push(`gmail.ilike.${gClean}`);
+      if (pClean) conditions.push(`personalPhone.eq.${pClean}`);
+
+      const { data: existingList } = await supabase
+        .from('registrations')
+        .select('*')
+        .or(conditions.join(','));
+
+      const validDup = existingList?.find((r: any) => r.status !== 'REJECTED');
+      if (validDup) {
+        throw new Error(`Hồ sơ với MSSV hoặc Email này đã được đăng ký trước đó (Mã vé: ${validDup.ticketCode || 'Chờ duyệt'}). Vui lòng vào mục Tra cứu vé để xem chi tiết.`);
+      }
+    } catch (checkErr: any) {
+      if (checkErr.message?.includes('đã được đăng ký')) throw checkErr;
     }
 
     const regId = 'CSG17-' + Math.floor(100000 + Math.random() * 900000);
@@ -440,7 +477,7 @@ export const apiClient = {
       memberId: data.memberId || `m-custom-${Date.now()}`,
       fullName: data.fullName || 'Người bạn Cóc Vàng',
       mssv: mssvClean,
-      role: isAlumni ? 'ALUMNI' : 'ACTIVE',
+      role: data.role || (isHighTier ? (data.role === 'GUEST' ? 'GUEST' : 'ALUMNI') : 'ACTIVE'),
       honorific: data.honorific || 'Bạn',
       gmail: data.gmail || '',
       personalPhone: data.personalPhone || '',
@@ -511,11 +548,11 @@ export const apiClient = {
   async lookupRegistration(query: string) {
     if (!query || !query.trim()) throw new Error('Vui lòng nhập MSSV hoặc Số điện thoại.');
 
-    const res = await safeFetchJson<{ success: boolean; data: RegistrationRecord; message?: string }>(
+    const res = await safeFetchJson<{ success: boolean; found?: boolean; data: RegistrationRecord | null; message?: string }>(
       `${API_BASE}/registrations/lookup?query=${encodeURIComponent(query.trim())}`
     );
 
-    if (res && res.success && res.data) return res.data;
+    if (res && res.success && res.data && res.found !== false) return res.data;
 
     // Direct Supabase lookup
     const qClean = query.trim().toLowerCase();
@@ -538,7 +575,7 @@ export const apiClient = {
   },
 
   // 5. Submit Phase 2 payment
-  async submitBalancePayment(id: string, receiptPhase2Url: string) {
+  async submitBalancePayment(id: string, receiptPhase2Url: string, mssv?: string, phone?: string) {
     const storedReceipt = await this.uploadReceiptToStorage(receiptPhase2Url, `rec_phase2_${id}`);
 
     const res = await safeFetchJson<{ success: boolean; data: RegistrationRecord; message?: string }>(
@@ -546,41 +583,14 @@ export const apiClient = {
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ receiptPhase2Url: storedReceipt })
+        body: JSON.stringify({ receiptPhase2Url: storedReceipt, mssv, phone })
       }
     );
 
     if (res && res.success && res.data) {
       return res.data;
     }
-
-    // Direct Supabase update
-    const { data: existing } = await supabase.from('registrations').select('*').eq('id', id).maybeSingle();
-    if (!existing) throw new Error('Không tìm thấy hồ sơ để cập nhật số dư.');
-
-    const history = Array.isArray(existing.paymentHistory) ? [...(existing.paymentHistory as any[])] : [];
-    const phase2Amount = (existing.remainingAmount && existing.remainingAmount > 0)
-      ? existing.remainingAmount
-      : ((existing.totalRequired ?? 0) - (existing.paidAmount ?? 0));
-
-    history.push({
-      id: 'pay-' + Date.now(),
-      phase: 2,
-      amount: phase2Amount,
-      receiptUrl: storedReceipt,
-      submittedAt: new Date().toISOString(),
-      status: 'PENDING'
-    });
-
-    const updates = {
-      receiptPhase2Url: storedReceipt,
-      paymentHistory: history,
-      status: 'PENDING',
-      paymentStatus: 'PENDING'
-    };
-
-    await supabase.from('registrations').update(updates as any).eq('id', id);
-    return { ...existing, ...updates } as unknown as RegistrationRecord;
+    throw new Error(res?.message || 'Không thể cập nhật biên lai thanh toán. Vui lòng kiểm tra lại.');
   },
 
   // 6. Public wishes & Stage characters
@@ -721,44 +731,30 @@ export const apiClient = {
 
     const cleanPin = pin.trim();
 
-    // 1. Try backend API first
-    const res = await safeFetchJson<{ success: boolean; message?: string }>(`${API_BASE}/admin/login`, {
+    const res = await safeFetchJson<{ success: boolean; token?: string; user?: string; message?: string }>(`${API_BASE}/admin/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ pin: cleanPin })
     });
 
-    if (res && res.success) return res;
-
-    // 2. Direct Supabase DB verification (RPC verify_admin_pin)
-    try {
-      const { data: isValid, error } = await (supabase as any).rpc('verify_admin_pin', { input_pin: cleanPin });
-      if (!error && isValid) {
-        return { success: true, message: 'Đăng nhập quản trị thành công từ Database.' };
+    if (res && res.success && res.token) {
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem('csg_admin_token', res.token);
       }
-    } catch {
-      // ignore
+      return res;
     }
 
-    throw new Error('Mã PIN không chính xác. Quyền truy cập bị từ chối.');
+    throw new Error(res?.message || 'Mã PIN không chính xác. Quyền truy cập bị từ chối.');
   },
 
   async getAdminRegistrations() {
-    const res = await safeFetchJson<{ success: boolean; data: RegistrationRecord[]; wishes: any[]; auditLogs: any[] }>(`${API_BASE}/admin/registrations`);
+    const res = await safeFetchJson<{ success: boolean; data: RegistrationRecord[]; wishes: any[]; auditLogs: any[] }>(
+      `${API_BASE}/admin/registrations`,
+      { headers: getAdminAuthHeaders() }
+    );
     if (res && res.success) return res;
 
-    const [regsRes, wishesRes, logsRes] = await Promise.all([
-      supabase.from('registrations').select('*').order('createdAt', { ascending: false }),
-      supabase.from('wishes').select('*').order('createdAt', { ascending: false }),
-      supabase.from('audit_logs').select('*').order('timestamp', { ascending: false })
-    ]);
-
-    return {
-      success: true,
-      data: (regsRes.data || []) as unknown as RegistrationRecord[],
-      wishes: wishesRes.data || [],
-      auditLogs: logsRes.data || []
-    };
+    throw new Error('Không thể tải dữ liệu quản trị. Phiên đăng nhập có thể đã hết hạn.');
   },
 
   async updateRegistrationStatus(id: string, data: { status?: string; isApproved100?: boolean; action?: string; adminUser?: string; templateType?: string }) {
@@ -766,61 +762,12 @@ export const apiClient = {
       `${API_BASE}/admin/registrations/${id}/status`,
       {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAdminAuthHeaders(),
         body: JSON.stringify(data)
       }
     );
     if (res && res.success && res.data) return res.data;
-
-    // Direct Supabase update
-    const { data: reg } = await supabase.from('registrations').select('*').eq('id', id).maybeSingle();
-    if (!reg) throw new Error('Không tìm thấy bản ghi.');
-
-    const updates: any = {};
-    if (data.status) {
-      updates.status = data.status;
-      updates.paymentStatus = data.status;
-    }
-    if (data.action === 'APPROVE_DEPOSIT' || data.status === 'DEPOSITED') {
-      updates.isApproved100 = false;
-      updates.status = 'DEPOSITED';
-      updates.paymentStatus = 'DEPOSITED';
-      updates.paidAmount = 150000;
-      const total = reg.totalRequired || (reg.role === 'ALUMNI' ? 389000 : 349000);
-      updates.totalRequired = total;
-      updates.remainingAmount = Math.max(0, total - 150000);
-      updates.verifiedBy = data.adminUser || 'BTC_Admin';
-      updates.verifiedAt = new Date().toISOString();
-      updates.isEmailSent = true;
-      updates.emailSentAt = new Date().toISOString();
-      updates.lastEmailTemplate = reg.role === 'ALUMNI' ? 'DEPOSIT_ALUMNI' : 'DEPOSIT_ACTIVE';
-    } else if (data.isApproved100 !== undefined || data.action === 'APPROVE_100') {
-      updates.isApproved100 = data.isApproved100 !== undefined ? data.isApproved100 : true;
-      if (updates.isApproved100) {
-        updates.status = 'FULLY_PAID';
-        updates.paymentStatus = 'FULLY_PAID';
-        updates.paidAmount = reg.totalRequired || (reg.role === 'ALUMNI' ? 389000 : 349000);
-        updates.remainingAmount = 0;
-        updates.verifiedBy = data.adminUser || 'BTC_Admin';
-        updates.verifiedAt = new Date().toISOString();
-        updates.isEmailSent = true;
-        updates.emailSentAt = new Date().toISOString();
-        updates.lastEmailTemplate = 'FULL_100';
-      }
-    }
-
-    await supabase.from('registrations').update(updates).eq('id', id);
-
-    await supabase.from('audit_logs').insert({
-      id: 'log-' + Date.now(),
-      action: data.isApproved100 ? 'APPROVE_100' : (data.action === 'APPROVE_DEPOSIT' ? 'APPROVE_DEPOSIT' : 'STATUS_CHANGE'),
-      targetId: id,
-      adminUser: data.adminUser || 'BTC_Admin',
-      details: `Duyệt trạng thái: ${updates.status || reg.status}. ${updates.isEmailSent ? `Gửi email ${updates.lastEmailTemplate}` : ''}`,
-      timestamp: new Date().toISOString()
-    });
-
-    return { ...reg, ...updates } as unknown as RegistrationRecord;
+    throw new Error(res?.message || 'Không thể cập nhật trạng thái thanh toán.');
   },
 
   async sendRegistrationEmail(id: string, options?: { templateType?: string; adminUser?: string }) {
@@ -828,50 +775,19 @@ export const apiClient = {
       `${API_BASE}/admin/registrations/${id}/send-email`,
       {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAdminAuthHeaders(),
         body: JSON.stringify(options || {})
       }
     );
     if (res && res.success && res.data) return res.data;
-
-    // Direct Supabase fallback
-    const { data: reg } = await supabase.from('registrations').select('*').eq('id', id).maybeSingle();
-    if (!reg) throw new Error('Không tìm thấy hồ sơ người đăng ký.');
-
-    let templateType = options?.templateType;
-    if (!templateType || templateType === 'AUTO') {
-      if (reg.isApproved100 || reg.status === 'FULLY_PAID') {
-        templateType = 'FULL_100';
-      } else if (reg.role === 'ALUMNI') {
-        templateType = 'DEPOSIT_ALUMNI';
-      } else {
-        templateType = 'DEPOSIT_ACTIVE';
-      }
-    }
-
-    const updates = {
-      isEmailSent: true,
-      emailSentAt: new Date().toISOString(),
-      lastEmailTemplate: templateType
-    };
-
-    await supabase.from('registrations').update(updates).eq('id', id);
-    await supabase.from('audit_logs').insert({
-      id: 'log-' + Date.now(),
-      action: 'RESEND_EMAIL',
-      targetId: id,
-      adminUser: options?.adminUser || 'BTC_Admin',
-      details: `Gửi email (${templateType}) cho ${reg.fullName} (${reg.mssv})`,
-      timestamp: new Date().toISOString()
-    });
-
-    return { ...reg, ...updates } as unknown as RegistrationRecord;
+    throw new Error(res?.message || 'Không thể gửi email xác nhận.');
   },
 
   async previewRegistrationEmail(id: string, templateType?: string) {
     const query = templateType ? `?templateType=${encodeURIComponent(templateType)}` : '';
     const res = await safeFetchJson<{ success: boolean; data: { subject: string; html: string; text: string; templateType: string } }>(
-      `${API_BASE}/admin/registrations/${id}/preview-email${query}`
+      `${API_BASE}/admin/registrations/${id}/preview-email${query}`,
+      { headers: getAdminAuthHeaders() }
     );
     return res?.data || null;
   },
@@ -881,63 +797,31 @@ export const apiClient = {
       `${API_BASE}/admin/registrations/${id}/reject`,
       {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAdminAuthHeaders(),
         body: JSON.stringify({ rejectReason, adminUser })
       }
     );
     if (res && res.success && res.data) return res.data;
-
-    const updates = {
-      status: 'REJECTED',
-      paymentStatus: 'REJECTED',
-      rejectReason,
-      isApproved100: false
-    };
-
-    await supabase.from('registrations').update(updates as any).eq('id', id);
-
-    await supabase.from('audit_logs').insert({
-      id: 'log-' + Date.now(),
-      action: 'REJECT_PAYMENT',
-      targetId: id,
-      adminUser: adminUser || 'BTC_Admin',
-      details: `Từ chối biên lai: ${rejectReason}`,
-      timestamp: new Date().toISOString()
-    });
-
-    const { data: updated } = await supabase.from('registrations').select('*').eq('id', id).maybeSingle();
-    return updated as unknown as RegistrationRecord;
+    throw new Error('Không thể từ chối biên lai thanh toán.');
   },
 
   async syncGoogleSheets(): Promise<{ success: boolean; message: string }> {
     const res = await safeFetchJson<{ success: boolean; message?: string }>(`${API_BASE}/admin/sheets/sync`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' }
+      headers: getAdminAuthHeaders()
     });
     if (res) return { success: true, message: res.message || 'Đã đồng bộ.' };
-
-    const { count } = await supabase.from('members').select('*', { count: 'exact', head: true });
-    return { success: true, message: `Đồng bộ thành công ${count || 20} thành viên từ Google Sheet whitelist.` };
+    return { success: false, message: 'Đồng bộ thất bại.' };
   },
 
   async moderateWish(id: string, moderationStatus: 'APPROVED' | 'REJECTED', adminUser?: string) {
     const res = await safeFetchJson<{ success: boolean; data: any }>(`${API_BASE}/admin/wishes/${id}/moderate`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getAdminAuthHeaders(),
       body: JSON.stringify({ moderationStatus, adminUser })
     });
     if (res) return res.data;
-
-    await supabase.from('wishes').update({ moderationStatus }).eq('id', id);
-    await supabase.from('audit_logs').insert({
-      id: 'log-' + Date.now(),
-      action: 'MODERATE_WISH',
-      targetId: id,
-      adminUser: adminUser || 'BTC_Admin',
-      details: `Kiểm duyệt lời chúc: ${moderationStatus}`,
-      timestamp: new Date().toISOString()
-    });
-    return { success: true };
+    throw new Error('Không thể kiểm duyệt lời chúc.');
   },
 
   async checkInTicket(tokenOrCode: string, adminUser?: string): Promise<{ success: boolean; data: RegistrationRecord; message: string }> {
@@ -945,57 +829,13 @@ export const apiClient = {
       `${API_BASE}/admin/tickets/checkin`,
       {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAdminAuthHeaders(),
         body: JSON.stringify({ tokenOrCode, adminUser })
       }
     );
     if (res && res.success && res.data) {
       return { success: true, data: res.data, message: res.message || 'Check-in thành công.' };
     }
-
-    const searchKey = tokenOrCode.trim().toUpperCase();
-    const { data: allRegs } = await supabase.from('registrations').select('*');
-    if (!allRegs) throw new Error('Không thể kết nối cơ sở dữ liệu để soát vé.');
-
-    const reg = allRegs.find(r => 
-      (r.ticketCode && r.ticketCode.toUpperCase() === searchKey) ||
-      (r.ticketToken && r.ticketToken.toUpperCase() === searchKey) ||
-      (r.mssv && r.mssv.toUpperCase() === searchKey) ||
-      r.id === tokenOrCode.trim()
-    );
-
-    if (!reg) throw new Error(`Không tìm thấy hồ sơ vé với mã: ${tokenOrCode}`);
-
-    if (!reg.isApproved100) {
-      throw new Error(`Vé của ${reg.fullName} (${reg.mssv}) chưa hoàn tất 100% phí tham dự. Không thể check-in!`);
-    }
-
-    if (reg.isCheckedIn) {
-      const checkedTime = reg.checkedInAt ? new Date(reg.checkedInAt).toLocaleTimeString('vi-VN') : 'không rõ';
-      throw new Error(`CẢNH BÁO: Vé của ${reg.fullName} đã được check-in trước đó vào lúc ${checkedTime} bởi ${reg.checkedInBy || 'BTC'}!`);
-    }
-
-    const updates = {
-      isCheckedIn: true,
-      checkedInAt: new Date().toISOString(),
-      checkedInBy: adminUser || 'BTC_Admin'
-    };
-
-    await supabase.from('registrations').update(updates as any).eq('id', reg.id);
-    await supabase.from('audit_logs').insert({
-      id: 'log-' + Date.now(),
-      action: 'CHECK_IN_TICKET',
-      targetId: reg.id,
-      adminUser: adminUser || 'BTC_Admin',
-      details: `Soát vé thành công cho ${reg.fullName} (${reg.mssv}) - Mã vé ${reg.ticketCode}`,
-      timestamp: new Date().toISOString()
-    });
-
-    const updatedReg = { ...reg, ...updates } as unknown as RegistrationRecord;
-    return {
-      success: true,
-      data: updatedReg,
-      message: `Xác nhận check-in thành công! Chào mừng ${reg.honorific || ''} ${reg.fullName} đến với Đại tiệc Cóc Sài Gòn 17Y`
-    };
+    throw new Error(res?.message || 'Không thể xác nhận check-in vé.');
   }
 };

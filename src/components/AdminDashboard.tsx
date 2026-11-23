@@ -43,7 +43,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
   // Filtering & Search for Registrations
   const [searchTerm, setSearchTerm] = useState('');
-  const [roleFilter, setRoleFilter] = useState<'ALL' | 'ACTIVE' | 'ALUMNI'>('ALL');
+  const [roleFilter, setRoleFilter] = useState<'ALL' | 'ACTIVE' | 'ALUMNI' | 'GUEST'>('ALL');
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'APPROVED' | 'PENDING' | 'REJECTED' | 'DEPOSIT_ONLY'>('ALL');
 
   // Payment Review Center State
@@ -57,8 +57,21 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [isSyncingSheets, setIsSyncingSheets] = useState(false);
   const [syncResult, setSyncResult] = useState<string | null>(null);
 
-  // Google Calendar Auto-open State
-  const [autoOpenCalendar, setAutoOpenCalendar] = useState<boolean>(true);
+  // Google Calendar Auto-open State (Mặc định FALSE để không nhảy tab khi duyệt, hệ thống tự gửi file lịch invite.ics qua email)
+  const [autoOpenCalendar, setAutoOpenCalendar] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('csg_admin_auto_open_cal') === 'true';
+    } catch {
+      return false;
+    }
+  });
+
+  const handleToggleAutoOpenCalendar = (checked: boolean) => {
+    setAutoOpenCalendar(checked);
+    try {
+      localStorage.setItem('csg_admin_auto_open_cal', String(checked));
+    } catch {}
+  };
 
   // On-Site Check-in Desk State
   const [checkInCode, setCheckInCode] = useState('');
@@ -98,11 +111,27 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     }
   };
 
+  // Restore session token if previously logged in
+  useEffect(() => {
+    if (isOpen) {
+      const token = sessionStorage.getItem('csg_admin_token');
+      if (token) {
+        setIsAuthenticated(true);
+      }
+    }
+  }, [isOpen]);
+
   useEffect(() => {
     if (isAuthenticated) {
       loadAdminData();
     }
   }, [isAuthenticated]);
+
+  const handleLogout = () => {
+    sessionStorage.removeItem('csg_admin_token');
+    setIsAuthenticated(false);
+    setPin('');
+  };
 
   if (!isOpen) return null;
 
@@ -151,7 +180,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     if (!reg) return;
     setIsLoading(true);
     try {
-      const template = reg.role === 'ALUMNI' ? 'DEPOSIT_ALUMNI' : 'DEPOSIT_ACTIVE';
+      const isHighTier = reg.role === 'ALUMNI' || reg.role === 'GUEST';
+      const template = isHighTier ? 'DEPOSIT_ALUMNI' : 'DEPOSIT_ACTIVE';
       await apiClient.updateRegistrationStatus(id, {
         action: 'APPROVE_DEPOSIT',
         status: 'DEPOSITED',
@@ -159,7 +189,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         adminUser: 'BTC_Admin'
       });
 
-      const total = reg.totalRequired || (reg.role === 'ALUMNI' ? 389000 : 349000);
+      const total = reg.totalRequired || (isHighTier ? 389000 : 349000);
       const remaining = Math.max(0, total - 150000);
 
       setRegistrations(prev => prev.map(r => r.id === id ? {
@@ -183,7 +213,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         window.open(calUrl, '_blank');
       }
 
-      showToast(`✓ Đã duyệt đặt cọc 150k và gửi email xác nhận (${reg.role === 'ALUMNI' ? 'Alumni - 389k' : 'Active - 349k'}) tới ${reg.gmail}!`, 'success');
+      const roleLabel = reg.role === 'GUEST' ? 'Khách mời - 389k' : (reg.role === 'ALUMNI' ? 'Alumni - 389k' : 'Active - 349k');
+      showToast(`✓ Đã duyệt đặt cọc 150k và gửi email xác nhận (${roleLabel}) tới ${reg.gmail}!`, 'success');
     } catch (err: unknown) {
       const error = err as Error;
       showToast('Lỗi duyệt đặt cọc: ' + error.message, 'error');
@@ -211,7 +242,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         isApproved100: true,
         status: 'FULLY_PAID',
         paymentStatus: 'FULLY_PAID',
-        paidAmount: r.totalRequired || (r.role === 'ALUMNI' ? 389000 : 349000),
+        paidAmount: r.totalRequired || ((r.role === 'ALUMNI' || r.role === 'GUEST') ? 389000 : 349000),
         remainingAmount: 0,
         isEmailSent: true,
         emailSentAt: new Date().toISOString(),
@@ -406,15 +437,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             {isAuthenticated && (
               <label 
                 className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#222222] border border-[#383838] text-[11px] font-mono text-[#F5C400] cursor-pointer hover:bg-[#2a2a2a] select-none transition-colors"
-                title="Tự động mở Google Calendar với tên sự kiện và người tham dự khi bấm duyệt"
+                title="Mặc định TẮT để duyệt nhanh liên tục không bị nhảy tab. Hệ thống tự động gửi email kèm file lịch invite.ics trực tiếp tới người đăng ký."
               >
                 <input
                   type="checkbox"
                   checked={autoOpenCalendar}
-                  onChange={(e) => setAutoOpenCalendar(e.target.checked)}
+                  onChange={(e) => handleToggleAutoOpenCalendar(e.target.checked)}
                   className="rounded bg-[#181818] border-[#444] text-[#F5C400] w-3.5 h-3.5 cursor-pointer accent-[#F5C400]"
                 />
-                <span>📅 Tự mở GG Calendar khi duyệt</span>
+                <span>📅 Tự mở tab GG Calendar</span>
               </label>
             )}
             <button
@@ -425,6 +456,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             >
               <RefreshIcon size={16} className={isLoading ? 'animate-spin' : ''} />
             </button>
+            {isAuthenticated && (
+              <button
+                onClick={handleLogout}
+                className="px-2.5 py-1 rounded-lg border border-red-900/60 hover:bg-red-950/40 text-red-400 text-xs font-bold transition-colors"
+                title="Đăng xuất quản trị"
+              >
+                Đăng xuất
+              </button>
+            )}
             <button
               onClick={onClose}
               className="p-1.5 rounded-lg border border-[#383838] hover:bg-[#222222] text-[#A8A8A8] hover:text-white transition-colors"
@@ -718,12 +758,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
                     <select
                       value={roleFilter}
-                      onChange={(e) => setRoleFilter(e.target.value as 'ALL' | 'ACTIVE' | 'ALUMNI')}
+                      onChange={(e) => setRoleFilter(e.target.value as 'ALL' | 'ACTIVE' | 'ALUMNI' | 'GUEST')}
                       className="px-3 py-2 rounded-lg bg-[#181818] border border-[#383838] text-xs text-white focus:outline-none focus:border-[#F5C400]"
                     >
                       <option value="ALL">Tất cả vai trò</option>
                       <option value="ACTIVE">Thành viên</option>
                       <option value="ALUMNI">Cựu thành viên</option>
+                      <option value="GUEST">Khách mời</option>
                     </select>
 
                     <select
@@ -777,9 +818,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                                 </td>
                                 <td className="py-2.5 px-3">
                                   <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                                    r.role === 'ALUMNI' ? 'bg-[#F5C400]/20 text-[#F5C400]' : 'bg-emerald-500/20 text-emerald-300'
+                                    r.role === 'GUEST'
+                                      ? 'bg-purple-500/20 text-purple-300'
+                                      : r.role === 'ALUMNI'
+                                      ? 'bg-[#F5C400]/20 text-[#F5C400]'
+                                      : 'bg-emerald-500/20 text-emerald-300'
                                   }`}>
-                                    {r.role === 'ALUMNI' ? 'Cựu TV' : 'Thành viên'}
+                                    {r.role === 'GUEST' ? 'Khách mời' : (r.role === 'ALUMNI' ? 'Cựu TV' : 'Thành viên')}
                                   </span>
                                 </td>
                                 <td className="py-2.5 px-3">
@@ -902,7 +947,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           >
                             <div className="flex justify-between items-center mb-0.5">
                               <span className="font-bold text-xs text-white truncate">{r.fullName}</span>
-                              <span className="text-[9px] font-mono px-1 rounded bg-[#383838]">{r.role === 'ALUMNI' ? 'Cựu' : 'Active'}</span>
+                              <span className="text-[9px] font-mono px-1 rounded bg-[#383838]">
+                                {r.role === 'GUEST' ? 'Khách' : (r.role === 'ALUMNI' ? 'Cựu' : 'Active')}
+                              </span>
                             </div>
                             <div className="flex justify-between text-[11px] font-mono">
                               <span>{r.mssv}</span>
@@ -983,7 +1030,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                             <span className="text-[10px] font-mono uppercase text-[#A8A8A8]">Hồ sơ tham dự</span>
                             <h4 className="text-lg font-bold text-white">{currentReviewRecord.fullName}</h4>
                             <span className="text-[11px] font-mono text-[#F5C400]">
-                              MSSV: {currentReviewRecord.mssv} • {currentReviewRecord.role === 'ALUMNI' ? 'Cựu thành viên' : 'Thành viên'}
+                              MSSV: {currentReviewRecord.mssv} • {currentReviewRecord.role === 'GUEST' ? 'Khách mời' : (currentReviewRecord.role === 'ALUMNI' ? 'Cựu thành viên' : 'Thành viên')}
                             </span>
                           </div>
 

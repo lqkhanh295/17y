@@ -21,13 +21,18 @@ dist-ssr/
 .taste-skill/
 .temp/
 *.log
+scratch/
+scratch*/
 
 # Heavy Source Raw Media
 /Music/
 /picture/
+/video/
 
 # Editor & OS files
 .DS_Store
 Thumbs.db
 .idea/
 .vscode/
+
+public/video/

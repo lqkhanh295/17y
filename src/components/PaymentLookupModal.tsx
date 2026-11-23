@@ -82,7 +82,12 @@ export const PaymentLookupModal: React.FC<PaymentLookupModalProps> = ({
 
     setIsSubmitting(true);
     try {
-      const updated = await apiClient.submitBalancePayment(foundRecord.id, receiptPhase2);
+      const updated = await apiClient.submitBalancePayment(
+        foundRecord.id,
+        receiptPhase2,
+        foundRecord.mssv,
+        foundRecord.personalPhone
+      );
       setFoundRecord(updated);
       setSuccessSubmitted(true);
       setReceiptPhase2('');
@@ -693,6 +698,32 @@ export const PaymentLookupModal: React.FC<PaymentLookupModalProps> = ({
               )}
             </div>
           )}
+        </div>
+
+        {/* Support Hotline Footer */}
+        <div className="px-4 py-2.5 bg-white border-t-2 border-[#20231F] shrink-0 flex items-center justify-between gap-2 text-xs font-mono shadow-sm">
+          <div className="flex items-center gap-2 text-[#20231F]/80 min-w-0">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+            <span className="text-[11px] sm:text-xs truncate">Cần hỗ trợ tra cứu hoặc thanh toán? Hotline BTC:</span>
+          </div>
+          <div className="flex items-center gap-1.5 shrink-0">
+            <a
+              href="tel:0901325178"
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-sm bg-[#F4C542] hover:bg-[#F8D56A] border border-[#20231F] text-[#20231F] font-bold text-xs shrink-0 transition-all active:scale-95 whitespace-nowrap"
+              title="Gọi hotline: 0901 325 178"
+            >
+              <span>📞 0901 325 178</span>
+            </a>
+            <a
+              href="https://zalo.me/0901325178"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden xs:inline-flex items-center gap-1 px-2 py-1 rounded-sm bg-[#F4EEDF] hover:bg-[#EAE4D6] border border-[#20231F] text-[#20231F] font-bold text-[11px] shrink-0 transition-all active:scale-95 whitespace-nowrap"
+              title="Zalo: 0901 325 178"
+            >
+              <span>Zalo</span>
+            </a>
+          </div>
         </div>
       </div>
     </div>

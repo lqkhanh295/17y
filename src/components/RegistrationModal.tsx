@@ -42,6 +42,8 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
   const [collisionCandidates, setCollisionCandidates] = useState<MemberDirectoryItem[]>([]);
   const [searchError, setSearchError] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
+  const [alreadyRegisteredRecord, setAlreadyRegisteredRecord] = useState<RegistrationRecord | null>(null);
+  const [isCheckingCandidate, setIsCheckingCandidate] = useState(false);
 
   // Screen 3: Payment selection state
   const [plan, setPlan] = useState<PaymentPlan>('FULL');
@@ -61,6 +63,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
   const [wishes, setWishes] = useState('');
   const [isPublicConsent, setIsPublicConsent] = useState(true);
   const [infoErrors, setInfoErrors] = useState<{ [key: string]: string }>({});
+  const [isCheckingStep3, setIsCheckingStep3] = useState(false);
 
   // Screen 6: Completed state
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -77,7 +80,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
   }, [isOpen, screen]);
 
   // Pricing calculation
-  const isAlumni = identifiedMember?.role === 'ALUMNI';
+  const isAlumni = identifiedMember?.role === 'ALUMNI' || identifiedMember?.role === 'GUEST';
   const totalFee = isAlumni ? 389000 : 349000;
 
   let currentPayAmount = totalFee;
@@ -114,19 +117,48 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
     if (!query.trim()) return;
 
     setSearchError('');
+    setAlreadyRegisteredRecord(null);
     setIsVerifying(true);
     try {
       const res = await apiClient.verifyMember(query);
+
+      // 1. Check if member already has active registration
+      if (res.hasExistingRegistration && res.existingRecord) {
+        setAlreadyRegisteredRecord(res.existingRecord);
+        return;
+      }
+
       if (res.multiple && res.candidates && res.candidates.length > 1) {
         setCollisionCandidates(res.candidates);
         return;
       }
 
       if (res.success && res.data) {
+        // Double check duplicate registration by MSSV or name
+        try {
+          const existing = await apiClient.lookupRegistration(res.data.mssv || res.data.fullName);
+          if (existing && existing.status !== 'REJECTED') {
+            setAlreadyRegisteredRecord(existing);
+            return;
+          }
+        } catch {
+          // not registered yet
+        }
+
         setCollisionCandidates([]);
         setIdentifiedMember(res.data);
         setScreen(2); // Personalized welcome
       } else {
+        // Fallback: check if query itself matches an existing registration
+        try {
+          const existing = await apiClient.lookupRegistration(query);
+          if (existing && existing.status !== 'REJECTED') {
+            setAlreadyRegisteredRecord(existing);
+            return;
+          }
+        } catch {
+          // not found
+        }
         handleQuickBypass();
       }
     } catch {
@@ -134,6 +166,27 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
       handleQuickBypass();
     } finally {
       setIsVerifying(false);
+    }
+  };
+
+  const handleSelectCandidate = async (cand: MemberDirectoryItem) => {
+    setIsCheckingCandidate(true);
+    try {
+      const existing = await apiClient.lookupRegistration(cand.mssv || cand.fullName);
+      if (existing && existing.status !== 'REJECTED') {
+        setCollisionCandidates([]);
+        setAlreadyRegisteredRecord(existing);
+        return;
+      }
+      setIdentifiedMember(cand);
+      setCollisionCandidates([]);
+      setScreen(2);
+    } catch {
+      setIdentifiedMember(cand);
+      setCollisionCandidates([]);
+      setScreen(2);
+    } finally {
+      setIsCheckingCandidate(false);
     }
   };
 
@@ -205,6 +258,73 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
     return Object.keys(errors).length === 0;
   };
 
+  // Proactive duplicate check before advancing to payment screen
+  const handleStep3Continue = async () => {
+    if (!validatePersonalInfo()) return;
+
+    setIsCheckingStep3(true);
+    try {
+      // 1. Check if MSSV has already been registered
+      if (identifiedMember?.mssv) {
+        try {
+          const existingByMssv = await apiClient.lookupRegistration(identifiedMember.mssv.trim());
+          if (existingByMssv && existingByMssv.status !== 'REJECTED') {
+            alert(`Mã sinh viên "${identifiedMember.mssv}" đã được dùng để đăng ký vé ${existingByMssv.ticketCode} (Họ tên: ${existingByMssv.fullName}).\n\nMỗi thành viên chỉ được đăng ký một vé.`);
+            setIsCheckingStep3(false);
+            return;
+          }
+        } catch {
+          // clean
+        }
+      }
+
+      // 2. Check if Gmail has already been registered
+      if (gmail.trim()) {
+        try {
+          const existingByEmail = await apiClient.lookupRegistration(gmail.trim());
+          if (existingByEmail && existingByEmail.status !== 'REJECTED') {
+            setInfoErrors(prev => ({
+              ...prev,
+              gmail: `Địa chỉ Gmail này đã được dùng cho vé ${existingByEmail.ticketCode} (${existingByEmail.fullName}).`
+            }));
+            alert(`Địa chỉ Gmail "${gmail.trim()}" đã được dùng để đăng ký vé ${existingByEmail.ticketCode} (Họ tên: ${existingByEmail.fullName}).\n\nVui lòng sử dụng Gmail khác hoặc tra cứu vé đã đăng ký.`);
+            setIsCheckingStep3(false);
+            return;
+          }
+        } catch {
+          // clean
+        }
+      }
+
+      // 3. Check if Personal Phone has already been registered
+      if (phone.trim()) {
+        try {
+          const existingByPhone = await apiClient.lookupRegistration(phone.trim());
+          if (existingByPhone && existingByPhone.status !== 'REJECTED') {
+            setInfoErrors(prev => ({
+              ...prev,
+              phone: `Số điện thoại này đã được dùng cho vé ${existingByPhone.ticketCode} (${existingByPhone.fullName}).`
+            }));
+            alert(`Số điện thoại "${phone.trim()}" đã được dùng để đăng ký vé ${existingByPhone.ticketCode} (Họ tên: ${existingByPhone.fullName}).\n\nVui lòng kiểm tra lại số điện thoại hoặc tra cứu vé đã đăng ký.`);
+            setIsCheckingStep3(false);
+            return;
+          }
+        } catch {
+          // clean
+        }
+      }
+
+      // Clear errors & proceed to Screen 4 (Payment)
+      setInfoErrors({});
+      setScreen(4);
+    } catch {
+      // In case of unexpected network timeout during pre-check, proceed to avoid blocking user
+      setScreen(4);
+    } finally {
+      setIsCheckingStep3(false);
+    }
+  };
+
   // Validate Screen 4 (Payment & Receipt)
   const validatePayment = () => {
     const errors: { [key: string]: string } = {};
@@ -265,7 +385,21 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
       setScreen(6); // Success screen
     } catch (err: unknown) {
       const error = err as Error;
-      alert(error.message || 'Lỗi khi gửi đăng ký. Vui lòng thử lại.');
+      const msg = error.message || 'Lỗi khi gửi đăng ký. Vui lòng thử lại.';
+      if (msg.includes('đã được đăng ký') || msg.includes('đã được sử dụng') || msg.includes('trùng lặp') || msg.includes('Conflict')) {
+        alert(msg);
+        apiClient
+          .lookupRegistration(identifiedMember.mssv || gmail || phone)
+          .then((rec) => {
+            if (rec && rec.status !== 'REJECTED') {
+              setAlreadyRegisteredRecord(rec);
+              setScreen(1);
+            }
+          })
+          .catch(() => {});
+      } else {
+        alert(msg);
+      }
     } finally {
       setIsSubmitting(false);
       setSubmitStatusText('');
@@ -344,157 +478,260 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
           {/* ================= SCREEN 01: IDENTITY VERIFICATION ================= */}
           {screen === 1 && (
             <div className="space-y-6 animate-fadeIn">
-              <div className="text-center max-w-md mx-auto space-y-2">
-                <span className="text-xs font-mono font-bold tracking-widest text-[#B94D35] uppercase">
-                  01 / 05 · XÁC THỰC THÔNG TIN
-                </span>
-                <h3 className="text-2xl sm:text-4xl font-display uppercase tracking-tight text-[#20231F]">
-                  CÙNG CÓC TÌM LẠI THÔNG TIN CỦA BẠN
-                </h3>
-                <p className="text-sm text-[#20231F]/75 leading-relaxed">
-                  Nhập mã số sinh viên (MSSV) hoặc họ và tên để Cóc xác nhận thông tin và tìm lại dấu ấn của bạn trong hành trình 17 năm.
-                </p>
-              </div>
-
-              <form onSubmit={handleIdentify} className="max-w-md mx-auto space-y-4 pt-2">
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-[#20231F] mb-1.5">
-                    MÃ SỐ SINH VIÊN HOẶC HỌ TÊN *
-                  </label>
-                  <input
-                    type="text"
-                    value={query}
-                    onChange={(e) => {
-                      setQuery(e.target.value);
-                      if (searchError) setSearchError('');
-                      if (collisionCandidates.length > 0) setCollisionCandidates([]);
-                    }}
-                    autoComplete="name"
-                    autoCapitalize="characters"
-                    inputMode="text"
-                    placeholder="VD: SE171224 hoặc Nguyễn Tiến Cường"
-                    className="w-full px-4 py-3 min-h-[48px] rounded-sm bg-white border-2 border-[#20231F] text-[#20231F] font-mono text-base focus:outline-none focus:ring-2 focus:ring-[#F4C542] shadow-poster-sm"
-                    autoFocus
-                  />
-                  {searchError && (
-                    <div className="mt-2 p-3 rounded-lg bg-red-50 border-2 border-[#B94D35] text-[#B94D35] text-xs space-y-2">
-                      <div className="flex items-center gap-2">
-                        <AlertCircleIcon size={16} className="shrink-0" />
-                        <span>{searchError}</span>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => handleQuickBypass()}
-                        className="w-full py-2.5 min-h-[44px] px-3 bg-[#B94D35] text-white font-bold rounded-sm text-center hover:bg-[#20231F] transition-colors active:scale-[0.98] flex items-center justify-center gap-1.5"
-                      >
-                        <span>Tiếp tục đăng ký với tên "{query.trim() || 'Khách mời'}"</span>
-                        <ArrowUpRightIcon size={14} />
-                      </button>
+              {alreadyRegisteredRecord ? (
+                <div className="max-w-md mx-auto p-5 sm:p-6 bg-white border-2 border-[#20231F] rounded-sm shadow-poster space-y-4 animate-fadeIn">
+                  {/* Top VIP Badge */}
+                  <div className="flex items-start gap-3 pb-3 border-b-2 border-[#20231F]">
+                    <div className="w-10 h-10 rounded-sm bg-[#F4C542] border-2 border-[#20231F] flex items-center justify-center shrink-0 font-bold text-lg text-[#20231F] shadow-poster-sm">
+                      🎟️
                     </div>
-                  )}
-                </div>
-
-                {/* Disambiguation: Multiple Members with Same Name */}
-                {collisionCandidates.length > 0 && (
-                  <div className="p-4 sm:p-5 rounded-sm bg-[#FFFFFF] border-2 border-[#20231F] shadow-poster space-y-3.5 animate-fadeIn text-left">
-                    <div className="flex items-start gap-2.5 pb-3 border-b-2 border-[#20231F]">
-                      <span className="w-8 h-8 rounded-sm bg-[#F4C542] border-2 border-[#20231F] flex items-center justify-center shrink-0 font-display text-sm font-bold text-[#20231F] shadow-poster-sm">
-                        ⚡
+                    <div className="flex-1 min-w-0">
+                      <span className="inline-block px-2 py-0.5 rounded-xs bg-[#20231F] text-[#F4C542] text-[10px] font-mono font-bold uppercase tracking-wider mb-1">
+                        HỒ SƠ ĐÃ ĐĂNG KÝ
                       </span>
-                      <div>
-                        <h4 className="font-display text-base uppercase text-[#20231F] tracking-wide leading-tight">
-                          Phát hiện {collisionCandidates.length} bạn trùng tên
-                        </h4>
-                        <p className="text-xs text-[#20231F]/80 font-body mt-0.5">
-                          CLB có {collisionCandidates.length} thành viên mang tên <strong className="font-bold text-[#B94D35]">"{query.trim()}"</strong>. Vui lòng bấm chọn đúng hồ sơ của bạn:
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="space-y-2.5 max-h-[380px] overflow-y-auto pr-1 overscroll-contain">
-                      {collisionCandidates.map((cand, idx) => {
-                        const candIsAlumni = cand.role === 'ALUMNI';
-                        const candGen = cand.generation
-                          ? (cand.generation.toLowerCase().startsWith('k') || cand.generation.toLowerCase().startsWith('gen')
-                              ? cand.generation.toUpperCase()
-                              : `KHÓA ${cand.generation}`)
-                          : 'CÓC SÀI GÒN';
-
-                        return (
-                          <button
-                            key={cand.id || `cand-${cand.mssv}-${idx}`}
-                            type="button"
-                            onClick={() => {
-                              setIdentifiedMember(cand);
-                              setCollisionCandidates([]);
-                              setScreen(2);
-                            }}
-                            className={`w-full text-left p-3 sm:p-3.5 rounded-sm border-2 border-[#20231F] transition-all group active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-poster-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5 cursor-pointer ${
-                              candIsAlumni
-                                ? 'bg-[#FFF8F6] hover:bg-[#FFEAE4]'
-                                : 'bg-[#F6FAF7] hover:bg-[#EBF5EE]'
-                            }`}
-                          >
-                            <div className="space-y-0.5 min-w-0">
-                              <div className="flex items-center gap-2 flex-wrap">
-                                <span className="font-display text-base uppercase text-[#20231F] tracking-wide group-hover:text-[#B94D35] transition-colors">
-                                  {cand.fullName}
-                                </span>
-                                <span className="text-[11px] font-mono font-bold px-1.5 py-0.5 rounded-sm bg-white border border-[#20231F]/40 text-[#20231F]">
-                                  {candGen}
-                                </span>
-                              </div>
-                              <div className="flex items-center gap-2 text-xs font-mono text-[#20231F]/70 flex-wrap">
-                                <span className="font-bold text-[#20231F]">MSSV: {cand.mssv}</span>
-                                {cand.department && <span>• {cand.department}</span>}
-                              </div>
-                            </div>
-
-                            <div className="flex items-center justify-between sm:justify-end gap-2 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-[#20231F]/15">
-                              <span
-                                className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-sm text-xs font-mono font-bold uppercase border ${
-                                  candIsAlumni
-                                    ? 'bg-[#B94D35] text-white border-[#20231F]'
-                                    : 'bg-[#286640] text-white border-[#20231F]'
-                                }`}
-                              >
-                                <span>{candIsAlumni ? 'CỰU THÀNH VIÊN' : 'THÀNH VIÊN'}</span>
-                                <span>•</span>
-                                <span>{candIsAlumni ? '389k' : '349k'}</span>
-                              </span>
-                              <span className="w-8 h-8 rounded-sm bg-[#20231F] text-white flex items-center justify-center font-bold text-sm group-hover:bg-[#F4C542] group-hover:text-[#20231F] group-hover:border-2 group-hover:border-[#20231F] transition-all">
-                                →
-                              </span>
-                            </div>
-                          </button>
-                        );
-                      })}
-                    </div>
-
-                    <div className="pt-2 text-center border-t border-[#20231F]/15 space-y-1">
-                      <p className="text-[11px] font-mono text-[#20231F]/60">
-                        💡 Hoặc nhập trực tiếp <span className="font-bold text-[#20231F]">MSSV</span> để chính xác 100%.
+                      <h4 className="font-display text-lg sm:text-xl uppercase text-[#20231F] tracking-tight truncate leading-tight">
+                        {alreadyRegisteredRecord.fullName}
+                      </h4>
+                      <p className="text-xs font-mono text-[#20231F]/70 mt-0.5">
+                        MÃ: <strong className="text-[#20231F]">{alreadyRegisteredRecord.mssv}</strong> • MÃ VÉ:{' '}
+                        <span className="font-bold text-[#B94D35]">{alreadyRegisteredRecord.ticketCode || 'Chờ cấp'}</span>
                       </p>
-                      <button
-                        type="button"
-                        onClick={() => handleQuickBypass()}
-                        className="text-xs font-mono text-[#B94D35] hover:underline font-bold"
-                      >
-                        Không phải bạn ở trên? Tiếp tục đăng ký với tên "{query.trim()}" →
-                      </button>
                     </div>
                   </div>
-                )}
 
-                <button
-                  type="submit"
-                  disabled={isVerifying || !query.trim()}
-                  className="btn-editorial-primary w-full py-3.5 min-h-[48px] rounded-sm font-display text-xl tracking-wider uppercase flex items-center justify-center gap-2 disabled:opacity-50 active:scale-[0.98]"
-                >
-                  <span>{isVerifying ? 'ĐANG ĐỐI CHIẾU...' : 'TÌM TÊN CỦA BẠN'}</span>
-                  {!isVerifying && <ArrowUpRightIcon size={18} />}
-                </button>
-              </form>
+                  {/* Status Box */}
+                  <div className="p-3.5 rounded-sm bg-[#FAF8F5] border-2 border-[#20231F]/20 space-y-2 text-xs">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[#20231F]/70 font-mono">Trạng thái vé:</span>
+                      <span
+                        className={`px-2.5 py-0.5 rounded-xs font-mono font-bold uppercase text-[11px] ${
+                          alreadyRegisteredRecord.isApproved100 || alreadyRegisteredRecord.status === 'FULLY_PAID'
+                            ? 'bg-[#3D6B45] text-white'
+                            : alreadyRegisteredRecord.status === 'DEPOSITED'
+                            ? 'bg-[#D99B26] text-white'
+                            : 'bg-[#315D91] text-white'
+                        }`}
+                      >
+                        {alreadyRegisteredRecord.isApproved100 || alreadyRegisteredRecord.status === 'FULLY_PAID'
+                          ? '✓ ĐÃ DUYỆT 100%'
+                          : alreadyRegisteredRecord.status === 'DEPOSITED'
+                          ? '⚡ ĐÃ ĐẶT CỌC 150K'
+                          : '⏳ ĐANG CHỜ DUYỆT'}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <span className="text-[#20231F]/70 font-mono">Đã thanh toán:</span>
+                      <span className="font-mono font-bold text-[#20231F]">
+                        {(alreadyRegisteredRecord.paidAmount || (alreadyRegisteredRecord.status === 'DEPOSITED' ? 150000 : 0)).toLocaleString('vi-VN')} VNĐ
+                      </span>
+                    </div>
+
+                    {(alreadyRegisteredRecord.remainingAmount && alreadyRegisteredRecord.remainingAmount > 0) ? (
+                      <div className="flex items-center justify-between pt-1 border-t border-[#20231F]/10 text-[#B94D35]">
+                        <span className="font-mono font-bold">Còn lại đợt 2:</span>
+                        <span className="font-mono font-bold text-sm">
+                          {alreadyRegisteredRecord.remainingAmount.toLocaleString('vi-VN')} VNĐ
+                        </span>
+                      </div>
+                    ) : null}
+                  </div>
+
+                  <p className="text-xs text-[#20231F]/80 leading-relaxed font-body">
+                    Hồ sơ với thông tin này đã được đăng ký tham gia sự kiện. Hệ thống không cho phép đăng ký trùng lặp.
+                    {(alreadyRegisteredRecord.remainingAmount && alreadyRegisteredRecord.remainingAmount > 0)
+                      ? ' Bạn có thể kiểm tra vé và quét QR hoàn tất thanh toán đợt 2 ngay bây giờ:'
+                      : ' Bạn có thể xem vé điện tử VIP và mã check-in sự kiện ngay bây giờ:'}
+                  </p>
+
+                  {/* Actions */}
+                  <div className="space-y-2 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onClose();
+                        if (onOpenPortal) onOpenPortal();
+                      }}
+                      className="btn-editorial-primary w-full py-3 min-h-[46px] rounded-sm font-display text-base tracking-wider uppercase flex items-center justify-center gap-2 shadow-poster-sm active:scale-[0.98]"
+                    >
+                      <span>
+                        {(alreadyRegisteredRecord.remainingAmount && alreadyRegisteredRecord.remainingAmount > 0)
+                          ? '⚡ BỔ SUNG THANH TOÁN ĐỢT 2'
+                          : '🎟️ TRA CỨU & XEM VÉ VIP NGAY'}
+                      </span>
+                      <ArrowUpRightIcon size={16} />
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setAlreadyRegisteredRecord(null);
+                        setQuery('');
+                        setSearchError('');
+                      }}
+                      className="w-full py-2 min-h-[40px] text-xs font-mono font-bold text-[#20231F]/70 hover:text-[#20231F] hover:underline transition-colors text-center"
+                    >
+                      ← Đăng ký cho người khác / Tìm lại
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <div className="text-center max-w-md mx-auto space-y-2">
+                    <span className="text-xs font-mono font-bold tracking-widest text-[#B94D35] uppercase">
+                      01 / 05 · XÁC THỰC THÔNG TIN
+                    </span>
+                    <h3 className="text-2xl sm:text-4xl font-display uppercase tracking-tight text-[#20231F]">
+                      CÙNG CÓC TÌM LẠI THÔNG TIN CỦA BẠN
+                    </h3>
+                    <p className="text-sm text-[#20231F]/75 leading-relaxed">
+                      Nhập mã số sinh viên (MSSV) hoặc họ và tên để Cóc xác nhận thông tin và tìm lại dấu ấn của bạn trong hành trình 17 năm.
+                    </p>
+                  </div>
+
+                  <form onSubmit={handleIdentify} className="max-w-md mx-auto space-y-4 pt-2">
+                    <div>
+                      <label className="block text-xs font-bold uppercase tracking-wider text-[#20231F] mb-1.5">
+                        MÃ SỐ SINH VIÊN HOẶC HỌ TÊN *
+                      </label>
+                      <input
+                        type="text"
+                        value={query}
+                        onChange={(e) => {
+                          setQuery(e.target.value);
+                          if (searchError) setSearchError('');
+                          if (collisionCandidates.length > 0) setCollisionCandidates([]);
+                        }}
+                        autoComplete="name"
+                        autoCapitalize="characters"
+                        inputMode="text"
+                        placeholder="VD: SE171224 hoặc Nguyễn Tiến Cường"
+                        className="w-full px-4 py-3 min-h-[48px] rounded-sm bg-white border-2 border-[#20231F] text-[#20231F] font-mono text-base focus:outline-none focus:ring-2 focus:ring-[#F4C542] shadow-poster-sm"
+                        autoFocus
+                      />
+                      {searchError && (
+                        <div className="mt-2 p-3 rounded-lg bg-red-50 border-2 border-[#B94D35] text-[#B94D35] text-xs space-y-2">
+                          <div className="flex items-center gap-2">
+                            <AlertCircleIcon size={16} className="shrink-0" />
+                            <span>{searchError}</span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => handleQuickBypass()}
+                            className="w-full py-2.5 min-h-[44px] px-3 bg-[#B94D35] text-white font-bold rounded-sm text-center hover:bg-[#20231F] transition-colors active:scale-[0.98] flex items-center justify-center gap-1.5"
+                          >
+                            <span>Tiếp tục đăng ký với tên "{query.trim() || 'Khách mời'}"</span>
+                            <ArrowUpRightIcon size={14} />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Disambiguation: Multiple Members with Same Name */}
+                    {collisionCandidates.length > 0 && (
+                      <div className="p-4 sm:p-5 rounded-sm bg-[#FFFFFF] border-2 border-[#20231F] shadow-poster space-y-3.5 animate-fadeIn text-left">
+                        <div className="flex items-start gap-2.5 pb-3 border-b-2 border-[#20231F]">
+                          <span className="w-8 h-8 rounded-sm bg-[#F4C542] border-2 border-[#20231F] flex items-center justify-center shrink-0 font-display text-sm font-bold text-[#20231F] shadow-poster-sm">
+                            ⚡
+                          </span>
+                          <div>
+                            <h4 className="font-display text-base uppercase text-[#20231F] tracking-wide leading-tight">
+                              Phát hiện {collisionCandidates.length} bạn trùng tên
+                            </h4>
+                            <p className="text-xs text-[#20231F]/80 font-body mt-0.5">
+                              CLB có {collisionCandidates.length} thành viên mang tên <strong className="font-bold text-[#B94D35]">"{query.trim()}"</strong>. Vui lòng bấm chọn đúng hồ sơ của bạn:
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="space-y-2.5 max-h-[380px] overflow-y-auto pr-1 overscroll-contain">
+                          {collisionCandidates.map((cand, idx) => {
+                            const candIsAlumni = cand.role === 'ALUMNI';
+                            const candIsGuest = cand.role === 'GUEST';
+                            const candGen = cand.generation
+                              ? (cand.generation.toLowerCase().startsWith('k') || cand.generation.toLowerCase().startsWith('gen')
+                                  ? cand.generation.toUpperCase()
+                                  : (candIsGuest ? cand.generation.toUpperCase() : `KHÓA ${cand.generation}`))
+                              : (candIsGuest ? 'KHÁCH MỜI' : 'CÓC SÀI GÒN');
+
+                            return (
+                              <button
+                                key={cand.id || `cand-${cand.mssv}-${idx}`}
+                                type="button"
+                                disabled={isCheckingCandidate}
+                                onClick={() => handleSelectCandidate(cand)}
+                                className={`w-full text-left p-3 sm:p-3.5 rounded-sm border-2 border-[#20231F] transition-all group active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-poster-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5 cursor-pointer disabled:opacity-50 ${
+                                  candIsGuest
+                                    ? 'bg-[#FAF5FF] hover:bg-[#F3E8FF]'
+                                    : candIsAlumni
+                                    ? 'bg-[#FFF8F6] hover:bg-[#FFEAE4]'
+                                    : 'bg-[#F6FAF7] hover:bg-[#EBF5EE]'
+                                }`}
+                              >
+                                <div className="space-y-0.5 min-w-0">
+                                  <div className="flex items-center gap-2 flex-wrap">
+                                    <span className="font-display text-base uppercase text-[#20231F] tracking-wide group-hover:text-[#B94D35] transition-colors">
+                                      {cand.fullName}
+                                    </span>
+                                    <span className="text-[11px] font-mono font-bold px-1.5 py-0.5 rounded-sm bg-white border border-[#20231F]/40 text-[#20231F]">
+                                      {candGen}
+                                    </span>
+                                  </div>
+                                  <div className="flex items-center gap-2 text-xs font-mono text-[#20231F]/70 flex-wrap">
+                                    <span className="font-bold text-[#20231F]">MÃ: {cand.mssv}</span>
+                                    {cand.department && <span>• {cand.department}</span>}
+                                  </div>
+                                </div>
+
+                                <div className="flex items-center justify-between sm:justify-end gap-2 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-[#20231F]/15">
+                                  <span
+                                    className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-sm text-xs font-mono font-bold uppercase border ${
+                                      candIsGuest
+                                        ? 'bg-[#7C3AED] text-white border-[#20231F]'
+                                        : candIsAlumni
+                                        ? 'bg-[#B94D35] text-white border-[#20231F]'
+                                        : 'bg-[#286640] text-white border-[#20231F]'
+                                    }`}
+                                  >
+                                    <span>{candIsGuest ? 'KHÁCH MỜI' : (candIsAlumni ? 'CỰU THÀNH VIÊN' : 'THÀNH VIÊN')}</span>
+                                    <span>•</span>
+                                    <span>{(candIsAlumni || candIsGuest) ? '389k' : '349k'}</span>
+                                  </span>
+                                  <span className="w-8 h-8 rounded-sm bg-[#20231F] text-white flex items-center justify-center font-bold text-sm group-hover:bg-[#F4C542] group-hover:text-[#20231F] group-hover:border-2 group-hover:border-[#20231F] transition-all">
+                                    →
+                                  </span>
+                                </div>
+                              </button>
+                            );
+                          })}
+                        </div>
+
+                        <div className="pt-2 text-center border-t border-[#20231F]/15 space-y-1">
+                          <p className="text-[11px] font-mono text-[#20231F]/60">
+                            💡 Hoặc nhập trực tiếp <span className="font-bold text-[#20231F]">MSSV</span> để chính xác 100%.
+                          </p>
+                          <button
+                            type="button"
+                            onClick={() => handleQuickBypass()}
+                            className="text-xs font-mono text-[#B94D35] hover:underline font-bold"
+                          >
+                            Không phải bạn ở trên? Tiếp tục đăng ký với tên "{query.trim()}" →
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+                    <button
+                      type="submit"
+                      disabled={isVerifying || !query.trim()}
+                      className="btn-editorial-primary w-full py-3.5 min-h-[48px] rounded-sm font-display text-xl tracking-wider uppercase flex items-center justify-center gap-2 disabled:opacity-50 active:scale-[0.98]"
+                    >
+                      <span>{isVerifying ? 'ĐANG ĐỐI CHIẾU...' : 'TÌM TÊN CỦA BẠN'}</span>
+                      {!isVerifying && <ArrowUpRightIcon size={18} />}
+                    </button>
+                  </form>
+                </>
+              )}
             </div>
           )}
 
@@ -770,15 +1007,21 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                 </button>
                 <button
                   type="button"
-                  onClick={() => {
-                    if (validatePersonalInfo()) {
-                      setScreen(4); // Go to payment
-                    }
-                  }}
-                  className="btn-editorial-primary flex-1 py-3.5 min-h-[48px] px-6 rounded-sm font-display text-base sm:text-lg tracking-wider uppercase flex items-center justify-center gap-2 active:scale-[0.98] shadow-poster-sm"
+                  disabled={isCheckingStep3}
+                  onClick={handleStep3Continue}
+                  className="btn-editorial-primary flex-1 py-3.5 min-h-[48px] px-6 rounded-sm font-display text-base sm:text-lg tracking-wider uppercase flex items-center justify-center gap-2 active:scale-[0.98] shadow-poster-sm disabled:opacity-60 cursor-pointer"
                 >
-                  <span>TIẾP TỤC: ĐÓNG PHÍ THAM DỰ</span>
-                  <ArrowRightIcon size={18} />
+                  {isCheckingStep3 ? (
+                    <>
+                      <span className="w-4 h-4 border-2 border-[#20231F] border-t-transparent rounded-full animate-spin" />
+                      <span>ĐANG KIỂM TRA THÔNG TIN...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>TIẾP TỤC: ĐÓNG PHÍ THAM DỰ</span>
+                      <ArrowRightIcon size={18} />
+                    </>
+                  )}
                 </button>
               </div>
             </div>
@@ -995,6 +1238,39 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                 </div>
               </div>
 
+              {/* Payment Support Helpline Notice */}
+              <div className="p-3 rounded-sm bg-[#FFFDF5] border-2 border-[#20231F] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5 text-xs shadow-poster-sm">
+                <div className="flex items-start sm:items-center gap-2.5">
+                  <span className="text-lg shrink-0">💬</span>
+                  <div className="space-y-0.5">
+                    <span className="font-bold text-[#20231F] block text-xs">
+                      Cần hỗ trợ chuyển khoản hoặc đối soát thanh toán?
+                    </span>
+                    <span className="text-[11px] text-[#20231F]/75 block">
+                      Nếu gặp vấn đề khi chuyển tiền hoặc cần hỗ trợ gấp, vui lòng liên hệ hotline/Zalo BTC.
+                    </span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
+                  <a
+                    href="tel:0901325178"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-sm bg-[#B94D35] hover:bg-[#20231F] text-white font-mono font-bold text-xs shrink-0 transition-colors shadow-xs active:scale-95 whitespace-nowrap"
+                    title="Gọi ngay 0901 325 178"
+                  >
+                    <span>📞 0901 325 178</span>
+                  </a>
+                  <a
+                    href="https://zalo.me/0901325178"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-sm bg-[#F4EEDF] hover:bg-[#EAE4D6] border border-[#20231F] text-[#20231F] font-bold text-xs shrink-0 transition-colors active:scale-95 whitespace-nowrap"
+                    title="Nhắn tin Zalo 0901 325 178"
+                  >
+                    <span>Zalo</span>
+                  </a>
+                </div>
+              </div>
+
               <div className="flex flex-col-reverse sm:flex-row gap-2.5 sm:gap-3 pt-2">
                 <button
                   type="button"
@@ -1041,7 +1317,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                       {identifiedMember?.fullName}
                     </span>
                     <span className="text-[11px] sm:text-xs text-[#20231F]/70 block font-mono truncate">
-                      MSSV: {identifiedMember?.mssv} • {isAlumni ? 'Cựu thành viên' : 'Thành viên'}
+                      MÃ: {identifiedMember?.mssv} • {identifiedMember?.role === 'GUEST' ? 'Khách mời' : (isAlumni ? 'Cựu thành viên' : 'Thành viên')}
                     </span>
                   </div>
                   <button
@@ -1104,8 +1380,16 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                 )}
               </div>
 
-              <div className="p-3 rounded-sm bg-amber-50 border border-[#F4C542] text-xs text-[#20231F]/80">
-                Thông tin đăng ký và xác nhận đóng phí tham gia sẽ được Ban Tổ Chức kiểm tra và liên hệ thông báo sớm nhất đến bạn.
+              <div className="p-3.5 rounded-sm bg-amber-50 border-2 border-[#F4C542] text-xs text-[#20231F]/90 space-y-1">
+                <p>
+                  Thông tin đăng ký và xác nhận đóng phí tham gia sẽ được Ban Tổ Chức kiểm tra và liên hệ thông báo sớm nhất đến bạn.
+                </p>
+                <p className="text-[11px] font-mono text-[#20231F]/70 flex items-center gap-1.5 flex-wrap">
+                  <span>Mọi thắc mắc cần giải đáp, liên hệ hotline/Zalo BTC:</span>
+                  <a href="tel:0901325178" className="font-bold text-[#B94D35] hover:underline font-mono">
+                    0901 325 178
+                  </a>
+                </p>
               </div>
 
               <div className="flex flex-col-reverse sm:flex-row gap-2.5 sm:gap-3 pt-2">
@@ -1141,6 +1425,37 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
             </div>
           )}
 
+        </div>
+
+        {/* Persistent Hotline Support Footer */}
+        <div className="px-3.5 sm:px-6 py-2.5 bg-[#FFFFFF] border-t-2 border-[#20231F] shrink-0 flex items-center justify-between gap-2 text-xs font-mono shadow-sm">
+          <div className="flex items-center gap-2 text-[#20231F]/80 min-w-0">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+            <span className="text-[11px] sm:text-xs truncate font-medium">
+              Có thắc mắc gì khi đăng ký? Liên hệ hotline BTC:
+            </span>
+          </div>
+          <div className="flex items-center gap-1.5 shrink-0">
+            <a
+              href="tel:0901325178"
+              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-sm bg-[#F4C542] hover:bg-[#F8D56A] border-2 border-[#20231F] text-[#20231F] font-bold text-xs shrink-0 shadow-poster-sm transition-all active:scale-95 whitespace-nowrap"
+              title="Gọi hotline hỗ trợ: 0901 325 178"
+            >
+              <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+              </svg>
+              <span>0901 325 178</span>
+            </a>
+            <a
+              href="https://zalo.me/0901325178"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden xs:inline-flex items-center gap-1 px-2.5 py-1 rounded-sm bg-[#F4EEDF] hover:bg-[#EAE4D6] border border-[#20231F] text-[#20231F] font-bold text-[11px] shrink-0 transition-all active:scale-95 whitespace-nowrap"
+              title="Nhắn tin Zalo hỗ trợ: 0901 325 178"
+            >
+              <span>Zalo</span>
+            </a>
+          </div>
         </div>
       </div>
     </div>

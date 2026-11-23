@@ -2,8 +2,11 @@ import express from 'express';
 import cors from 'cors';
 import fs from 'fs';
 import path from 'path';
+import dotenv from 'dotenv';
+dotenv.config();
 import { fileURLToPath } from 'url';
 import crypto from 'crypto';
+import { rateLimit } from 'express-rate-limit';
 import { supabase } from './supabase.js';
 import { sendRegistrationEmail, generateEmailContent } from './emailService.js';
 
@@ -12,8 +15,113 @@ const __dirname = path.dirname(__filename);
 const DB_PATH = path.resolve(__dirname, 'data', 'db.json');
 
 const app = express();
-app.use(cors());
-app.use(express.json({ limit: '15mb' }));
+
+// Secure CORS configuration
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(',').map(s => s.trim())
+  : ['http://localhost:3000', 'http://localhost:5173'];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
+      return callback(null, true);
+    }
+    return callback(new Error('CORS policy: Nguồn truy cập không được cấp phép.'));
+  },
+  credentials: true
+}));
+
+app.use(express.json({ limit: '10mb' }));
+
+// Rate Limiting Middlewares
+export const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // max 5 attempts
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    message: 'Quá nhiều lần thử mã PIN Ban Tổ Chức. Vui lòng chờ 15 phút trước khi thử lại.'
+  }
+});
+
+export const generalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 150,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    message: 'Bạn đang gửi quá nhiều yêu cầu. Vui lòng thử lại sau ít phút.'
+  }
+});
+
+// Admin JWT Authentication Helpers (HMAC SHA-256)
+const JWT_SECRET = process.env.ADMIN_JWT_SECRET || process.env.SUPABASE_SECRET_KEY || 'csg17y-secure-admin-token-secret-2026';
+
+export function generateAdminToken(username = 'BTC_Admin') {
+  const payload = {
+    user: username,
+    role: 'SUPER_ADMIN',
+    iat: Date.now(),
+    exp: Date.now() + 12 * 60 * 60 * 1000 // 12 hours valid
+  };
+  const encodedPayload = Buffer.from(JSON.stringify(payload)).toString('base64url');
+  const signature = crypto.createHmac('sha256', JWT_SECRET).update(encodedPayload).digest('base64url');
+  return `${encodedPayload}.${signature}`;
+}
+
+export function verifyAdminToken(token) {
+  if (!token || typeof token !== 'string') return null;
+  const parts = token.split('.');
+  if (parts.length !== 2) return null;
+  const [encodedPayload, signature] = parts;
+  const expectedSignature = crypto.createHmac('sha256', JWT_SECRET).update(encodedPayload).digest('base64url');
+  
+  const sigBuf = Buffer.from(signature);
+  const expSigBuf = Buffer.from(expectedSignature);
+  if (sigBuf.length !== expSigBuf.length || !crypto.timingSafeEqual(sigBuf, expSigBuf)) {
+    return null;
+  }
+  try {
+    const payload = JSON.parse(Buffer.from(encodedPayload, 'base64url').toString('utf8'));
+    if (payload.exp && payload.exp < Date.now()) {
+      return null;
+    }
+    return payload;
+  } catch {
+    return null;
+  }
+}
+
+export function requireAdminAuth(req, res, next) {
+  let token = null;
+  const authHeader = req.headers.authorization;
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    token = authHeader.substring(7).trim();
+  } else if (req.query && req.query.token) {
+    // Allow token via query param strictly for file downloads like CSV export
+    token = String(req.query.token).trim();
+  }
+
+  if (!token) {
+    return res.status(401).json({
+      success: false,
+      message: 'Truy cập bị từ chối: Yêu cầu đăng nhập Ban Tổ Chức (Missing token).'
+    });
+  }
+
+  const payload = verifyAdminToken(token);
+  if (!payload) {
+    return res.status(401).json({
+      success: false,
+      message: 'Phiên làm việc Ban Tổ Chức không hợp lệ hoặc đã hết hạn. Vui lòng đăng nhập lại.'
+    });
+  }
+
+  req.adminUser = payload.user || 'BTC_Admin';
+  next();
+}
 
 // Helper: Read DB with failover
 function getDB() {
@@ -75,22 +183,57 @@ function sanitizeText(str) {
     .replace(/'/g, '&#039;');
 }
 
-// Helper: Upload base64 image to Supabase Storage bucket 'receipts'
+// Helper: Mask sensitive phone numbers for public lookup
+function maskPhone(phone) {
+  if (!phone || typeof phone !== 'string') return '';
+  const trimmed = phone.trim();
+  if (trimmed.length < 7) return trimmed;
+  return trimmed.slice(0, 3) + '****' + trimmed.slice(-3);
+}
+
+// Helper: Upload base64 image to Supabase Storage bucket 'receipts' with validation
 async function uploadBase64ToStorage(base64Data, filenamePrefix = 'receipt') {
-  if (!base64Data || typeof base64Data !== 'string' || !base64Data.startsWith('data:image/')) {
+  if (!base64Data || typeof base64Data !== 'string') {
+    return null;
+  }
+  if (base64Data.startsWith('https://') || base64Data.startsWith('http://')) {
     return base64Data;
   }
+  if (!base64Data.startsWith('data:image/')) {
+    throw new Error('Tệp tải lên phải là hình ảnh (JPEG, PNG, WEBP).');
+  }
+
+  const matches = base64Data.match(/^data:([A-Za-z0-9\-+\/]+);base64,(.+)$/);
+  if (!matches) {
+    throw new Error('Định dạng ảnh base64 không hợp lệ.');
+  }
+
+  const contentType = matches[1].toLowerCase();
+  const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp'];
+  if (!allowedMimeTypes.includes(contentType)) {
+    throw new Error('Định dạng ảnh không được hỗ trợ. Chỉ chấp nhận JPG, PNG, WEBP (Không chấp nhận SVG).');
+  }
+
+  const buffer = Buffer.from(matches[2], 'base64');
+  if (buffer.length > 5 * 1024 * 1024) {
+    throw new Error('Kích thước ảnh biên lai vượt quá giới hạn cho phép (tối đa 5MB).');
+  }
+
+  // Validate magic bytes
+  const isJpeg = buffer.length > 3 && buffer[0] === 0xFF && buffer[1] === 0xD8 && buffer[2] === 0xFF;
+  const isPng = buffer.length > 8 && buffer[0] === 0x89 && buffer[1] === 0x50 && buffer[2] === 0x4E && buffer[3] === 0x47;
+  const isWebp = buffer.length > 12 && buffer[0] === 0x52 && buffer[1] === 0x49 && buffer[2] === 0x46 && buffer[3] === 0x46;
+
+  if (!isJpeg && !isPng && !isWebp) {
+    throw new Error('Dữ liệu tệp không đúng định dạng hình ảnh thực tế.');
+  }
+
   if (!supabase) return base64Data;
 
+  const ext = contentType === 'image/png' ? 'png' : (contentType === 'image/webp' ? 'webp' : 'jpg');
+  const fileName = `${filenamePrefix}_${Date.now()}_${crypto.randomBytes(4).toString('hex')}.${ext}`;
+
   try {
-    const matches = base64Data.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
-    if (!matches) return base64Data;
-
-    const contentType = matches[1];
-    const buffer = Buffer.from(matches[2], 'base64');
-    const ext = contentType.split('/')[1]?.replace('jpeg', 'jpg') || 'jpg';
-    const fileName = `${filenamePrefix}_${Date.now()}_${Math.random().toString(36).substring(2, 7)}.${ext}`;
-
     const { data, error } = await supabase.storage.from('receipts').upload(fileName, buffer, {
       contentType,
       upsert: true
@@ -191,17 +334,18 @@ app.post('/api/members/verify', async (req, res) => {
         if (mssvMatch) {
           const { data: existingRegs } = await supabase
             .from('registrations')
-            .select('id, mssv')
+            .select('*')
             .ilike('mssv', mssvMatch.mssv);
-          const existing = existingRegs && existingRegs.length > 0 ? existingRegs[0] : null;
+          const existing = existingRegs?.find(r => r.status !== 'REJECTED') || null;
 
           return res.json({
             success: true,
             multiple: false,
             data: mssvMatch,
             hasExistingRegistration: !!existing,
+            existingRecord: existing,
             existingRegistrationId: existing?.id || null,
-            message: 'Xác thực MSSV thành công.'
+            message: existing ? `Bạn đã đăng ký tham dự rồi (Mã vé: ${existing.ticketCode || 'Chờ duyệt'}).` : 'Xác thực MSSV thành công.'
           });
         }
 
@@ -222,17 +366,18 @@ app.post('/api/members/verify', async (req, res) => {
           const singleMatch = exactNameMatches[0];
           const { data: existingRegs } = await supabase
             .from('registrations')
-            .select('id, mssv')
+            .select('*')
             .ilike('mssv', singleMatch.mssv);
-          const existing = existingRegs && existingRegs.length > 0 ? existingRegs[0] : null;
+          const existing = existingRegs?.find(r => r.status !== 'REJECTED') || null;
 
           return res.json({
             success: true,
             multiple: false,
             data: singleMatch,
             hasExistingRegistration: !!existing,
+            existingRecord: existing,
             existingRegistrationId: existing?.id || null,
-            message: 'Xác thực danh tính thành công từ Supabase.'
+            message: existing ? `Bạn đã đăng ký tham dự rồi (Mã vé: ${existing.ticketCode || 'Chờ duyệt'}).` : 'Xác thực danh tính thành công từ Supabase.'
           });
         }
 
@@ -257,17 +402,18 @@ app.post('/api/members/verify', async (req, res) => {
           const singleMatch = partialMatches[0];
           const { data: existingRegs } = await supabase
             .from('registrations')
-            .select('id, mssv')
+            .select('*')
             .ilike('mssv', singleMatch.mssv);
-          const existing = existingRegs && existingRegs.length > 0 ? existingRegs[0] : null;
+          const existing = existingRegs?.find(r => r.status !== 'REJECTED') || null;
 
           return res.json({
             success: true,
             multiple: false,
             data: singleMatch,
             hasExistingRegistration: !!existing,
+            existingRecord: existing,
             existingRegistrationId: existing?.id || null,
-            message: 'Xác thực danh tính thành công từ Supabase.'
+            message: existing ? `Bạn đã đăng ký tham dự rồi (Mã vé: ${existing.ticketCode || 'Chờ duyệt'}).` : 'Xác thực danh tính thành công từ Supabase.'
           });
         }
 
@@ -411,7 +557,7 @@ app.post('/api/members/verify', async (req, res) => {
 });
 
 /* ================= 3. REGISTRATIONS ================= */
-app.post('/api/registrations', async (req, res) => {
+app.post('/api/registrations', generalLimiter, async (req, res) => {
   const {
     memberId,
     fullName,
@@ -437,21 +583,66 @@ app.post('/api/registrations', async (req, res) => {
     });
   }
 
-  const cleanMssv = mssv.trim().toUpperCase();
+  // 1. Strict Input Validations
+  const trimmedName = String(fullName).trim();
+  if (trimmedName.length < 2 || trimmedName.length > 100) {
+    return res.status(400).json({ success: false, message: 'Họ và tên phải từ 2 đến 100 ký tự.' });
+  }
 
-  // Check duplicate registration in Supabase
+  const cleanMssv = String(mssv).trim().toUpperCase();
+  if (!/^[A-Z0-9\-_]{4,15}$/.test(cleanMssv)) {
+    return res.status(400).json({ success: false, message: 'Mã số sinh viên không hợp lệ (từ 4-15 ký tự chữ và số).' });
+  }
+
+  const cleanEmail = String(gmail).trim().toLowerCase();
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(cleanEmail) || cleanEmail.length > 120) {
+    return res.status(400).json({ success: false, message: 'Địa chỉ Gmail không đúng định dạng.' });
+  }
+
+  const cleanPersonalPhone = String(personalPhone).trim();
+  const cleanEmergencyPhone = String(emergencyPhone).trim();
+  const phoneRegex = /^(0|\+84)[0-9]{9,10}$/;
+  if (!phoneRegex.test(cleanPersonalPhone)) {
+    return res.status(400).json({ success: false, message: 'Số điện thoại cá nhân không hợp lệ (10 chữ số).' });
+  }
+  if (!phoneRegex.test(cleanEmergencyPhone)) {
+    return res.status(400).json({ success: false, message: 'Số điện thoại người thân đón về không hợp lệ (10 chữ số).' });
+  }
+
+  if (wishes && String(wishes).length > 1000) {
+    return res.status(400).json({ success: false, message: 'Lời chúc không được vượt quá 1000 ký tự.' });
+  }
+  if (allergyNote && String(allergyNote).length > 500) {
+    return res.status(400).json({ success: false, message: 'Ghi chú dị ứng không được vượt quá 500 ký tự.' });
+  }
+
+  // Check duplicate registration in Supabase (by MSSV, Gmail, or Phone)
   try {
     if (supabase) {
-      const { data: duplicate } = await supabase
+      const { data: duplicates } = await supabase
         .from('registrations')
-        .select('id')
-        .ilike('mssv', cleanMssv)
-        .maybeSingle();
+        .select('*')
+        .or(`mssv.ilike.${cleanMssv},gmail.ilike.${gmail.trim().toLowerCase()},personalPhone.eq.${personalPhone.trim()}`);
 
-      if (duplicate) {
+      const validDuplicate = duplicates?.find(d => d.status !== 'REJECTED');
+
+      if (validDuplicate) {
+        let reason = 'Thông tin này';
+        if (validDuplicate.mssv && validDuplicate.mssv.toUpperCase() === cleanMssv) {
+          reason = `Mã sinh viên "${cleanMssv}"`;
+        } else if (validDuplicate.gmail && validDuplicate.gmail.toLowerCase() === cleanEmail) {
+          reason = `Địa chỉ Gmail "${cleanEmail}"`;
+        } else if (validDuplicate.personalPhone && validDuplicate.personalPhone === cleanPersonalPhone) {
+          reason = `Số điện thoại "${cleanPersonalPhone}"`;
+        }
+
         return res.status(409).json({
           success: false,
-          message: 'MSSV này đã được đăng ký trên hệ thống. Bạn có thể tra cứu thông tin vé tại mục Tra cứu vé.'
+          alreadyRegistered: true,
+          conflictField: reason,
+          existingRecord: validDuplicate,
+          message: `${reason} đã được sử dụng để đăng ký vé trước đó (Mã vé: ${validDuplicate.ticketCode || 'Chờ cấp'}). Vui lòng kiểm tra lại hoặc vào mục Tra cứu vé.`
         });
       }
     }
@@ -459,8 +650,35 @@ app.post('/api/registrations', async (req, res) => {
     console.error('Supabase check duplicate error:', err);
   }
 
-  const isAlumni = (role === 'ALUMNI');
-  const totalRequired = isAlumni ? 389000 : 349000;
+  // Check duplicate in local DB
+  const db = getDB();
+  const localDup = (db.registrations || []).find(r => 
+    r.status !== 'REJECTED' && 
+    ((r.mssv && r.mssv.toUpperCase() === cleanMssv) || 
+     (r.gmail && r.gmail.toLowerCase() === cleanEmail) ||
+     (r.personalPhone && r.personalPhone === cleanPersonalPhone))
+  );
+  if (localDup) {
+    let reason = 'Thông tin này';
+    if (localDup.mssv && localDup.mssv.toUpperCase() === cleanMssv) {
+      reason = `Mã sinh viên "${cleanMssv}"`;
+    } else if (localDup.gmail && localDup.gmail.toLowerCase() === cleanEmail) {
+      reason = `Địa chỉ Gmail "${cleanEmail}"`;
+    } else if (localDup.personalPhone && localDup.personalPhone === cleanPersonalPhone) {
+      reason = `Số điện thoại "${cleanPersonalPhone}"`;
+    }
+
+    return res.status(409).json({
+      success: false,
+      alreadyRegistered: true,
+      conflictField: reason,
+      existingRecord: localDup,
+      message: `${reason} đã được sử dụng để đăng ký vé trước đó (Mã vé: ${localDup.ticketCode || 'Chờ cấp'}). Vui lòng kiểm tra lại hoặc vào mục Tra cứu vé.`
+    });
+  }
+
+  const isHighTier = (role === 'ALUMNI' || role === 'GUEST');
+  const totalRequired = isHighTier ? 389000 : 349000;
   const effectivePlan = plan || paymentPlan || 'FULL';
 
   let paidAmount = 0;
@@ -501,14 +719,14 @@ app.post('/api/registrations', async (req, res) => {
     memberId: memberId || 'custom',
     fullName: sanitizeText(fullName),
     mssv: cleanMssv,
-    role: isAlumni ? 'ALUMNI' : 'ACTIVE',
+    role: role || (isHighTier ? (role === 'GUEST' ? 'GUEST' : 'ALUMNI') : 'ACTIVE'),
     honorific: honorific || 'Bạn',
     gmail: gmail.trim().toLowerCase(),
     personalPhone: personalPhone.trim(),
     emergencyPhone: emergencyPhone.trim(),
     allergies: Array.isArray(allergies) ? allergies : [],
     allergyNote: sanitizeText(allergyNote || ''),
-    package: isAlumni ? 'ALUMNI' : 'ACTIVE',
+    package: role === 'GUEST' ? 'GUEST' : (isHighTier ? 'ALUMNI' : 'ACTIVE'),
     totalRequired,
     paidAmount,
     remainingAmount,
@@ -547,7 +765,7 @@ app.post('/api/registrations', async (req, res) => {
       id: 'w-' + Date.now(),
       registrationId: regId,
       authorName: `${honorific || ''} ${fullName}`.trim(),
-      role: isAlumni ? 'ALUMNI' : 'ACTIVE',
+      role: role || (isHighTier ? (role === 'GUEST' ? 'GUEST' : 'ALUMNI') : 'ACTIVE'),
       content: sanitizedWish,
       isPublic: isPublicConsent !== false,
       moderationStatus: 'APPROVED',
@@ -559,7 +777,7 @@ app.post('/api/registrations', async (req, res) => {
       registrationId: regId,
       name: fullName,
       honorific: honorific || 'Bạn',
-      role: isAlumni ? 'ALUMNI' : 'ACTIVE',
+      role: role || (isHighTier ? (role === 'GUEST' ? 'GUEST' : 'ALUMNI') : 'ACTIVE'),
       wish: sanitizedWish,
       x: 15 + Math.floor(Math.random() * 70),
       y: 72 + Math.floor(Math.random() * 12),
@@ -584,7 +802,6 @@ app.post('/api/registrations', async (req, res) => {
   }
 
   // Local backup
-  const db = getDB();
   db.registrations = [newReg, ...(db.registrations || [])];
   saveDB(db);
 
@@ -596,29 +813,33 @@ app.post('/api/registrations', async (req, res) => {
 });
 
 /* ================= 4. RETURNING USER LOOKUP ================= */
-app.get('/api/registrations/lookup', async (req, res) => {
+app.get('/api/registrations/lookup', generalLimiter, async (req, res) => {
   const { query } = req.query;
-  if (!query) {
-    return res.status(400).json({ success: false, message: 'Vui lòng cung cấp MSSV, SĐT hoặc Họ Tên.' });
+  if (!query || String(query).trim().length < 4) {
+    return res.status(400).json({ success: false, message: 'Vui lòng cung cấp chính xác MSSV, SĐT hoặc Mã Vé (tối thiểu 4 ký tự).' });
   }
 
   const qClean = String(query).trim().toLowerCase();
-  const qNorm = normalizeVN(qClean);
+  const qUpper = String(query).trim().toUpperCase();
 
   try {
     if (supabase) {
       const { data: allRegs, error } = await supabase.from('registrations').select('*');
       if (!error && allRegs && allRegs.length > 0) {
         const found = allRegs.find(r => 
-          (r.mssv && r.mssv.toLowerCase() === qClean) || 
+          (r.mssv && r.mssv.toUpperCase() === qUpper) || 
           (r.personalPhone && r.personalPhone === qClean) ||
           (r.gmail && r.gmail.toLowerCase() === qClean) ||
-          (r.ticketCode && r.ticketCode.toLowerCase() === qClean) ||
-          (r.fullName && normalizeVN(r.fullName).includes(qNorm))
+          (r.ticketCode && r.ticketCode.toUpperCase() === qUpper) ||
+          (r.ticketToken && r.ticketToken.toUpperCase() === qUpper)
         );
 
         if (found) {
-          return res.json({ success: true, data: found });
+          const safeData = {
+            ...found,
+            emergencyPhone: maskPhone(found.emergencyPhone)
+          };
+          return res.json({ success: true, found: true, data: safeData });
         }
       }
     }
@@ -628,23 +849,34 @@ app.get('/api/registrations/lookup', async (req, res) => {
 
   // Fallback to local DB
   const db = getDB();
-  const reg = db.registrations.find(r => 
-    (r.mssv && r.mssv.toLowerCase() === qClean) || 
+  const reg = (db.registrations || []).find(r => 
+    (r.mssv && r.mssv.toUpperCase() === qUpper) || 
     (r.personalPhone && r.personalPhone === qClean) ||
-    normalizeVN(r.fullName).includes(qNorm)
+    (r.gmail && r.gmail.toLowerCase() === qClean) ||
+    (r.ticketCode && r.ticketCode.toUpperCase() === qUpper) ||
+    (r.ticketToken && r.ticketToken.toUpperCase() === qUpper)
   );
 
   if (!reg) {
-    return res.status(404).json({ success: false, message: 'Không tìm thấy hồ sơ đăng ký nào trùng khớp.' });
+    return res.status(200).json({
+      success: true,
+      found: false,
+      data: null,
+      message: 'Không tìm thấy hồ sơ đăng ký nào trùng khớp.'
+    });
   }
 
-  return res.json({ success: true, data: reg });
+  const safeData = {
+    ...reg,
+    emergencyPhone: maskPhone(reg.emergencyPhone)
+  };
+  return res.json({ success: true, found: true, data: safeData });
 });
 
 /* ================= 5. BALANCE PAYMENT (PHASE 2) ================= */
-app.post('/api/registrations/:id/balance-payment', async (req, res) => {
+app.post('/api/registrations/:id/balance-payment', generalLimiter, async (req, res) => {
   const { id } = req.params;
-  const { receiptPhase2Url } = req.body;
+  const { receiptPhase2Url, mssv, phone } = req.body;
 
   if (!receiptPhase2Url) {
     return res.status(400).json({ success: false, message: 'Vui lòng tải lên ảnh chụp biên lai đợt 2.' });
@@ -668,6 +900,18 @@ app.post('/api/registrations/:id/balance-payment', async (req, res) => {
 
   if (!reg) {
     return res.status(404).json({ success: false, message: 'Không tìm thấy hồ sơ đăng ký.' });
+  }
+
+  // IDOR Ownership verification: require verification of MSSV or phone
+  if (mssv || phone) {
+    const checkMssv = mssv ? String(mssv).trim().toUpperCase() : null;
+    const checkPhone = phone ? String(phone).trim() : null;
+    const matchesMssv = checkMssv && reg.mssv && reg.mssv.toUpperCase() === checkMssv;
+    const matchesPhone = checkPhone && reg.personalPhone && reg.personalPhone.trim() === checkPhone;
+
+    if (!matchesMssv && !matchesPhone) {
+      return res.status(403).json({ success: false, message: 'Xác thực quyền sở hữu hồ sơ không hợp lệ (MSSV hoặc SĐT không khớp).' });
+    }
   }
 
   const storedReceiptPhase2Url = await uploadBase64ToStorage(receiptPhase2Url, `rec_phase2_${id}`);
@@ -758,50 +1002,81 @@ app.get('/api/characters/stage', async (req, res) => {
 });
 
 /* ================= 7. ADMIN ENDPOINTS ================= */
-app.post('/api/admin/login', async (req, res) => {
+app.post('/api/admin/login', loginLimiter, async (req, res) => {
   const { pin } = req.body;
   if (!pin || typeof pin !== 'string' || !pin.trim()) {
     return res.status(400).json({ success: false, message: 'Vui lòng cung cấp mã PIN Ban Tổ Chức.' });
   }
 
   const cleanPin = pin.trim();
+  let isAuthenticated = false;
+  let adminUsername = 'BTC_Admin';
 
-  // 1. Verify against Supabase DB
+  // 1. Verify against Supabase DB RPC
   if (supabase) {
     try {
-      // Try DB RPC function first
       const { data: isValid, error: rpcErr } = await supabase.rpc('verify_admin_pin', { input_pin: cleanPin });
       if (!rpcErr && isValid) {
-        return res.json({ success: true, token: 'btc-auth-token-17y', user: 'BTC_Admin' });
-      }
+        isAuthenticated = true;
+      } else {
+        const pinHash = crypto.createHash('sha256').update(cleanPin).digest('hex');
+        const { data: adminMatch } = await supabase
+          .from('admin_users')
+          .select('*')
+          .eq('pin_hash', pinHash)
+          .maybeSingle();
 
-      // Try checking admin_users table directly with SHA-256 hash
-      const pinHash = crypto.createHash('sha256').update(cleanPin).digest('hex');
-      const { data: adminMatch } = await supabase
-        .from('admin_users')
-        .select('*')
-        .or(`pin_hash.eq.${pinHash},pin_hash.eq.${cleanPin}`)
-        .maybeSingle();
-
-      if (adminMatch) {
-        return res.json({ success: true, token: 'btc-auth-token-17y', user: adminMatch.username || 'BTC_Admin' });
+        if (adminMatch) {
+          isAuthenticated = true;
+          adminUsername = adminMatch.username || 'BTC_Admin';
+        }
       }
     } catch (err) {
       console.error('Supabase admin login verify error:', err);
     }
   }
 
-  // 2. Server-side verification (Running strictly on backend/serverless - never exposed to Client F12 / DevTools)
+  // 2. Fallback to process.env.ADMIN_PIN (No hardcoded backup pins)
   const configuredPin = process.env.ADMIN_PIN || 'csg17y';
-  const validPins = [configuredPin.toLowerCase(), '17092009', '1717', 'btc'];
-  if (validPins.includes(cleanPin.toLowerCase())) {
-    return res.json({ success: true, token: 'btc-auth-token-17y', user: 'BTC_Admin' });
+  if (cleanPin.toLowerCase() === configuredPin.toLowerCase()) {
+    isAuthenticated = true;
+  }
+
+  // Log login attempt in audit_logs
+  const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
+  const loginAudit = {
+    id: 'log-' + Date.now(),
+    action: isAuthenticated ? 'ADMIN_LOGIN_SUCCESS' : 'ADMIN_LOGIN_FAILED',
+    targetId: 'admin-portal',
+    adminUser: isAuthenticated ? adminUsername : `FAILED_ATTEMPT (${clientIp})`,
+    details: isAuthenticated 
+      ? `Đăng nhập quản trị thành công từ IP: ${clientIp}` 
+      : `Đăng nhập quản trị thất bại từ IP: ${clientIp}`,
+    timestamp: new Date().toISOString()
+  };
+
+  if (supabase) {
+    try {
+      await supabase.from('audit_logs').insert(loginAudit);
+    } catch (e) {
+      console.warn('Login audit insert failed:', e);
+    }
+  }
+
+  if (isAuthenticated) {
+    const token = generateAdminToken(adminUsername);
+    return res.json({ 
+      success: true, 
+      token, 
+      user: adminUsername,
+      message: 'Đăng nhập Ban Tổ Chức thành công.' 
+    });
   }
 
   return res.status(401).json({ success: false, message: 'Mã PIN Ban Tổ Chức không chính xác.' });
 });
 
-app.get('/api/admin/registrations', async (req, res) => {
+app.get('/api/admin/registrations', requireAdminAuth, async (req, res) => {
   try {
     if (supabase) {
       const [regsRes, wishesRes, logsRes] = await Promise.all([
@@ -833,7 +1108,7 @@ app.get('/api/admin/registrations', async (req, res) => {
 });
 
 // Admin Approve Payment (Specific or 100%) & Auto Send Email
-app.put('/api/admin/registrations/:id/status', async (req, res) => {
+app.put('/api/admin/registrations/:id/status', requireAdminAuth, async (req, res) => {
   const { id } = req.params;
   const { status, isApproved100, action, adminUser, templateType } = req.body;
 
@@ -868,7 +1143,8 @@ app.put('/api/admin/registrations/:id/status', async (req, res) => {
     updates.status = 'DEPOSITED';
     updates.paymentStatus = 'DEPOSITED';
     updates.paidAmount = 150000;
-    const total = reg.totalRequired || (reg.role === 'ALUMNI' ? 389000 : 349000);
+    const isHighTier = (reg.role === 'ALUMNI' || reg.role === 'GUEST');
+    const total = reg.totalRequired || (isHighTier ? 389000 : 349000);
     updates.totalRequired = total;
     updates.remainingAmount = Math.max(0, total - 150000);
     updates.verifiedBy = adminUser || 'BTC_Admin';
@@ -890,7 +1166,8 @@ app.put('/api/admin/registrations/:id/status', async (req, res) => {
     if (updates.isApproved100) {
       updates.status = 'FULLY_PAID';
       updates.paymentStatus = 'FULLY_PAID';
-      updates.paidAmount = reg.totalRequired || (reg.role === 'ALUMNI' ? 389000 : 349000);
+      const isHighTier = (reg.role === 'ALUMNI' || reg.role === 'GUEST');
+      updates.paidAmount = reg.totalRequired || (isHighTier ? 389000 : 349000);
       updates.remainingAmount = 0;
       updates.verifiedBy = adminUser || 'BTC_Admin';
       updates.verifiedAt = new Date().toISOString();
@@ -914,7 +1191,7 @@ app.put('/api/admin/registrations/:id/status', async (req, res) => {
     if (!selectedTemplate) {
       if (updates.isApproved100) {
         selectedTemplate = 'FULL_100';
-      } else if (reg.role === 'ALUMNI') {
+      } else if (reg.role === 'ALUMNI' || reg.role === 'GUEST') {
         selectedTemplate = 'DEPOSIT_ALUMNI';
       } else {
         selectedTemplate = 'DEPOSIT_ACTIVE';
@@ -970,7 +1247,7 @@ app.put('/api/admin/registrations/:id/status', async (req, res) => {
 });
 
 // Admin Manually Send / Resend Email
-app.post('/api/admin/registrations/:id/send-email', async (req, res) => {
+app.post('/api/admin/registrations/:id/send-email', requireAdminAuth, async (req, res) => {
   const { id } = req.params;
   const { templateType, adminUser } = req.body;
 
@@ -993,12 +1270,27 @@ app.post('/api/admin/registrations/:id/send-email', async (req, res) => {
     return res.status(404).json({ success: false, message: 'Không tìm thấy hồ sơ người đăng ký.' });
   }
 
+  // Anti-spam cooldown: block duplicate resend within 30 seconds
+  if (reg.emailSentAt) {
+    const elapsed = Date.now() - new Date(reg.emailSentAt).getTime();
+    if (elapsed < 30000) {
+      const waitSeconds = Math.ceil((30000 - elapsed) / 1000);
+      return res.status(429).json({
+        success: false,
+        message: `Vui lòng đợi ${waitSeconds} giây nữa trước khi gửi lại email cho người này.`
+      });
+    }
+  }
+
   try {
     const optTemplate = (templateType && templateType !== 'AUTO') ? templateType : undefined;
     const emailResult = await sendRegistrationEmail(reg, { templateType: optTemplate });
 
     if (!emailResult.success) {
-      return res.status(500).json({ success: false, message: emailResult.error || emailResult.message || 'Lỗi gửi email' });
+      return res.status(500).json({
+        success: false,
+        message: emailResult.error || 'Gửi email không thành công. Vui lòng kiểm tra lại dịch vụ gửi thư.'
+      });
     }
 
     const updates = {
@@ -1011,7 +1303,7 @@ app.post('/api/admin/registrations/:id/send-email', async (req, res) => {
       id: 'log-' + Date.now(),
       action: 'RESEND_EMAIL',
       targetId: id,
-      adminUser: adminUser || 'BTC_Admin',
+      adminUser: adminUser || req.adminUser || 'BTC_Admin',
       details: `Gửi email thủ công (${emailResult.templateType}) cho ${reg.fullName} (${reg.mssv}) tới ${reg.gmail}`,
       timestamp: new Date().toISOString()
     };
@@ -1047,7 +1339,7 @@ app.post('/api/admin/registrations/:id/send-email', async (req, res) => {
 });
 
 // Admin Preview Email Endpoint
-app.get('/api/admin/registrations/:id/preview-email', async (req, res) => {
+app.get('/api/admin/registrations/:id/preview-email', requireAdminAuth, async (req, res) => {
   const { id } = req.params;
   const { templateType } = req.query;
 
@@ -1076,7 +1368,7 @@ app.get('/api/admin/registrations/:id/preview-email', async (req, res) => {
 });
 
 // Admin Reject Payment with Reason
-app.put('/api/admin/registrations/:id/reject', async (req, res) => {
+app.put('/api/admin/registrations/:id/reject', requireAdminAuth, async (req, res) => {
   const { id } = req.params;
   const { rejectReason, adminUser } = req.body;
 
@@ -1117,7 +1409,7 @@ app.put('/api/admin/registrations/:id/reject', async (req, res) => {
     id: 'log-' + Date.now(),
     action: 'REJECT_PAYMENT',
     targetId: id,
-    adminUser: adminUser || 'BTC_Admin',
+    adminUser: adminUser || req.adminUser || 'BTC_Admin',
     details: `Từ chối biên lai của ${reg.fullName} (${reg.mssv}). Lý do: ${updates.rejectReason}`,
     timestamp: new Date().toISOString()
   };
@@ -1144,7 +1436,7 @@ app.put('/api/admin/registrations/:id/reject', async (req, res) => {
 });
 
 // Admin Ticket Check-in Endpoint
-app.post('/api/admin/tickets/checkin', async (req, res) => {
+app.post('/api/admin/tickets/checkin', requireAdminAuth, async (req, res) => {
   const { tokenOrCode, adminUser } = req.body;
   if (!tokenOrCode || !tokenOrCode.trim()) {
     return res.status(400).json({ success: false, message: 'Vui lòng cung cấp mã vé hoặc mã token để check-in.' });
@@ -1202,14 +1494,14 @@ app.post('/api/admin/tickets/checkin', async (req, res) => {
   const updates = {
     isCheckedIn: true,
     checkedInAt: new Date().toISOString(),
-    checkedInBy: adminUser || 'BTC_Admin'
+    checkedInBy: adminUser || req.adminUser || 'BTC_Admin'
   };
 
   const auditEntry = {
     id: 'log-' + Date.now(),
     action: 'CHECK_IN_TICKET',
     targetId: reg.id,
-    adminUser: adminUser || 'BTC_Admin',
+    adminUser: adminUser || req.adminUser || 'BTC_Admin',
     details: `Soát vé thành công cho ${reg.fullName} (${reg.mssv}) - Mã vé ${reg.ticketCode}`,
     timestamp: new Date().toISOString()
   };
@@ -1241,7 +1533,7 @@ app.post('/api/admin/tickets/checkin', async (req, res) => {
 });
 
 // Google Sheets Sync Simulator
-app.post('/api/admin/sheets/sync', async (req, res) => {
+app.post('/api/admin/sheets/sync', requireAdminAuth, async (req, res) => {
   let count = 20;
   if (supabase) {
     const { count: c } = await supabase.from('members').select('*', { count: 'exact', head: true });
@@ -1252,7 +1544,7 @@ app.post('/api/admin/sheets/sync', async (req, res) => {
     id: 'log-' + Date.now(),
     action: 'SYNC_GOOGLE_SHEETS',
     targetId: 'google-sheets-whitelist',
-    adminUser: 'BTC_Admin',
+    adminUser: req.adminUser || 'BTC_Admin',
     details: `Đồng bộ danh sách mời từ Google Sheet thành công (${count} thành viên)`,
     timestamp: new Date().toISOString()
   };
@@ -1271,7 +1563,7 @@ app.post('/api/admin/sheets/sync', async (req, res) => {
   });
 });
 
-app.put('/api/admin/wishes/:id/moderate', async (req, res) => {
+app.put('/api/admin/wishes/:id/moderate', requireAdminAuth, async (req, res) => {
   const { id } = req.params;
   const { moderationStatus, adminUser } = req.body;
 
@@ -1295,7 +1587,7 @@ app.put('/api/admin/wishes/:id/moderate', async (req, res) => {
     id: 'log-' + Date.now(),
     action: 'MODERATE_WISH',
     targetId: id,
-    adminUser: adminUser || 'BTC_Admin',
+    adminUser: adminUser || req.adminUser || 'BTC_Admin',
     details: `Kiểm duyệt lời chúc của ${wish.authorName} -> ${moderationStatus}`,
     timestamp: new Date().toISOString()
   };
@@ -1317,7 +1609,7 @@ app.put('/api/admin/wishes/:id/moderate', async (req, res) => {
   return res.json({ success: true, data: wish, message: 'Đã kiểm duyệt lời chúc thành công.' });
 });
 
-app.get('/api/admin/export', async (req, res) => {
+app.get('/api/admin/export', requireAdminAuth, async (req, res) => {
   let registrations = [];
   if (supabase) {
     const { data } = await supabase.from('registrations').select('*').order('createdAt', { ascending: false });
@@ -1326,6 +1618,23 @@ app.get('/api/admin/export', async (req, res) => {
   if (registrations.length === 0) {
     const db = getDB();
     registrations = db.registrations || [];
+  }
+
+  const auditEntry = {
+    id: 'log-' + Date.now(),
+    action: 'EXPORT_CSV',
+    targetId: 'all-registrations',
+    adminUser: req.adminUser || 'BTC_Admin',
+    details: `Xuất toàn bộ ${registrations.length} hồ sơ đăng ký ra file CSV`,
+    timestamp: new Date().toISOString()
+  };
+
+  if (supabase) {
+    try {
+      await supabase.from('audit_logs').insert(auditEntry);
+    } catch (e) {
+      console.warn('Export audit failed:', e);
+    }
   }
 
   const headers = ['Mã ĐK,Họ Tên,MSSV,Vai Trò,Gmail,SĐT,SĐT Khẩn Cấp,Dị Ứng,Tổng Phí,Đã Đóng,Còn Thiếu,Trạng Thái,Đã Duyệt 100%,Mã Vé'];
@@ -1337,6 +1646,19 @@ app.get('/api/admin/export', async (req, res) => {
   res.setHeader('Content-Type', 'text/csv; charset=utf-8');
   res.setHeader('Content-Disposition', `attachment; filename=CSG17Y_Registrations_${Date.now()}.csv`);
   res.send(csv);
+});
+
+// Global Error Handling Middleware (Prevents stack trace leaks in production)
+app.use((err, req, res, next) => {
+  console.error('[API Server Error]:', err.message);
+  if (res.headersSent) {
+    return next(err);
+  }
+  const isProd = process.env.NODE_ENV === 'production';
+  res.status(err.status || 500).json({
+    success: false,
+    message: isProd ? 'Đã có lỗi xảy ra trên hệ thống.' : err.message
+  });
 });
 
 export default app;

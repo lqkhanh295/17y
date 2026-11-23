@@ -92,7 +92,7 @@ export const FloatingMascotCrowd: React.FC<FloatingMascotCrowdProps> = ({ mascot
                   {m.name}
                 </span>
                 <span className="text-[9px] px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 font-mono">
-                  {m.role === 'ALUMNI' ? 'Cựu TV' : 'Thành viên'}
+                  {m.role === 'GUEST' ? 'Khách mời' : (m.role === 'ALUMNI' ? 'Cựu TV' : 'Thành viên')}
                 </span>
               </div>
               <p className="text-[11px] text-slate-200 line-clamp-2 leading-tight italic">
