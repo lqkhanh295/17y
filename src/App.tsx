@@ -83,6 +83,7 @@ export const App: React.FC = () => {
     if (window.location.pathname !== '/register') {
       window.history.pushState({}, '', '/register');
     }
+    setIsStageOpen(false);
     setIsRegisterOpen(true);
     setIsLookupOpen(false);
     setIsAdminOpen(false);
@@ -92,6 +93,7 @@ export const App: React.FC = () => {
     if (window.location.pathname !== '/portal') {
       window.history.pushState({}, '', '/portal');
     }
+    setIsStageOpen(false);
     setIsLookupOpen(true);
     setIsRegisterOpen(false);
     setIsAdminOpen(false);

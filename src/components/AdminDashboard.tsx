@@ -8,6 +8,7 @@ import {
 } from 'naive-icons';
 import { RegistrationRecord } from '../types';
 import { apiClient } from '../services/apiClient';
+import { EmailPreviewModal } from './EmailPreviewModal';
 
 interface AdminDashboardProps {
   isOpen: boolean;
@@ -63,6 +64,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     record?: RegistrationRecord;
   } | null>(null);
   const [isCheckingIn, setIsCheckingIn] = useState(false);
+
+  // Email Preview & Dispatch States
+  const [emailPreviewRecord, setEmailPreviewRecord] = useState<RegistrationRecord | null>(null);
+  const [isSendingEmail, setIsSendingEmail] = useState(false);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
+
+  const showToast = (message: string, type: 'success' | 'error' | 'info' = 'success') => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 4500);
+  };
 
   // Fetch live registrations & wishes from backend API
   const loadAdminData = async () => {
@@ -130,12 +141,58 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   // Active reviewing record
   const currentReviewRecord = registrations.find(r => r.id === (selectedReviewId || pendingReviewList[0]?.id));
 
+  // Handle Approve Deposit (150.000đ)
+  const handleApproveDeposit = async (id: string) => {
+    const reg = registrations.find(r => r.id === id);
+    if (!reg) return;
+    setIsLoading(true);
+    try {
+      const template = reg.role === 'ALUMNI' ? 'DEPOSIT_ALUMNI' : 'DEPOSIT_ACTIVE';
+      await apiClient.updateRegistrationStatus(id, {
+        action: 'APPROVE_DEPOSIT',
+        status: 'DEPOSITED',
+        templateType: template,
+        adminUser: 'BTC_Admin'
+      });
+
+      const total = reg.totalRequired || (reg.role === 'ALUMNI' ? 389000 : 349000);
+      const remaining = Math.max(0, total - 150000);
+
+      setRegistrations(prev => prev.map(r => r.id === id ? {
+        ...r,
+        status: 'DEPOSITED',
+        paymentStatus: 'DEPOSITED',
+        paidAmount: 150000,
+        totalRequired: total,
+        remainingAmount: remaining,
+        isApproved100: false,
+        isEmailSent: true,
+        emailSentAt: new Date().toISOString(),
+        lastEmailTemplate: template,
+        verifiedBy: 'BTC_Admin',
+        verifiedAt: new Date().toISOString()
+      } : r));
+
+      showToast(`✓ Đã duyệt đặt cọc 150k và gửi email xác nhận (${reg.role === 'ALUMNI' ? 'Alumni - 389k' : 'Active - 349k'}) tới ${reg.gmail}!`, 'success');
+    } catch (err: unknown) {
+      const error = err as Error;
+      showToast('Lỗi duyệt đặt cọc: ' + error.message, 'error');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // Handle Approve 100%
-  const handleApprove = async (id: string) => {
+  const handleApprove100 = async (id: string) => {
+    const reg = registrations.find(r => r.id === id);
+    if (!reg) return;
+    setIsLoading(true);
     try {
       await apiClient.updateRegistrationStatus(id, {
         isApproved100: true,
+        action: 'APPROVE_100',
         status: 'FULLY_PAID',
+        templateType: 'FULL_100',
         adminUser: 'BTC_Admin'
       });
       onApprove100(id);
@@ -143,14 +200,47 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         ...r,
         isApproved100: true,
         status: 'FULLY_PAID',
-        paidAmount: r.totalRequired,
+        paymentStatus: 'FULLY_PAID',
+        paidAmount: r.totalRequired || (r.role === 'ALUMNI' ? 389000 : 349000),
         remainingAmount: 0,
+        isEmailSent: true,
+        emailSentAt: new Date().toISOString(),
+        lastEmailTemplate: 'FULL_100',
         approvedBy: 'BTC_Admin',
-        approvedAt: new Date().toISOString()
+        approvedAt: new Date().toISOString(),
+        verifiedBy: 'BTC_Admin',
+        verifiedAt: new Date().toISOString()
       } : r));
+
+      showToast(`✓ Đã phê duyệt 100% và gửi email kèm mã QR Check-in tới ${reg.gmail}!`, 'success');
     } catch (err: unknown) {
       const error = err as Error;
-      alert('Lỗi cập nhật: ' + error.message);
+      showToast('Lỗi duyệt 100%: ' + error.message, 'error');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Handle Send/Resend Email manually
+  const handleSendEmail = async (id: string, templateType: string) => {
+    const reg = registrations.find(r => r.id === id);
+    if (!reg) return;
+    setIsSendingEmail(true);
+    try {
+      await apiClient.sendRegistrationEmail(id, { templateType, adminUser: 'BTC_Admin' });
+      setRegistrations(prev => prev.map(r => r.id === id ? {
+        ...r,
+        isEmailSent: true,
+        emailSentAt: new Date().toISOString(),
+        lastEmailTemplate: templateType
+      } : r));
+      showToast(`✓ Đã gửi email (${templateType}) thành công tới ${reg.gmail}!`, 'success');
+      setEmailPreviewRecord(null);
+    } catch (err: unknown) {
+      const error = err as Error;
+      showToast('Lỗi gửi email: ' + error.message, 'error');
+    } finally {
+      setIsSendingEmail(false);
     }
   };
 
@@ -630,6 +720,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                             <th className="py-2.5 px-3">Đã Đóng</th>
                             <th className="py-2.5 px-3">Liên Hệ</th>
                             <th className="py-2.5 px-3">Trạng Thái</th>
+                            <th className="py-2.5 px-3">Email Vé</th>
                             <th className="py-2.5 px-3">Vé VIP</th>
                             <th className="py-2.5 px-3 text-right">Thao Tác</th>
                           </tr>
@@ -637,7 +728,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         <tbody className="divide-y divide-[#383838] font-body text-[#F4F0E6]">
                           {filtered.length === 0 ? (
                             <tr>
-                              <td colSpan={7} className="py-8 text-center text-[#A8A8A8]">
+                              <td colSpan={8} className="py-8 text-center text-[#A8A8A8]">
                                 Không tìm thấy người tham dự nào khớp với bộ lọc.
                               </td>
                             </tr>
@@ -684,6 +775,26 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                                     {r.isApproved100 ? 'ĐÃ DUYỆT 100%' : (r.status === 'REJECTED' ? 'TỪ CHỐI' : 'CHỜ DUYỆT')}
                                   </span>
                                 </td>
+                                <td className="py-2.5 px-3">
+                                  {r.isEmailSent ? (
+                                    <div className="flex flex-col gap-0.5">
+                                      <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 flex items-center gap-1 w-fit">
+                                        <MailIcon size={10} />
+                                        <span>{r.lastEmailTemplate === 'FULL_100' ? 'Vé VIP' : (r.lastEmailTemplate === 'DEPOSIT_ALUMNI' ? 'Cọc Alumni' : (r.lastEmailTemplate === 'DEPOSIT_ACTIVE' ? 'Cọc Active' : 'Đã gửi'))}</span>
+                                      </span>
+                                      {r.emailSentAt && (
+                                        <span className="text-[9px] text-[#A8A8A8] font-mono">
+                                          {new Date(r.emailSentAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
+                                        </span>
+                                      )}
+                                    </div>
+                                  ) : (
+                                    <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-[#242424] text-[#888888] border border-[#383838] flex items-center gap-1 w-fit">
+                                      <MailIcon size={10} />
+                                      <span>Chưa gửi</span>
+                                    </span>
+                                  )}
+                                </td>
                                 <td className="py-2.5 px-3 font-mono text-[11px]">
                                   {r.isApproved100 ? (
                                     <span className="text-emerald-400 font-bold">{r.ticketCode}</span>
@@ -692,16 +803,26 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                                   )}
                                 </td>
                                 <td className="py-2.5 px-3 text-right">
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      setSelectedReviewId(r.id);
-                                      setActiveModule('PAYMENT_REVIEW');
-                                    }}
-                                    className="px-2.5 py-1 rounded bg-[#222222] hover:bg-[#383838] border border-[#383838] text-[11px] font-bold text-white transition-colors"
-                                  >
-                                    Chi tiết
-                                  </button>
+                                  <div className="flex items-center justify-end gap-1.5">
+                                    <button
+                                      type="button"
+                                      onClick={() => setEmailPreviewRecord(r)}
+                                      title="Xem trước & Gửi mail"
+                                      className="p-1.5 rounded-lg bg-[#222222] hover:bg-[#333333] border border-[#383838] text-[#F5C400] transition-colors"
+                                    >
+                                      <MailIcon size={13} />
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        setSelectedReviewId(r.id);
+                                        setActiveModule('PAYMENT_REVIEW');
+                                      }}
+                                      className="px-2.5 py-1 rounded-lg bg-[#222222] hover:bg-[#383838] border border-[#383838] text-[11px] font-bold text-white transition-colors"
+                                    >
+                                      Chi tiết
+                                    </button>
+                                  </div>
                                 </td>
                               </tr>
                             ))
@@ -884,25 +1005,84 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       )}
 
                       {/* Action Buttons with distinct spacing and confirmation hierarchy */}
-                      {currentReviewRecord && !currentReviewRecord.isApproved100 && (
+                      {currentReviewRecord && (
                         <div className="space-y-2 pt-2 border-t border-[#383838]">
-                          <button
-                            type="button"
-                            onClick={() => handleApprove(currentReviewRecord.id)}
-                            className="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 transition-colors shadow-sm"
-                          >
-                            <CheckIcon size={16} />
-                            <span>PHÊ DUYỆT THANH TOÁN (APPROVE 100%)</span>
-                          </button>
+                          {/* Live Email Dispatch Status Box */}
+                          <div className="flex items-center justify-between text-xs px-3 py-2 rounded-lg bg-[#222222] border border-[#383838]">
+                            <span className="text-[#A8A8A8] flex items-center gap-1.5 font-medium">
+                              <MailIcon size={14} className="text-[#F5C400]" />
+                              <span>Email xác nhận:</span>
+                            </span>
+                            {currentReviewRecord.isEmailSent ? (
+                              <span className="text-emerald-400 font-mono font-bold text-[11px] flex items-center gap-1">
+                                <CheckIcon size={12} />
+                                <span>ĐÃ GỬI ({currentReviewRecord.lastEmailTemplate === 'FULL_100' ? 'VÉ VIP 100%' : (currentReviewRecord.lastEmailTemplate === 'DEPOSIT_ALUMNI' ? 'CỌC ALUMNI' : 'CỌC ACTIVE')})</span>
+                              </span>
+                            ) : (
+                              <span className="text-amber-400 font-mono font-bold text-[11px]">
+                                CHƯA ĐI MAIL
+                              </span>
+                            )}
+                          </div>
 
-                          <button
-                            type="button"
-                            onClick={() => setShowRejectModal(true)}
-                            className="w-full py-2.5 rounded-xl bg-[#222222] hover:bg-red-950/40 text-[#D94C2B] border border-[#D94C2B]/40 font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 transition-colors"
-                          >
-                            <CloseIcon size={16} />
-                            <span>TỪ CHỐI BIÊN LAI (REJECT)</span>
-                          </button>
+                          {!currentReviewRecord.isApproved100 && (
+                            <>
+                              {/* Option 1: Approve 150k Deposit if remaining balance exists */}
+                              {(currentReviewRecord.remainingAmount > 0 || currentReviewRecord.plan === 'DEPOSIT_150' || currentReviewRecord.plan === 'DEPOSIT_100') && (
+                                <button
+                                  type="button"
+                                  disabled={isLoading}
+                                  onClick={() => handleApproveDeposit(currentReviewRecord.id)}
+                                  className="w-full py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 transition-colors shadow-sm disabled:opacity-50"
+                                >
+                                  <CheckIcon size={16} />
+                                  <span>DUYỆT ĐẶT CỌC 150K & GỬI MAIL (THIẾU {currentReviewRecord.remainingAmount.toLocaleString('vi-VN')}Đ)</span>
+                                </button>
+                              )}
+
+                              {/* Option 2: Approve 100% Full Payment with Check-in QR */}
+                              <button
+                                type="button"
+                                disabled={isLoading}
+                                onClick={() => handleApprove100(currentReviewRecord.id)}
+                                className="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 transition-colors shadow-sm disabled:opacity-50"
+                              >
+                                <CheckIcon size={16} />
+                                <span>PHÊ DUYỆT 100% & GỬI VÉ VIP (QR CHECK-IN)</span>
+                              </button>
+
+                              {/* Option 3: Reject Payment */}
+                              <button
+                                type="button"
+                                onClick={() => setShowRejectModal(true)}
+                                className="w-full py-2 rounded-xl bg-[#222222] hover:bg-red-950/40 text-[#D94C2B] border border-[#D94C2B]/40 font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 transition-colors"
+                              >
+                                <CloseIcon size={16} />
+                                <span>TỪ CHỐI BIÊN LAI (REJECT)</span>
+                              </button>
+                            </>
+                          )}
+
+                          {/* Secondary Toolbar: Preview & Manual Dispatch */}
+                          <div className="flex gap-2 pt-1">
+                            <button
+                              type="button"
+                              onClick={() => setEmailPreviewRecord(currentReviewRecord)}
+                              className="flex-1 py-2 rounded-lg bg-[#222222] hover:bg-[#2c2c2c] border border-[#383838] text-[11px] font-bold text-[#F5C400] flex items-center justify-center gap-1.5 transition-colors"
+                            >
+                              <EyeIcon size={14} />
+                              <span>Xem trước & Chọn mẫu</span>
+                            </button>
+                            <button
+                              type="button"
+                              disabled={isSendingEmail}
+                              onClick={() => handleSendEmail(currentReviewRecord.id, currentReviewRecord.isApproved100 ? 'FULL_100' : (currentReviewRecord.role === 'ALUMNI' ? 'DEPOSIT_ALUMNI' : 'DEPOSIT_ACTIVE'))}
+                              className="flex-1 py-2 rounded-lg bg-[#222222] hover:bg-[#2c2c2c] border border-[#383838] text-[11px] font-bold text-emerald-400 flex items-center justify-center gap-1.5 transition-colors disabled:opacity-50"
+                            >
+                              <MailIcon size={14} />
+                              <span>{currentReviewRecord.isEmailSent ? 'Gửi lại email' : 'Gửi mail ngay'}</span>
+                            </button>
+                          </div>
                         </div>
                       )}
                     </div>
@@ -1180,6 +1360,30 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 </button>
               </div>
             </div>
+          </div>
+        )}
+
+        {/* Modal: Email Preview and Dispatch */}
+        <EmailPreviewModal
+          isOpen={Boolean(emailPreviewRecord)}
+          onClose={() => setEmailPreviewRecord(null)}
+          record={emailPreviewRecord}
+          onSendEmail={handleSendEmail}
+          isSending={isSendingEmail}
+        />
+
+        {/* Global Action Toast Notification */}
+        {toast && (
+          <div className={`fixed bottom-6 right-6 z-[130] px-4 py-3 rounded-xl border shadow-2xl flex items-center gap-2.5 text-xs font-bold transition-all ${
+            toast.type === 'success' 
+              ? 'bg-emerald-950/95 border-emerald-500 text-emerald-200 shadow-emerald-950/50' 
+              : toast.type === 'error'
+              ? 'bg-red-950/95 border-red-500 text-red-200 shadow-red-950/50'
+              : 'bg-amber-950/95 border-amber-500 text-amber-200 shadow-amber-950/50'
+          }`}>
+            {toast.type === 'success' ? <CheckCircleIcon size={18} /> : <AlertTriangleIcon size={18} />}
+            <span>{toast.message}</span>
+            <button type="button" onClick={() => setToast(null)} className="ml-2 opacity-70 hover:opacity-100 text-base">✕</button>
           </div>
         )}
 

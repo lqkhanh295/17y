@@ -284,7 +284,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-5 bg-[#20231F]/90 backdrop-blur-md overflow-hidden animate-fadeIn pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)]">
+    <div className="fixed inset-0 z-[70] flex items-center justify-center p-2 sm:p-5 bg-[#20231F]/90 backdrop-blur-md overflow-hidden animate-fadeIn pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)]">
       <div
         className="relative w-full max-w-2xl max-h-[96dvh] sm:max-h-[95vh] my-auto bg-[#F4EEDF] border-2 border-[#20231F] rounded-sm shadow-poster-lg overflow-hidden flex flex-col animate-paper-unfold"
         onClick={(e) => e.stopPropagation()}

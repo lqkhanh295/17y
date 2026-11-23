@@ -1186,8 +1186,11 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
           <div className="absolute bottom-4 right-4 sm:bottom-6 sm:right-6 z-30">
             <button
               type="button"
-              onClick={onOpenRegister}
-              className="group px-4 py-2 rounded-full bg-[#1C140D]/85 hover:bg-[#1C140D] backdrop-blur-md text-amber-200 hover:text-amber-100 border border-amber-400/30 hover:border-amber-400/60 text-xs font-mono font-medium tracking-wide shadow-lg flex items-center gap-2 transition-all hover:-translate-y-0.5 active:translate-y-0"
+              onClick={() => {
+                if (onClose) onClose();
+                if (onOpenRegister) onOpenRegister();
+              }}
+              className="group px-4 py-2 rounded-full bg-[#1C140D]/85 hover:bg-[#1C140D] backdrop-blur-md text-amber-200 hover:text-amber-100 border border-amber-400/30 hover:border-amber-400/60 text-xs font-mono font-medium tracking-wide shadow-lg flex items-center gap-2 transition-all hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
             >
               <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse shrink-0" />
               <span>Gửi lời chúc lên sân khấu</span>
@@ -1513,9 +1516,10 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
                 type="button"
                 onClick={() => {
                   setIsWishDrawerOpen(false);
-                  onOpenRegister();
+                  if (onClose) onClose();
+                  if (onOpenRegister) onOpenRegister();
                 }}
-                className="px-4 py-2 min-h-[40px] rounded-full bg-amber-400 hover:bg-amber-300 text-[#1C140D] font-mono font-bold text-xs uppercase flex items-center gap-1.5 transition-colors active:scale-95 shadow-sm"
+                className="px-4 py-2 min-h-[40px] rounded-full bg-amber-400 hover:bg-amber-300 text-[#1C140D] font-mono font-bold text-xs uppercase flex items-center gap-1.5 transition-colors active:scale-95 shadow-sm cursor-pointer"
               >
                 <span>Gửi lời chúc của bạn</span>
                 <SparklesIcon size={14} />
