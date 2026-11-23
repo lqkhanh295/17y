@@ -46,27 +46,37 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
   const [selectedRole, setSelectedRole] = useState<'ALL' | MemberRole>('ALL');
   const [searchTerm, setSearchTerm] = useState('');
   const [activeCharacter, setActiveCharacter] = useState<MascotFrog | null>(null);
-  const [soundEnabled, setSoundEnabled] = useState(false);
+  const [soundEnabled, setSoundEnabled] = useState(true);
   const [stageLightsOn, setStageLightsOn] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  // Tắt toàn bộ nhạc nền khi bước vào sân khấu & autoplay video TVC
+  // Tắt nhạc nền web khi bước vào sân khấu & phát video TVC CÓ TIẾNG
   useEffect(() => {
-    audioService.stop();
+    audioService.pauseForStage();
     if (videoRef.current) {
-      videoRef.current.play().catch(() => {
+      videoRef.current.muted = false;
+      videoRef.current.volume = 1.0;
+      videoRef.current.play().catch((err) => {
+        console.warn('Autoplay with sound restricted, fallback to muted autoplay:', err);
         if (videoRef.current) {
           videoRef.current.muted = true;
           videoRef.current.play().catch(() => {});
         }
       });
     }
+
+    return () => {
+      if (videoRef.current) {
+        videoRef.current.pause();
+      }
+    };
   }, []);
 
   // Sync video audio with soundEnabled toggle
   useEffect(() => {
     if (videoRef.current) {
       videoRef.current.muted = !soundEnabled;
+      videoRef.current.volume = 1.0;
       if (soundEnabled) {
         videoRef.current.play().catch(() => {});
       }
@@ -979,15 +989,19 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
         </div>
 
         {/* ========================================================================= */}
-        {/* 3. MÀN HÌNH LED 16:9 CHÍNH GIỮA CHIẾU VIDEO TVC LẶP ĐI LẶP LẠI             */}
+        {/* 3. MÀN HÌNH LED 16:9 CHÍNH GIỮA CHIẾU VIDEO TVC LẶP ĐI LẶP LẠI (CÓ TIẾNG)   */}
         {/* ========================================================================= */}
-        <div className="absolute top-[14%] sm:top-14 left-1/2 -translate-x-1/2 w-[72%] sm:w-[52%] md:w-[45%] max-w-[580px] aspect-[16/9] z-20 pointer-events-none">
+        <div className="absolute top-[14%] sm:top-14 left-1/2 -translate-x-1/2 w-[72%] sm:w-[52%] md:w-[45%] max-w-[580px] aspect-[16/9] z-20">
           {/* Ambient Wall Drop Shadow & Soft Stage Screen Glow */}
           <div className="absolute -inset-2 bg-amber-500/15 rounded-xs blur-xl -z-10 pointer-events-none" />
-          <div className="absolute -inset-1.5 bg-black/70 rounded-xs blur-md -z-10" />
+          <div className="absolute -inset-1.5 bg-black/70 rounded-xs blur-md -z-10 pointer-events-none" />
 
           {/* Heavy Matte Black Concert LED Frame */}
-          <div className="w-full h-full bg-[#07080A] border-2 sm:border-3 border-[#1E232E] rounded-xs relative overflow-hidden shadow-2xl">
+          <div 
+            onClick={() => setSoundEnabled(!soundEnabled)}
+            className="w-full h-full bg-[#07080A] border-2 sm:border-3 border-[#1E232E] rounded-xs relative overflow-hidden shadow-2xl cursor-pointer group select-none"
+            title={soundEnabled ? 'Nhấp vào màn hình để tắt tiếng TVC' : 'Nhấp vào màn hình để bật tiếng TVC'}
+          >
             {/* Real TVC Video looping continuously */}
             <video
               ref={videoRef}
@@ -1013,8 +1027,28 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
             <div className="absolute bottom-1 left-1 w-1 h-1 rounded-full bg-[#11141C] border border-white/20" />
             <div className="absolute bottom-1 right-1 w-1 h-1 rounded-full bg-[#11141C] border border-white/20" />
 
+            {/* Sound Toggle Pill Overlay on TVC Screen */}
+            <div className="absolute top-2 left-2 z-30 pointer-events-auto">
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSoundEnabled(!soundEnabled);
+                }}
+                className={`flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-mono font-bold transition-all shadow-md active:scale-95 ${
+                  soundEnabled
+                    ? 'bg-amber-400 text-[#1C140D] border border-amber-300'
+                    : 'bg-black/85 hover:bg-black text-rose-300 border border-rose-500/80 animate-pulse'
+                }`}
+                title={soundEnabled ? 'Tắt tiếng video TVC' : 'Bật tiếng video TVC'}
+              >
+                {soundEnabled ? <Volume2Icon size={12} className="text-[#1C140D]" /> : <VolumeXIcon size={12} className="text-rose-400" />}
+                <span>{soundEnabled ? 'TIẾNG TVC: BẬT' : 'CHẠM ĐỂ BẬT TIẾNG TVC'}</span>
+              </button>
+            </div>
+
             {/* Live Broadcast Badge */}
-            <div className="absolute bottom-1.5 right-2 flex items-center gap-1.5 px-1.5 py-0.5 rounded-xs bg-black/60 backdrop-blur-xs border border-white/10 opacity-75">
+            <div className="absolute bottom-1.5 right-2 flex items-center gap-1.5 px-1.5 py-0.5 rounded-xs bg-black/60 backdrop-blur-xs border border-white/10 opacity-75 pointer-events-none">
               <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />
               <span className="font-mono text-[8px] text-white/90 font-bold uppercase tracking-wider">LIVE • TVC 17Y</span>
             </div>

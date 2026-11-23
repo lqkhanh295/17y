@@ -22,7 +22,7 @@ export function createGoogleCalendarUrl(record?: CalendarEventRecord): string {
   const { title, startUtc, endUtc, location, dateFormatted, timeFormatted } = CSG_EVENT_DETAILS;
   
   const attendeeInfo = record?.fullName
-    ? `\nNgười tham dự: ${record.fullName}${record.mssv ? ` (${record.mssv})` : ''}\nMã vé Check-in: ${record.ticketCode || 'CSG17'}\n`
+    ? `\nNgười tham dự: ${record.fullName}${record.mssv ? ` (${record.mssv})` : ''}\n`
     : '';
 
   const details = `Đại tiệc sinh nhật Cóc Sài Gòn 17 tuổi: THE NEXT SIGNAL!

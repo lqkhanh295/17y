@@ -20,7 +20,6 @@ export function createGoogleCalendarUrl(record) {
 Thời gian: ${timeFormatted} ngày ${dateFormatted}
 Địa điểm: ${location}
 Họ và tên: ${fullName}
-Mã vé Check-in: ${ticketCode}
 
 Hẹn gặp bạn tại đêm hội ngộ 17 năm đại gia đình Cóc Sài Gòn!`;
 
@@ -106,14 +105,10 @@ BAN TỔ CHỨC SINH NHẬT CÓC SÀI GÒN 17 TUỔI`;
     return { subject, html: simpleHtml(text), text, templateType };
   }
 
-  /* ================= TEMPLATE 3: FULL 100% (KHỚP 100% MẪU BTC) ================= */
+  /* ================= TEMPLATE 3: FULL 100% (KHÔNG DÙNG MÃ CHECK-IN) ================= */
   const subject = `[CÓC SÀI GÒN] XÁC NHẬN ĐĂNG KÝ THÀNH CÔNG – SINH NHẬT CÓC SÀI GÒN 17 TUỔI`;
   const text = `Thân gửi ${fullName},
 Ban Tổ Chức Cóc Sài Gòn xin xác nhận bạn đã hoàn tất đăng ký tham dự sự kiện sinh nhật 17 tuổi: The Next Signal. Vậy là bạn đã chính thức có một chỗ hẹn cùng đại gia đình Cóc Sài Gòn trong cột mốc đặc biệt này rồi!
-Để chuẩn bị cho ngày hội ngộ, Ban Tổ Chức gửi bạn mã Check-in cá nhân bên dưới:
-MÃ CHECK-IN CỦA BẠN: ${ticketCode}
-Họ và tên: ${fullName}
-Bạn vui lòng lưu lại mã này và xuất trình tại khu vực Check-in vào ngày diễn ra sự kiện để Ban Tổ Chức hỗ trợ xác nhận thông tin và đón tiếp bạn nhé!
 17 năm là hành trình được viết nên bởi nhiều thế hệ, và mỗi người đều mang theo một mảnh ghép thật riêng trong câu chuyện ấy. Dù bạn đã từng đồng hành cùng Cóc từ những ngày đầu hay chỉ vừa mới bắt đầu hành trình của mình, chúng ta đều có chung một điểm hẹn mang tên Cóc Sài Gòn.
 Hẹn gặp bạn tại Tiệc Sinh nhật Cóc Sài Gòn 17 tuổi: The Next Signal. Cùng nhau tạo nên một ngày hội ngộ thật đáng nhớ nhé!
 Thân mến,

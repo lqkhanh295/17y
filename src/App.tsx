@@ -72,7 +72,7 @@ export const App: React.FC = () => {
 
   // URL-based routing handlers
   const openStage = () => {
-    audioService.stop();
+    audioService.pauseForStage();
     setIsStageOpen(true);
     setIsRegisterOpen(false);
     setIsLookupOpen(false);
@@ -112,14 +112,28 @@ export const App: React.FC = () => {
     if (window.location.pathname !== '/') {
       window.history.pushState({}, '', '/');
     }
+    const wasStage = isStageOpen;
     setIsRegisterOpen(false);
     setIsLookupOpen(false);
     setIsAdminOpen(false);
     setIsStageOpen(false);
+    if (wasStage) {
+      audioService.resumeFromStage();
+    }
     if (typeof window !== 'undefined') {
       window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
     }
   };
+
+  // Khởi động nhạc nền khi vào trang web (tự động phát hoặc phát ngay khi có tương tác đầu tiên)
+  useEffect(() => {
+    const path = window.location.pathname.toLowerCase();
+    const hash = window.location.hash.toLowerCase();
+    const isStage = path.startsWith('/stage') || hash === '#stage';
+    if (!isStage) {
+      audioService.initAutoPlay();
+    }
+  }, []);
 
   // Disable browser scroll restoration so page always starts fresh from the beginning
   useEffect(() => {
@@ -362,7 +376,10 @@ export const App: React.FC = () => {
         <CelebrationStage
           isModal={true}
           characters={stageCharacters}
-          onClose={() => setIsStageOpen(false)}
+          onClose={() => {
+            setIsStageOpen(false);
+            audioService.resumeFromStage();
+          }}
           onOpenRegister={openRegister}
           onOpenPortal={openLookup}
         />

@@ -88,6 +88,22 @@ class AudioService {
     this.notifyListeners();
   }
 
+  // Tạm dừng nhạc nền khi bước vào Sân Khấu Cóc (không đánh dấu userMuted)
+  public pauseForStage() {
+    if (this.audio && this.isPlaying) {
+      this.audio.pause();
+      this.isPlaying = false;
+      this.notifyListeners();
+    }
+  }
+
+  // Tiếp tục phát nhạc nền khi rời khỏi Sân Khấu Cóc (nếu user không bấm tắt chủ động)
+  public resumeFromStage() {
+    if (!this.userMuted) {
+      this.start().catch(() => {});
+    }
+  }
+
   public togglePlay(): boolean {
     if (this.isPlaying) {
       this.stop();
