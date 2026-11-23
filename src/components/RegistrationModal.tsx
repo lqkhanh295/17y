@@ -30,8 +30,8 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
   // 6-Screen Guided Flow:
   // Screen 1: Identity Verification (MSSV / Name Lookup)
   // Screen 2: Personalized Welcome (Alumni vs Member)
-  // Screen 3: Payment Selection & VietQR (Full 100%, Deposit 100k, Deposit 150k + Receipt)
-  // Screen 4: Participant Information (About you, Just in case, A little note)
+  // Screen 3: Participant Information (About you, Just in case, A little note)
+  // Screen 4: Payment Selection & VietQR (Full 100%, Deposit 150k + Receipt)
   // Screen 5: Review & Confirm
   // Screen 6: Registration Success & Mascot Reveal
   const [screen, setScreen] = useState<number>(1);
@@ -41,8 +41,6 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
   const [identifiedMember, setIdentifiedMember] = useState<MemberDirectoryItem | null>(null);
   const [searchError, setSearchError] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
-  const [suggestions, setSuggestions] = useState<MemberDirectoryItem[]>([]);
-  const [isSearchingSuggestions, setIsSearchingSuggestions] = useState(false);
 
   // Screen 3: Payment selection state
   const [plan, setPlan] = useState<PaymentPlan>('FULL');
@@ -77,30 +75,6 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
     window.scrollTo({ top: 0, behavior: 'instant' });
   }, [isOpen, screen]);
 
-  // Auto-complete suggestion search while typing in Screen 1
-  useEffect(() => {
-    if (!isOpen || screen !== 1) return;
-    const q = query.trim();
-    if (q.length < 2) {
-      setSuggestions([]);
-      return;
-    }
-
-    const timer = setTimeout(async () => {
-      setIsSearchingSuggestions(true);
-      try {
-        const list = await apiClient.searchMembers(q);
-        setSuggestions(list);
-      } catch {
-        setSuggestions([]);
-      } finally {
-        setIsSearchingSuggestions(false);
-      }
-    }, 200);
-
-    return () => clearTimeout(timer);
-  }, [isOpen, query, screen]);
-
   // Pricing calculation
   const isAlumni = identifiedMember?.role === 'ALUMNI';
   const totalFee = isAlumni ? 389000 : 349000;
@@ -134,21 +108,12 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
     setScreen(2);
   };
 
-  const handleSelectSuggestion = (member: MemberDirectoryItem) => {
-    setIdentifiedMember(member);
-    setQuery(member.fullName);
-    setSuggestions([]);
-    setSearchError('');
-    setScreen(2);
-  };
-
   const handleIdentify = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!query.trim()) return;
 
     setSearchError('');
     setIsVerifying(true);
-    setSuggestions([]);
     try {
       const res = await apiClient.verifyMember(query);
       if (res.success && res.data) {
@@ -222,22 +187,22 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
     );
   };
 
-  // Validate Screen 3 (Payment)
-  const validateScreen3 = () => {
-    const errors: { [key: string]: string } = {};
-    if (!receiptImage) errors.receipt = 'Vui lòng tải lên ảnh chụp màn hình biên lai chuyển khoản.';
-    setPaymentErrors(errors);
-    return Object.keys(errors).length === 0;
-  };
-
-  // Validate Screen 4 (Personal Info)
-  const validateScreen4 = () => {
+  // Validate Screen 3 (Personal Info Form)
+  const validatePersonalInfo = () => {
     const errors: { [key: string]: string } = {};
     if (!gmail.includes('@')) errors.gmail = 'Vui lòng nhập địa chỉ Gmail hợp lệ.';
     if (!phone || phone.length < 9) errors.phone = 'Vui lòng nhập số điện thoại cá nhân.';
     if (!emergencyPhone || emergencyPhone.length < 9) errors.emergencyPhone = 'Vui lòng nhập SĐT người thân đón về khi say tiệc.';
 
     setInfoErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  // Validate Screen 4 (Payment & Receipt)
+  const validatePayment = () => {
+    const errors: { [key: string]: string } = {};
+    if (!receiptImage) errors.receipt = 'Vui lòng tải lên ảnh chụp màn hình biên lai chuyển khoản.';
+    setPaymentErrors(errors);
     return Object.keys(errors).length === 0;
   };
 
@@ -389,63 +354,20 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                   <label className="block text-xs font-bold uppercase tracking-wider text-[#20231F] mb-1.5">
                     MÃ SỐ SINH VIÊN HOẶC HỌ TÊN *
                   </label>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      value={query}
-                      onChange={(e) => {
-                        setQuery(e.target.value);
-                        if (searchError) setSearchError('');
-                      }}
-                      autoComplete="name"
-                      autoCapitalize="characters"
-                      inputMode="text"
-                      placeholder="VD: SE171224 hoặc Nguyễn Tiến Cường"
-                      className="w-full px-4 py-3 min-h-[48px] rounded-sm bg-white border-2 border-[#20231F] text-[#20231F] font-mono text-base focus:outline-none focus:ring-2 focus:ring-[#F4C542] shadow-poster-sm"
-                      autoFocus
-                    />
-                    {isSearchingSuggestions && (
-                      <div className="absolute right-3 top-3.5 text-xs font-mono text-[#20231F]/50 animate-pulse">
-                        Đang dò tìm...
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Live Suggestions Dropdown */}
-                  {suggestions.length > 0 && (
-                    <div className="mt-2 p-2 rounded-sm bg-white border-2 border-[#20231F] shadow-poster max-h-60 overflow-y-auto space-y-1 text-left z-20 animate-fadeIn">
-                      <div className="px-2 py-1 text-[10px] font-mono font-bold uppercase tracking-wider text-[#20231F]/60 flex items-center justify-between border-b border-[#20231F]/10 mb-1 pb-1">
-                        <span>Gợi ý từ danh bạ CLB</span>
-                        <span>{suggestions.length} kết quả</span>
-                      </div>
-                      {suggestions.map((m) => {
-                        const isAlum = m.role === 'ALUMNI';
-                        return (
-                          <button
-                            key={m.id}
-                            type="button"
-                            onClick={() => handleSelectSuggestion(m)}
-                            className="w-full px-2.5 py-2 rounded-sm hover:bg-[#F4EEDF] transition-all flex items-center justify-between text-left group border border-transparent hover:border-[#20231F]/20 active:scale-[0.99]"
-                          >
-                            <div className="min-w-0 pr-2">
-                              <div className="font-bold text-sm text-[#20231F] group-hover:text-[#B94D35] flex items-center gap-1.5 truncate">
-                                <span>{m.fullName}</span>
-                                {m.generation && (
-                                  <span className="text-[11px] font-mono font-normal text-[#20231F]/50">({m.generation})</span>
-                                )}
-                              </div>
-                              <div className="text-xs font-mono text-[#20231F]/60 truncate">
-                                {m.mssv} · {m.department}
-                              </div>
-                            </div>
-                            <span className={`shrink-0 px-2 py-0.5 rounded text-[10px] font-mono font-bold border ${isAlum ? 'bg-red-50 text-[#B94D35] border-[#B94D35]/30' : 'bg-emerald-50 text-[#286640] border-[#286640]/30'}`}>
-                              {isAlum ? 'CỰU THÀNH VIÊN' : 'THÀNH VIÊN HIỆN TẠI'}
-                            </span>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  )}
+                  <input
+                    type="text"
+                    value={query}
+                    onChange={(e) => {
+                      setQuery(e.target.value);
+                      if (searchError) setSearchError('');
+                    }}
+                    autoComplete="name"
+                    autoCapitalize="characters"
+                    inputMode="text"
+                    placeholder="VD: SE171224 hoặc Nguyễn Tiến Cường"
+                    className="w-full px-4 py-3 min-h-[48px] rounded-sm bg-white border-2 border-[#20231F] text-[#20231F] font-mono text-base focus:outline-none focus:ring-2 focus:ring-[#F4C542] shadow-poster-sm"
+                    autoFocus
+                  />
                   {searchError && (
                     <div className="mt-2 p-3 rounded-lg bg-red-50 border-2 border-[#B94D35] text-[#B94D35] text-xs space-y-2">
                       <div className="flex items-center gap-2">
@@ -621,262 +543,12 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
             </div>
           )}
 
-          {/* ================= SCREEN 03: PAYMENT SELECTION & VIETQR ================= */}
+          {/* ================= SCREEN 03: PARTICIPANT INFORMATION ================= */}
           {screen === 3 && (
-            <div className="space-y-6 animate-fadeIn">
-              <div className="border-b-2 border-[#20231F] pb-3 flex items-end justify-between">
-                <div>
-                  <span className="text-xs font-mono font-bold tracking-widest text-[#B94D35] uppercase">
-                    03 / 05 · CHỌN HÌNH THỨC ĐÓNG PHÍ
-                  </span>
-                  <h3 className="text-2xl sm:text-4xl font-display uppercase tracking-tight text-[#20231F]">
-                    CHỌN HÌNH THỨC ĐÓNG PHÍ
-                  </h3>
-                </div>
-                <div className="text-right">
-                  <span className="text-[10px] font-mono font-bold uppercase text-[#20231F]/60 block">
-                    MỨC PHÍ DÀNH CHO BẠN
-                  </span>
-                  <span className="text-xl sm:text-2xl font-display font-black text-[#B94D35]">
-                    {totalFee.toLocaleString('vi-VN')} VNĐ
-                  </span>
-                </div>
-              </div>
-
-              {/* 2 Payment Options: 100% Trọn Gói & Đặt Cọc 150K */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                <div
-                  onClick={() => setPlan('FULL')}
-                  className={`p-3.5 sm:p-4 rounded-sm border-2 cursor-pointer transition-all active:scale-[0.99] min-h-[76px] ${plan === 'FULL'
-                    ? 'bg-[#F4C542] border-[#20231F] shadow-poster-sm'
-                    : 'bg-white border-[#20231F] hover:bg-[#F4EEDF]'
-                    }`}
-                >
-                  <div className="flex justify-between items-center mb-1 gap-2">
-                    <span className="text-xs font-mono font-bold uppercase whitespace-nowrap">100% TRỌN GÓI</span>
-                    <span className="text-[9px] px-1.5 py-0.5 rounded bg-[#20231F] text-[#F4C542] font-bold whitespace-nowrap">KHUYÊN DÙNG</span>
-                  </div>
-                  <div className="text-2xl font-display font-bold whitespace-nowrap">{totalFee.toLocaleString('vi-VN')} đ</div>
-                  <p className="text-[11px] text-[#20231F]/70 mt-1 whitespace-nowrap">Hoàn tất ngay toàn bộ chi phí</p>
-                </div>
-
-                <div
-                  onClick={() => setPlan('DEPOSIT_150')}
-                  className={`p-3.5 sm:p-4 rounded-sm border-2 cursor-pointer transition-all active:scale-[0.99] min-h-[76px] ${plan === 'DEPOSIT_150'
-                    ? 'bg-[#F4C542] border-[#20231F] shadow-poster-sm'
-                    : 'bg-white border-[#20231F] hover:bg-[#F4EEDF]'
-                    }`}
-                >
-                  <div className="flex justify-between items-center mb-1 gap-2">
-                    <span className="text-xs font-mono font-bold uppercase whitespace-nowrap">ĐẶT CỌC GIỮ CHỖ</span>
-                    <span className="text-[9px] px-1.5 py-0.5 rounded bg-[#B94D35] text-white font-bold whitespace-nowrap">CỌC 150K</span>
-                  </div>
-                  <div className="text-2xl font-display font-bold whitespace-nowrap">150.000 đ</div>
-                  <p className="text-[11px] text-[#20231F]/70 mt-1 whitespace-nowrap sm:whitespace-normal">Còn lại: {(totalFee - 150000).toLocaleString('vi-VN')}đ (đóng trước sự kiện)</p>
-                </div>
-              </div>
-
-              {/* VietQR & Banking Split */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-3 sm:p-4 rounded-sm bg-white border-2 border-[#20231F] shadow-poster-sm">
-                {/* QR Code Container */}
-                <div className="text-center flex flex-col items-center justify-center p-3 bg-[#F4EEDF] rounded-sm border-2 border-[#20231F]">
-                  <span className="text-xs font-mono font-bold text-[#20231F] uppercase mb-2">
-                    QUÉT MÃ VIETQR ĐỂ CHUYỂN KHOẢN
-                  </span>
-                  <div className="p-2 bg-white rounded-sm border-2 border-[#20231F] inline-block shadow-sm">
-                    <img
-                      src={vietQrUrl}
-                      onError={(e) => {
-                        (e.currentTarget as HTMLImageElement).src = '/images/vietinbank_qr.jpg';
-                      }}
-                      alt="VietQR Chuyển khoản VietinBank"
-                      className="w-44 h-44 object-contain"
-                    />
-                  </div>
-                  <span className="text-xs font-bold text-[#B94D35] mt-2">
-                    Số tiền: {currentPayAmount.toLocaleString('vi-VN')} VNĐ
-                  </span>
-                </div>
-
-                {/* Bank Account Details & Transfer Memo */}
-                <div className="space-y-2.5 text-xs">
-                  <div className="p-2.5 bg-[#F4EEDF] rounded-sm border border-[#20231F]">
-                    <span className="text-[#20231F]/60 block text-[10px] uppercase font-bold">Ngân hàng thụ hưởng</span>
-                    <span className="font-bold text-sm text-[#20231F]">VietinBank (CN Tân Bình - PGD Hóc Môn)</span>
-                  </div>
-
-                  <div className="p-2.5 bg-[#F4EEDF] rounded-sm border border-[#20231F]">
-                    <span className="text-[#20231F]/60 block text-[10px] uppercase font-bold">Chủ tài khoản</span>
-                    <span className="font-mono font-bold text-sm text-[#20231F] uppercase">{ACCOUNT_NAME}</span>
-                  </div>
-
-                  <div className="p-2.5 bg-[#F4EEDF] rounded-sm border border-[#20231F] flex items-center justify-between gap-2">
-                    <div className="min-w-0 flex-1">
-                      <span className="text-[#20231F]/60 block text-[10px] uppercase font-bold truncate">Số tài khoản</span>
-                      <span className="font-mono font-bold text-sm text-[#20231F] tracking-wide truncate block">{ACCOUNT_NO}</span>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => copyToClipboard(ACCOUNT_NO)}
-                      className="px-3 py-2 min-h-[44px] min-w-[70px] rounded bg-[#20231F] text-white text-[11px] font-bold active:scale-95 flex items-center justify-center shrink-0 whitespace-nowrap"
-                    >
-                      {copiedBank ? 'Đã chép' : 'Sao chép'}
-                    </button>
-                  </div>
-
-                  {/* Phone input to automatically populate transfer content & QR code */}
-                  <div className="p-2.5 bg-white rounded-sm border-2 border-[#20231F] space-y-1 shadow-xs">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[#20231F] block text-[10px] uppercase font-bold">Số điện thoại của bạn</span>
-                      <span className="text-[9px] font-mono text-[#B94D35] font-semibold">Tự động cập nhật QR & cú pháp CK</span>
-                    </div>
-                    <input
-                      type="tel"
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      placeholder="Nhập SĐT của bạn (VD: 0901234567)"
-                      autoComplete="tel"
-                      inputMode="tel"
-                      className="w-full px-2.5 py-1.5 min-h-[38px] rounded-xs bg-[#F4EEDF] border border-[#20231F] text-xs font-mono font-bold text-[#20231F] focus:outline-none focus:ring-1 focus:ring-[#F4C542]"
-                    />
-                  </div>
-
-                  <div className="p-2.5 bg-[#F4EEDF] rounded-sm border-2 border-[#B94D35] flex items-center justify-between gap-2">
-                    <div className="min-w-0 flex-1">
-                      <span className="text-[#B94D35] block text-[10px] uppercase font-bold truncate">Nội dung chuyển khoản (bắt buộc)</span>
-                      <span className="font-mono font-bold text-sm text-[#20231F] truncate block select-all">{transferContent}</span>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => copyToClipboard(transferContent)}
-                      className="px-3 py-2 min-h-[44px] min-w-[70px] rounded bg-[#B94D35] text-white text-[11px] font-bold active:scale-95 flex items-center justify-center shrink-0 whitespace-nowrap"
-                    >
-                      {copiedBank ? 'Đã chép' : 'Sao chép'}
-                    </button>
-                  </div>
-
-                  {/* Receipt Upload Area with Preview & Remove/Replace */}
-                  <div>
-                    <label className="block text-[11px] font-bold uppercase text-[#20231F] mb-1">
-                      TẢI LÊN BIÊN LAI CHUYỂN KHOẢN (ẢNH CHỤP / HÓA ĐƠN) *
-                    </label>
-
-                    {receiptImage ? (
-                      <div className="p-3 bg-white border-2 border-[#20231F] flex items-center justify-between gap-3">
-                        <div className="flex items-center gap-3">
-                          <img
-                            src={receiptImage}
-                            alt="Biên lai đã chọn"
-                            className="w-14 h-14 object-cover border border-[#20231F]"
-                          />
-                          <div>
-                            <span className="text-xs font-bold text-emerald-800 block">Đã đính kèm ảnh biên lai</span>
-                            {isCompressingReceipt ? (
-                              <span className="text-[10px] font-mono text-amber-700 flex items-center gap-1">
-                                <span className="w-2.5 h-2.5 border border-amber-600 border-t-transparent rounded-full animate-spin" />
-                                Đang tối ưu dung lượng...
-                              </span>
-                            ) : preuploadedReceiptUrl ? (
-                              <span className="text-[10px] font-mono text-emerald-700 flex items-center gap-1 font-bold">
-                                ✓ Đã sẵn sàng gửi ngay
-                              </span>
-                            ) : (
-                              <span className="text-[10px] font-mono text-[#20231F]/60">
-                                Đã nén tối ưu (sẵn sàng đối soát)
-                              </span>
-                            )}
-                          </div>
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                          <label className="px-3 py-2 min-h-[44px] bg-[#EAE4D6] hover:bg-[#F4EEDF] border border-[#20231F] text-xs font-bold cursor-pointer transition-colors active:scale-95 flex items-center justify-center">
-                            <span>Thay ảnh</span>
-                            <input
-                              type="file"
-                              accept="image/png,image/jpeg,image/webp"
-                              onChange={handleReceiptUpload}
-                              className="hidden"
-                              disabled={isCompressingReceipt}
-                            />
-                          </label>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setReceiptImage('');
-                              setPreuploadedReceiptUrl(null);
-                            }}
-                            className="px-3 py-2 min-h-[44px] bg-red-100 hover:bg-red-200 text-[#B94D35] border border-[#B94D35] text-xs font-bold transition-colors active:scale-95 flex items-center justify-center"
-                          >
-                            Xóa
-                          </button>
-                        </div>
-                      </div>
-                    ) : (
-                      <label className="border-2 border-dashed border-[#20231F] p-4 min-h-[84px] bg-white flex flex-col items-center justify-center gap-1.5 cursor-pointer hover:bg-[#F4EEDF] transition-colors active:scale-[0.99]">
-                        {isCompressingReceipt ? (
-                          <div className="flex flex-col items-center gap-2">
-                            <span className="w-6 h-6 border-2 border-[#B94D35] border-t-transparent rounded-full animate-spin" />
-                            <span className="text-xs font-bold text-[#B94D35]">Đang tối ưu dung lượng ảnh...</span>
-                          </div>
-                        ) : (
-                          <>
-                            <UploadIcon size={20} className="text-[#20231F]" />
-                            <span className="text-xs font-bold text-[#20231F] text-center">
-                              Nhấp để tải lên ảnh chụp màn hình chuyển khoản
-                            </span>
-                            <span className="text-[10px] font-mono text-[#20231F]/60 text-center">
-                              Tự động tối ưu dung lượng siêu tốc (Hỗ trợ JPG, PNG, WEBP)
-                            </span>
-                          </>
-                        )}
-                        <input
-                          type="file"
-                          accept="image/png,image/jpeg,image/webp"
-                          onChange={handleReceiptUpload}
-                          className="hidden"
-                          disabled={isCompressingReceipt}
-                        />
-                      </label>
-                    )}
-
-                    {paymentErrors.receipt && (
-                      <p className="text-[11px] text-[#B94D35] font-bold mt-1">{paymentErrors.receipt}</p>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex gap-3 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setScreen(2)}
-                  className="btn-editorial-secondary flex-1 py-3 min-h-[44px] rounded-sm font-bold text-xs uppercase active:scale-[0.98] flex items-center justify-center gap-1.5"
-                >
-                  <ArrowLeftIcon size={14} />
-                  <span>Quay lại</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (validateScreen3()) {
-                      setScreen(4); // Go to participant info
-                    }
-                  }}
-                  className="btn-editorial-primary flex-2 py-3 min-h-[48px] rounded-sm font-display text-xl uppercase tracking-wider active:scale-[0.98] flex items-center justify-center gap-2"
-                >
-                  <span>ĐIỀN THÔNG TIN THAM DỰ</span>
-                  <ArrowRightIcon size={18} />
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* ================= SCREEN 04: PARTICIPANT INFORMATION ================= */}
-          {screen === 4 && (
             <div className="space-y-6 animate-fadeIn">
               <div className="border-b-2 border-[#20231F] pb-3">
                 <span className="text-xs font-mono font-bold tracking-widest text-[#B94D35] uppercase">
-                  04 / 05 · THÔNG TIN THAM DỰ
+                  03 / 05 · THÔNG TIN THAM DỰ
                 </span>
                 <h3 className="text-2xl sm:text-4xl font-display uppercase tracking-tight text-[#20231F]">
                   THÔNG TIN CÁ NHÂN & LỜI CHÚC
@@ -1009,22 +681,255 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
               <div className="flex gap-3 pt-2">
                 <button
                   type="button"
-                  onClick={() => setScreen(3)}
+                  onClick={() => setScreen(2)}
                   className="btn-editorial-secondary flex-1 py-3 min-h-[44px] rounded-sm font-bold text-xs uppercase active:scale-[0.98] flex items-center justify-center gap-1.5"
                 >
                   <ArrowLeftIcon size={14} />
-                  <span>Chọn lại thanh toán</span>
+                  <span>Quay lại</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => {
-                    if (validateScreen4()) {
+                    if (validatePersonalInfo()) {
+                      setScreen(4); // Go to payment
+                    }
+                  }}
+                  className="btn-editorial-primary flex-2 py-3 min-h-[48px] rounded-sm font-display text-xl uppercase tracking-wider active:scale-[0.98] flex items-center justify-center gap-2"
+                >
+                  <span>TIẾP TỤC: ĐÓNG PHÍ THAM DỰ</span>
+                  <ArrowRightIcon size={18} />
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* ================= SCREEN 04: PAYMENT SELECTION & VIETQR ================= */}
+          {screen === 4 && (
+            <div className="space-y-6 animate-fadeIn">
+              <div className="border-b-2 border-[#20231F] pb-3 flex items-end justify-between">
+                <div>
+                  <span className="text-xs font-mono font-bold tracking-widest text-[#B94D35] uppercase">
+                    04 / 05 · ĐÓNG PHÍ THAM DỰ
+                  </span>
+                  <h3 className="text-2xl sm:text-4xl font-display uppercase tracking-tight text-[#20231F]">
+                    CHỌN HÌNH THỨC ĐÓNG PHÍ & VIETQR
+                  </h3>
+                </div>
+                <div className="text-right">
+                  <span className="text-[10px] font-mono font-bold uppercase text-[#20231F]/60 block">
+                    MỨC PHÍ DÀNH CHO BẠN
+                  </span>
+                  <span className="text-xl sm:text-2xl font-display font-black text-[#B94D35]">
+                    {totalFee.toLocaleString('vi-VN')} VNĐ
+                  </span>
+                </div>
+              </div>
+
+              {/* 2 Payment Options: 100% Trọn Gói & Đặt Cọc 150K */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                <div
+                  onClick={() => setPlan('FULL')}
+                  className={`p-3.5 sm:p-4 rounded-sm border-2 cursor-pointer transition-all active:scale-[0.99] min-h-[76px] ${plan === 'FULL'
+                    ? 'bg-[#F4C542] border-[#20231F] shadow-poster-sm'
+                    : 'bg-white border-[#20231F] hover:bg-[#F4EEDF]'
+                    }`}
+                >
+                  <div className="flex justify-between items-center mb-1 gap-2">
+                    <span className="text-xs font-mono font-bold uppercase whitespace-nowrap">100% TRỌN GÓI</span>
+                    <span className="text-[9px] px-1.5 py-0.5 rounded bg-[#20231F] text-[#F4C542] font-bold whitespace-nowrap">KHUYÊN DÙNG</span>
+                  </div>
+                  <div className="text-2xl font-display font-bold whitespace-nowrap">{totalFee.toLocaleString('vi-VN')} đ</div>
+                  <p className="text-[11px] text-[#20231F]/70 mt-1 whitespace-nowrap">Hoàn tất ngay toàn bộ chi phí</p>
+                </div>
+
+                <div
+                  onClick={() => setPlan('DEPOSIT_150')}
+                  className={`p-3.5 sm:p-4 rounded-sm border-2 cursor-pointer transition-all active:scale-[0.99] min-h-[76px] ${plan === 'DEPOSIT_150'
+                    ? 'bg-[#F4C542] border-[#20231F] shadow-poster-sm'
+                    : 'bg-white border-[#20231F] hover:bg-[#F4EEDF]'
+                    }`}
+                >
+                  <div className="flex justify-between items-center mb-1 gap-2">
+                    <span className="text-xs font-mono font-bold uppercase whitespace-nowrap">ĐẶT CỌC GIỮ CHỖ</span>
+                    <span className="text-[9px] px-1.5 py-0.5 rounded bg-[#B94D35] text-white font-bold whitespace-nowrap">CỌC 150K</span>
+                  </div>
+                  <div className="text-2xl font-display font-bold whitespace-nowrap">150.000 đ</div>
+                  <p className="text-[11px] text-[#20231F]/70 mt-1 whitespace-nowrap sm:whitespace-normal">Còn lại: {(totalFee - 150000).toLocaleString('vi-VN')}đ (đóng trước sự kiện)</p>
+                </div>
+              </div>
+
+              {/* VietQR & Banking Split */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-3 sm:p-4 rounded-sm bg-white border-2 border-[#20231F] shadow-poster-sm">
+                {/* QR Code Container */}
+                <div className="text-center flex flex-col items-center justify-center p-3 bg-[#F4EEDF] rounded-sm border-2 border-[#20231F]">
+                  <span className="text-xs font-mono font-bold text-[#20231F] uppercase mb-2">
+                    QUÉT MÃ VIETQR ĐỂ CHUYỂN KHOẢN
+                  </span>
+                  <div className="p-2 bg-white rounded-sm border-2 border-[#20231F] inline-block shadow-sm">
+                    <img
+                      src={vietQrUrl}
+                      onError={(e) => {
+                        (e.currentTarget as HTMLImageElement).src = '/images/vietinbank_qr.jpg';
+                      }}
+                      alt="VietQR Chuyển khoản VietinBank"
+                      className="w-44 h-44 object-contain"
+                    />
+                  </div>
+                  <span className="text-xs font-bold text-[#B94D35] mt-2">
+                    Số tiền: {currentPayAmount.toLocaleString('vi-VN')} VNĐ
+                  </span>
+                </div>
+
+                {/* Bank Account Details & Transfer Memo */}
+                <div className="space-y-2.5 text-xs">
+                  <div className="p-2.5 bg-[#F4EEDF] rounded-sm border border-[#20231F]">
+                    <span className="text-[#20231F]/60 block text-[10px] uppercase font-bold">Ngân hàng thụ hưởng</span>
+                    <span className="font-bold text-sm text-[#20231F]">VietinBank (CN Tân Bình - PGD Hóc Môn)</span>
+                  </div>
+
+                  <div className="p-2.5 bg-[#F4EEDF] rounded-sm border border-[#20231F]">
+                    <span className="text-[#20231F]/60 block text-[10px] uppercase font-bold">Chủ tài khoản</span>
+                    <span className="font-mono font-bold text-sm text-[#20231F] uppercase">{ACCOUNT_NAME}</span>
+                  </div>
+
+                  <div className="p-2.5 bg-[#F4EEDF] rounded-sm border border-[#20231F] flex items-center justify-between gap-2">
+                    <div className="min-w-0 flex-1">
+                      <span className="text-[#20231F]/60 block text-[10px] uppercase font-bold truncate">Số tài khoản</span>
+                      <span className="font-mono font-bold text-sm text-[#20231F] tracking-wide truncate block">{ACCOUNT_NO}</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => copyToClipboard(ACCOUNT_NO)}
+                      className="px-3 py-2 min-h-[44px] min-w-[70px] rounded bg-[#20231F] text-white text-[11px] font-bold active:scale-95 flex items-center justify-center shrink-0 whitespace-nowrap"
+                    >
+                      {copiedBank ? 'Đã chép' : 'Sao chép'}
+                    </button>
+                  </div>
+
+                  <div className="p-2.5 bg-[#F4EEDF] rounded-sm border-2 border-[#B94D35] flex items-center justify-between gap-2">
+                    <div className="min-w-0 flex-1">
+                      <span className="text-[#B94D35] block text-[10px] uppercase font-bold truncate">Nội dung chuyển khoản (bắt buộc)</span>
+                      <span className="font-mono font-bold text-sm text-[#20231F] truncate block select-all">{transferContent}</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => copyToClipboard(transferContent)}
+                      className="px-3 py-2 min-h-[44px] min-w-[70px] rounded bg-[#B94D35] text-white text-[11px] font-bold active:scale-95 flex items-center justify-center shrink-0 whitespace-nowrap"
+                    >
+                      {copiedBank ? 'Đã chép' : 'Sao chép'}
+                    </button>
+                  </div>
+
+                  {/* Receipt Upload Area with Preview & Remove/Replace */}
+                  <div>
+                    <label className="block text-[11px] font-bold uppercase text-[#20231F] mb-1">
+                      TẢI LÊN BIÊN LAI CHUYỂN KHOẢN (ẢNH CHỤP / HÓA ĐƠN) *
+                    </label>
+
+                    {receiptImage ? (
+                      <div className="p-3 bg-white border-2 border-[#20231F] flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-3">
+                          <img
+                            src={receiptImage}
+                            alt="Biên lai đã chọn"
+                            className="w-14 h-14 object-cover border border-[#20231F]"
+                          />
+                          <div>
+                            <span className="text-xs font-bold text-emerald-800 block">Đã đính kèm ảnh biên lai</span>
+                            {isCompressingReceipt ? (
+                              <span className="text-[10px] font-mono text-amber-700 flex items-center gap-1">
+                                <span className="w-2.5 h-2.5 border border-amber-600 border-t-transparent rounded-full animate-spin" />
+                                Đang tối ưu dung lượng...
+                              </span>
+                            ) : preuploadedReceiptUrl ? (
+                              <span className="text-[10px] font-mono text-emerald-700 flex items-center gap-1 font-bold">
+                                ✓ Đã sẵn sàng gửi ngay
+                              </span>
+                            ) : (
+                              <span className="text-[10px] font-mono text-[#20231F]/60">
+                                Đã nén tối ưu (sẵn sàng đối soát)
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <label className="px-3 py-2 min-h-[44px] bg-[#EAE4D6] hover:bg-[#F4EEDF] border border-[#20231F] text-xs font-bold cursor-pointer transition-colors active:scale-95 flex items-center justify-center">
+                            <span>Thay ảnh</span>
+                            <input
+                              type="file"
+                              accept="image/png,image/jpeg,image/webp"
+                              onChange={handleReceiptUpload}
+                              className="hidden"
+                              disabled={isCompressingReceipt}
+                            />
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setReceiptImage('');
+                              setPreuploadedReceiptUrl(null);
+                            }}
+                            className="px-3 py-2 min-h-[44px] bg-red-100 hover:bg-red-200 text-[#B94D35] border border-[#B94D35] text-xs font-bold transition-colors active:scale-95 flex items-center justify-center"
+                          >
+                            Xóa
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <label className="border-2 border-dashed border-[#20231F] p-4 min-h-[84px] bg-white flex flex-col items-center justify-center gap-1.5 cursor-pointer hover:bg-[#F4EEDF] transition-colors active:scale-[0.99]">
+                        {isCompressingReceipt ? (
+                          <div className="flex flex-col items-center gap-2">
+                            <span className="w-6 h-6 border-2 border-[#B94D35] border-t-transparent rounded-full animate-spin" />
+                            <span className="text-xs font-bold text-[#B94D35]">Đang tối ưu dung lượng ảnh...</span>
+                          </div>
+                        ) : (
+                          <>
+                            <UploadIcon size={20} className="text-[#20231F]" />
+                            <span className="text-xs font-bold text-[#20231F] text-center">
+                              Nhấp để tải lên ảnh chụp màn hình chuyển khoản
+                            </span>
+                            <span className="text-[10px] font-mono text-[#20231F]/60 text-center">
+                              Tự động tối ưu dung lượng siêu tốc (Hỗ trợ JPG, PNG, WEBP)
+                            </span>
+                          </>
+                        )}
+                        <input
+                          type="file"
+                          accept="image/png,image/jpeg,image/webp"
+                          onChange={handleReceiptUpload}
+                          className="hidden"
+                          disabled={isCompressingReceipt}
+                        />
+                      </label>
+                    )}
+
+                    {paymentErrors.receipt && (
+                      <p className="text-[11px] text-[#B94D35] font-bold mt-1">{paymentErrors.receipt}</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setScreen(3)}
+                  className="btn-editorial-secondary flex-1 py-3 min-h-[44px] rounded-sm font-bold text-xs uppercase active:scale-[0.98] flex items-center justify-center gap-1.5"
+                >
+                  <ArrowLeftIcon size={14} />
+                  <span>Sửa thông tin</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (validatePayment()) {
                       setScreen(5); // Go to review
                     }
                   }}
                   className="btn-editorial-primary flex-2 py-3 min-h-[48px] rounded-sm font-display text-xl uppercase tracking-wider active:scale-[0.98] flex items-center justify-center gap-2"
                 >
-                  <span>XEM LẠI & XÁC NHẬN</span>
+                  <span>KIỂM TRA & XÁC NHẬN</span>
                   <ArrowRightIcon size={18} />
                 </button>
               </div>
@@ -1065,16 +970,15 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                   </button>
                 </div>
 
-                {/* Payment Review */}
+                {/* Contact Review */}
                 <div className="p-3 sm:p-3.5 rounded-sm bg-white border-2 border-[#20231F] flex items-center justify-between gap-2.5">
-                  <div className="min-w-0 flex-1">
-                    <span className="text-[10px] font-mono text-[#20231F]/60 uppercase block">Gói & Biên lai thanh toán</span>
-                    <span className="font-bold text-sm text-[#B94D35] truncate block">
-                      {plan === 'FULL' ? 'Đóng trọn gói 100%' : 'Đặt cọc giữ chỗ 150.000đ'}
-                    </span>
-                    <span className="text-[11px] sm:text-xs text-[#20231F]/70 block truncate">
-                      Đã nộp: {currentPayAmount.toLocaleString('vi-VN')}đ {remainingAmount > 0 ? `• Còn lại: ${remainingAmount.toLocaleString('vi-VN')}đ` : '• Đã đủ 100%'}
-                    </span>
+                  <div className="space-y-0.5 min-w-0 flex-1">
+                    <span className="text-[10px] font-mono text-[#20231F]/60 uppercase block">Thông tin liên lạc</span>
+                    <p className="text-[11px] sm:text-xs truncate">Gmail: <span className="font-mono font-bold">{gmail}</span></p>
+                    <p className="text-[11px] sm:text-xs truncate">SĐT: <span className="font-mono font-bold">{phone}</span> • Người thân: <span className="font-mono font-bold text-[#B94D35]">{emergencyPhone}</span></p>
+                    {allergies.length > 0 && (
+                      <p className="text-[11px] sm:text-xs text-[#B94D35] truncate">Dị ứng: {allergies.join(', ')} {allergyNote ? `(${allergyNote})` : ''}</p>
+                    )}
                   </div>
                   <button
                     type="button"
@@ -1086,15 +990,16 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                   </button>
                 </div>
 
-                {/* Contact Review */}
+                {/* Payment Review */}
                 <div className="p-3 sm:p-3.5 rounded-sm bg-white border-2 border-[#20231F] flex items-center justify-between gap-2.5">
-                  <div className="space-y-0.5 min-w-0 flex-1">
-                    <span className="text-[10px] font-mono text-[#20231F]/60 uppercase block">Thông tin liên lạc</span>
-                    <p className="text-[11px] sm:text-xs truncate">Gmail: <span className="font-mono font-bold">{gmail}</span></p>
-                    <p className="text-[11px] sm:text-xs truncate">SĐT: <span className="font-mono font-bold">{phone}</span> • Người thân: <span className="font-mono font-bold text-[#B94D35]">{emergencyPhone}</span></p>
-                    {allergies.length > 0 && (
-                      <p className="text-[11px] sm:text-xs text-[#B94D35] truncate">Dị ứng: {allergies.join(', ')} {allergyNote ? `(${allergyNote})` : ''}</p>
-                    )}
+                  <div className="min-w-0 flex-1">
+                    <span className="text-[10px] font-mono text-[#20231F]/60 uppercase block">Gói & Biên lai thanh toán</span>
+                    <span className="font-bold text-sm text-[#B94D35] truncate block">
+                      {plan === 'FULL' ? 'Đóng trọn gói 100%' : 'Đặt cọc giữ chỗ 150.000đ'}
+                    </span>
+                    <span className="text-[11px] sm:text-xs text-[#20231F]/70 block truncate">
+                      Đã nộp: {currentPayAmount.toLocaleString('vi-VN')}đ {remainingAmount > 0 ? `• Còn lại: ${remainingAmount.toLocaleString('vi-VN')}đ` : '• Đã đủ 100%'}
+                    </span>
                   </div>
                   <button
                     type="button"
