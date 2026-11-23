@@ -33,7 +33,22 @@ function normalizeVN(str: string): string {
     .replace(/[\u0300-\u036f]/g, '')
     .replace(/đ/g, 'd')
     .replace(/[^a-z0-9]/g, ' ')
+    .replace(/\s+/g, ' ')
     .trim();
+}
+
+// Helper: Deduplicate member candidates by MSSV
+function deduplicateByMssv<T extends { mssv?: string; id?: string }>(list: T[]): T[] {
+  const result: T[] = [];
+  const seen = new Set<string>();
+  for (const item of list || []) {
+    const key = (item.mssv || item.id || '').toUpperCase();
+    if (!seen.has(key)) {
+      seen.add(key);
+      result.push(item);
+    }
+  }
+  return result;
 }
 
 export const apiClient = {
@@ -183,7 +198,7 @@ export const apiClient = {
 
       const { data: candidates, error: rpcErr } = await (supabase as any).rpc('search_members', {
         query_text: query.trim(),
-        max_limit: 10
+        max_limit: 25
       });
 
       if (!rpcErr && candidates && (candidates as any[]).length > 0) {
@@ -209,7 +224,9 @@ export const apiClient = {
         }
 
         // 1b. Check multiple exact name matches (collision detection)
-        const exactNameMatches = candidateList.filter(m => normalizeVN(m.fullName) === qNorm);
+        const exactNameMatches = deduplicateByMssv(
+          candidateList.filter(m => normalizeVN(m.fullName) === qNorm)
+        );
         if (exactNameMatches.length > 1) {
           return {
             success: true,
@@ -219,21 +236,67 @@ export const apiClient = {
           };
         }
 
-        // 1c. Single match
-        const singleMatch = exactNameMatches.length === 1 ? exactNameMatches[0] : candidateList[0];
-        const { data: existingRegs } = await supabase
-          .from('registrations')
-          .select('id, mssv')
-          .ilike('mssv', singleMatch.mssv || '');
-        const existing = existingRegs && existingRegs.length > 0 ? existingRegs[0] : null;
+        if (exactNameMatches.length === 1) {
+          const singleMatch = exactNameMatches[0];
+          const { data: existingRegs } = await supabase
+            .from('registrations')
+            .select('id, mssv')
+            .ilike('mssv', singleMatch.mssv || '');
+          const existing = existingRegs && existingRegs.length > 0 ? existingRegs[0] : null;
 
+          return {
+            success: true,
+            multiple: false,
+            data: singleMatch,
+            hasExistingRegistration: !!existing,
+            existingRegistrationId: existing?.id || undefined,
+            message: 'Xác thực danh tính thành công từ cơ sở dữ liệu.'
+          };
+        }
+
+        // 1c. Partial name matches (e.g. user typed "Minh Đức" or "Khánh Linh")
+        const partialMatches = deduplicateByMssv(
+          candidateList.filter(m => {
+            const normName = normalizeVN(m.fullName);
+            return normName.includes(qNorm) || qNorm.split(' ').every(w => normName.includes(w));
+          })
+        );
+
+        if (partialMatches.length > 1) {
+          return {
+            success: true,
+            multiple: true,
+            candidates: partialMatches,
+            message: `Tìm thấy ${partialMatches.length} thành viên phù hợp với "${query.trim()}".`
+          };
+        }
+
+        if (partialMatches.length === 1) {
+          const singleMatch = partialMatches[0];
+          const { data: existingRegs } = await supabase
+            .from('registrations')
+            .select('id, mssv')
+            .ilike('mssv', singleMatch.mssv || '');
+          const existing = existingRegs && existingRegs.length > 0 ? existingRegs[0] : null;
+
+          return {
+            success: true,
+            multiple: false,
+            data: singleMatch,
+            hasExistingRegistration: !!existing,
+            existingRegistrationId: existing?.id || undefined,
+            message: 'Xác thực danh tính thành công từ cơ sở dữ liệu.'
+          };
+        }
+
+        // 1d. Fallback single match
+        const firstMatch = candidateList[0];
         return {
           success: true,
           multiple: false,
-          data: singleMatch,
-          hasExistingRegistration: !!existing,
-          existingRegistrationId: existing?.id || undefined,
-          message: 'Xác thực danh tính thành công từ cơ sở dữ liệu.'
+          data: firstMatch,
+          hasExistingRegistration: false,
+          message: 'Xác thực danh tính thành công.'
         };
       }
 
@@ -251,7 +314,9 @@ export const apiClient = {
           };
         }
 
-        const exactNameMatches = memberList.filter(m => normalizeVN(m.fullName) === qNorm);
+        const exactNameMatches = deduplicateByMssv(
+          memberList.filter(m => normalizeVN(m.fullName) === qNorm)
+        );
         if (exactNameMatches.length > 1) {
           return {
             success: true,
@@ -261,16 +326,36 @@ export const apiClient = {
           };
         }
 
-        const match = exactNameMatches[0] || memberList.find(m => {
-          const nameNorm = normalizeVN(m.fullName);
-          return nameNorm.includes(qNorm) || qNorm.includes(nameNorm);
-        });
-
-        if (match) {
+        if (exactNameMatches.length === 1) {
           return {
             success: true,
             multiple: false,
-            data: match,
+            data: exactNameMatches[0],
+            message: 'Xác thực danh tính thành công.'
+          };
+        }
+
+        const partialMatches = deduplicateByMssv(
+          memberList.filter(m => {
+            const nameNorm = normalizeVN(m.fullName);
+            return nameNorm.includes(qNorm) || qNorm.split(' ').every(w => nameNorm.includes(w));
+          })
+        );
+
+        if (partialMatches.length > 1) {
+          return {
+            success: true,
+            multiple: true,
+            candidates: partialMatches,
+            message: `Tìm thấy ${partialMatches.length} thành viên phù hợp với "${query.trim()}".`
+          };
+        }
+
+        if (partialMatches.length === 1) {
+          return {
+            success: true,
+            multiple: false,
+            data: partialMatches[0],
             message: 'Xác thực danh tính thành công.'
           };
         }

@@ -411,7 +411,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                       </div>
                     </div>
 
-                    <div className="space-y-2.5">
+                    <div className="space-y-2.5 max-h-[380px] overflow-y-auto pr-1 overscroll-contain">
                       {collisionCandidates.map((cand, idx) => {
                         const candIsAlumni = cand.role === 'ALUMNI';
                         const candGen = cand.generation
