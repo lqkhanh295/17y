@@ -556,26 +556,30 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                 </div>
               )}
 
-              {/* Role & Ticket Tier Switcher */}
-              <div className="p-3 bg-[#FFFFFF] border-2 border-[#20231F] rounded-sm space-y-2 text-left shadow-poster-sm">
-                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#20231F]/70 block">
-                  XÁC NHẬN VAI TRÒ CỦA BẠN:
-                </span>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setIdentifiedMember(prev => prev ? { ...prev, role: 'ALUMNI', honorific: prev.honorific === 'Chị' ? 'Chị' : 'Anh' } : null)}
-                    className={`py-2.5 px-3 min-h-[44px] rounded-sm text-xs font-mono font-bold border-2 transition-all text-center flex items-center justify-center active:scale-[0.98] whitespace-nowrap ${isAlumni ? 'bg-[#20231F] text-white border-[#20231F] shadow-sm' : 'bg-[#F4EEDF] text-[#20231F] border-[#20231F]/30 hover:border-[#20231F]'}`}
-                  >
-                    Cựu Thành Viên (389k)
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setIdentifiedMember(prev => prev ? { ...prev, role: 'ACTIVE', honorific: 'Bạn' } : null)}
-                    className={`py-2.5 px-3 min-h-[44px] rounded-sm text-xs font-mono font-bold border-2 transition-all text-center flex items-center justify-center active:scale-[0.98] whitespace-nowrap ${!isAlumni ? 'bg-[#20231F] text-white border-[#20231F] shadow-sm' : 'bg-[#F4EEDF] text-[#20231F] border-[#20231F]/30 hover:border-[#20231F]'}`}
-                  >
-                    Thành Viên / Khách Mời (349k)
-                  </button>
+              {/* Role & Ticket Tier Status (Direct from Database) */}
+              <div className="p-3.5 bg-[#FFFFFF] border-2 border-[#20231F] rounded-sm shadow-poster-sm flex items-center justify-between text-left">
+                <div className="space-y-1">
+                  <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#20231F]/60 block">
+                    VAI TRÒ THAM DỰ
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className={`inline-flex items-center px-2.5 py-1 rounded-sm text-xs font-mono font-bold border ${isAlumni ? 'bg-red-50 text-[#B94D35] border-[#B94D35]/40' : 'bg-emerald-50 text-[#286640] border-[#286640]/40'}`}>
+                      {isAlumni ? 'CỰU THÀNH VIÊN' : 'THÀNH VIÊN HIỆN TẠI'}
+                    </span>
+                    {identifiedMember.generation && (
+                      <span className="text-xs font-mono text-[#20231F]/70 font-semibold">
+                        Khóa {identifiedMember.generation}
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <div className="text-right">
+                  <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#20231F]/60 block">
+                    MỨC VÉ
+                  </span>
+                  <span className="font-mono font-bold text-base sm:text-lg text-[#B94D35]">
+                    {totalFee.toLocaleString('vi-VN')}đ
+                  </span>
                 </div>
               </div>
 
