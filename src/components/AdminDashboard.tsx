@@ -524,7 +524,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       <span className="text-2xl font-display font-black text-[#F5C400]">
                         {totalRevenue.toLocaleString('vi-VN')} đ
                       </span>
-                      <span className="text-[10px] text-[#A8A8A8] block">Thực nhận tài khoản MB</span>
+                      <span className="text-[10px] text-[#A8A8A8] block">Thực nhận tài khoản VietinBank</span>
                     </div>
 
                     <div className="p-4 rounded-xl bg-[#222222] border border-[#383838]">
@@ -1159,7 +1159,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   <option value="Số tiền chuyển không khớp gói đã chọn">Số tiền chuyển không khớp gói đã chọn</option>
                   <option value="Sai cú pháp nội dung chuyển khoản">Sai cú pháp nội dung chuyển khoản</option>
                   <option value="Ảnh tải lên không phải biên lai thanh toán">Ảnh tải lên không phải biên lai thanh toán</option>
-                  <option value="Giao dịch chưa khớp sao kê ngân hàng MB">Giao dịch chưa khớp sao kê ngân hàng MB</option>
+                  <option value="Giao dịch chưa khớp sao kê ngân hàng VietinBank">Giao dịch chưa khớp sao kê ngân hàng VietinBank</option>
                 </select>
               </div>
 

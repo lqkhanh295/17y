@@ -108,10 +108,10 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
   if (plan === 'DEPOSIT_150' || plan === 'DEPOSIT_100') currentPayAmount = 150000;
   const remainingAmount = totalFee - currentPayAmount;
 
-  // VietQR Config
-  const BANK_ID = 'MB';
-  const ACCOUNT_NO = '0987654321';
-  const ACCOUNT_NAME = 'CLB TRUYEN THONG COC SAI GON';
+  // VietQR Config (VietinBank - NGUYEN PHUONG THAO)
+  const BANK_ID = 'ICB';
+  const ACCOUNT_NO = '104881849322';
+  const ACCOUNT_NAME = 'NGUYEN PHUONG THAO';
   const transferContent = `CSG26 ${identifiedMember?.mssv || 'KH'} ${phone || 'SDT'}`;
   const vietQrUrl = `https://img.vietqr.io/image/${BANK_ID}-${ACCOUNT_NO}-compact2.png?amount=${currentPayAmount}&addInfo=${encodeURIComponent(transferContent)}&accountName=${encodeURIComponent(ACCOUNT_NAME)}`;
 
@@ -373,10 +373,10 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
             <div className="space-y-6 animate-fadeIn">
               <div className="text-center max-w-md mx-auto space-y-2">
                 <span className="text-xs font-mono font-bold tracking-widest text-[#B94D35] uppercase">
-                  01 / 05 · IDENTITY VERIFICATION
+                  01 / 05 · XÁC THỰC THÔNG TIN
                 </span>
                 <h3 className="text-2xl sm:text-4xl font-display uppercase tracking-tight text-[#20231F]">
-                  LET'S SEE WHO YOU ARE.
+                  BẠN LÀ AI TRONG GIA ĐÌNH CÓC?
                 </h3>
                 <p className="text-sm text-[#20231F]/75 leading-relaxed">
                   Nhập Mã số sinh viên (MSSV) hoặc Họ và tên để chúng mình tìm lại vị trí của bạn trong gia đình Cóc Sài Gòn.
@@ -498,14 +498,14 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
           {screen === 2 && identifiedMember && (
             <div className="space-y-6 animate-fadeIn text-center max-w-lg mx-auto">
               <span className="text-xs font-mono font-bold tracking-widest text-[#B94D35] uppercase">
-                02 / 05 · WELCOME HOME
+                02 / 05 · CHÀO MỪNG TRỞ VỀ
               </span>
 
               {/* Dynamic Personalized Letter */}
               {isAlumni ? (
                 <div className="space-y-4">
                   <h3 className="text-2xl sm:text-4xl font-display uppercase tracking-tight text-[#20231F] leading-tight">
-                    WELCOME BACK HOME,
+                    CHÀO MỪNG TRỞ VỀ NHÀ,
                     <br />
                     <span className="text-[#B94D35] underline decoration-[#F4C542] decoration-4">
                       {identifiedMember.honorific} {identifiedMember.fullName}!
@@ -531,10 +531,10 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
               ) : (
                 <div className="space-y-4">
                   <h3 className="text-2xl sm:text-4xl font-display uppercase tracking-tight text-[#20231F] leading-tight">
-                    HEY, {identifiedMember.fullName.toUpperCase()}!
+                    CHÀO BẠN, {identifiedMember.fullName.toUpperCase()}!
                     <br />
                     <span className="text-[#B94D35] underline decoration-[#F4C542] decoration-4">
-                      YOU'RE STILL ONE OF US.
+                      BẠN MÃI LÀ MỘT PHẦN CỦA CÓC.
                     </span>
                   </h3>
                   <div className="p-4 sm:p-6 rounded-sm bg-[#FFFFFF] border-2 border-[#20231F] shadow-poster text-left space-y-3 relative">
@@ -606,7 +606,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
               <div className="border-b-2 border-[#20231F] pb-3 flex items-end justify-between">
                 <div>
                   <span className="text-xs font-mono font-bold tracking-widest text-[#B94D35] uppercase">
-                    03 / 05 · PAYMENT SELECTION
+                    03 / 05 · CHỌN HÌNH THỨC ĐÓNG PHÍ
                   </span>
                   <h3 className="text-2xl sm:text-4xl font-display uppercase tracking-tight text-[#20231F]">
                     CHỌN HÌNH THỨC ĐÓNG PHÍ
@@ -665,7 +665,10 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                   <div className="p-2 bg-white rounded-sm border-2 border-[#20231F] inline-block shadow-sm">
                     <img
                       src={vietQrUrl}
-                      alt="VietQR Chuyển khoản"
+                      onError={(e) => {
+                        (e.currentTarget as HTMLImageElement).src = '/images/vietinbank_qr.jpg';
+                      }}
+                      alt="VietQR Chuyển khoản VietinBank"
                       className="w-44 h-44 object-contain"
                     />
                   </div>
@@ -678,13 +681,18 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                 <div className="space-y-2.5 text-xs">
                   <div className="p-2.5 bg-[#F4EEDF] rounded-sm border border-[#20231F]">
                     <span className="text-[#20231F]/60 block text-[10px] uppercase font-bold">Ngân hàng thụ hưởng</span>
-                    <span className="font-bold text-sm text-[#20231F]">MB Bank (Quân Đội)</span>
+                    <span className="font-bold text-sm text-[#20231F]">VietinBank (CN Tân Bình - PGD Hóc Môn)</span>
+                  </div>
+
+                  <div className="p-2.5 bg-[#F4EEDF] rounded-sm border border-[#20231F]">
+                    <span className="text-[#20231F]/60 block text-[10px] uppercase font-bold">Chủ tài khoản</span>
+                    <span className="font-mono font-bold text-sm text-[#20231F] uppercase">{ACCOUNT_NAME}</span>
                   </div>
 
                   <div className="p-2.5 bg-[#F4EEDF] rounded-sm border border-[#20231F] flex items-center justify-between gap-2">
                     <div className="min-w-0 flex-1">
                       <span className="text-[#20231F]/60 block text-[10px] uppercase font-bold truncate">Số tài khoản</span>
-                      <span className="font-mono font-bold text-sm text-[#20231F] truncate block">{ACCOUNT_NO}</span>
+                      <span className="font-mono font-bold text-sm text-[#20231F] tracking-wide truncate block">{ACCOUNT_NO}</span>
                     </div>
                     <button
                       type="button"
@@ -830,7 +838,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
             <div className="space-y-6 animate-fadeIn">
               <div className="border-b-2 border-[#20231F] pb-3">
                 <span className="text-xs font-mono font-bold tracking-widest text-[#B94D35] uppercase">
-                  04 / 05 · PARTICIPANT DETAILS
+                  04 / 05 · THÔNG TIN THAM DỰ
                 </span>
                 <h3 className="text-2xl sm:text-4xl font-display uppercase tracking-tight text-[#20231F]">
                   THÔNG TIN CÁ NHÂN & LỜI CHÚC
@@ -841,7 +849,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                 {/* Block 1: About You */}
                 <div className="p-3.5 sm:p-4 rounded-sm bg-white border-2 border-[#20231F] space-y-3">
                   <h4 className="text-xs font-mono font-bold text-[#20231F] uppercase border-b border-[#20231F]/15 pb-1.5">
-                    1. VỀ BẠN (ABOUT YOU)
+                    1. THÔNG TIN CỦA BẠN
                   </h4>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
@@ -932,7 +940,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                 <div className="p-3.5 sm:p-4 rounded-sm bg-white border-2 border-[#20231F] space-y-2">
                   <div className="flex items-center justify-between border-b border-[#20231F]/15 pb-1.5">
                     <h4 className="text-xs font-mono font-bold text-[#20231F] uppercase">
-                      3. LỜI CHÚC GỬI CÓC SÀI GÒN (A LITTLE NOTE)
+                      3. LỜI CHÚC GỬI CÓC SÀI GÒN
                     </h4>
                     <span className="text-[10px] font-mono text-[#20231F]/60">
                       {wishes.length} / 250 ký tự
@@ -990,7 +998,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
             <div className="space-y-6 animate-fadeIn">
               <div className="border-b-2 border-[#20231F] pb-3">
                 <span className="text-xs font-mono font-bold tracking-widest text-[#B94D35] uppercase">
-                  05 / 05 · REVIEW & CONFIRM
+                  05 / 05 · KIỂM TRA & XÁC NHẬN
                 </span>
                 <h3 className="text-2xl sm:text-4xl font-display uppercase tracking-tight text-[#20231F]">
                   XÁC NHẬN THÔNG TIN ĐĂNG KÝ

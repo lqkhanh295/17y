@@ -93,9 +93,9 @@ export const PaymentLookupModal: React.FC<PaymentLookupModalProps> = ({
     }
   };
 
-  const BANK_ID = 'MB';
-  const ACCOUNT_NO = '0987654321';
-  const ACCOUNT_NAME = 'CLB TRUYEN THONG COC SAI GON';
+  const BANK_ID = 'ICB';
+  const ACCOUNT_NO = '104881849322';
+  const ACCOUNT_NAME = 'NGUYEN PHUONG THAO';
   const transferContent = `CSG26 ${foundRecord?.mssv || ''} DOT2`;
   const remainingDue = foundRecord ? (foundRecord.remainingAmount > 0 ? foundRecord.remainingAmount : Math.max(0, foundRecord.totalRequired - foundRecord.paidAmount)) : 0;
   const vietQrUrl = foundRecord ? `https://img.vietqr.io/image/${BANK_ID}-${ACCOUNT_NO}-compact2.png?amount=${remainingDue}&addInfo=${encodeURIComponent(transferContent)}&accountName=${encodeURIComponent(ACCOUNT_NAME)}` : '';
@@ -290,7 +290,7 @@ END:VCALENDAR`;
                     <div>
                       <div className="flex items-center gap-2">
                         <h4 className="text-xl font-display uppercase tracking-wide text-[#20231F]">
-                          WELCOME BACK, {foundRecord.fullName.toUpperCase()}!
+                          CHÀO MỪNG TRỞ VỀ, {foundRecord.fullName.toUpperCase()}!
                         </h4>
                         <span className="stamp-seal text-[9px]">
                           {foundRecord.role === 'ALUMNI' ? 'CỰU THÀNH VIÊN' : 'THÀNH VIÊN'}
@@ -537,9 +537,13 @@ END:VCALENDAR`;
                         </div>
 
                         <div className="space-y-2.5 text-xs">
-                          <div className="p-2.5 bg-[#F4EEDF] rounded-sm border border-[#20231F]">
-                            <span className="text-[#20231F]/60 block text-[10px] uppercase font-bold">Số tài khoản</span>
-                            <span className="font-mono font-bold text-sm text-[#20231F]">{ACCOUNT_NO} (MB Bank)</span>
+                          <div className="p-2.5 bg-[#F4EEDF] rounded-sm border border-[#20231F] space-y-1">
+                            <span className="text-[#20231F]/60 block text-[10px] uppercase font-bold">Tài khoản thụ hưởng VietinBank</span>
+                            <div className="flex justify-between items-center">
+                              <span className="font-mono font-bold text-sm text-[#20231F]">{ACCOUNT_NO}</span>
+                              <span className="text-[11px] font-bold text-[#20231F]/80">VietinBank</span>
+                            </div>
+                            <span className="text-[11px] text-[#20231F]/70 block font-medium">Chủ TK: {ACCOUNT_NAME}</span>
                           </div>
 
                           <div className="p-2.5 bg-[#F4EEDF] rounded-sm border-2 border-[#B94D35] flex items-center justify-between">
