@@ -342,10 +342,10 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                   01 / 05 · XÁC THỰC THÔNG TIN
                 </span>
                 <h3 className="text-2xl sm:text-4xl font-display uppercase tracking-tight text-[#20231F]">
-                  BẠN LÀ AI TRONG GIA ĐÌNH CÓC?
+                  CÙNG CÓC TÌM LẠI THÔNG TIN CỦA BẠN
                 </h3>
                 <p className="text-sm text-[#20231F]/75 leading-relaxed">
-                  Nhập Mã số sinh viên (MSSV) hoặc Họ và tên để chúng mình tìm lại vị trí của bạn trong gia đình Cóc Sài Gòn.
+                  Nhập mã số sinh viên (MSSV) hoặc họ và tên để Cóc xác nhận thông tin và tìm lại dấu ấn của bạn trong hành trình 17 năm.
                 </p>
               </div>
 
