@@ -1038,48 +1038,48 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
         )}
 
         {/* ========================================================================= */}
-        {/* 6. HÀNG GHẾ KHÁN GIẢ TIỀN CẢNH: MỖI BÊN 5 CÁI, LỐI ĐI Ở GIỮA, KHÔNG CÓ SỐ (ẨN TRÊN MOBILE ĐỂ TRÁNH CHE SÂN KHẤU) */}
+        {/* 6. HÀNG GHẾ KHÁN GIẢ TIỀN CẢNH: MỖI BÊN 5 CÁI, LỐI ĐI Ở GIỮA, KHÔNG CÓ SỐ */}
         {/* ========================================================================= */}
-        <div className="absolute -bottom-2 left-0 right-0 h-16 sm:h-20 pointer-events-none z-30 hidden sm:flex items-end justify-between px-3 sm:px-8">
+        <div className="absolute -bottom-2 left-0 right-0 h-12 sm:h-20 pointer-events-none z-30 flex items-end justify-between px-1.5 sm:px-8">
           
           {/* Dãy ghế bên trái: đúng 5 ghế */}
-          <div className="flex items-end gap-1.5 sm:gap-2.5 flex-1 justify-around">
+          <div className="flex items-end gap-1 sm:gap-2.5 flex-1 justify-around">
             {[...Array(5)].map((_, i) => (
-              <div key={`left-chair-${i}`} className="relative flex flex-col items-center flex-1 max-w-[56px] h-14 sm:h-18 shadow-2xl">
+              <div key={`left-chair-${i}`} className="relative flex flex-col items-center flex-1 max-w-[32px] sm:max-w-[56px] h-11 sm:h-18 shadow-2xl">
                 {/* Tay vịn bên hông ghế */}
-                <div className="absolute -left-1 top-2.5 w-1.5 h-11 bg-[#1A1A1A] border-t-2 border-[#D97706] rounded-t-xs -z-10" />
-                <div className="absolute -right-1 top-2.5 w-1.5 h-11 bg-[#1A1A1A] border-t-2 border-[#D97706] rounded-t-xs -z-10" />
+                <div className="absolute -left-0.5 sm:-left-1 top-2 w-1 sm:w-1.5 h-7 sm:h-11 bg-[#1A1A1A] border-t-2 border-[#D97706] rounded-t-xs -z-10" />
+                <div className="absolute -right-0.5 sm:-right-1 top-2 w-1 sm:w-1.5 h-7 sm:h-11 bg-[#1A1A1A] border-t-2 border-[#D97706] rounded-t-xs -z-10" />
                 
                 {/* Tựa lưng ghế màu xanh đặc trưng hội trường */}
-                <div className="w-full h-full bg-[#1E3A8A] border-2 border-[#0F172A] rounded-t-xl overflow-hidden flex flex-col justify-between shadow-md">
+                <div className="w-full h-full bg-[#1E3A8A] border sm:border-2 border-[#0F172A] rounded-t-lg sm:rounded-t-xl overflow-hidden flex flex-col justify-between shadow-md">
                   {/* Đệm tựa đầu màu đỏ nỉ - KHÔNG CÓ SỐ */}
-                  <div className="w-full h-4 sm:h-5 bg-[#DC2626] border-b-2 border-[#991B1B] rounded-t-lg shadow-inner" />
+                  <div className="w-full h-3 sm:h-5 bg-[#DC2626] border-b sm:border-b-2 border-[#991B1B] rounded-t-md sm:rounded-t-lg shadow-inner" />
                   {/* Vỏ ghế nhựa đen phía sau */}
-                  <div className="w-full h-3 bg-[#0F172A] opacity-60" />
+                  <div className="w-full h-2 sm:h-3 bg-[#0F172A] opacity-60" />
                 </div>
               </div>
             ))}
           </div>
 
           {/* Lối đi ở giữa hội trường (Center Aisle) */}
-          <div className="w-8 sm:w-16 shrink-0 h-full flex items-center justify-center">
+          <div className="w-5 sm:w-16 shrink-0 h-full flex items-center justify-center">
             <div className="w-full h-1 bg-[#8C6237]/35 rounded-full" />
           </div>
 
           {/* Dãy ghế bên phải: đúng 5 ghế */}
-          <div className="flex items-end gap-1.5 sm:gap-2.5 flex-1 justify-around">
+          <div className="flex items-end gap-1 sm:gap-2.5 flex-1 justify-around">
             {[...Array(5)].map((_, i) => (
-              <div key={`right-chair-${i}`} className="relative flex flex-col items-center flex-1 max-w-[56px] h-14 sm:h-18 shadow-2xl">
+              <div key={`right-chair-${i}`} className="relative flex flex-col items-center flex-1 max-w-[32px] sm:max-w-[56px] h-11 sm:h-18 shadow-2xl">
                 {/* Tay vịn bên hông ghế */}
-                <div className="absolute -left-1 top-2.5 w-1.5 h-11 bg-[#1A1A1A] border-t-2 border-[#D97706] rounded-t-xs -z-10" />
-                <div className="absolute -right-1 top-2.5 w-1.5 h-11 bg-[#1A1A1A] border-t-2 border-[#D97706] rounded-t-xs -z-10" />
+                <div className="absolute -left-0.5 sm:-left-1 top-2 w-1 sm:w-1.5 h-7 sm:h-11 bg-[#1A1A1A] border-t-2 border-[#D97706] rounded-t-xs -z-10" />
+                <div className="absolute -right-0.5 sm:-right-1 top-2 w-1 sm:w-1.5 h-7 sm:h-11 bg-[#1A1A1A] border-t-2 border-[#D97706] rounded-t-xs -z-10" />
                 
                 {/* Tựa lưng ghế màu xanh đặc trưng hội trường */}
-                <div className="w-full h-full bg-[#1E3A8A] border-2 border-[#0F172A] rounded-t-xl overflow-hidden flex flex-col justify-between shadow-md">
+                <div className="w-full h-full bg-[#1E3A8A] border sm:border-2 border-[#0F172A] rounded-t-lg sm:rounded-t-xl overflow-hidden flex flex-col justify-between shadow-md">
                   {/* Đệm tựa đầu màu đỏ nỉ - KHÔNG CÓ SỐ */}
-                  <div className="w-full h-4 sm:h-5 bg-[#DC2626] border-b-2 border-[#991B1B] rounded-t-lg shadow-inner" />
+                  <div className="w-full h-3 sm:h-5 bg-[#DC2626] border-b sm:border-b-2 border-[#991B1B] rounded-t-md sm:rounded-t-lg shadow-inner" />
                   {/* Vỏ ghế nhựa đen phía sau */}
-                  <div className="w-full h-3 bg-[#0F172A] opacity-60" />
+                  <div className="w-full h-2 sm:h-3 bg-[#0F172A] opacity-60" />
                 </div>
               </div>
             ))}
