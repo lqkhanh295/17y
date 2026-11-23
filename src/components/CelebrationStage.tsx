@@ -415,10 +415,10 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
         // If already tracking this frog, keep its current dynamic motion state
         if (next[c.id]) return;
 
-        // Distribute nicely along stage floor (12% to 88% width, 65% to 81% depth)
+        // Distribute nicely along stage floor (12% to 88% width, 66% to 78% depth)
         const stepX = count > 1 ? 76 / (count - 1) : 0;
         const initialX = count > 1 ? 12 + idx * stepX : 50;
-        const initialY = 65 + (idx % 3) * 6; // 65%, 71%, 77%
+        const initialY = 66 + (idx % 3) * 6; // 66%, 72%, 78%
         const initialDir = idx % 2 === 0 ? 1 : -1;
         const speed = 0.20 + (idx % 4) * 0.04;
         const scale = 0.88 + ((initialY - 64) / 18) * 0.26;
@@ -547,9 +547,20 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
               let nextX = x + newDir * travelDistance;
               nextX = Math.max(12, Math.min(88, nextX));
 
-              const nextY = 65 + Math.random() * 16; // 65% to 81%
+              // Collision avoidance: prevent clumping and overlapping name tags
+              let candidateX = nextX;
+              const isColliding = Object.entries(next).some(([otherId, otherFrog]) => {
+                if (otherId === id) return false;
+                return Math.abs(otherFrog.targetX - candidateX) < 8;
+              });
+              if (isColliding) {
+                candidateX = candidateX > 50 ? Math.max(12, candidateX - 12) : Math.min(88, candidateX + 12);
+              }
 
-              targetX = nextX;
+              // Snap to 3 clean depth tiers (66%, 72%, 78%) to maintain vertical hierarchy
+              const nextY = 66 + (Math.floor(Math.random() * 3)) * 6;
+
+              targetX = candidateX;
               targetY = nextY;
               dir = targetX >= x ? 1 : -1;
               speed = 0.36 + Math.random() * 0.18; // dynamic, energetic hop speed!
@@ -647,15 +658,17 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
   // Main stage body
   const stageContent = (
     <div className="w-full h-full flex flex-col flex-1 overflow-hidden">
-      {/* Refined Theatrical Ambient Top Bar */}
-      <div className="w-full h-13 sm:h-14 bg-[#14100C]/95 backdrop-blur-md border-b border-white/10 px-3 sm:px-6 flex items-center justify-between gap-3 shrink-0 z-40 select-none shadow-sm pt-[env(safe-area-inset-top)]">
+      {/* ========================================================================= */}
+      {/* 1. DESKTOP & TABLET TOP BAR (Single sleek 3-column bar, sm:flex hidden)    */}
+      {/* ========================================================================= */}
+      <div className="hidden sm:flex w-full h-14 bg-[#14100C]/95 backdrop-blur-md border-b border-white/10 px-4 lg:px-6 items-center justify-between gap-3 shrink-0 z-40 select-none shadow-sm pt-[env(safe-area-inset-top)]">
         {/* Left: Brand Identity & Subdued Count */}
         <div className="flex items-center gap-2.5 shrink-0">
           <span className="w-8 h-8 rounded-full bg-amber-400/15 border border-amber-400/30 flex items-center justify-center text-amber-300 shrink-0">
             <FrogIcon size={17} />
           </span>
           <div className="flex items-center gap-2 min-w-0">
-            <span className="font-display font-bold text-xs sm:text-sm tracking-wide text-white uppercase whitespace-nowrap">
+            <span className="font-display font-bold text-sm tracking-wide text-white uppercase whitespace-nowrap">
               SÂN KHẤU CÓC 17Y
             </span>
             <span className="text-[11px] font-mono text-white/45 hidden sm:inline">
@@ -669,7 +682,7 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
           <button
             type="button"
             onClick={() => setSelectedRole('ALL')}
-            className={`px-3 py-1 rounded-full transition-all text-[11px] sm:text-xs ${
+            className={`px-3 py-1 rounded-full transition-all text-xs ${
               selectedRole === 'ALL'
                 ? 'bg-amber-400 text-[#1C140D] font-bold shadow-xs'
                 : 'text-white/60 hover:text-white'
@@ -680,7 +693,7 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
           <button
             type="button"
             onClick={() => setSelectedRole('ALUMNI')}
-            className={`px-3 py-1 rounded-full transition-all text-[11px] sm:text-xs ${
+            className={`px-3 py-1 rounded-full transition-all text-xs ${
               selectedRole === 'ALUMNI'
                 ? 'bg-amber-400 text-[#1C140D] font-bold shadow-xs'
                 : 'text-white/60 hover:text-white'
@@ -691,7 +704,7 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
           <button
             type="button"
             onClick={() => setSelectedRole('ACTIVE')}
-            className={`px-3 py-1 rounded-full transition-all text-[11px] sm:text-xs ${
+            className={`px-3 py-1 rounded-full transition-all text-xs ${
               selectedRole === 'ACTIVE'
                 ? 'bg-amber-400 text-[#1C140D] font-bold shadow-xs'
                 : 'text-white/60 hover:text-white'
@@ -702,14 +715,14 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
         </div>
 
         {/* Right: Daily Hearts Quota + Sổ Lời Chúc + Utilities + Close */}
-        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+        <div className="flex items-center gap-2 shrink-0">
           {/* Daily Hearts Quota Indicator Pill */}
           <div 
-            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-rose-950/70 border border-rose-500/40 text-rose-300 font-mono text-[11px] sm:text-xs shadow-xs"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-rose-950/70 border border-rose-500/40 text-rose-300 font-mono text-xs shadow-xs"
             title={`Hôm nay bạn còn ${dailyHeartsRemaining}/12 lượt thả tim • Mỗi ngày được thả tối đa 12 tim`}
           >
             <HeartIcon size={13} className="text-rose-400 fill-rose-400 animate-pulse shrink-0" />
-            <span className="hidden sm:inline text-rose-200/80 font-sans text-[11px]">Hôm nay:</span>
+            <span className="hidden lg:inline text-rose-200/80 font-sans text-[11px]">Hôm nay:</span>
             <span className="font-bold text-rose-300">{dailyHeartsRemaining}/12</span>
             <span className="hidden md:inline text-rose-300/80">tim</span>
           </div>
@@ -718,7 +731,7 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
           <button
             type="button"
             onClick={() => setIsWishDrawerOpen(true)}
-            className="px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/15 border border-white/15 text-white hover:text-amber-300 font-mono text-[11px] sm:text-xs flex items-center gap-1.5 transition-all active:scale-95 shadow-xs"
+            className="px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/15 border border-white/15 text-white hover:text-amber-300 font-mono text-xs flex items-center gap-1.5 transition-all active:scale-95 shadow-xs"
             title="Mở toàn bộ sổ lời chúc"
           >
             <BookOpenIcon size={14} className="text-amber-400" />
@@ -767,6 +780,125 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
               <CloseIcon size={16} />
             </button>
           )}
+        </div>
+      </div>
+
+      {/* ========================================================================= */}
+      {/* 2. MOBILE-OPTIMIZED TOP BAR (2-Tier, Zero Overflow at 375px, sm:hidden)    */}
+      {/* ========================================================================= */}
+      <div className="flex sm:hidden w-full bg-[#14100C]/95 backdrop-blur-md border-b border-white/10 px-3 py-1.5 flex-col gap-1.5 shrink-0 z-40 select-none shadow-sm pt-[env(safe-area-inset-top)]">
+        {/* Tier 1: Brand + Daily Hearts + Sổ Lời Chúc + Close */}
+        <div className="flex items-center justify-between gap-1.5">
+          <div className="flex items-center gap-1.5 shrink-0">
+            <span className="w-7 h-7 rounded-full bg-amber-400/15 border border-amber-400/30 flex items-center justify-center text-amber-300 shrink-0">
+              <FrogIcon size={15} />
+            </span>
+            <span className="font-display font-bold text-xs tracking-wide text-white uppercase whitespace-nowrap">
+              SÂN KHẤU CÓC
+            </span>
+          </div>
+
+          <div className="flex items-center gap-1.5 shrink-0">
+            {/* Daily Hearts Quota Pill */}
+            <div 
+              className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-rose-950/70 border border-rose-500/40 text-rose-300 font-mono text-[10px] shadow-xs"
+              title={`Hôm nay bạn còn ${dailyHeartsRemaining}/12 lượt thả tim`}
+            >
+              <HeartIcon size={11} className="text-rose-400 fill-rose-400 animate-pulse shrink-0" />
+              <span className="font-bold text-rose-300">{dailyHeartsRemaining}/12</span>
+            </div>
+
+            {/* Sổ Lời Chúc Drawer Trigger */}
+            <button
+              type="button"
+              onClick={() => setIsWishDrawerOpen(true)}
+              className="px-2 py-0.5 rounded-full bg-white/10 hover:bg-white/15 border border-white/15 text-white hover:text-amber-300 font-mono text-[10px] flex items-center gap-1 transition-all active:scale-95"
+              title="Mở toàn bộ sổ lời chúc"
+            >
+              <BookOpenIcon size={12} className="text-amber-400 shrink-0" />
+              <span className="text-amber-300 font-bold">({allCharacters.length})</span>
+            </button>
+
+            {/* Exit Modal Button */}
+            {onClose && (
+              <button
+                type="button"
+                onClick={onClose}
+                className="w-7 h-7 rounded-full bg-white/10 hover:bg-rose-500 text-white/80 hover:text-white transition-colors flex items-center justify-center shrink-0 ml-0.5 active:scale-90"
+                title="Đóng sân khấu"
+              >
+                <CloseIcon size={14} />
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Tier 2: Role Filters + Quick Stage Utilities */}
+        <div className="flex items-center justify-between gap-1 pt-1 border-t border-white/5">
+          <div className="flex items-center bg-white/5 p-0.5 rounded-full border border-white/10 font-mono">
+            <button
+              type="button"
+              onClick={() => setSelectedRole('ALL')}
+              className={`px-2.5 py-0.5 rounded-full transition-all text-[10px] ${
+                selectedRole === 'ALL'
+                  ? 'bg-amber-400 text-[#1C140D] font-bold shadow-xs'
+                  : 'text-white/60 hover:text-white'
+              }`}
+            >
+              Tất cả
+            </button>
+            <button
+              type="button"
+              onClick={() => setSelectedRole('ALUMNI')}
+              className={`px-2.5 py-0.5 rounded-full transition-all text-[10px] ${
+                selectedRole === 'ALUMNI'
+                  ? 'bg-amber-400 text-[#1C140D] font-bold shadow-xs'
+                  : 'text-white/60 hover:text-white'
+              }`}
+            >
+              Cựu TV
+            </button>
+            <button
+              type="button"
+              onClick={() => setSelectedRole('ACTIVE')}
+              className={`px-2.5 py-0.5 rounded-full transition-all text-[10px] ${
+                selectedRole === 'ACTIVE'
+                  ? 'bg-amber-400 text-[#1C140D] font-bold shadow-xs'
+                  : 'text-white/60 hover:text-white'
+              }`}
+            >
+              Thành viên
+            </button>
+          </div>
+
+          <div className="flex items-center bg-white/5 rounded-full p-0.5 border border-white/10">
+            <button
+              type="button"
+              onClick={() => triggerConfettiBlast()}
+              className="p-1 rounded-full text-white/70 hover:text-amber-300 hover:bg-white/10 transition-colors"
+              title="Bắn pháo hoa"
+            >
+              <PartyIcon size={12} />
+            </button>
+            <button
+              type="button"
+              onClick={() => setStageLightsOn(!stageLightsOn)}
+              className={`p-1 rounded-full transition-colors ${
+                stageLightsOn ? 'text-amber-400 hover:bg-white/10' : 'text-white/40 hover:bg-white/10'
+              }`}
+              title={stageLightsOn ? 'Tắt đèn sân khấu' : 'Bật đèn sân khấu'}
+            >
+              <BulbIcon size={12} />
+            </button>
+            <button
+              type="button"
+              onClick={() => setSoundEnabled(!soundEnabled)}
+              className="p-1 rounded-full text-white/70 hover:text-amber-300 hover:bg-white/10 transition-colors"
+              title={soundEnabled ? 'Tắt âm thanh' : 'Bật âm thanh'}
+            >
+              {soundEnabled ? <Volume2Icon size={12} className="text-amber-400" /> : <VolumeXIcon size={12} className="text-rose-400" />}
+            </button>
+          </div>
         </div>
       </div>
 

@@ -217,16 +217,57 @@ END:VCALENDAR`;
         {/* Content Area */}
         <div className="p-6 overflow-y-auto flex-1 space-y-6">
           {!foundRecord && !hasSearched && (
-            <div className="text-center py-12 text-[#20231F]/60 space-y-2">
-              <div className="w-16 h-16 mx-auto rounded-sm bg-[#EAE4D6] border-2 border-[#20231F] flex items-center justify-center">
-                <SearchIcon size={28} className="text-[#20231F]" />
+            <div className="space-y-6 py-2">
+              <div className="text-center space-y-1.5">
+                <div className="w-12 h-12 mx-auto rounded-sm bg-[#F4C542] border-2 border-[#20231F] flex items-center justify-center shadow-poster-sm">
+                  <SearchIcon size={22} className="text-[#20231F]" />
+                </div>
+                <h4 className="font-display text-xl sm:text-2xl text-[#20231F] uppercase tracking-wide">
+                  TRA CỨU VÉ & TIẾN ĐỘ ĐỐI SOÁT
+                </h4>
+                <p className="text-xs text-[#20231F]/70 max-w-md mx-auto">
+                  Nhập MSSV (hoặc số điện thoại) đã đăng ký vào ô tìm kiếm phía trên để xem chi tiết hồ sơ của bạn.
+                </p>
               </div>
-              <h4 className="font-display text-2xl text-[#20231F] uppercase tracking-wide">
-                TRA CỨU VÉ & THÔNG TIN THANH TOÁN
-              </h4>
-              <p className="text-xs max-w-sm mx-auto">
-                Nhập MSSV hoặc số điện thoại bạn đã dùng khi đăng ký để kiểm tra tiến độ duyệt vé hoặc đóng số dư còn lại.
-              </p>
+
+              {/* 3 Guidance Feature Cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="p-3 bg-white border-2 border-[#20231F] rounded-sm space-y-1">
+                  <span className="text-[10px] font-mono font-bold text-[#B94D35] uppercase block">BƯỚC 01</span>
+                  <h5 className="font-display font-bold text-xs uppercase text-[#20231F]">TRA CỨU HỒ SƠ</h5>
+                  <p className="text-[11px] text-[#20231F]/70 font-body">Kiểm tra thông tin cá nhân và tình trạng duyệt vé của BTC.</p>
+                </div>
+                <div className="p-3 bg-white border-2 border-[#20231F] rounded-sm space-y-1">
+                  <span className="text-[10px] font-mono font-bold text-[#B94D35] uppercase block">BƯỚC 02</span>
+                  <h5 className="font-display font-bold text-xs uppercase text-[#20231F]">ĐÓNG SỐ DƯ ĐỢT 2</h5>
+                  <p className="text-[11px] text-[#20231F]/70 font-body">Nếu bạn đã đặt cọc 150k, có thể đóng phần còn lại trực tiếp tại đây.</p>
+                </div>
+                <div className="p-3 bg-white border-2 border-[#20231F] rounded-sm space-y-1">
+                  <span className="text-[10px] font-mono font-bold text-[#B94D35] uppercase block">BƯỚC 03</span>
+                  <h5 className="font-display font-bold text-xs uppercase text-[#20231F]">LẤY VÉ VIP CHECK-IN</h5>
+                  <p className="text-[11px] text-[#20231F]/70 font-body">Nhận mã vé và QR Check-in chính thức vào cửa Đồi Sứ Villa.</p>
+                </div>
+              </div>
+
+              {/* VIP Ticket Preview Blueprint */}
+              <div className="p-4 bg-white/70 border-2 border-dashed border-[#20231F]/40 rounded-sm space-y-2 opacity-85">
+                <div className="flex items-center justify-between text-[10px] font-mono font-bold text-[#20231F]/60 uppercase">
+                  <span>MẪU THẺ THAM DỰ // GALA KỶ NIỆM 17Y</span>
+                  <span>PREVIEW TICKET</span>
+                </div>
+                <div className="flex items-center justify-between py-2 border-y border-[#20231F]/15">
+                  <div className="space-y-0.5">
+                    <span className="font-display font-bold text-sm text-[#20231F] uppercase">ĐẠI TIỆC GALA CÓC SÀI GÒN 17 NĂM</span>
+                    <span className="text-[11px] font-mono text-[#20231F]/60 block">12.12.2026 • ĐỒI SỨ VILLA • 17:00</span>
+                  </div>
+                  <span className="px-2 py-1 bg-[#F4C542] border border-[#20231F] font-mono font-bold text-[10px] text-[#20231F] rounded-xs shadow-xs">
+                    VIP PASS
+                  </span>
+                </div>
+                <p className="text-[10px] font-mono text-center text-[#20231F]/50 pt-0.5">
+                  Vé chính thức của bạn sẽ kích hoạt đầy đủ mã QR Check-in ngay sau khi tra cứu.
+                </p>
+              </div>
             </div>
           )}
 

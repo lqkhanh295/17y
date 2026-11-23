@@ -740,62 +740,65 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
               </div>
 
               {/* VietQR & Banking Split */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-3 sm:p-4 rounded-sm bg-white border-2 border-[#20231F] shadow-poster-sm">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 p-3 sm:p-4 rounded-sm bg-white border-2 border-[#20231F] shadow-poster-sm">
                 {/* QR Code Container */}
-                <div className="text-center flex flex-col items-center justify-center p-3 bg-[#F4EEDF] rounded-sm border-2 border-[#20231F]">
-                  <span className="text-xs font-mono font-bold text-[#20231F] uppercase mb-2">
+                <div className="text-center flex flex-col items-center justify-center p-2.5 sm:p-3 bg-[#F4EEDF] rounded-sm border-2 border-[#20231F]">
+                  <span className="text-[11px] sm:text-xs font-mono font-bold text-[#20231F] uppercase mb-1.5">
                     QUÉT MÃ VIETQR ĐỂ CHUYỂN KHOẢN
                   </span>
-                  <div className="p-2 bg-white rounded-sm border-2 border-[#20231F] inline-block shadow-sm">
+                  <div className="p-1.5 sm:p-2 bg-white rounded-sm border-2 border-[#20231F] inline-block shadow-sm">
                     <img
                       src={vietQrUrl}
                       onError={(e) => {
                         (e.currentTarget as HTMLImageElement).src = '/images/vietinbank_qr.jpg';
                       }}
                       alt="VietQR Chuyển khoản VietinBank"
-                      className="w-44 h-44 object-contain"
+                      className="w-32 h-32 sm:w-40 sm:h-40 object-contain"
                     />
                   </div>
-                  <span className="text-xs font-bold text-[#B94D35] mt-2">
+                  <span className="text-xs font-bold text-[#B94D35] mt-1.5">
                     Số tiền: {currentPayAmount.toLocaleString('vi-VN')} VNĐ
                   </span>
                 </div>
 
                 {/* Bank Account Details & Transfer Memo */}
-                <div className="space-y-2.5 text-xs">
-                  <div className="p-2.5 bg-[#F4EEDF] rounded-sm border border-[#20231F]">
-                    <span className="text-[#20231F]/60 block text-[10px] uppercase font-bold">Ngân hàng thụ hưởng</span>
-                    <span className="font-bold text-sm text-[#20231F]">VietinBank (CN Tân Bình - PGD Hóc Môn)</span>
+                <div className="space-y-2 text-xs">
+                  {/* Compact Bank + Account Name 2-Column Grid */}
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="p-2 sm:p-2.5 bg-[#F4EEDF] rounded-sm border border-[#20231F]">
+                      <span className="text-[#20231F]/60 block text-[9px] sm:text-[10px] uppercase font-bold">Ngân hàng</span>
+                      <span className="font-bold text-xs sm:text-sm text-[#20231F] truncate block">VietinBank</span>
+                    </div>
+
+                    <div className="p-2 sm:p-2.5 bg-[#F4EEDF] rounded-sm border border-[#20231F]">
+                      <span className="text-[#20231F]/60 block text-[9px] sm:text-[10px] uppercase font-bold">Chủ tài khoản</span>
+                      <span className="font-mono font-bold text-xs sm:text-sm text-[#20231F] uppercase truncate block">{ACCOUNT_NAME}</span>
+                    </div>
                   </div>
 
-                  <div className="p-2.5 bg-[#F4EEDF] rounded-sm border border-[#20231F]">
-                    <span className="text-[#20231F]/60 block text-[10px] uppercase font-bold">Chủ tài khoản</span>
-                    <span className="font-mono font-bold text-sm text-[#20231F] uppercase">{ACCOUNT_NAME}</span>
-                  </div>
-
-                  <div className="p-2.5 bg-[#F4EEDF] rounded-sm border border-[#20231F] flex items-center justify-between gap-2">
+                  <div className="p-2 sm:p-2.5 bg-[#F4EEDF] rounded-sm border border-[#20231F] flex items-center justify-between gap-2">
                     <div className="min-w-0 flex-1">
-                      <span className="text-[#20231F]/60 block text-[10px] uppercase font-bold truncate">Số tài khoản</span>
-                      <span className="font-mono font-bold text-sm text-[#20231F] tracking-wide truncate block">{ACCOUNT_NO}</span>
+                      <span className="text-[#20231F]/60 block text-[9px] sm:text-[10px] uppercase font-bold truncate">Số tài khoản</span>
+                      <span className="font-mono font-bold text-xs sm:text-sm text-[#20231F] tracking-wide truncate block">{ACCOUNT_NO}</span>
                     </div>
                     <button
                       type="button"
                       onClick={() => copyToClipboard(ACCOUNT_NO)}
-                      className="px-3 py-2 min-h-[44px] min-w-[70px] rounded bg-[#20231F] text-white text-[11px] font-bold active:scale-95 flex items-center justify-center shrink-0 whitespace-nowrap"
+                      className="px-2.5 py-1.5 sm:px-3 sm:py-2 min-h-[40px] min-w-[65px] rounded bg-[#20231F] text-white text-[11px] font-bold active:scale-95 flex items-center justify-center shrink-0 whitespace-nowrap"
                     >
                       {copiedBank ? 'Đã chép' : 'Sao chép'}
                     </button>
                   </div>
 
-                  <div className="p-2.5 bg-[#F4EEDF] rounded-sm border-2 border-[#B94D35] flex items-center justify-between gap-2">
+                  <div className="p-2 sm:p-2.5 bg-[#F4EEDF] rounded-sm border-2 border-[#B94D35] flex items-center justify-between gap-2">
                     <div className="min-w-0 flex-1">
-                      <span className="text-[#B94D35] block text-[10px] uppercase font-bold truncate">Nội dung chuyển khoản (bắt buộc)</span>
-                      <span className="font-mono font-bold text-sm text-[#20231F] truncate block select-all">{transferContent}</span>
+                      <span className="text-[#B94D35] block text-[9px] sm:text-[10px] uppercase font-bold truncate">Nội dung chuyển khoản (bắt buộc)</span>
+                      <span className="font-mono font-bold text-xs sm:text-sm text-[#20231F] truncate block select-all">{transferContent}</span>
                     </div>
                     <button
                       type="button"
                       onClick={() => copyToClipboard(transferContent)}
-                      className="px-3 py-2 min-h-[44px] min-w-[70px] rounded bg-[#B94D35] text-white text-[11px] font-bold active:scale-95 flex items-center justify-center shrink-0 whitespace-nowrap"
+                      className="px-2.5 py-1.5 sm:px-3 sm:py-2 min-h-[40px] min-w-[65px] rounded bg-[#B94D35] text-white text-[11px] font-bold active:scale-95 flex items-center justify-center shrink-0 whitespace-nowrap"
                     >
                       {copiedBank ? 'Đã chép' : 'Sao chép'}
                     </button>

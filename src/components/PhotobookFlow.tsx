@@ -119,9 +119,9 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
             </span>
           </div>
 
-          <div className="grid grid-cols-12 gap-6 lg:gap-8 items-start">
+          <div className="grid grid-cols-12 gap-6 lg:gap-8 items-stretch">
             {/* Major Feature with Overlapping Polaroid (Col 7) */}
-            <div className="col-span-7 relative">
+            <div className="col-span-7 relative flex flex-col justify-between">
               {/* Primary Plate Card */}
               <div
                 onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.cover)}
@@ -153,7 +153,7 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
               {/* Overlapping Candid Print */}
               <div
                 onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.coverOffset)}
-                className={`absolute -bottom-6 -right-5 w-[38%] z-20 cursor-pointer transition-transform duration-300 hover:scale-[1.04] shadow-poster-sm rotate-2 bg-white p-1.5 pb-2.5 border-2 border-csg-black ${!isAnimationComplete ? 'film-reveal-item' : ''
+                className={`absolute bottom-2 right-2 sm:-bottom-2 sm:-right-2 w-[36%] z-20 cursor-pointer transition-transform duration-300 hover:scale-[1.04] shadow-poster-sm rotate-2 bg-white p-1.5 pb-2.5 border-2 border-csg-black ${!isAnimationComplete ? 'film-reveal-item' : ''
                   }`}
                 style={{ animationDelay: '300ms' }}
                 title="Nhấp để phóng to khoảnh khắc này"
@@ -171,10 +171,10 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
             </div>
 
             {/* Complementary Workspace Dialogue (Col 5) */}
-            <div className="col-span-5 space-y-3">
+            <div className="col-span-5 flex flex-col justify-between h-full space-y-3">
               <div
                 onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.workspace)}
-                className={`paper-sheet p-2 sm:p-2.5 pb-3 sm:pb-3.5 cursor-pointer transition-all duration-300 hover:shadow-poster active:scale-[0.99] ${!isAnimationComplete ? 'film-reveal-item' : ''
+                className={`paper-sheet p-2 sm:p-2.5 pb-3 sm:pb-3.5 cursor-pointer transition-all duration-300 hover:shadow-poster active:scale-[0.99] flex-1 flex flex-col justify-between ${!isAnimationComplete ? 'film-reveal-item' : ''
                   }`}
                 style={{ animationDelay: '200ms' }}
               >
@@ -200,7 +200,7 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
               </div>
 
               {/* Heartfelt Note */}
-              <div className="p-3 bg-csg-surface/80 border border-csg-black/20 rounded-xs font-mono text-xs space-y-1">
+              <div className="p-3 bg-csg-surface/80 border border-csg-black/20 rounded-xs font-mono text-xs space-y-1 shrink-0">
                 <div className="flex items-center gap-1.5 text-csg-red font-bold text-[10px] uppercase">
                   <HeartIcon size={12} />
                   <span>MẨU CHUYỆN NHỎ</span>
@@ -250,11 +250,11 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
           </div>
 
           {/* Paired Heritage Discovery Row */}
-          <div className="grid grid-cols-12 gap-6 items-start">
+          <div className="grid grid-cols-12 gap-6 items-stretch">
             {/* Vertical Chronology (Col 5) */}
             <div
               onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.camera)}
-              className={`col-span-5 paper-sheet p-2 sm:p-2.5 pb-3 sm:pb-3.5 cursor-pointer transition-all duration-300 hover:shadow-poster active:scale-[0.99] ${!isAnimationComplete ? 'film-reveal-item' : ''
+              className={`col-span-5 paper-sheet p-2 sm:p-2.5 pb-3 sm:pb-3.5 cursor-pointer transition-all duration-300 hover:shadow-poster active:scale-[0.99] flex flex-col justify-between ${!isAnimationComplete ? 'film-reveal-item' : ''
                 }`}
               style={{ animationDelay: '500ms' }}
             >
@@ -279,32 +279,48 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
               </p>
             </div>
 
-            {/* Highland Gathering (Col 7) */}
-            <div
-              onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.bonfire)}
-              className={`col-span-7 paper-sheet p-2 sm:p-2.5 pb-3 sm:pb-3.5 cursor-pointer transition-all duration-300 hover:shadow-poster active:scale-[0.99] ${!isAnimationComplete ? 'film-reveal-item' : ''
-                }`}
-              style={{ animationDelay: '600ms' }}
-            >
-              <div className="overflow-hidden bg-csg-black/5">
-                <img
-                  src={PHOTOBOOK_IMAGES.bonfire.src}
-                  alt={PHOTOBOOK_IMAGES.bonfire.alt}
-                  className="w-full aspect-[16/11] object-cover transition-transform duration-500 hover:scale-[1.02]"
-                  loading="lazy"
-                />
+            {/* Highland Gathering & Expedition Dispatch (Col 7) */}
+            <div className="col-span-7 flex flex-col justify-between h-full space-y-3">
+              <div
+                onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.bonfire)}
+                className={`paper-sheet p-2 sm:p-2.5 pb-3 sm:pb-3.5 cursor-pointer transition-all duration-300 hover:shadow-poster active:scale-[0.99] flex-1 flex flex-col justify-between ${!isAnimationComplete ? 'film-reveal-item' : ''
+                  }`}
+                style={{ animationDelay: '600ms' }}
+              >
+                <div className="overflow-hidden bg-csg-black/5">
+                  <img
+                    src={PHOTOBOOK_IMAGES.bonfire.src}
+                    alt={PHOTOBOOK_IMAGES.bonfire.alt}
+                    className="w-full aspect-[16/11] object-cover transition-transform duration-500 hover:scale-[1.02]"
+                    loading="lazy"
+                  />
+                </div>
+                <div className="pt-2.5 flex items-baseline justify-between font-mono text-xs">
+                  <span className="font-bold text-csg-black uppercase text-[11px]">
+                    05 // ĐÀ LẠT SƯƠNG MÙ & SẮC ÁO VÀNG
+                  </span>
+                  <span className="text-csg-black/50 text-[10px]">
+                    Lâm Viên
+                  </span>
+                </div>
+                <p className="text-[11px] text-csg-black/75 font-body pt-0.5 leading-relaxed">
+                  Giữa cái lạnh cao nguyên, tụi mình đứng cạnh nhau là thấy ấm ran cả lòng.
+                </p>
               </div>
-              <div className="pt-2.5 flex items-baseline justify-between font-mono text-xs">
-                <span className="font-bold text-csg-black uppercase text-[11px]">
-                  05 // ĐÀ LẠT SƯƠNG MÙ & SẮC ÁO VÀNG
-                </span>
-                <span className="text-csg-black/50 text-[10px]">
-                  Lâm Viên
-                </span>
+
+              {/* Expedition Log Card to perfectly balance vertical baseline */}
+              <div className="p-3 bg-csg-surface/80 border border-csg-black/20 rounded-xs font-mono text-xs flex items-center justify-between gap-3 shrink-0">
+                <div className="space-y-0.5 min-w-0">
+                  <span className="text-[10px] uppercase font-bold text-csg-red block">CHUYẾN ĐI ĐẦU TIÊN CỦA NHIỀU THẾ HỆ</span>
+                  <p className="text-[11px] text-csg-black/75 font-body italic truncate">
+                    "Lửa trại bập bùng, tiếng ghita hòa lẫn tiếng cười vang vọng khắp thung lũng."
+                  </p>
+                </div>
+                <div className="shrink-0 text-right font-mono text-[10px] text-csg-black/50 border-l border-csg-black/15 pl-3">
+                  <div>48H ĐỒNG HÀNH</div>
+                  <div className="font-bold text-csg-black">100% KỶ NIỆM</div>
+                </div>
               </div>
-              <p className="text-[11px] text-csg-black/75 font-body line-clamp-1 pt-0.5">
-                Giữa cái lạnh cao nguyên, tụi mình đứng cạnh nhau là thấy ấm ran cả lòng.
-              </p>
             </div>
           </div>
         </section>
@@ -320,11 +336,11 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
             </span>
           </div>
 
-          <div className="grid grid-cols-12 gap-6 lg:gap-8 items-start">
+          <div className="grid grid-cols-12 gap-6 lg:gap-8 items-stretch">
             {/* Prominent Stage Feature (Col 7) */}
             <div
               onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.stage)}
-              className={`col-span-7 paper-sheet p-2 sm:p-2.5 pb-3 sm:pb-3.5 cursor-pointer transition-all duration-300 hover:shadow-poster active:scale-[0.99] ${!isAnimationComplete ? 'film-reveal-item' : ''
+              className={`col-span-7 paper-sheet p-2 sm:p-2.5 pb-3 sm:pb-3.5 cursor-pointer transition-all duration-300 hover:shadow-poster active:scale-[0.99] flex flex-col justify-between ${!isAnimationComplete ? 'film-reveal-item' : ''
                 }`}
               style={{ animationDelay: '700ms' }}
             >
@@ -344,37 +360,50 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
                   Đại hội 2022
                 </span>
               </div>
-              <p className="text-[11px] text-csg-black/75 font-body line-clamp-1 pt-0.5">
+              <p className="text-[11px] text-csg-black/75 font-body pt-0.5 leading-relaxed">
                 Ánh đèn bừng sáng, tiếng hò reo và những cánh tay giơ cao hòa chung một nhịp đập tuổi trẻ.
               </p>
             </div>
 
-            {/* Coastal Toast Feature (Col 5) */}
-            <div
-              onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.celebrationToast)}
-              className={`col-span-5 paper-sheet p-2 sm:p-2.5 pb-3 sm:pb-3.5 cursor-pointer transition-all duration-300 hover:shadow-poster active:scale-[0.99] ${!isAnimationComplete ? 'film-reveal-item' : ''
-                }`}
-              style={{ animationDelay: '800ms' }}
-            >
-              <div className="overflow-hidden bg-csg-black/5">
-                <img
-                  src={PHOTOBOOK_IMAGES.celebrationToast.src}
-                  alt={PHOTOBOOK_IMAGES.celebrationToast.alt}
-                  className="w-full aspect-[4/3] object-cover transition-transform duration-500 hover:scale-[1.02]"
-                  loading="lazy"
-                />
+            {/* Coastal Toast Feature & Youth Memory Quote (Col 5) */}
+            <div className="col-span-5 flex flex-col justify-between h-full space-y-3">
+              <div
+                onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.celebrationToast)}
+                className={`paper-sheet p-2 sm:p-2.5 pb-3 sm:pb-3.5 cursor-pointer transition-all duration-300 hover:shadow-poster active:scale-[0.99] flex-1 flex flex-col justify-between ${!isAnimationComplete ? 'film-reveal-item' : ''
+                  }`}
+                style={{ animationDelay: '800ms' }}
+              >
+                <div className="overflow-hidden bg-csg-black/5">
+                  <img
+                    src={PHOTOBOOK_IMAGES.celebrationToast.src}
+                    alt={PHOTOBOOK_IMAGES.celebrationToast.alt}
+                    className="w-full aspect-[4/3] object-cover transition-transform duration-500 hover:scale-[1.02]"
+                    loading="lazy"
+                  />
+                </div>
+                <div className="pt-2.5 flex items-baseline justify-between font-mono text-xs">
+                  <span className="font-bold text-csg-black uppercase text-[11px]">
+                    07 // GIÓ BIỂN VÀ NỤ CƯỜI THANH XUÂN
+                  </span>
+                  <span className="text-csg-black/50 text-[10px]">
+                    Bờ kè đá xanh
+                  </span>
+                </div>
+                <p className="text-[11px] text-csg-black/75 font-body pt-0.5 leading-relaxed">
+                  Ngồi bên bờ kè đón gió biển, cười nói giòn tan những ngày tháng đôi mươi rực rỡ.
+                </p>
               </div>
-              <div className="pt-2.5 flex items-baseline justify-between font-mono text-xs">
-                <span className="font-bold text-csg-black uppercase text-[11px]">
-                  07 // GIÓ BIỂN VÀ NỤ CƯỜI THANH XUÂN
-                </span>
-                <span className="text-csg-black/50 text-[10px]">
-                  Bờ kè đá xanh
-                </span>
+
+              {/* Memory Note to match Card 06 baseline */}
+              <div className="p-3 bg-csg-surface/80 border border-csg-black/20 rounded-xs font-mono text-xs space-y-1 shrink-0">
+                <div className="flex items-center gap-1.5 text-csg-red font-bold text-[10px] uppercase">
+                  <HeartIcon size={12} />
+                  <span>NHẬT KÝ THANH XUÂN</span>
+                </div>
+                <p className="text-[11px] text-csg-black/75 leading-relaxed font-body italic">
+                  "Những đêm chạy sự kiện đến 2 giờ sáng, mệt rã rời nhưng ngước nhìn sân khấu sáng đèn là mọi nhọc nhằn tan biến."
+                </p>
               </div>
-              <p className="text-[11px] text-csg-black/75 font-body line-clamp-1 pt-0.5">
-                Ngồi bên bờ kè đón gió biển, cười nói giòn tan những ngày tháng đôi mươi rực rỡ.
-              </p>
             </div>
           </div>
         </section>
@@ -597,10 +626,10 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
       {/* GRAND FINALE SPREAD: GALA KEEPSAKE TICKET FIRST, SÂN KHẤU CÓC COMPANION    */}
       {/* User Rule: "form trc rồi tới sân khấu cóc sau"                            */}
       {/* ========================================================================= */}
-      <section className="pt-10 sm:pt-14 mt-10 sm:mt-14 border-t border-csg-black/20">
+      <section className="pt-8 sm:pt-10 mt-8 sm:mt-10 border-t border-csg-black/20">
 
         {/* Section Header Bar */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 pb-4 mb-6 border-b border-csg-black/15 font-mono text-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 pb-3 mb-5 border-b border-csg-black/15 font-mono text-xs">
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-csg-red animate-pulse" />
             <span className="font-bold uppercase tracking-wider text-csg-black">
@@ -694,6 +723,18 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
                     <span className="font-mono text-[10px] text-csg-black/50 block pt-0.5">
                       Đầy đủ lời chúc từ các thế hệ cựu thành viên
                     </span>
+                  </div>
+                </div>
+
+                {/* Interactive Stage Live Badges to harmonize card height */}
+                <div className="grid grid-cols-2 gap-2 font-mono text-[11px]">
+                  <div className="p-2 bg-white/70 border border-csg-black/15 rounded-xs">
+                    <span className="text-[9px] uppercase text-csg-black/50 block font-bold">KHÔNG GIAN</span>
+                    <span className="font-bold text-csg-black">Sân khấu 3D hội trường</span>
+                  </div>
+                  <div className="p-2 bg-white/70 border border-csg-black/15 rounded-xs">
+                    <span className="text-[9px] uppercase text-csg-black/50 block font-bold">TƯƠNG TÁC</span>
+                    <span className="font-bold text-csg-black">12 Lượt tim / ngày</span>
                   </div>
                 </div>
 
