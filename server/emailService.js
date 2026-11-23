@@ -305,6 +305,9 @@ export async function sendRegistrationEmail(record, options = {}) {
 
   const { subject, html, text, templateType } = generateEmailContent(record, options.templateType);
   const { transporter, isConfigured, sender } = createMailTransporter();
+  const env = getEnvConfig();
+  const senderEmail = (env.SMTP_USER || env.GMAIL_USER || 'csg.fptuhcm@gmail.com').trim();
+  const domainPart = senderEmail.includes('@') ? senderEmail.split('@')[1] : 'gmail.com';
 
   const safeFullName = String(record?.fullName || 'Bạn').replace(/[\r\n;,"\\]+/g, ' ').trim();
   const safeTicketCode = String(record?.ticketCode || 'CSG17').replace(/[\r\n;,"\\]+/g, ' ').trim();
@@ -312,18 +315,19 @@ export async function sendRegistrationEmail(record, options = {}) {
 
   const icsContent = [
     'BEGIN:VCALENDAR',
-    'VERSION:2.0',
     'PRODID:-//Coc Sai Gon//CSG 17Y Event//VI',
+    'VERSION:2.0',
     'CALSCALE:GREGORIAN',
     'METHOD:REQUEST',
     'BEGIN:VEVENT',
-    `UID:csg17y-${record.id || Date.now()}@cocsaigon.com`,
+    `UID:csg17y-${record?.id || Date.now()}@${domainPart}`,
     `DTSTAMP:${new Date().toISOString().replace(/[-:]/g, '').split('.')[0]}Z`,
     'DTSTART:20261212T100000Z',
     'DTEND:20261212T150000Z',
     'SUMMARY:CÓC SÀI GÒN 17th BIRTHDAY: THE NEXT SIGNAL',
     `DESCRIPTION:Đại tiệc sinh nhật Cóc Sài Gòn 17 tuổi: THE NEXT SIGNAL!\\nThời gian: 17:00 - 22:00 ngày 12.12.2026\\nĐịa điểm: Đồi Sứ Villa\\nHọ và tên: ${safeFullName}\\nMã vé: ${safeTicketCode}`,
     'LOCATION:Đồi Sứ Villa',
+    `ORGANIZER;CN=Ban Tổ Chức Cóc Sài Gòn:mailto:${senderEmail}`,
     'STATUS:CONFIRMED',
     `ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=TRUE;CN=${safeFullName}:mailto:${safeToEmail}`,
     'BEGIN:VALARM',
@@ -338,6 +342,7 @@ export async function sendRegistrationEmail(record, options = {}) {
   const mailOptions = {
     from: sender,
     to: safeToEmail,
+    replyTo: senderEmail,
     subject: safeSubject,
     text,
     html,
