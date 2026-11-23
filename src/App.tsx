@@ -71,6 +71,14 @@ export const App: React.FC = () => {
   const [wishSubmitted, setWishSubmitted] = useState(false);
 
   // URL-based routing handlers
+  const openStage = () => {
+    audioService.stop();
+    setIsStageOpen(true);
+    setIsRegisterOpen(false);
+    setIsLookupOpen(false);
+    setIsAdminOpen(false);
+  };
+
   const openRegister = () => {
     if (window.location.pathname !== '/register') {
       window.history.pushState({}, '', '/register');
@@ -147,6 +155,12 @@ export const App: React.FC = () => {
         setIsRegisterOpen(false);
         setIsLookupOpen(false);
         setIsStageOpen(false);
+      } else if (path.startsWith('/stage') || hash === '#stage') {
+        audioService.stop();
+        setIsStageOpen(true);
+        setIsRegisterOpen(false);
+        setIsLookupOpen(false);
+        setIsAdminOpen(false);
       } else {
         setIsRegisterOpen(false);
         setIsLookupOpen(false);
@@ -272,7 +286,7 @@ export const App: React.FC = () => {
           {/* Minimal Quick Actions */}
           <nav className="flex items-center gap-1.5 sm:gap-6 font-mono text-xs uppercase tracking-wider text-csg-black/80 font-medium shrink-0">
             <button
-              onClick={() => setIsStageOpen(true)}
+              onClick={openStage}
               className="hover:text-csg-red transition-colors font-bold px-2 py-1.5 min-h-[44px] min-w-[44px] flex items-center justify-center gap-1.5 active:scale-95 text-xs rounded-sm"
               title="Xem sân khấu kỷ niệm 17Y"
             >
