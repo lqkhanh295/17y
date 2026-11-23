@@ -252,7 +252,7 @@ export const apiClient = {
 
     // Direct Supabase fallback registration
     const isAlumni = (data.role === 'ALUMNI');
-    const totalRequired = data.totalRequired || (isAlumni ? 449000 : 349000);
+    const totalRequired = data.totalRequired || (isAlumni ? 389000 : 349000);
     const plan = data.plan || 'FULL';
     let paidAmount = totalRequired;
     let remainingAmount = 0;

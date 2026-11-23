@@ -79,7 +79,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
 
   // Pricing calculation
   const isAlumni = identifiedMember?.role === 'ALUMNI';
-  const totalFee = isAlumni ? 449000 : 349000;
+  const totalFee = isAlumni ? 389000 : 349000;
 
   let currentPayAmount = totalFee;
   if (plan === 'DEPOSIT_150' || plan === 'DEPOSIT_100') currentPayAmount = 150000;
@@ -566,7 +566,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                     onClick={() => setIdentifiedMember(prev => prev ? { ...prev, role: 'ALUMNI', honorific: prev.honorific === 'Chị' ? 'Chị' : 'Anh' } : null)}
                     className={`py-2.5 px-3 min-h-[44px] rounded-sm text-xs font-mono font-bold border-2 transition-all text-center flex items-center justify-center active:scale-[0.98] whitespace-nowrap ${isAlumni ? 'bg-[#20231F] text-white border-[#20231F] shadow-sm' : 'bg-[#F4EEDF] text-[#20231F] border-[#20231F]/30 hover:border-[#20231F]'}`}
                   >
-                    Cựu Thành Viên (449k)
+                    Cựu Thành Viên (389k)
                   </button>
                   <button
                     type="button"

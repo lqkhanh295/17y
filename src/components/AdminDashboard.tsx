@@ -514,7 +514,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         Cựu thành viên
                       </span>
                       <span className="text-2xl font-display font-black text-[#F5C400]">{totalAlumni}</span>
-                      <span className="text-[10px] text-[#A8A8A8] block">Gói 449.000 đ</span>
+                      <span className="text-[10px] text-[#A8A8A8] block">Gói 389.000 đ</span>
                     </div>
 
                     <div className="p-4 rounded-xl bg-[#222222] border border-[#F5C400]">

@@ -304,7 +304,7 @@ app.post('/api/registrations', async (req, res) => {
   }
 
   const isAlumni = (role === 'ALUMNI');
-  const totalRequired = isAlumni ? 449000 : 349000;
+  const totalRequired = isAlumni ? 389000 : 349000;
   const effectivePlan = plan || paymentPlan || 'FULL';
 
   let paidAmount = 0;

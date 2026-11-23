@@ -52,7 +52,7 @@ export interface RegistrationRecord {
   // Finance
   plan: PaymentPlan;
   paymentPlan?: PaymentPlan;
-  totalRequired: number; // 349000 (Active) | 449000 (Alumni)
+  totalRequired: number; // 349000 (Active) | 389000 (Alumni)
   paidAmount: number; // Verified amount only!
   remainingAmount: number;
   receiptPhase1Url: string;
