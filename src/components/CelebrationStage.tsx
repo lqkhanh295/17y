@@ -49,6 +49,11 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [stageLightsOn, setStageLightsOn] = useState(true);
 
+  // Tắt toàn bộ nhạc nền khi bước vào sân khấu
+  useEffect(() => {
+    audioService.stop();
+  }, []);
+
   // Close wish popup on Escape key
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {

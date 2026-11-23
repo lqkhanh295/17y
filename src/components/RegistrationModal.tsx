@@ -918,7 +918,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                   className="btn-editorial-secondary flex-1 py-3 min-h-[44px] rounded-sm font-bold text-xs uppercase active:scale-[0.98] flex items-center justify-center gap-1.5"
                 >
                   <ArrowLeftIcon size={14} />
-                  <span>Sửa thông tin</span>
+                  <span>Quay lại</span>
                 </button>
                 <button
                   type="button"
@@ -1031,7 +1031,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                   className="btn-editorial-secondary flex-1 py-3.5 min-h-[44px] rounded-sm font-bold text-xs uppercase active:scale-[0.98] flex items-center justify-center gap-1.5"
                 >
                   <ArrowLeftIcon size={14} />
-                  <span>Sửa thông tin</span>
+                  <span>Quay lại</span>
                 </button>
                 <button
                   type="button"
