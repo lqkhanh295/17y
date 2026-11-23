@@ -807,7 +807,7 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
         {/* ========================================================================= */}
         {/* 3. MÀN HÌNH LED MÀU ĐEN 16:9 CHÍNH GIỮA (CENTER BLACK 16:9 LED SCREEN)     */}
         {/* ========================================================================= */}
-        <div className="absolute top-[16%] sm:top-14 left-1/2 -translate-x-1/2 w-[70%] sm:w-[52%] md:w-[45%] max-w-[580px] aspect-[16/9] z-20 pointer-events-none">
+        <div className="absolute top-[14%] sm:top-14 left-1/2 -translate-x-1/2 w-[72%] sm:w-[52%] md:w-[45%] max-w-[580px] aspect-[16/9] z-20 pointer-events-none">
           {/* Ambient Wall Drop Shadow */}
           <div className="absolute -inset-1.5 bg-black/60 rounded-xs blur-md -z-10" />
 
@@ -901,9 +901,9 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
         )}
 
         {/* ========================================================================= */}
-        {/* 6. HÀNG GHẾ KHÁN GIẢ TIỀN CẢNH: MỖI BÊN 5 CÁI, LỐI ĐI Ở GIỮA, KHÔNG CÓ SỐ */}
+        {/* 6. HÀNG GHẾ KHÁN GIẢ TIỀN CẢNH: MỖI BÊN 5 CÁI, LỐI ĐI Ở GIỮA, KHÔNG CÓ SỐ (ẨN TRÊN MOBILE ĐỂ TRÁNH CHE SÂN KHẤU) */}
         {/* ========================================================================= */}
-        <div className="absolute -bottom-2 left-0 right-0 h-16 sm:h-20 pointer-events-none z-30 flex items-end justify-between px-3 sm:px-8">
+        <div className="absolute -bottom-2 left-0 right-0 h-16 sm:h-20 pointer-events-none z-30 hidden sm:flex items-end justify-between px-3 sm:px-8">
           
           {/* Dãy ghế bên trái: đúng 5 ghế */}
           <div className="flex items-end gap-1.5 sm:gap-2.5 flex-1 justify-around">
