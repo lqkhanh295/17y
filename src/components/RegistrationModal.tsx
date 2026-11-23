@@ -454,7 +454,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                     <div className="flex items-center justify-between pb-2.5 border-b border-[#20231F]/15">
                       <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-sm bg-[#286640] text-white border-2 border-[#20231F] shadow-poster-sm font-mono font-bold text-xs uppercase tracking-wider">
                         <span className="w-2 h-2 rounded-full bg-[#F4C542] shrink-0"></span>
-                        <span>THÀNH VIÊN ĐƯƠNG NHIỆM</span>
+                        <span>THÀNH VIÊN</span>
                       </div>
                       <span className="text-[11px] font-mono text-[#20231F]/60 font-semibold hidden sm:inline">
                         CSG 17Y GALA
@@ -484,7 +484,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                   </span>
                   <div className="flex items-center gap-2">
                     <span className={`inline-flex items-center px-2.5 py-1 rounded-sm text-xs font-mono font-bold border ${isAlumni ? 'bg-red-50 text-[#B94D35] border-[#B94D35]/40' : 'bg-emerald-50 text-[#286640] border-[#286640]/40'}`}>
-                      {isAlumni ? 'CỰU THÀNH VIÊN' : 'THÀNH VIÊN HIỆN TẠI'}
+                      {isAlumni ? 'CỰU THÀNH VIÊN' : 'THÀNH VIÊN'}
                     </span>
                     {identifiedMember.generation && (
                       <span className="text-xs font-mono text-[#20231F]/70 font-semibold">

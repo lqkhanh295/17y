@@ -675,7 +675,7 @@ END:VCALENDAR`;
                           {foundRecord.fullName}
                         </h3>
                         <span className="text-xs text-[#20231F]/70 font-mono">
-                          MSSV: {foundRecord.mssv} • {foundRecord.role === 'ALUMNI' ? 'Cựu Thành Viên' : 'Thành Viên Đương Nhiệm'}
+                          MSSV: {foundRecord.mssv} • {foundRecord.role === 'ALUMNI' ? 'Cựu Thành Viên' : 'Thành Viên'}
                         </span>
                       </div>
 

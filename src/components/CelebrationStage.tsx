@@ -1378,7 +1378,7 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
               {activeCharacter.name}
             </h3>
             <div className="flex items-center justify-center gap-1.5 text-xs font-mono text-stone-500 mt-1">
-              <span>{activeCharacter.role === 'ALUMNI' ? 'Cựu thành viên' : 'Thành viên đương nhiệm'}</span>
+              <span>{activeCharacter.role === 'ALUMNI' ? 'Cựu thành viên' : 'Thành viên'}</span>
               {isTop && (
                 <span className="inline-flex items-center gap-1 text-amber-700 font-bold ml-1">
                   • <SparklesIcon size={11} className="text-amber-600 inline" /> Top 1 Yêu Thích
