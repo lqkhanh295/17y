@@ -110,7 +110,48 @@ app.get('/api/memories', async (req, res) => {
   res.json({ success: true, data: db.memories || [] });
 });
 
-/* ================= 2. MEMBER VERIFICATION ================= */
+/* ================= 2. MEMBER SEARCH & VERIFICATION ================= */
+app.get('/api/members/search', async (req, res) => {
+  const query = (req.query.q || '').toString().trim();
+  if (!query) {
+    return res.json({ success: true, data: [] });
+  }
+
+  try {
+    if (supabase) {
+      const { data: results, error: rpcErr } = await supabase.rpc('search_members', {
+        query_text: query,
+        max_limit: 8
+      });
+
+      if (!rpcErr && results) {
+        return res.json({ success: true, data: results });
+      }
+
+      // Fallback direct query
+      const { data: directMembers } = await supabase
+        .from('members')
+        .select('id, mssv, "fullName", role, honorific, generation, department')
+        .or(`fullName.ilike.%${query}%,mssv.ilike.%${query}%`)
+        .limit(8);
+
+      return res.json({ success: true, data: directMembers || [] });
+    }
+  } catch (err) {
+    console.error('Member search error:', err);
+  }
+
+  const db = getDB();
+  const qNorm = normalizeVN(query);
+  const qUpper = query.toUpperCase();
+  const matches = (db.members || []).filter(m => {
+    return (m.mssv && m.mssv.toUpperCase().includes(qUpper)) ||
+           (m.fullName && normalizeVN(m.fullName).includes(qNorm));
+  }).slice(0, 8);
+
+  res.json({ success: true, data: matches });
+});
+
 app.post('/api/members/verify', async (req, res) => {
   const { query } = req.body;
   if (!query || !query.trim()) {
@@ -122,32 +163,47 @@ app.post('/api/members/verify', async (req, res) => {
 
   try {
     if (supabase) {
-      const { data: members, error } = await supabase.from('members').select('*');
-      if (!error && members && members.length > 0) {
-        let match = members.find(m => m.mssv && m.mssv.toUpperCase() === qUpper);
-        if (!match) {
-          match = members.find(m => {
-            const nameNorm = normalizeVN(m.fullName);
-            return nameNorm === qNorm || nameNorm.includes(qNorm) || qNorm.includes(nameNorm);
-          });
+      // 1. Prioritize search_members RPC (unaccented, ranked match)
+      const { data: candidates, error: rpcErr } = await supabase.rpc('search_members', {
+        query_text: query.trim(),
+        max_limit: 5
+      });
+
+      let match = null;
+      if (!rpcErr && candidates && candidates.length > 0) {
+        match = candidates[0];
+      } else {
+        // Fallback: direct select
+        const { data: members, error } = await supabase.from('members').select('*');
+        if (!error && members && members.length > 0) {
+          match = members.find(m => m.mssv && m.mssv.toUpperCase() === qUpper);
+          if (!match) {
+            match = members.find(m => normalizeVN(m.fullName) === qNorm);
+          }
+          if (!match) {
+            match = members.find(m => {
+              const nameNorm = normalizeVN(m.fullName);
+              return nameNorm.includes(qNorm) || qNorm.includes(nameNorm);
+            });
+          }
         }
+      }
 
-        if (match) {
-          const { data: existingRegs } = await supabase
-            .from('registrations')
-            .select('id, mssv')
-            .ilike('mssv', match.mssv);
+      if (match) {
+        const { data: existingRegs } = await supabase
+          .from('registrations')
+          .select('id, mssv')
+          .ilike('mssv', match.mssv);
 
-          const existing = existingRegs && existingRegs.length > 0 ? existingRegs[0] : null;
+        const existing = existingRegs && existingRegs.length > 0 ? existingRegs[0] : null;
 
-          return res.json({
-            success: true,
-            data: match,
-            hasExistingRegistration: !!existing,
-            existingRegistrationId: existing?.id || null,
-            message: 'Xác thực danh tính thành công từ Supabase.'
-          });
-        }
+        return res.json({
+          success: true,
+          data: match,
+          hasExistingRegistration: !!existing,
+          existingRegistrationId: existing?.id || null,
+          message: 'Xác thực danh tính thành công từ Supabase.'
+        });
       }
     }
   } catch (err) {
@@ -157,6 +213,9 @@ app.post('/api/members/verify', async (req, res) => {
   // Fallback to local DB if Supabase search didn't match
   const db = getDB();
   let match = db.members.find(m => m.mssv && m.mssv.toUpperCase() === qUpper);
+  if (!match) {
+    match = db.members.find(m => normalizeVN(m.fullName) === qNorm);
+  }
   if (!match) {
     match = db.members.find(m => {
       const nameNorm = normalizeVN(m.fullName);

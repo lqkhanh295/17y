@@ -105,7 +105,48 @@ export const apiClient = {
     return [];
   },
 
-  // 2. Member verification (With failover to Supabase)
+  // 2. Member search (Auto-complete candidate search)
+  async searchMembers(query: string): Promise<MemberDirectoryItem[]> {
+    if (!query || !query.trim() || query.trim().length < 2) return [];
+
+    const cleanQ = query.trim();
+    const res = await safeFetchJson<{ success: boolean; data: MemberDirectoryItem[] }>(
+      `${API_BASE}/members/search?q=${encodeURIComponent(cleanQ)}`
+    );
+
+    if (res && res.success && Array.isArray(res.data) && res.data.length > 0) {
+      return res.data;
+    }
+
+    // Direct Supabase RPC failover
+    try {
+      const { data: candidates, error: rpcErr } = await (supabase as any).rpc('search_members', {
+        query_text: cleanQ,
+        max_limit: 8
+      });
+
+      if (!rpcErr && candidates && (candidates as any[]).length > 0) {
+        return candidates as MemberDirectoryItem[];
+      }
+
+      // Fallback direct ilike
+      const { data: directData } = await supabase
+        .from('members')
+        .select('id, mssv, fullName, role, honorific, generation, department')
+        .or(`fullName.ilike.%${cleanQ}%,mssv.ilike.%${cleanQ}%`)
+        .limit(8);
+
+      if (directData && directData.length > 0) {
+        return directData as unknown as MemberDirectoryItem[];
+      }
+    } catch (err) {
+      console.warn('Direct search failover error:', err);
+    }
+
+    return [];
+  },
+
+  // 2b. Member verification (With failover to Supabase)
   async verifyMember(query: string) {
     if (!query || !query.trim()) {
       throw new Error('Vui lòng cung cấp MSSV hoặc Họ tên.');
@@ -125,19 +166,28 @@ export const apiClient = {
 
     if (res && res.success) return res;
 
-    // Fallback: Direct Supabase directory lookup
-    const qNorm = normalizeVN(query);
-    const qUpper = query.trim().toUpperCase();
+    // Fallback: Direct Supabase directory lookup via search_members RPC
+    try {
+      const { data: candidates, error: rpcErr } = await (supabase as any).rpc('search_members', {
+        query_text: query.trim(),
+        max_limit: 5
+      });
 
-    const { data: members } = await supabase.from('members').select('*');
-    if (members && members.length > 0) {
-      let match = members.find(m => m.mssv && m.mssv.toUpperCase() === qUpper);
-
-      if (!match) {
-        match = members.find(m => {
-          const nameNorm = normalizeVN(m.fullName);
-          return nameNorm === qNorm || nameNorm.includes(qNorm) || qNorm.includes(nameNorm);
-        });
+      let match: MemberDirectoryItem | null = null;
+      if (!rpcErr && candidates && (candidates as any[]).length > 0) {
+        match = (candidates as any[])[0] as MemberDirectoryItem;
+      } else {
+        const qNorm = normalizeVN(query);
+        const qUpper = query.trim().toUpperCase();
+        const { data: members } = await supabase.from('members').select('*');
+        if (members && members.length > 0) {
+          match = (members.find(m => m.mssv && m.mssv.toUpperCase() === qUpper) ||
+                   members.find(m => normalizeVN(m.fullName) === qNorm) ||
+                   members.find(m => {
+                     const nameNorm = normalizeVN(m.fullName);
+                     return nameNorm.includes(qNorm) || qNorm.includes(nameNorm);
+                   })) as MemberDirectoryItem || null;
+        }
       }
 
       if (match) {
@@ -150,12 +200,14 @@ export const apiClient = {
 
         return {
           success: true,
-          data: match as unknown as MemberDirectoryItem,
+          data: match,
           hasExistingRegistration: !!existing,
           existingRegistrationId: existing?.id || undefined,
           message: 'Xác thực danh tính thành công từ cơ sở dữ liệu.'
         };
       }
+    } catch (err) {
+      console.warn('Direct member verification failover error:', err);
     }
 
     // Dynamic attendee bypass

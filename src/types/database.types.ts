@@ -310,7 +310,28 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      search_members: {
+        Args: {
+          query_text: string
+          max_limit?: number
+        }
+        Returns: {
+          id: string
+          mssv: string
+          fullName: string
+          role: string
+          honorific: string
+          generation: string
+          department: string
+          match_rank: number
+        }[]
+      }
+      verify_admin_pin: {
+        Args: {
+          input_pin: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never

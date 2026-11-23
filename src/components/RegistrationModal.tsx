@@ -40,6 +40,8 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
   const [identifiedMember, setIdentifiedMember] = useState<MemberDirectoryItem | null>(null);
   const [searchError, setSearchError] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
+  const [suggestions, setSuggestions] = useState<MemberDirectoryItem[]>([]);
+  const [isSearchingSuggestions, setIsSearchingSuggestions] = useState(false);
 
   // Screen 3: Payment selection state
   const [plan, setPlan] = useState<PaymentPlan>('FULL');
@@ -108,12 +110,45 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
     setScreen(2);
   };
 
+  // Auto-complete suggestion search while typing in Screen 1
+  useEffect(() => {
+    if (screen !== 1) return;
+    const q = query.trim();
+    if (q.length < 2) {
+      setSuggestions([]);
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      setIsSearchingSuggestions(true);
+      try {
+        const list = await apiClient.searchMembers(q);
+        setSuggestions(list);
+      } catch {
+        setSuggestions([]);
+      } finally {
+        setIsSearchingSuggestions(false);
+      }
+    }, 200);
+
+    return () => clearTimeout(timer);
+  }, [query, screen]);
+
+  const handleSelectSuggestion = (member: MemberDirectoryItem) => {
+    setIdentifiedMember(member);
+    setQuery(member.fullName);
+    setSuggestions([]);
+    setSearchError('');
+    setScreen(2);
+  };
+
   const handleIdentify = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!query.trim()) return;
 
     setSearchError('');
     setIsVerifying(true);
+    setSuggestions([]);
     try {
       const res = await apiClient.verifyMember(query);
       if (res.success && res.data) {
@@ -352,20 +387,63 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                   <label className="block text-xs font-bold uppercase tracking-wider text-[#20231F] mb-1.5">
                     MÃ SỐ SINH VIÊN HOẶC HỌ TÊN *
                   </label>
-                  <input
-                    type="text"
-                    value={query}
-                    onChange={(e) => {
-                      setQuery(e.target.value);
-                      if (searchError) setSearchError('');
-                    }}
-                    autoComplete="name"
-                    autoCapitalize="characters"
-                    inputMode="text"
-                    placeholder="VD: SE120101 hoặc Nguyễn Tiến Cường"
-                    className="w-full px-4 py-3 min-h-[48px] rounded-sm bg-white border-2 border-[#20231F] text-[#20231F] font-mono text-base focus:outline-none focus:ring-2 focus:ring-[#F4C542] shadow-poster-sm"
-                    autoFocus
-                  />
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={query}
+                      onChange={(e) => {
+                        setQuery(e.target.value);
+                        if (searchError) setSearchError('');
+                      }}
+                      autoComplete="name"
+                      autoCapitalize="characters"
+                      inputMode="text"
+                      placeholder="VD: SE171224 hoặc Nguyễn Tiến Cường"
+                      className="w-full px-4 py-3 min-h-[48px] rounded-sm bg-white border-2 border-[#20231F] text-[#20231F] font-mono text-base focus:outline-none focus:ring-2 focus:ring-[#F4C542] shadow-poster-sm"
+                      autoFocus
+                    />
+                    {isSearchingSuggestions && (
+                      <div className="absolute right-3 top-3.5 text-xs font-mono text-[#20231F]/50 animate-pulse">
+                        Đang dò tìm...
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Live Suggestions Dropdown */}
+                  {suggestions.length > 0 && (
+                    <div className="mt-2 p-2 rounded-sm bg-white border-2 border-[#20231F] shadow-poster max-h-60 overflow-y-auto space-y-1 text-left z-20 animate-fadeIn">
+                      <div className="px-2 py-1 text-[10px] font-mono font-bold uppercase tracking-wider text-[#20231F]/60 flex items-center justify-between border-b border-[#20231F]/10 mb-1 pb-1">
+                        <span>Gợi ý từ danh bạ CLB</span>
+                        <span>{suggestions.length} kết quả</span>
+                      </div>
+                      {suggestions.map((m) => {
+                        const isAlum = m.role === 'ALUMNI';
+                        return (
+                          <button
+                            key={m.id}
+                            type="button"
+                            onClick={() => handleSelectSuggestion(m)}
+                            className="w-full px-2.5 py-2 rounded-sm hover:bg-[#F4EEDF] transition-all flex items-center justify-between text-left group border border-transparent hover:border-[#20231F]/20 active:scale-[0.99]"
+                          >
+                            <div className="min-w-0 pr-2">
+                              <div className="font-bold text-sm text-[#20231F] group-hover:text-[#B94D35] flex items-center gap-1.5 truncate">
+                                <span>{m.fullName}</span>
+                                {m.generation && (
+                                  <span className="text-[11px] font-mono font-normal text-[#20231F]/50">({m.generation})</span>
+                                )}
+                              </div>
+                              <div className="text-xs font-mono text-[#20231F]/60 truncate">
+                                {m.mssv} · {m.department}
+                              </div>
+                            </div>
+                            <span className={`shrink-0 px-2 py-0.5 rounded text-[10px] font-mono font-bold border ${isAlum ? 'bg-red-50 text-[#B94D35] border-[#B94D35]/30' : 'bg-emerald-50 text-[#286640] border-[#286640]/30'}`}>
+                              {isAlum ? 'CỰU THÀNH VIÊN' : 'THÀNH VIÊN HIỆN TẠI'}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
                   {searchError && (
                     <div className="mt-2 p-3 rounded-lg bg-red-50 border-2 border-[#B94D35] text-[#B94D35] text-xs space-y-2">
                       <div className="flex items-center gap-2">

@@ -14,7 +14,7 @@ interface AdminDashboardProps {
   onClose: () => void;
   registrations: RegistrationRecord[];
   onApprove100: (id: string) => void;
-  onSimulateEmailDispatch: () => void;
+  onSimulateEmailDispatch?: () => void;
 }
 
 export const AdminDashboard: React.FC<AdminDashboardProps> = ({
@@ -22,7 +22,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   onClose,
   registrations: initialRegistrations,
   onApprove100,
-  onSimulateEmailDispatch
+  onSimulateEmailDispatch: _onSimulateEmailDispatch
 }) => {
   // Authentication PIN for BTC
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -31,7 +31,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
   // Active Navigation Module
   const [activeModule, setActiveModule] = useState<
-    'OVERVIEW' | 'REGISTRATIONS' | 'PAYMENT_REVIEW' | 'TICKETS' | 'CAMPAIGNS' | 'WISHES' | 'SHEETS_SYNC'
+    'OVERVIEW' | 'REGISTRATIONS' | 'PAYMENT_REVIEW' | 'TICKETS' | 'WISHES' | 'SHEETS_SYNC'
   >('OVERVIEW');
 
   // Live registrations list from API
@@ -50,10 +50,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [imageRotate, setImageRotate] = useState(0);
   const [rejectReason, setRejectReason] = useState('Không đọc được nội dung/mã giao dịch');
   const [showRejectModal, setShowRejectModal] = useState(false);
-
-  // Email Campaigns state
-  const [dispatchDate, setDispatchDate] = useState('2026-12-10T08:00');
-  const [dispatchSuccess, setDispatchSuccess] = useState(false);
 
   // Google Sheet Sync state
   const [isSyncingSheets, setIsSyncingSheets] = useState(false);
@@ -417,17 +413,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   </span>
                 </button>
 
-                <button
-                  type="button"
-                  onClick={() => setActiveModule('CAMPAIGNS')}
-                  className={`w-full px-3 py-2.5 rounded-lg text-left font-bold transition-colors flex items-center gap-2 ${
-                    activeModule === 'CAMPAIGNS'
-                      ? 'bg-[#222222] text-[#F5C400] border border-[#383838]'
-                      : 'text-[#A8A8A8] hover:text-white hover:bg-[#222222]/50'
-                  }`}
-                >
-                  <span>▰ Email tự động</span>
-                </button>
 
                 <button
                   type="button"
@@ -1051,69 +1036,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 </div>
               )}
 
-              {/* ================= 5. CAMPAIGNS MODULE ================= */}
-              {activeModule === 'CAMPAIGNS' && (
-                <div className="space-y-4 animate-fadeIn max-w-3xl">
-                  <div>
-                    <h3 className="font-display text-2xl uppercase tracking-wide text-white">
-                      EMAIL CAMPAIGN AUTOMATION
-                    </h3>
-                    <p className="text-xs text-[#A8A8A8]">
-                      Lên lịch và gửi email vé mời QR Check-in kèm tệp Apple/Google Calendar .ics
-                    </p>
-                  </div>
-
-                  <div className="p-5 rounded-xl bg-[#181818] border border-[#383838] space-y-4">
-                    <div className="flex items-center gap-2 p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-lg text-emerald-400 text-xs">
-                      <ShieldCheckIcon size={20} className="shrink-0" />
-                      <span>
-                        Quy tắc bảo vệ: Hệ thống chỉ gửi email cho những người đạt trạng thái <strong>Fully Paid ({totalApproved} người)</strong>. Chống gửi email trùng lặp tự động.
-                      </span>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                      <div>
-                        <label className="block text-[#A8A8A8] uppercase font-bold mb-1">Thời gian gửi chiến dịch</label>
-                        <input
-                          type="datetime-local"
-                          value={dispatchDate}
-                          onChange={(e) => setDispatchDate(e.target.value)}
-                          className="w-full px-3 py-2 rounded-lg bg-[#222222] border border-[#383838] text-white font-mono"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-[#A8A8A8] uppercase font-bold mb-1">Đối tượng nhận</label>
-                        <input
-                          type="text"
-                          value={`Tất cả đã đóng đủ 100% (${totalApproved} người)`}
-                          disabled
-                          className="w-full px-3 py-2 rounded-lg bg-[#222222] border border-[#383838] text-[#F5C400] font-bold"
-                        />
-                      </div>
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={() => {
-                        onSimulateEmailDispatch();
-                        setDispatchSuccess(true);
-                        setTimeout(() => setDispatchSuccess(false), 4000);
-                      }}
-                      className="w-full py-3 rounded-xl bg-[#F5C400] hover:bg-[#F8D879] text-[#111111] font-display text-xl uppercase tracking-wider font-black transition-colors flex items-center justify-center gap-1.5"
-                    >
-                      <span>KÍCH HOẠT GỬI EMAIL VÉ MỜI NGAY</span>
-                      <ArrowUpRightIcon size={18} />
-                    </button>
-
-                    {dispatchSuccess && (
-                      <div className="p-3 rounded-lg bg-emerald-500/20 border border-emerald-500/50 text-emerald-300 text-xs flex items-center gap-2">
-                        <CheckCircleIcon size={16} />
-                        <span>Đã kích hoạt gửi thành công vé mời QR và nhắc lịch cho {totalApproved} thành viên!</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
 
               {/* ================= 6. WISHES MODULE ================= */}
               {activeModule === 'WISHES' && (
