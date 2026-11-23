@@ -288,12 +288,17 @@ export const App: React.FC = () => {
       <header className="sticky top-0 z-40 bg-csg-paper/95 backdrop-blur-md border-b border-csg-black/20 pt-[env(safe-area-inset-top)]">
         <div className="max-w-[1360px] mx-auto px-4 sm:px-8 h-14 sm:h-16 flex items-center justify-between">
           {/* Identity */}
-          <a href="/" onClick={(e) => { e.preventDefault(); closeModals(); }} className="flex items-baseline gap-2 group min-h-[44px] items-center shrink-0">
-            <span className="font-display font-extrabold text-base tracking-tight text-csg-black uppercase whitespace-nowrap">
-              CÓC SÀI GÒN <span className="font-editorial italic font-normal text-csg-red lowercase text-lg">17 năm</span>
+          <a href="/" onClick={(e) => { e.preventDefault(); closeModals(); }} className="flex items-center gap-2.5 group min-h-[44px] shrink-0" title="Trang chủ Cóc Sài Gòn 17 Năm">
+            <img 
+              src="/images/csg_logo.png" 
+              alt="Cóc Sài Gòn" 
+              className="h-8 sm:h-9 w-auto object-contain transition-transform group-hover:scale-105" 
+            />
+            <span className="font-editorial italic font-normal text-csg-red text-base sm:text-lg whitespace-nowrap">
+              17 năm
             </span>
-            <span className="hidden md:inline font-mono text-[10px] text-csg-black/40 uppercase tracking-widest pl-2">
-              Photobook // 2009 — 2026
+            <span className="hidden md:inline font-mono text-[10px] text-csg-black/40 uppercase tracking-widest pl-2 border-l border-csg-black/15 ml-1">
+              Photobook • 2009 — 2026
             </span>
           </a>
 
