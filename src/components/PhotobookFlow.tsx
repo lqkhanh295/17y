@@ -119,13 +119,13 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
             </span>
           </div>
 
-          <div className="grid grid-cols-12 gap-6 lg:gap-8 items-stretch">
+          <div className="grid grid-cols-12 gap-6 lg:gap-8 items-start">
             {/* Major Feature with Overlapping Polaroid (Col 7) */}
-            <div className="col-span-7 relative flex flex-col justify-between">
+            <div className="col-span-7 relative flex flex-col">
               {/* Primary Plate Card */}
               <div
                 onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.cover)}
-                className={`paper-sheet p-2 sm:p-2.5 pb-3 sm:pb-3.5 cursor-pointer transition-all duration-300 hover:shadow-poster active:scale-[0.99] ${!isAnimationComplete ? 'film-reveal-item' : ''
+                className={`paper-sheet p-2 sm:p-2.5 pb-3 sm:pb-3.5 cursor-pointer transition-all duration-300 hover:shadow-poster active:scale-[0.99] flex flex-col ${!isAnimationComplete ? 'film-reveal-item' : ''
                   }`}
                 style={{ animationDelay: '100ms' }}
               >
@@ -171,10 +171,10 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
             </div>
 
             {/* Complementary Workspace Dialogue (Col 5) */}
-            <div className="col-span-5 flex flex-col h-full">
+            <div className="col-span-5 flex flex-col">
               <div
                 onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.workspace)}
-                className={`paper-sheet p-2 sm:p-2.5 pb-3 sm:pb-3.5 cursor-pointer transition-all duration-300 hover:shadow-poster active:scale-[0.99] h-full flex flex-col justify-between ${!isAnimationComplete ? 'film-reveal-item' : ''
+                className={`paper-sheet p-2 sm:p-2.5 pb-3 sm:pb-3.5 cursor-pointer transition-all duration-300 hover:shadow-poster active:scale-[0.99] flex flex-col ${!isAnimationComplete ? 'film-reveal-item' : ''
                   }`}
                 style={{ animationDelay: '200ms' }}
               >
@@ -239,11 +239,11 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
           </div>
 
           {/* Paired Heritage Discovery Row */}
-          <div className="grid grid-cols-12 gap-6 items-stretch">
+          <div className="grid grid-cols-12 gap-6 items-start">
             {/* Vertical Chronology (Col 5) */}
             <div
               onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.camera)}
-              className={`col-span-5 paper-sheet p-2 sm:p-2.5 pb-3 sm:pb-3.5 cursor-pointer transition-all duration-300 hover:shadow-poster active:scale-[0.99] flex flex-col justify-between ${!isAnimationComplete ? 'film-reveal-item' : ''
+              className={`col-span-5 paper-sheet p-2 sm:p-2.5 pb-3 sm:pb-3.5 cursor-pointer transition-all duration-300 hover:shadow-poster active:scale-[0.99] flex flex-col ${!isAnimationComplete ? 'film-reveal-item' : ''
                 }`}
               style={{ animationDelay: '500ms' }}
             >
@@ -269,10 +269,10 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
             </div>
 
             {/* Highland Gathering & Expedition Dispatch (Col 7) */}
-            <div className="col-span-7 flex flex-col h-full">
+            <div className="col-span-7 flex flex-col">
               <div
                 onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.bonfire)}
-                className={`paper-sheet p-2 sm:p-2.5 pb-3 sm:pb-3.5 cursor-pointer transition-all duration-300 hover:shadow-poster active:scale-[0.99] h-full flex flex-col justify-between ${!isAnimationComplete ? 'film-reveal-item' : ''
+                className={`paper-sheet p-2 sm:p-2.5 pb-3 sm:pb-3.5 cursor-pointer transition-all duration-300 hover:shadow-poster active:scale-[0.99] flex flex-col ${!isAnimationComplete ? 'film-reveal-item' : ''
                   }`}
                 style={{ animationDelay: '600ms' }}
               >
@@ -311,11 +311,11 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
             </span>
           </div>
 
-          <div className="grid grid-cols-12 gap-6 lg:gap-8 items-stretch">
+          <div className="grid grid-cols-12 gap-6 lg:gap-8 items-start">
             {/* Prominent Stage Feature (Col 7) */}
             <div
               onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.stage)}
-              className={`col-span-7 paper-sheet p-2 sm:p-2.5 pb-3 sm:pb-3.5 cursor-pointer transition-all duration-300 hover:shadow-poster active:scale-[0.99] flex flex-col justify-between ${!isAnimationComplete ? 'film-reveal-item' : ''
+              className={`col-span-7 paper-sheet p-2 sm:p-2.5 pb-3 sm:pb-3.5 cursor-pointer transition-all duration-300 hover:shadow-poster active:scale-[0.99] flex flex-col ${!isAnimationComplete ? 'film-reveal-item' : ''
                 }`}
               style={{ animationDelay: '700ms' }}
             >
@@ -341,10 +341,10 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
             </div>
 
             {/* Coastal Toast Feature & Youth Memory Quote (Col 5) */}
-            <div className="col-span-5 flex flex-col justify-between h-full space-y-3">
+            <div className="col-span-5 flex flex-col space-y-3">
               <div
                 onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.celebrationToast)}
-                className={`paper-sheet p-2 sm:p-2.5 pb-3 sm:pb-3.5 cursor-pointer transition-all duration-300 hover:shadow-poster active:scale-[0.99] flex-1 flex flex-col justify-between ${!isAnimationComplete ? 'film-reveal-item' : ''
+                className={`paper-sheet p-2 sm:p-2.5 pb-3 sm:pb-3.5 cursor-pointer transition-all duration-300 hover:shadow-poster active:scale-[0.99] flex flex-col ${!isAnimationComplete ? 'film-reveal-item' : ''
                   }`}
                 style={{ animationDelay: '800ms' }}
               >
