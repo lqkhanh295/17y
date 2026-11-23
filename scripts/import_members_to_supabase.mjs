@@ -15,21 +15,8 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_SECRET_KEY);
 
 const EXCEL_PATH = process.env.EXCEL_PATH || './members.xlsx';
 
-function getHonorific(name, role) {
-  if (role === 'ACTIVE') return 'Bạn';
-  const n = ' ' + name.toLowerCase() + ' ';
-  const females = [
-    ' thị ', ' thảo ', ' my ', ' ngọc ', ' trâm ', ' mai ', ' chi ', ' ngân ',
-    ' trang ', ' linh ', ' nhi ', ' phương ', ' yến ', ' vy ', ' duyên ', ' hân ',
-    ' hà ', ' thu ', ' quỳnh ', ' nhung ', ' hằng ', ' hương ', ' huyền ', ' dung ',
-    ' loan ', ' oanh ', ' thư ', ' ly ', ' diệu ', ' huệ ', ' cẩm ', ' bích ',
-    ' lan ', ' uyên ', ' nga ', ' trúc ', ' vân ', ' thủy ', ' mẫn ', ' tiên ',
-    ' khánh '
-  ];
-  for (const f of females) {
-    if (n.includes(f)) return 'Chị';
-  }
-  return 'Anh';
+function getHonorific() {
+  return 'Bạn';
 }
 
 function getGeneration(mssv, memberCode) {

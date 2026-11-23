@@ -127,7 +127,7 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
 
     const myFrog: MascotFrog = {
       id: `frog-${newRegistrant.id}`,
-      name: `${newRegistrant.honorific} ${newRegistrant.fullName}`,
+      name: newRegistrant.fullName,
       role: newRegistrant.role,
       wish: newRegistrant.wishes?.trim() || 'Mừng sinh nhật 17 năm Cóc Sài Gòn rực rỡ và bùng cháy!',
       x: 50,

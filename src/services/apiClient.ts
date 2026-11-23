@@ -268,7 +268,7 @@ export const apiClient = {
       paymentStatus = 'PARTIAL';
     }
 
-    const regId = 'CSG26-' + Math.floor(100000 + Math.random() * 900000);
+    const regId = 'CSG17-' + Math.floor(100000 + Math.random() * 900000);
     const ticketCode = `CSG17Y-${mssvClean.slice(-4)}-${Math.floor(100 + Math.random() * 900)}`;
 
     const initialPaymentSubmission = {
@@ -323,7 +323,7 @@ export const apiClient = {
       const wishObj = {
         id: 'w-' + Date.now(),
         registrationId: regId,
-        authorName: `${newRecord.honorific} ${newRecord.fullName}`.trim(),
+        authorName: newRecord.fullName.trim(),
         role: newRecord.role,
         content: data.wishes.trim(),
         isPublic: newRecord.isPublicConsent !== false,
@@ -499,10 +499,7 @@ export const apiClient = {
     // 1. Process all raw characters from character table
     rawChars.forEach((c: any, idx: number) => {
       const id = String(c.id || `char-${idx}`);
-      let displayName = c.name || 'Thành viên Cóc Sài Gòn';
-      if (c.honorific && !displayName.toLowerCase().startsWith(c.honorific.toLowerCase())) {
-        displayName = `${c.honorific} ${displayName}`;
-      }
+      const displayName = c.name || 'Thành viên Cóc Sài Gòn';
 
       charMap.set(id, {
         id,

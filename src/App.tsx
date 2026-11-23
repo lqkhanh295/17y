@@ -182,7 +182,7 @@ export const App: React.FC = () => {
     // Add newly registered frog to the stage characters
     const newFrog: MascotFrog = {
       id: `frog-${newRecord.id || Date.now()}`,
-      name: `${newRecord.honorific} ${newRecord.fullName}`,
+      name: newRecord.fullName,
       role: newRecord.role,
       wish: newRecord.wishes?.trim() || 'Mừng sinh nhật 17 năm Cóc Sài Gòn rực rỡ!',
       x: 50,

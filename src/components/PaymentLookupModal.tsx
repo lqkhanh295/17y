@@ -7,6 +7,7 @@ import {
 import { RegistrationRecord, PaymentSubmission } from '../types';
 import { apiClient } from '../services/apiClient';
 import { compressImage } from '../utils/imageCompressor';
+import { formatTransferContent } from '../utils/formatters';
 
 interface PaymentLookupModalProps {
   isOpen: boolean;
@@ -96,7 +97,7 @@ export const PaymentLookupModal: React.FC<PaymentLookupModalProps> = ({
   const BANK_ID = 'ICB';
   const ACCOUNT_NO = '104881849322';
   const ACCOUNT_NAME = 'NGUYEN PHUONG THAO';
-  const transferContent = `CSG26 ${foundRecord?.mssv || ''} DOT2`;
+  const transferContent = formatTransferContent(foundRecord?.fullName || '', foundRecord?.personalPhone || '');
   const remainingDue = foundRecord ? (foundRecord.remainingAmount > 0 ? foundRecord.remainingAmount : Math.max(0, foundRecord.totalRequired - foundRecord.paidAmount)) : 0;
   const vietQrUrl = foundRecord ? `https://img.vietqr.io/image/${BANK_ID}-${ACCOUNT_NO}-compact2.png?amount=${remainingDue}&addInfo=${encodeURIComponent(transferContent)}&accountName=${encodeURIComponent(ACCOUNT_NAME)}` : '';
 
@@ -191,7 +192,7 @@ END:VCALENDAR`;
                 onChange={(e) => setSearchTerm(e.target.value)}
                 autoCapitalize="characters"
                 inputMode="text"
-                placeholder="Nhập MSSV (VD: SE120101) hoặc Số điện thoại, Mã CSG26..."
+                placeholder="Nhập MSSV (VD: SE120101) hoặc Số điện thoại, Mã vé CSG17..."
                 className="w-full pl-9 pr-3 py-2.5 min-h-[44px] rounded-sm bg-[#F4EEDF] border-2 border-[#20231F] text-base sm:text-xs font-mono text-[#20231F] focus:outline-none focus:ring-2 focus:ring-[#F4C542]"
               />
             </div>
