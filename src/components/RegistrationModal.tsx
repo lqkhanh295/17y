@@ -3,7 +3,7 @@ import confetti from 'canvas-confetti';
 import {
   CloseIcon, AlertCircleIcon, SparklesIcon, UploadIcon,
   EditIcon, ArrowLeftIcon, ArrowRightIcon, ArrowUpRightIcon,
-  FrogIcon, BoltIcon
+  FrogIcon
 } from 'naive-icons';
 import { MemberDirectoryItem, PaymentPlan, RegistrationRecord, MascotFrog } from '../types';
 import { apiClient } from '../services/apiClient';
@@ -394,25 +394,6 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                   <span>{isVerifying ? 'ĐANG ĐỐI CHIẾU...' : 'TÌM TÊN CỦA BẠN'}</span>
                   {!isVerifying && <ArrowUpRightIcon size={18} />}
                 </button>
-
-                <div className="pt-2 text-center space-y-2.5">
-                  <button
-                    type="button"
-                    onClick={() => handleQuickBypass()}
-                    className="w-full py-3 min-h-[44px] px-4 rounded-sm border-2 border-dashed border-[#20231F]/40 bg-[#FFFFFF]/80 hover:bg-[#FFFFFF] text-xs font-mono font-bold uppercase tracking-wider text-[#20231F] hover:border-[#20231F] transition-all flex items-center justify-center gap-2 shadow-poster-sm active:scale-[0.98]"
-                  >
-                    <SparklesIcon size={16} className="text-[#B94D35]" />
-                    <span className="flex items-center gap-1">
-                      <BoltIcon size={14} />
-                      <span>Bỏ qua tra cứu · Đăng ký tự do ngay</span>
-                      <ArrowUpRightIcon size={14} />
-                    </span>
-                  </button>
-
-                  <p className="text-[11px] text-[#20231F]/65 font-body">
-                    Chưa có trong danh bạ? Mọi thành viên & bạn bè đều được chào đón tham dự!
-                  </p>
-                </div>
               </form>
             </div>
           )}
