@@ -319,7 +319,7 @@ export const App: React.FC = () => {
         <PhotobookFlow
           onOpenRegister={openRegister}
           onOpenLookup={openLookup}
-          onOpenStage={() => setIsStageOpen(true)}
+          onOpenStage={openStage}
           totalWishesCount={stageCharacters.length}
           onWishSubmit={handleWishSubmit}
           wishSubmitted={wishSubmitted}
