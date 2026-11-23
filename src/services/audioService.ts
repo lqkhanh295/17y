@@ -7,6 +7,7 @@ class AudioService {
   private ctx: AudioContext | null = null;
   private gainNode: GainNode | null = null;
   private audioSrc = '/music/1214.mp3';
+  private gestureCleanup: (() => void) | null = null;
 
   constructor() {
     if (typeof window !== 'undefined') {
@@ -76,6 +77,10 @@ class AudioService {
 
   public stop() {
     this.userMuted = true;
+    if (this.gestureCleanup) {
+      this.gestureCleanup();
+      this.gestureCleanup = null;
+    }
     if (this.audio) {
       this.audio.pause();
     }
@@ -112,16 +117,24 @@ class AudioService {
     this.start().then(success => {
       if (!success) {
         // 2. Browser blocked autoplay without user gesture -> bind one-time interaction listeners
+        const events = ['pointerdown', 'touchstart', 'click', 'keydown', 'scroll'];
         const startOnFirstGesture = () => {
           if (!this.userMuted && !this.isPlaying) {
             this.start().catch(() => {});
           }
-          ['pointerdown', 'touchstart', 'click', 'keydown', 'scroll'].forEach(evt => {
+          events.forEach(evt => {
+            window.removeEventListener(evt, startOnFirstGesture);
+          });
+          this.gestureCleanup = null;
+        };
+
+        this.gestureCleanup = () => {
+          events.forEach(evt => {
             window.removeEventListener(evt, startOnFirstGesture);
           });
         };
 
-        ['pointerdown', 'touchstart', 'click', 'keydown', 'scroll'].forEach(evt => {
+        events.forEach(evt => {
           window.addEventListener(evt, startOnFirstGesture, { once: true, passive: true });
         });
       }

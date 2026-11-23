@@ -46,7 +46,7 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
   const [selectedRole, setSelectedRole] = useState<'ALL' | MemberRole>('ALL');
   const [searchTerm, setSearchTerm] = useState('');
   const [activeCharacter, setActiveCharacter] = useState<MascotFrog | null>(null);
-  const [soundEnabled, setSoundEnabled] = useState(true);
+  const [soundEnabled, setSoundEnabled] = useState(false);
   const [stageLightsOn, setStageLightsOn] = useState(true);
 
   // Tắt toàn bộ nhạc nền khi bước vào sân khấu

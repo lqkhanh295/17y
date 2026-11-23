@@ -127,8 +127,6 @@ export const App: React.FC = () => {
       }
       window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
     }
-    // Continuous background music autoplay throughout website
-    audioService.initAutoPlay();
   }, []);
 
   // Sync initial URL on mount, handle Back/Forward navigation, Hash and Admin shortcuts
