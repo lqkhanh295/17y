@@ -228,7 +228,7 @@ export const PaymentLookupModal: React.FC<PaymentLookupModalProps> = ({
               {/* VIP Ticket Preview Blueprint */}
               <div className="p-4 bg-white/70 border-2 border-dashed border-[#20231F]/40 rounded-sm space-y-2 opacity-85">
                 <div className="flex items-center justify-between text-[10px] font-mono font-bold text-[#20231F]/60 uppercase">
-                  <span>MẪU THẺ THAM DỰ // GALA KỶ NIỆM 17Y</span>
+                  <span>MẪU THẺ THAM DỰ • GALA KỶ NIỆM 17Y</span>
                   <span>PREVIEW TICKET</span>
                 </div>
                 <div className="flex items-center justify-between py-2 border-y border-[#20231F]/15">

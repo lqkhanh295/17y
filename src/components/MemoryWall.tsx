@@ -29,7 +29,7 @@ const PHOTOBOOK_ARCHIVE: PhotobookItem[] = [
     note: 'Khoảnh khắc toàn thể anh em cùng hô vang khẩu hiệu Cóc Sài Gòn!',
     url: '/images/csg/IMG_9688.JPG',
     department: 'Ban Điều Hành & Ban Sự kiện',
-    archiveCode: 'PLATE 01 // CSG-ARC-2023-SH',
+    archiveCode: 'PLATE 01 • CSG-ARC-2023-SH',
     aspectRatio: 'landscape'
   },
   {
@@ -43,7 +43,7 @@ const PHOTOBOOK_ARCHIVE: PhotobookItem[] = [
     note: 'Tri ân các thế hệ Chủ nhiệm và Trưởng ban qua từng thời kỳ.',
     url: '/images/csg/IMG_9686.PNG',
     department: 'Ban Điều Hành & Toàn thể CSG',
-    archiveCode: 'PLATE 02 // CSG-ARC-2022-VT',
+    archiveCode: 'PLATE 02 • CSG-ARC-2022-VT',
     aspectRatio: 'landscape'
   },
   {
@@ -56,7 +56,7 @@ const PHOTOBOOK_ARCHIVE: PhotobookItem[] = [
     caption: 'Sân khấu lung linh biểu tượng cánh bướm Phá Kén, tôn vinh sự trưởng thành và bứt phá của các thế hệ Cóc mới.',
     url: '/images/csg/IMG_9690.JPG',
     department: 'Ban Sự kiện & Ban Kỹ thuật',
-    archiveCode: 'PLATE 03 // CSG-ARC-2024-PK',
+    archiveCode: 'PLATE 03 • CSG-ARC-2024-PK',
     aspectRatio: 'landscape'
   },
 
@@ -72,7 +72,7 @@ const PHOTOBOOK_ARCHIVE: PhotobookItem[] = [
     note: 'Tuổi trẻ rực rỡ dưới nền trời xanh ngút ngàn.',
     url: '/images/csg/IMG_9699.JPG',
     department: 'Toàn thể thành viên CSG',
-    archiveCode: 'PLATE 04 // CSG-ARC-2024-SEA',
+    archiveCode: 'PLATE 04 • CSG-ARC-2024-SEA',
     aspectRatio: 'landscape'
   },
   {
@@ -85,7 +85,7 @@ const PHOTOBOOK_ARCHIVE: PhotobookItem[] = [
     caption: 'Sắc cờ vàng chú Cóc tung bay trước Quảng trường Lâm Viên, thắt chặt tình cảm giữa các thế hệ anh chị và các em khóa mới.',
     url: '/images/csg/IMG_9697.JPG',
     department: 'Ban Nhân sự & Ban Sự kiện',
-    archiveCode: 'PLATE 05 // CSG-ARC-2024-DL',
+    archiveCode: 'PLATE 05 • CSG-ARC-2024-DL',
     aspectRatio: 'landscape'
   },
 
@@ -101,7 +101,7 @@ const PHOTOBOOK_ARCHIVE: PhotobookItem[] = [
     note: 'Kíp máy ảnh và tác nghiệp hoạt động hết công suất.',
     url: '/images/csg/IMG_9695.JPG',
     department: 'Ban Kỹ thuật & Truyền thông',
-    archiveCode: 'PLATE 06 // CSG-ARC-2024-BUS',
+    archiveCode: 'PLATE 06 • CSG-ARC-2024-BUS',
     aspectRatio: 'landscape'
   },
   {
@@ -114,7 +114,7 @@ const PHOTOBOOK_ARCHIVE: PhotobookItem[] = [
     caption: 'Buổi talkshow trực tuyến với hơn 100 thành viên qua màn hình Google Meet, giữ vững tinh thần kết nối không khoảng cách.',
     url: '/images/csg/IMG_9682.JPG',
     department: 'Ban Nội dung & Toàn thể CLB',
-    archiveCode: 'PLATE 07 // CSG-ARC-2021-SGT',
+    archiveCode: 'PLATE 07 • CSG-ARC-2021-SGT',
     aspectRatio: 'landscape'
   }
 ];
@@ -164,7 +164,7 @@ export const MemoryWall: React.FC = () => {
         <div className="space-y-2 max-w-3xl">
           <div className="flex items-center gap-3">
             <span className="font-mono text-xs font-bold text-csg-red uppercase tracking-widest">
-              LƯU TRỮ TƯ LIỆU // VOL. 17
+              LƯU TRỮ TƯ LIỆU • VOL. 17
             </span>
             <span className="text-csg-black/30">•</span>
             <span className="text-xs font-mono text-csg-black/60 uppercase tracking-widest">
