@@ -77,7 +77,7 @@ export function generateEmailContent(record, explicitTemplate) {
     const subject = `[CÓC SÀI GÒN] XÁC NHẬN THANH TOÁN PHÍ THAM DỰ SINH NHẬT CÓC SÀI GÒN 17 TUỔI`;
     
     const html = `
-<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 15px; line-height: 1.6; color: #111111; max-width: 650px; margin: 0 auto; padding: 24px 16px;">
+<div style="font-family: 'Times New Roman', Times, serif; font-size: 16px; line-height: 1.6; color: #111111; max-width: 650px; margin: 0 auto; padding: 24px 16px;">
   <p style="margin: 0 0 16px 0;">Thân gửi <strong>${safeFullName}</strong>,</p>
 
   <p style="margin: 0 0 16px 0;">Ban Tổ Chức Cóc Sài Gòn đã nhận được khoản thanh toán đặt cọc <strong>150.000 VNĐ</strong> của bạn cho buổi tiệc sinh nhật Cóc Sài Gòn 17 tuổi: <strong>The Next Signal</strong>. Cảm ơn bạn đã đăng ký tham dự! Ban Tổ Chức rất mong được gặp bạn trong ngày sinh nhật đặc biệt sắp tới!</p>
@@ -141,7 +141,7 @@ BAN TỔ CHỨC SINH NHẬT CÓC SÀI GÒN 17 TUỔI`;
     const subject = `[CÓC SÀI GÒN] XÁC NHẬN THANH TOÁN PHÍ THAM DỰ SINH NHẬT CÓC SÀI GÒN 17 TUỔI`;
     
     const html = `
-<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 15px; line-height: 1.6; color: #111111; max-width: 650px; margin: 0 auto; padding: 24px 16px;">
+<div style="font-family: 'Times New Roman', Times, serif; font-size: 16px; line-height: 1.6; color: #111111; max-width: 650px; margin: 0 auto; padding: 24px 16px;">
   <p style="margin: 0 0 16px 0;">Thân gửi <strong>${safeFullName}</strong>,</p>
 
   <p style="margin: 0 0 16px 0;">Ban Tổ Chức Cóc Sài Gòn đã nhận được khoản thanh toán đặt cọc <strong>150.000 VNĐ</strong> của bạn cho buổi tiệc sinh nhật Cóc Sài Gòn 17 tuổi: <strong>The Next Signal</strong>. Cảm ơn bạn đã đăng ký tham dự! Ban Tổ Chức rất mong được gặp bạn trong ngày sinh nhật đặc biệt sắp tới!</p>
@@ -204,7 +204,7 @@ BAN TỔ CHỨC SINH NHẬT CÓC SÀI GÒN 17 TUỔI`;
   const subject = `[CÓC SÀI GÒN] XÁC NHẬN ĐĂNG KÝ THÀNH CÔNG – SINH NHẬT CÓC SÀI GÒN 17 TUỔI`;
   
   const html = `
-<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 15px; line-height: 1.6; color: #111111; max-width: 650px; margin: 0 auto; padding: 24px 16px;">
+<div style="font-family: 'Times New Roman', Times, serif; font-size: 16px; line-height: 1.6; color: #111111; max-width: 650px; margin: 0 auto; padding: 24px 16px;">
   <p style="margin: 0 0 16px 0;">Thân gửi <strong>${safeFullName}</strong>,</p>
 
   <p style="margin: 0 0 16px 0;">Ban Tổ Chức Cóc Sài Gòn xin xác nhận bạn đã hoàn tất đăng ký tham dự sự kiện sinh nhật 17 tuổi: <strong>The Next Signal</strong>. Vậy là bạn đã chính thức có một chỗ hẹn cùng đại gia đình Cóc Sài Gòn trong cột mốc đặc biệt này rồi!</p>
