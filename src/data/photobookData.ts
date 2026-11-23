@@ -77,7 +77,7 @@ export const ALL_PHOTOBOOK_IMAGES = Object.values(PHOTOBOOK_IMAGES);
 // Thông tin sự kiện Gala 17Y tập trung (Dữ liệu xác thực)
 export const GALA_EVENT_DETAILS = {
   title: 'ĐẠI TIỆC GALA 17Y',
-  subtitle: 'Cóc Sài Gòn — Mười Bảy Năm Một Mái Nhà',
+  subtitle: 'Cóc Sài Gòn — 17 năm — 1 hành trình',
   time: '12.12.2026',
   dateIso: '2026-12-12T08:00:00+07:00',
   venue: 'Đồi Sứ Villa',
