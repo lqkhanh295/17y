@@ -81,14 +81,14 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
           <div className="space-y-1">
             <div className="flex flex-wrap items-center gap-2">
               <span className="px-2 py-0.5 rounded-xs bg-csg-yellow text-csg-black font-mono font-bold text-[10px] uppercase tracking-wider shadow-xs">
-                GÓC KỶ NIỆM // 2009 — 2026
+                GÓC KỶ NIỆM • 2009 — 2026
               </span>
               <span className="font-mono text-xs text-csg-black/60 hidden sm:inline">
                 9 KHOẢNH KHẮC • 17 NĂM MỘT MÁI NHÀ
               </span>
             </div>
             <h1 className="text-xl sm:text-2xl lg:text-3xl font-display font-extrabold uppercase text-csg-black tracking-tight leading-tight">
-              MƯỜI BẢY NĂM // HÀNH TRÌNH TỤI MÌNH LỚN
+              MƯỜI BẢY NĂM — HÀNH TRÌNH TỤI MÌNH LỚN
             </h1>
           </div>
           <div className="flex items-center gap-3 font-mono text-xs shrink-0">
@@ -112,7 +112,7 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
         <section className="space-y-3">
           <div className="flex items-center justify-between border-b border-csg-black/15 pb-2 font-mono text-xs">
             <span className="font-bold uppercase tracking-wider text-csg-black/80">
-              CHƯƠNG I // NHỮNG NGÀY BÊN NHAU
+              CHƯƠNG I: NHỮNG NGÀY BÊN NHAU
             </span>
             <span className="text-csg-black/40 text-[11px]">
               KỶ NIỆM 2021 — 2023
@@ -139,7 +139,7 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
                 </div>
                 <div className="pt-2.5 flex items-baseline justify-between font-mono text-xs">
                   <span className="font-bold text-csg-black uppercase text-[11px]">
-                    01 // ĐẠI HỘI SONG HÀNH 2023
+                    01. ĐẠI HỘI SONG HÀNH 2023
                   </span>
                   <span className="text-csg-black/50 text-[10px] shrink-0">
                     Tháng 10.2023
@@ -188,7 +188,7 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
                 </div>
                 <div className="pt-2.5 flex items-baseline justify-between font-mono text-xs">
                   <span className="font-bold text-csg-black uppercase text-[11px]">
-                    02 // SAIGON TALK — NHỮNG ĐÊM ONLINE
+                    02. SAIGON TALK — NHỮNG ĐÊM ONLINE
                   </span>
                   <span className="text-csg-black/50 text-[10px] shrink-0">
                     Mùa giãn cách 2021
@@ -206,7 +206,7 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
         <section className="space-y-4">
           <div className="flex items-center justify-between border-b border-csg-black/15 pb-2 font-mono text-xs">
             <span className="font-bold uppercase tracking-wider text-csg-black/80">
-              CHƯƠNG II // NHỮNG CHUYẾN ĐI XA
+              CHƯƠNG II: NHỮNG CHUYẾN ĐI XA
             </span>
             <span className="text-csg-black/40 text-[11px]">
               DẤU CHÂN & CỘT MỐC
@@ -230,7 +230,7 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
             </div>
             <div className="pt-3 flex flex-col sm:flex-row sm:items-center justify-between gap-1 font-mono text-xs">
               <span className="font-bold text-csg-black uppercase text-xs">
-                03 // CỜ CÓC BAY Ở PO KLONG GARAI
+                03. CỜ CÓC BAY Ở PO KLONG GARAI
               </span>
               <span className="text-csg-black/60 text-[11px]">
                 Chuyến đi xa cùng nhau, lá cờ CLB giương cao giữa nắng gió miền Trung.
@@ -257,7 +257,7 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
               </div>
               <div className="pt-2 flex items-baseline justify-between font-mono text-xs">
                 <span className="font-bold text-csg-black uppercase text-[11px]">
-                  04 // NĂM MÙA THỔI NẾN (7TH — 11TH)
+                  04. NĂM MÙA THỔI NẾN (7TH — 11TH)
                 </span>
                 <span className="text-csg-black/50 text-[10px]">
                   2016 — 2020
@@ -286,7 +286,7 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
                 </div>
                 <div className="pt-2.5 flex items-baseline justify-between font-mono text-xs">
                   <span className="font-bold text-csg-black uppercase text-[11px]">
-                    05 // ĐÀ LẠT SƯƠNG MÙ & SẮC ÁO VÀNG
+                    05. ĐÀ LẠT SƯƠNG MÙ & SẮC ÁO VÀNG
                   </span>
                   <span className="text-csg-black/50 text-[10px]">
                     Lâm Viên
@@ -318,7 +318,7 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
         <section className="space-y-3">
           <div className="flex items-center justify-between border-b border-csg-black/15 pb-2 font-mono text-xs">
             <span className="font-bold uppercase tracking-wider text-csg-black/80">
-              CHƯƠNG III // CHÁY HẾT MÌNH TRÊN SÂN KHẤU
+              CHƯƠNG III: CHÁY HẾT MÌNH TRÊN SÂN KHẤU
             </span>
             <span className="text-csg-black/40 text-[11px]">
               ĐÊM ĐẠI HỘI & BIỂN XANH
@@ -343,7 +343,7 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
               </div>
               <div className="pt-2.5 flex items-baseline justify-between font-mono text-xs">
                 <span className="font-bold text-csg-black uppercase text-[11px]">
-                  06 // ĐÊM HỘI TRƯỜNG VỌNG TIẾN
+                  06. ĐÊM HỘI TRƯỜNG VỌNG TIẾN
                 </span>
                 <span className="text-csg-black/50 text-[10px]">
                   Đại hội 2022
@@ -372,7 +372,7 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
                 </div>
                 <div className="pt-2.5 flex items-baseline justify-between font-mono text-xs">
                   <span className="font-bold text-csg-black uppercase text-[11px]">
-                    07 // GIÓ BIỂN VÀ NỤ CƯỜI THANH XUÂN
+                    07. GIÓ BIỂN VÀ NỤ CƯỜI THANH XUÂN
                   </span>
                   <span className="text-csg-black/50 text-[10px]">
                     Bờ kè đá xanh
@@ -401,7 +401,7 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
         <section className="space-y-3">
           <div className="flex items-center justify-between border-b border-csg-black/15 pb-2 font-mono text-xs">
             <span className="font-bold uppercase tracking-wider text-csg-black/80">
-              TRANG KỶ NIỆM // ĐẠI GIA ĐÌNH CÓC SÀI GÒN
+              TRANG KỶ NIỆM: ĐẠI GIA ĐÌNH CÓC SÀI GÒN
             </span>
             <span className="text-csg-black/40 text-[11px]">
               2009 — 2026 • 17 NĂM MỘT MÁI NHÀ
@@ -424,7 +424,7 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
             </div>
             <div className="pt-3 flex flex-col sm:flex-row sm:items-center justify-between gap-1 font-mono text-xs border-t border-csg-black/15 mt-3">
               <span className="font-bold text-csg-black uppercase text-xs">
-                08 // MƯỜI BẢY NĂM TRỌN MỘT MÁI NHÀ
+                08. MƯỜI BẢY NĂM TRỌN MỘT MÁI NHÀ
               </span>
               <span className="text-csg-black/60 text-[11px]">
                 Bao thế hệ Cóc đã đi qua, nhưng mỗi lần nhìn lại, tụi mình vẫn là một gia đình.
@@ -444,7 +444,7 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
         {/* Mobile Item 1: Song Hành with Overlay */}
         <div className="space-y-2">
           <div className="font-mono text-[10px] text-csg-black/60 uppercase font-bold tracking-wider">
-            01 & 02 // ĐẠI HỘI SONG HÀNH & HOA HƯỚNG DƯƠNG
+            01 & 02. ĐẠI HỘI SONG HÀNH & HOA HƯỚNG DƯƠNG
           </div>
           <div className="relative">
             <div
@@ -515,7 +515,7 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
         {/* Mobile Item 3: Cinematic Panorama Breakout */}
         <div className="space-y-1">
           <div className="font-mono text-[10px] text-csg-black/60 uppercase font-bold tracking-wider">
-            03 // CỜ CÓC TẠI PO KLONG GARAI
+            03. CỜ CÓC TẠI PO KLONG GARAI
           </div>
           <div
             onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.beachPanoramic)}
@@ -569,7 +569,7 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
         {/* Mobile Item 5: Stage Concert Energy */}
         <div className="space-y-1">
           <div className="font-mono text-[10px] text-csg-black/60 uppercase font-bold tracking-wider">
-            06 // ĐÊM HỘI TRƯỜNG VỌNG TIẾN
+            06. ĐÊM HỘI TRƯỜNG VỌNG TIẾN
           </div>
           <div
             onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.stage)}
@@ -590,7 +590,7 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
         {/* Mobile Item 6: Climax Monument Centerpiece */}
         <div className="space-y-1">
           <div className="font-mono text-[10px] text-csg-black/60 uppercase font-bold tracking-wider">
-            08 // ĐẠI GIA ĐÌNH CÓC GIỮA RỪNG THÔNG
+            08. ĐẠI GIA ĐÌNH CÓC GIỮA RỪNG THÔNG
           </div>
           <div
             onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.gatheringCrowd)}
@@ -622,7 +622,7 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-csg-red animate-pulse" />
             <span className="font-bold uppercase tracking-wider text-csg-black">
-              ĐẠI TIỆC GALA 17Y // THƯ MỜI HỘI NGỘ & SÂN KHẤU KỶ NIỆM
+              ĐẠI TIỆC GALA 17Y • THƯ MỜI HỘI NGỘ & SÂN KHẤU KỶ NIỆM
             </span>
           </div>
           <span className="text-csg-black/50 text-[11px]">
@@ -685,63 +685,52 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
 
           </div>
 
-          {/* 2. SÂN KHẤU CÓC COMPANION PASSPORT (SECOND / SAU FORM) */}
+          {/* 2. SÂN KHẤU CÓC COMPANION PASSPORT (TỐI GIẢN & TINH GỌN) */}
           {onOpenStage && (
             <div className="lg:col-span-5 bg-csg-surface border-2 border-csg-black p-4 sm:p-6 shadow-poster flex flex-col justify-between space-y-4">
 
-              <div className="space-y-3">
-                <div className="flex items-center justify-between gap-2 border-b-2 border-csg-black/15 pb-2.5">
-                  <span className="px-2 py-0.5 rounded-xs bg-csg-yellow text-csg-black font-mono font-bold text-[10px] uppercase tracking-wider shadow-xs">
+              <div className="space-y-4">
+                {/* Header */}
+                <div className="flex items-center justify-between gap-2 border-b-2 border-dashed border-csg-black/25 pb-2.5 font-mono text-[10px] sm:text-[11px]">
+                  <span className="font-bold uppercase tracking-wider text-csg-black">
                     SÂN KHẤU CÓC 17Y
                   </span>
-                  <span className="font-mono text-xs font-bold text-csg-black/70 flex items-center gap-1">
+                  <span className="text-csg-black/70 flex items-center gap-1 font-bold">
                     <FrogIcon size={14} className="text-csg-red" />
                     <span>{totalWishesCount} LỜI CHÚC</span>
                   </span>
                 </div>
 
-                {/* Animated Mascot Visual Hook */}
-                <div className="relative p-3 bg-white/70 border border-csg-black/20 rounded-xs flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-xs bg-csg-yellow border border-csg-black flex items-center justify-center shadow-xs shrink-0 animate-bounce">
-                    <FrogIcon size={24} className="text-csg-black" />
+                {/* Minimalist Mascot Visual Hook */}
+                <div className="flex items-center gap-3.5 py-1">
+                  <div className="w-13 h-13 rounded-xs bg-csg-yellow border-2 border-csg-black flex items-center justify-center shadow-xs shrink-0">
+                    <FrogIcon size={26} className="text-csg-black" />
                   </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="font-display font-bold text-xs text-csg-black leading-snug">
-                      Mỗi lời chúc gửi về đều xuất hiện cùng một chú Cóc Áo Vàng nhảy múa trên sân khấu ảo!
+                  <div className="min-w-0">
+                    <h3 className="font-display font-bold text-sm sm:text-base text-csg-black leading-snug">
+                      Hội ngộ các thế hệ Cóc Áo Vàng
+                    </h3>
+                    <p className="font-mono text-[11px] text-csg-black/60 mt-0.5 leading-relaxed">
+                      Mỗi lời chúc gửi về đều là một chú Cóc nhảy múa trên sân khấu ảo.
                     </p>
-                    <span className="font-mono text-[10px] text-csg-black/50 block pt-0.5">
-                      Đầy đủ lời chúc từ các thế hệ cựu thành viên
-                    </span>
                   </div>
                 </div>
 
-                {/* Interactive Stage Live Badges to harmonize card height */}
-                <div className="grid grid-cols-2 gap-2 font-mono text-[11px]">
-                  <div className="p-2 bg-white/70 border border-csg-black/15 rounded-xs">
-                    <span className="text-[9px] uppercase text-csg-black/50 block font-bold">KHÔNG GIAN</span>
-                    <span className="font-bold text-csg-black">Sân khấu 3D hội trường</span>
-                  </div>
-                  <div className="p-2 bg-white/70 border border-csg-black/15 rounded-xs">
-                    <span className="text-[9px] uppercase text-csg-black/50 block font-bold">TƯƠNG TÁC</span>
-                    <span className="font-bold text-csg-black">12 Lượt tim / ngày</span>
-                  </div>
-                </div>
-
-                {/* Mini Live Wish Quote Ticker */}
-                <div className="p-2.5 bg-[#FAF7F0] border-l-3 border-csg-red rounded-r-xs font-handwriting text-base sm:text-lg text-csg-black/85 leading-snug">
+                {/* Single Warm Keepsake Quote */}
+                <div className="p-3 bg-[#FFFDF8] border-l-3 border-csg-yellow rounded-r-xs font-handwriting text-base sm:text-lg text-csg-black/85 leading-snug">
                   "Chúc Cóc Sài Gòn mãi là ngôi nhà ấm áp của bao thế hệ!"
                 </div>
               </div>
 
               {/* Enter Stage CTA Button */}
-              <div className="pt-2">
+              <div className="pt-1">
                 <button
                   type="button"
                   onClick={onOpenStage}
-                  className="btn-editorial-primary w-full py-3 min-h-[44px] text-xs sm:text-sm font-display font-black uppercase tracking-wider shadow-sm flex items-center justify-center gap-2 whitespace-nowrap active:scale-95"
+                  className="btn-editorial-primary w-full py-3.5 sm:py-4 min-h-[48px] font-display font-extrabold text-xs sm:text-sm uppercase tracking-wider flex items-center justify-center gap-2 shadow-poster active:scale-[0.98] whitespace-nowrap"
                 >
                   <FrogIcon size={16} className="shrink-0" />
-                  <span>XEM SÂN KHẤU CÓC & LỜI CHÚC</span>
+                  <span>XEM SÂN KHẤU CÓC</span>
                   <ArrowRightIcon size={14} className="shrink-0" />
                 </button>
               </div>
@@ -755,7 +744,7 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
 
       {/* ================= MINIMAL ARCHIVAL COLOPHON ================= */}
       <div className="text-center pt-8 font-mono text-xs text-csg-black/40 uppercase tracking-widest">
-        CÓC SÀI GÒN // 2009 — 2026
+        CÓC SÀI GÒN • 2009 — 2026
       </div>
 
       {/* ================= FULLSCREEN DARKROOM LIGHTBOX ================= */}
