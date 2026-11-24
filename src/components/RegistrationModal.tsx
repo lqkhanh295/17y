@@ -268,8 +268,10 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
   const validatePersonalInfo = () => {
     const errors: { [key: string]: string } = {};
     if (!gmail.includes('@')) errors.gmail = 'Vui lòng nhập địa chỉ Gmail hợp lệ.';
-    if (!phone || phone.length < 9) errors.phone = 'Vui lòng nhập số điện thoại cá nhân.';
-    if (!emergencyPhone || emergencyPhone.length < 9) errors.emergencyPhone = 'Vui lòng nhập SĐT người thân đón về khi say tiệc.';
+    const cleanPhoneDigits = phone.replace(/[\s\.\-\(\)]/g, '').trim();
+    const cleanEmerPhoneDigits = emergencyPhone.replace(/[\s\.\-\(\)]/g, '').trim();
+    if (!cleanPhoneDigits || cleanPhoneDigits.length < 9) errors.phone = 'Vui lòng nhập số điện thoại cá nhân (tối thiểu 9-10 chữ số).';
+    if (!cleanEmerPhoneDigits || cleanEmerPhoneDigits.length < 9) errors.emergencyPhone = 'Vui lòng nhập SĐT người thân đón về khi say tiệc.';
     if (stayOvernight === null) errors.stayOvernight = 'Vui lòng chọn bạn có đăng ký suất "ngủ lại" cùng anh em không nhé!';
 
     setInfoErrors(errors);
@@ -285,7 +287,8 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
       // 1. Check if MSSV has already been registered
       if (identifiedMember?.mssv) {
         try {
-          const existingByMssv = await apiClient.lookupRegistration(identifiedMember.mssv.trim());
+          const cleanMssv = identifiedMember.mssv.replace(/\s+/g, '').toUpperCase();
+          const existingByMssv = await apiClient.lookupRegistration(cleanMssv);
           if (existingByMssv && existingByMssv.status !== 'REJECTED') {
             setNotification({
               isOpen: true,
@@ -331,9 +334,10 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
       }
 
       // 3. Check if Personal Phone has already been registered
-      if (phone.trim()) {
+      const cleanPhoneDigits = phone.replace(/[\s\.\-\(\)]/g, '').trim();
+      if (cleanPhoneDigits) {
         try {
-          const existingByPhone = await apiClient.lookupRegistration(phone.trim());
+          const existingByPhone = await apiClient.lookupRegistration(cleanPhoneDigits);
           if (existingByPhone && existingByPhone.status !== 'REJECTED') {
             setInfoErrors(prev => ({
               ...prev,
@@ -394,17 +398,21 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
       }
 
       setSubmitStatusText('Đang lưu thông tin đăng ký...');
+      const cleanPersonalPhone = phone.replace(/[\s\.\-\(\)]/g, '').trim();
+      const cleanEmerPhone = emergencyPhone.replace(/[\s\.\-\(\)]/g, '').trim();
+      const cleanMssv = (identifiedMember.mssv || 'VIP').replace(/\s+/g, '').toUpperCase();
+
       const record = await apiClient.createRegistration({
         memberId: identifiedMember.id,
-        fullName: identifiedMember.fullName,
-        mssv: identifiedMember.mssv,
+        fullName: identifiedMember.fullName.trim(),
+        mssv: cleanMssv,
         role: identifiedMember.role,
         honorific: identifiedMember.honorific,
-        gmail,
-        personalPhone: phone,
-        emergencyPhone,
+        gmail: gmail.trim().toLowerCase(),
+        personalPhone: cleanPersonalPhone,
+        emergencyPhone: cleanEmerPhone,
         allergies,
-        allergyNote,
+        allergyNote: (allergyNote || '').trim(),
         stayOvernight: stayOvernight === true,
         plan,
         paymentPlan: plan,

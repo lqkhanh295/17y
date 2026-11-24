@@ -408,13 +408,15 @@ export const apiClient = {
     const storedReceiptUrl = await this.uploadReceiptToStorage(data.receiptImage, `rec_phase1_${mssvClean}`);
     const payload = { ...data, receiptImage: storedReceiptUrl };
 
+    // Set 25-second timeout to accommodate cold starts and storage uploads
     const res = await safeFetchJson<{ success: boolean; data: RegistrationRecord; message?: string }>(
       `${API_BASE}/registrations`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
-      }
+      },
+      25000
     );
 
     if (res && res.success && res.data) {
@@ -446,7 +448,8 @@ export const apiClient = {
     // Direct duplicate verification
     try {
       const gClean = (data.gmail || '').trim().toLowerCase();
-      const pClean = (data.personalPhone || '').trim();
+      let pClean = (data.personalPhone || '').replace(/[\s\.\-\(\)]/g, '').trim();
+      if (pClean.startsWith('+84')) pClean = '0' + pClean.slice(3);
       const conditions: string[] = [`mssv.ilike.${mssvClean}`];
       if (gClean) conditions.push(`gmail.ilike.${gClean}`);
       if (pClean) conditions.push(`personalPhone.eq.${pClean}`);
@@ -476,6 +479,11 @@ export const apiClient = {
       status: 'PENDING'
     };
 
+    let sanitizedPersonalPhone = (data.personalPhone || '').replace(/[\s\.\-\(\)]/g, '').trim();
+    if (sanitizedPersonalPhone.startsWith('+84')) sanitizedPersonalPhone = '0' + sanitizedPersonalPhone.slice(3);
+    let sanitizedEmergencyPhone = (data.emergencyPhone || '').replace(/[\s\.\-\(\)]/g, '').trim();
+    if (sanitizedEmergencyPhone.startsWith('+84')) sanitizedEmergencyPhone = '0' + sanitizedEmergencyPhone.slice(3);
+
     const newRecord: RegistrationRecord = {
       id: regId,
       memberId: data.memberId || `m-custom-${Date.now()}`,
@@ -483,11 +491,12 @@ export const apiClient = {
       mssv: mssvClean,
       role: data.role || (isHighTier ? (data.role === 'GUEST' ? 'GUEST' : 'ALUMNI') : 'ACTIVE'),
       honorific: data.honorific || 'Bạn',
-      gmail: data.gmail || '',
-      personalPhone: data.personalPhone || '',
-      emergencyPhone: data.emergencyPhone || '',
+      gmail: (data.gmail || '').trim().toLowerCase(),
+      personalPhone: sanitizedPersonalPhone,
+      emergencyPhone: sanitizedEmergencyPhone,
       allergies: data.allergies || [],
       allergyNote: data.allergyNote || '',
+      stayOvernight: data.stayOvernight === true,
       wishes: data.wishes || '',
       plan: plan,
       paymentPlan: plan,
@@ -513,37 +522,41 @@ export const apiClient = {
       package: newRecord.role
     };
 
-    await supabase.from('registrations').insert(dbRecord as any);
-
-    if (data.wishes && data.wishes.trim()) {
-      const wishObj = {
-        id: 'w-' + Date.now(),
-        registrationId: regId,
-        authorName: newRecord.fullName.trim(),
-        role: newRecord.role,
-        content: data.wishes.trim(),
-        isPublic: newRecord.isPublicConsent !== false,
-        moderationStatus: 'APPROVED',
-        createdAt: new Date().toISOString()
-      };
-      const charObj = {
-        id: 'char-' + Date.now(),
-        registrationId: regId,
-        name: newRecord.fullName,
-        honorific: newRecord.honorific,
-        role: newRecord.role,
-        wish: data.wishes.trim(),
-        x: 15 + Math.floor(Math.random() * 70),
-        y: 72 + Math.floor(Math.random() * 12),
-        direction: Math.random() > 0.5 ? 1 : -1
-      };
-
-      // High-speed parallel insert
-      await Promise.allSettled([
-        supabase.from('wishes').insert(wishObj),
-        supabase.from('characters').insert(charObj)
-      ]);
+    const { error: insErr } = await supabase.from('registrations').insert(dbRecord as any);
+    if (insErr) {
+      console.error('Direct Supabase registration insert error:', insErr);
+      throw new Error('Không thể lưu hồ sơ đăng ký vào cơ sở dữ liệu. Vui lòng thử lại sau ít phút hoặc liên hệ hotline BTC.');
     }
+
+    const effectiveWish = data.wishes && data.wishes.trim() ? data.wishes.trim() : 'Mừng sinh nhật 17 năm Cóc Sài Gòn rực rỡ!';
+    const wishObj = {
+      id: 'w-' + Date.now(),
+      registrationId: regId,
+      authorName: newRecord.fullName.trim(),
+      role: newRecord.role,
+      content: effectiveWish,
+      isPublic: newRecord.isPublicConsent !== false,
+      moderationStatus: 'APPROVED',
+      createdAt: new Date().toISOString()
+    };
+    const charObj = {
+      id: 'char-' + Date.now(),
+      registrationId: regId,
+      name: newRecord.fullName,
+      honorific: newRecord.honorific,
+      role: newRecord.role,
+      wish: effectiveWish,
+      x: 15 + Math.floor(Math.random() * 70),
+      y: 72 + Math.floor(Math.random() * 12),
+      direction: Math.random() > 0.5 ? 1 : -1,
+      created_at: new Date().toISOString()
+    };
+
+    // Parallel insert
+    await Promise.allSettled([
+      supabase.from('wishes').insert(wishObj),
+      supabase.from('characters').insert(charObj)
+    ]);
 
     return newRecord;
   },
@@ -564,16 +577,18 @@ export const apiClient = {
     }
 
     // Direct Supabase lookup
-    const qClean = query.trim().toLowerCase();
-    const qNorm = normalizeVN(qClean);
+    const rawClean = query.trim().toLowerCase();
+    const qNorm = normalizeVN(rawClean);
+    let qPhone = rawClean.replace(/[\s\.\-\(\)]/g, '');
+    if (qPhone.startsWith('+84')) qPhone = '0' + qPhone.slice(3);
 
     const { data: allRegs } = await supabase.from('registrations').select('*');
     if (allRegs) {
       const found = allRegs.find(r => 
-        (r.mssv && r.mssv.toLowerCase() === qClean) || 
-        (r.personalPhone && r.personalPhone === qClean) ||
-        (r.gmail && r.gmail.toLowerCase() === qClean) ||
-        (r.ticketCode && r.ticketCode.toLowerCase() === qClean) ||
+        (r.mssv && r.mssv.toLowerCase() === rawClean) || 
+        (r.personalPhone && (r.personalPhone === rawClean || (qPhone && r.personalPhone === qPhone))) ||
+        (r.gmail && r.gmail.toLowerCase() === rawClean) ||
+        (r.ticketCode && r.ticketCode.toLowerCase() === rawClean) ||
         (r.fullName && normalizeVN(r.fullName).includes(qNorm))
       );
 
@@ -593,7 +608,8 @@ export const apiClient = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ receiptPhase2Url: storedReceipt, mssv, phone })
-      }
+      },
+      25000
     );
 
     if (res && res.success && res.data) {

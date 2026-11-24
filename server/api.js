@@ -605,223 +605,237 @@ app.post('/api/members/verify', async (req, res) => {
 
 /* ================= 3. REGISTRATIONS ================= */
 app.post('/api/registrations', generalLimiter, async (req, res) => {
-  const {
-    memberId,
-    fullName,
-    mssv,
-    role,
-    honorific,
-    gmail,
-    personalPhone,
-    emergencyPhone,
-    allergies,
-    allergyNote,
-    paymentPlan,
-    plan,
-    receiptImage,
-    wishes,
-    isPublicConsent,
-    stayOvernight
-  } = req.body;
-
-  if (!fullName || !mssv || !gmail || !personalPhone || !emergencyPhone || !receiptImage) {
-    return res.status(400).json({
-      success: false,
-      message: 'Vui lòng điền đầy đủ các trường bắt buộc và tải lên biên lai chuyển khoản.'
-    });
-  }
-
-  // 1. Strict Input Validations
-  const trimmedName = String(fullName).trim();
-  if (trimmedName.length < 2 || trimmedName.length > 100) {
-    return res.status(400).json({ success: false, message: 'Họ và tên phải từ 2 đến 100 ký tự.' });
-  }
-
-  const cleanMssv = String(mssv).trim().toUpperCase();
-  if (!/^[A-Z0-9\-_]{4,15}$/.test(cleanMssv)) {
-    return res.status(400).json({ success: false, message: 'Mã số sinh viên không hợp lệ (từ 4-15 ký tự chữ và số).' });
-  }
-
-  const cleanEmail = String(gmail).trim().toLowerCase();
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(cleanEmail) || cleanEmail.length > 120) {
-    return res.status(400).json({ success: false, message: 'Địa chỉ Gmail không đúng định dạng.' });
-  }
-
-  const cleanPersonalPhone = String(personalPhone).trim();
-  const cleanEmergencyPhone = String(emergencyPhone).trim();
-  const phoneRegex = /^(0|\+84)[0-9]{9,10}$/;
-  if (!phoneRegex.test(cleanPersonalPhone)) {
-    return res.status(400).json({ success: false, message: 'Số điện thoại cá nhân không hợp lệ (10 chữ số).' });
-  }
-  if (!phoneRegex.test(cleanEmergencyPhone)) {
-    return res.status(400).json({ success: false, message: 'Số điện thoại người thân đón về không hợp lệ (10 chữ số).' });
-  }
-
-  if (wishes && String(wishes).length > 1000) {
-    return res.status(400).json({ success: false, message: 'Lời chúc không được vượt quá 1000 ký tự.' });
-  }
-  if (allergyNote && String(allergyNote).length > 500) {
-    return res.status(400).json({ success: false, message: 'Ghi chú dị ứng không được vượt quá 500 ký tự.' });
-  }
-
-  // Check duplicate registration in Supabase (by MSSV, Gmail, or Phone)
-  let supabaseChecked = false;
   try {
-    if (supabase) {
-      const { data: duplicates, error: dupErr } = await supabase
-        .from('registrations')
-        .select('*')
-        .or(`mssv.ilike.${cleanMssv},gmail.ilike.${gmail.trim().toLowerCase()},personalPhone.eq.${personalPhone.trim()}`);
+    const {
+      memberId,
+      fullName,
+      mssv,
+      role,
+      honorific,
+      gmail,
+      personalPhone,
+      emergencyPhone,
+      allergies,
+      allergyNote,
+      paymentPlan,
+      plan,
+      receiptImage,
+      wishes,
+      isPublicConsent,
+      stayOvernight
+    } = req.body;
 
-      if (!dupErr) {
-        supabaseChecked = true;
-        const validDuplicate = duplicates?.find(d => d.status !== 'REJECTED');
-
-        if (validDuplicate) {
-          let reason = 'Thông tin này';
-          if (validDuplicate.mssv && validDuplicate.mssv.toUpperCase() === cleanMssv) {
-            reason = `Mã sinh viên "${cleanMssv}"`;
-          } else if (validDuplicate.gmail && validDuplicate.gmail.toLowerCase() === cleanEmail) {
-            reason = `Địa chỉ Gmail "${cleanEmail}"`;
-          } else if (validDuplicate.personalPhone && validDuplicate.personalPhone === cleanPersonalPhone) {
-            reason = `Số điện thoại "${cleanPersonalPhone}"`;
-          }
-
-          return res.status(409).json({
-            success: false,
-            alreadyRegistered: true,
-            conflictField: reason,
-            existingRecord: sanitizeExistingRecordForPublic(validDuplicate),
-            message: `${reason} đã được sử dụng để đăng ký vé trước đó (Mã vé: ${validDuplicate.ticketCode || 'Chờ cấp'}). Vui lòng kiểm tra lại hoặc vào mục Tra cứu vé.`
-          });
-        }
-      }
-    }
-  } catch (err) {
-    console.error('Supabase check duplicate error:', err);
-  }
-
-  // Check duplicate in local DB ONLY IF Supabase was not available
-  if (!supabaseChecked) {
-    const db = getDB();
-    const localDup = (db.registrations || []).find(r => 
-      r.status !== 'REJECTED' && 
-      ((r.mssv && r.mssv.toUpperCase() === cleanMssv) || 
-       (r.gmail && r.gmail.toLowerCase() === cleanEmail) ||
-       (r.personalPhone && r.personalPhone === cleanPersonalPhone))
-    );
-    if (localDup) {
-      let reason = 'Thông tin này';
-      if (localDup.mssv && localDup.mssv.toUpperCase() === cleanMssv) {
-        reason = `Mã sinh viên "${cleanMssv}"`;
-      } else if (localDup.gmail && localDup.gmail.toLowerCase() === cleanEmail) {
-        reason = `Địa chỉ Gmail "${cleanEmail}"`;
-      } else if (localDup.personalPhone && localDup.personalPhone === cleanPersonalPhone) {
-        reason = `Số điện thoại "${cleanPersonalPhone}"`;
-      }
-
-      return res.status(409).json({
+    if (!fullName || !mssv || !gmail || !personalPhone || !emergencyPhone || !receiptImage) {
+      return res.status(400).json({
         success: false,
-        alreadyRegistered: true,
-        conflictField: reason,
-        existingRecord: sanitizeExistingRecordForPublic(localDup),
-        message: `${reason} đã được sử dụng để đăng ký vé trước đó (Mã vé: ${localDup.ticketCode || 'Chờ cấp'}). Vui lòng kiểm tra lại hoặc vào mục Tra cứu vé.`
+        message: 'Vui lòng điền đầy đủ các trường bắt buộc và tải lên biên lai chuyển khoản.'
       });
     }
-  }
 
-  const isHighTier = (role === 'ALUMNI' || role === 'GUEST');
-  const totalRequired = isHighTier ? 389000 : 349000;
-  const effectivePlan = plan || paymentPlan || 'FULL';
+    // 1. Strict Input Validations
+    const trimmedName = String(fullName).trim();
+    if (trimmedName.length < 2 || trimmedName.length > 100) {
+      return res.status(400).json({ success: false, message: 'Họ và tên phải từ 2 đến 100 ký tự.' });
+    }
 
-  let paidAmount = 0;
-  let remainingAmount = totalRequired;
-  let paymentStatus = 'PENDING';
+    const cleanMssv = String(mssv).replace(/\s+/g, '').toUpperCase();
+    if (!/^[A-Z0-9\-_]{3,20}$/.test(cleanMssv)) {
+      return res.status(400).json({ success: false, message: 'Mã số sinh viên không hợp lệ (từ 3-20 ký tự chữ và số).' });
+    }
 
-  if (effectivePlan === 'FULL') {
-    paidAmount = totalRequired;
-    remainingAmount = 0;
-    paymentStatus = 'PENDING';
-  } else if (effectivePlan === 'DEPOSIT_150') {
-    paidAmount = 150000;
-    remainingAmount = totalRequired - 150000;
-    paymentStatus = 'PARTIAL';
-  } else if (effectivePlan === 'DEPOSIT_100') {
-    paidAmount = 100000;
-    remainingAmount = totalRequired - 100000;
-    paymentStatus = 'PARTIAL';
-  }
+    const cleanEmail = String(gmail).trim().toLowerCase();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(cleanEmail) || cleanEmail.length > 120) {
+      return res.status(400).json({ success: false, message: 'Địa chỉ Gmail không đúng định dạng.' });
+    }
 
-  const regId = 'CSG26-' + Math.floor(100000 + Math.random() * 900000);
-  const ticketCode = 'CSG17Y-' + cleanMssv.slice(-4) + '-' + Math.floor(100 + Math.random() * 900);
+    let cleanPersonalPhone = String(personalPhone).replace(/[\s\.\-\(\)]/g, '').trim();
+    let cleanEmergencyPhone = String(emergencyPhone).replace(/[\s\.\-\(\)]/g, '').trim();
+    if (cleanPersonalPhone.startsWith('+84')) {
+      cleanPersonalPhone = '0' + cleanPersonalPhone.slice(3);
+    } else if (cleanPersonalPhone.startsWith('84') && cleanPersonalPhone.length === 11) {
+      cleanPersonalPhone = '0' + cleanPersonalPhone.slice(2);
+    }
+    if (cleanEmergencyPhone.startsWith('+84')) {
+      cleanEmergencyPhone = '0' + cleanEmergencyPhone.slice(3);
+    } else if (cleanEmergencyPhone.startsWith('84') && cleanEmergencyPhone.length === 11) {
+      cleanEmergencyPhone = '0' + cleanEmergencyPhone.slice(2);
+    }
 
-  // Upload receipt image to Supabase Storage
-  const storedReceiptUrl = await uploadBase64ToStorage(receiptImage, `rec_phase1_${cleanMssv}`);
+    const phoneRegex = /^0[0-9]{9,10}$/;
+    if (!phoneRegex.test(cleanPersonalPhone)) {
+      return res.status(400).json({ success: false, message: 'Số điện thoại cá nhân không hợp lệ (10 chữ số).' });
+    }
+    if (!phoneRegex.test(cleanEmergencyPhone)) {
+      return res.status(400).json({ success: false, message: 'Số điện thoại người thân đón về không hợp lệ (10 chữ số).' });
+    }
 
-  const initialPaymentSubmission = {
-    id: 'pay-' + Date.now(),
-    phase: 1,
-    amount: paidAmount,
-    receiptUrl: storedReceiptUrl,
-    submittedAt: new Date().toISOString(),
-    status: 'PENDING'
-  };
+    if (wishes && String(wishes).length > 1000) {
+      return res.status(400).json({ success: false, message: 'Lời chúc không được vượt quá 1000 ký tự.' });
+    }
+    if (allergyNote && String(allergyNote).length > 500) {
+      return res.status(400).json({ success: false, message: 'Ghi chú dị ứng không được vượt quá 500 ký tự.' });
+    }
 
-  const newReg = {
-    id: regId,
-    memberId: memberId || 'custom',
-    fullName: sanitizeText(fullName),
-    mssv: cleanMssv,
-    role: role || (isHighTier ? (role === 'GUEST' ? 'GUEST' : 'ALUMNI') : 'ACTIVE'),
-    honorific: honorific || 'Bạn',
-    gmail: gmail.trim().toLowerCase(),
-    personalPhone: personalPhone.trim(),
-    emergencyPhone: emergencyPhone.trim(),
-    allergies: Array.isArray(allergies) ? allergies : [],
-    allergyNote: sanitizeText(allergyNote || ''),
-    stayOvernight: stayOvernight === true || stayOvernight === 'true' || stayOvernight === 'YES',
-    package: role === 'GUEST' ? 'GUEST' : (isHighTier ? 'ALUMNI' : 'ACTIVE'),
-    totalRequired,
-    paidAmount,
-    remainingAmount,
-    plan: effectivePlan,
-    paymentPlan: effectivePlan,
-    status: paymentStatus,
-    paymentStatus,
-    isApproved100: false,
-    isPublicConsent: isPublicConsent !== false,
-    receiptPhase1Url: storedReceiptUrl,
-    receiptPhase2Url: null,
-    ticketCode,
-    ticketToken: 'TKT-' + Math.random().toString(36).substring(2, 10).toUpperCase(),
-    createdAt: new Date().toISOString(),
-    paymentHistory: [initialPaymentSubmission],
-    verifiedBy: null,
-    verifiedAt: null
-  };
+    // Check duplicate registration in Supabase (by MSSV, Gmail, or Phone)
+    let supabaseChecked = false;
+    try {
+      if (supabase) {
+        const { data: duplicates, error: dupErr } = await supabase
+          .from('registrations')
+          .select('*')
+          .or(`mssv.ilike.${cleanMssv},gmail.ilike.${cleanEmail},personalPhone.eq.${cleanPersonalPhone}`);
 
-  // 1. Save to Supabase Registrations
-  try {
+        if (!dupErr) {
+          supabaseChecked = true;
+          const validDuplicate = duplicates?.find(d => d.status !== 'REJECTED');
+
+          if (validDuplicate) {
+            let reason = 'Thông tin này';
+            if (validDuplicate.mssv && validDuplicate.mssv.toUpperCase() === cleanMssv) {
+              reason = `Mã sinh viên "${cleanMssv}"`;
+            } else if (validDuplicate.gmail && validDuplicate.gmail.toLowerCase() === cleanEmail) {
+              reason = `Địa chỉ Gmail "${cleanEmail}"`;
+            } else if (validDuplicate.personalPhone && validDuplicate.personalPhone === cleanPersonalPhone) {
+              reason = `Số điện thoại "${cleanPersonalPhone}"`;
+            }
+
+            return res.status(409).json({
+              success: false,
+              alreadyRegistered: true,
+              conflictField: reason,
+              existingRecord: sanitizeExistingRecordForPublic(validDuplicate),
+              message: `${reason} đã được sử dụng để đăng ký vé trước đó (Mã vé: ${validDuplicate.ticketCode || 'Chờ cấp'}). Vui lòng kiểm tra lại hoặc vào mục Tra cứu vé.`
+            });
+          }
+        }
+      }
+    } catch (err) {
+      console.error('Supabase check duplicate error:', err);
+    }
+
+    // Check duplicate in local DB ONLY IF Supabase was not available
+    if (!supabaseChecked) {
+      const db = getDB();
+      const localDup = (db.registrations || []).find(r => 
+        r.status !== 'REJECTED' && 
+        ((r.mssv && r.mssv.toUpperCase() === cleanMssv) || 
+         (r.gmail && r.gmail.toLowerCase() === cleanEmail) ||
+         (r.personalPhone && r.personalPhone === cleanPersonalPhone))
+      );
+      if (localDup) {
+        let reason = 'Thông tin này';
+        if (localDup.mssv && localDup.mssv.toUpperCase() === cleanMssv) {
+          reason = `Mã sinh viên "${cleanMssv}"`;
+        } else if (localDup.gmail && localDup.gmail.toLowerCase() === cleanEmail) {
+          reason = `Địa chỉ Gmail "${cleanEmail}"`;
+        } else if (localDup.personalPhone && localDup.personalPhone === cleanPersonalPhone) {
+          reason = `Số điện thoại "${cleanPersonalPhone}"`;
+        }
+
+        return res.status(409).json({
+          success: false,
+          alreadyRegistered: true,
+          conflictField: reason,
+          existingRecord: sanitizeExistingRecordForPublic(localDup),
+          message: `${reason} đã được sử dụng để đăng ký vé trước đó (Mã vé: ${localDup.ticketCode || 'Chờ cấp'}). Vui lòng kiểm tra lại hoặc vào mục Tra cứu vé.`
+        });
+      }
+    }
+
+    const isHighTier = (role === 'ALUMNI' || role === 'GUEST');
+    const totalRequired = isHighTier ? 389000 : 349000;
+    const effectivePlan = plan || paymentPlan || 'FULL';
+
+    let paidAmount = 0;
+    let remainingAmount = totalRequired;
+    let paymentStatus = 'PENDING';
+
+    if (effectivePlan === 'FULL') {
+      paidAmount = totalRequired;
+      remainingAmount = 0;
+      paymentStatus = 'PENDING';
+    } else if (effectivePlan === 'DEPOSIT_150') {
+      paidAmount = 150000;
+      remainingAmount = totalRequired - 150000;
+      paymentStatus = 'PARTIAL';
+    } else if (effectivePlan === 'DEPOSIT_100') {
+      paidAmount = 100000;
+      remainingAmount = totalRequired - 100000;
+      paymentStatus = 'PARTIAL';
+    }
+
+    const regId = 'CSG26-' + Math.floor(100000 + Math.random() * 900000);
+    const ticketCode = 'CSG17Y-' + cleanMssv.slice(-4) + '-' + Math.floor(100 + Math.random() * 900);
+
+    // Upload receipt image to Supabase Storage
+    const storedReceiptUrl = await uploadBase64ToStorage(receiptImage, `rec_phase1_${cleanMssv}`);
+
+    const initialPaymentSubmission = {
+      id: 'pay-' + Date.now(),
+      phase: 1,
+      amount: paidAmount,
+      receiptUrl: storedReceiptUrl,
+      submittedAt: new Date().toISOString(),
+      status: 'PENDING'
+    };
+
+    const sanitizedWish = sanitizeText(wishes || '');
+
+    const newReg = {
+      id: regId,
+      memberId: memberId || 'custom',
+      fullName: sanitizeText(fullName),
+      mssv: cleanMssv,
+      role: role || (isHighTier ? (role === 'GUEST' ? 'GUEST' : 'ALUMNI') : 'ACTIVE'),
+      honorific: honorific || 'Bạn',
+      gmail: cleanEmail,
+      personalPhone: cleanPersonalPhone,
+      emergencyPhone: cleanEmergencyPhone,
+      allergies: Array.isArray(allergies) ? allergies : [],
+      allergyNote: sanitizeText(allergyNote || ''),
+      stayOvernight: stayOvernight === true || stayOvernight === 'true' || stayOvernight === 'YES',
+      wishes: sanitizedWish,
+      package: role === 'GUEST' ? 'GUEST' : (isHighTier ? 'ALUMNI' : 'ACTIVE'),
+      totalRequired,
+      paidAmount,
+      remainingAmount,
+      plan: effectivePlan,
+      paymentPlan: effectivePlan,
+      status: paymentStatus,
+      paymentStatus,
+      isApproved100: false,
+      isPublicConsent: isPublicConsent !== false,
+      receiptPhase1Url: storedReceiptUrl,
+      receiptPhase2Url: null,
+      ticketCode,
+      ticketToken: 'TKT-' + Math.random().toString(36).substring(2, 10).toUpperCase(),
+      createdAt: new Date().toISOString(),
+      paymentHistory: [initialPaymentSubmission],
+      verifiedBy: null,
+      verifiedAt: null
+    };
+
+    // 1. Save to Supabase Registrations
     if (supabase) {
       const { error: insErr } = await supabase.from('registrations').insert(newReg);
       if (insErr) {
         console.error('Supabase registration insert error:', insErr);
+        return res.status(500).json({
+          success: false,
+          message: 'Không thể lưu hồ sơ vào cơ sở dữ liệu. Vui lòng thử lại sau ít phút hoặc liên hệ hotline BTC.'
+        });
       }
     }
-  } catch (err) {
-    console.error('Supabase insert error:', err);
-  }
 
-  // 2. If wish is provided, save to Supabase Wishes & Characters
-  const sanitizedWish = sanitizeText(wishes || '');
-  if (sanitizedWish.trim().length > 0) {
+    // 2. Save to Supabase Characters & Wishes (every registrant gets a mascot frog on stage!)
+    const displayWish = sanitizedWish.length > 0 ? sanitizedWish : 'Mừng sinh nhật 17 năm Cóc Sài Gòn rực rỡ!';
     const wishObj = {
       id: 'w-' + Date.now(),
       registrationId: regId,
       authorName: `${honorific || ''} ${fullName}`.trim(),
       role: role || (isHighTier ? (role === 'GUEST' ? 'GUEST' : 'ALUMNI') : 'ACTIVE'),
-      content: sanitizedWish,
+      content: displayWish,
       isPublic: isPublicConsent !== false,
       moderationStatus: 'APPROVED',
       createdAt: new Date().toISOString()
@@ -833,21 +847,22 @@ app.post('/api/registrations', generalLimiter, async (req, res) => {
       name: fullName,
       honorific: honorific || 'Bạn',
       role: role || (isHighTier ? (role === 'GUEST' ? 'GUEST' : 'ALUMNI') : 'ACTIVE'),
-      wish: sanitizedWish,
+      wish: displayWish,
       x: 15 + Math.floor(Math.random() * 70),
       y: 72 + Math.floor(Math.random() * 12),
-      direction: Math.random() > 0.5 ? 1 : -1
+      direction: Math.random() > 0.5 ? 1 : -1,
+      created_at: new Date().toISOString()
     };
 
-    try {
-      if (supabase) {
+    if (supabase) {
+      try {
         await Promise.allSettled([
           supabase.from('wishes').insert(wishObj),
           supabase.from('characters').insert(charObj)
         ]);
+      } catch (err) {
+        console.error('Supabase wish/character insert error:', err);
       }
-    } catch (err) {
-      console.error('Supabase wish/character insert error:', err);
     }
 
     try {
@@ -858,22 +873,28 @@ app.post('/api/registrations', generalLimiter, async (req, res) => {
     } catch (backupErr) {
       console.error('Local wish backup error:', backupErr);
     }
-  }
 
-  // Local backup
-  try {
-    const db = getDB();
-    db.registrations = [newReg, ...(db.registrations || [])];
-    saveDB(db);
-  } catch (backupErr) {
-    console.error('Local registration backup error:', backupErr);
-  }
+    // Local backup
+    try {
+      const db = getDB();
+      db.registrations = [newReg, ...(db.registrations || [])];
+      saveDB(db);
+    } catch (backupErr) {
+      console.error('Local registration backup error:', backupErr);
+    }
 
-  return res.json({
-    success: true,
-    data: newReg,
-    message: 'Đăng ký thành công! Dữ liệu đã được lưu trực tiếp vào cơ sở dữ liệu Supabase.'
-  });
+    return res.json({
+      success: true,
+      data: newReg,
+      message: 'Đăng ký thành công! Dữ liệu đã được lưu trực tiếp vào cơ sở dữ liệu Supabase.'
+    });
+  } catch (error) {
+    console.error('Fatal error during registration:', error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || 'Đã xảy ra lỗi trong quá trình xử lý đơn đăng ký. Vui lòng thử lại.'
+    });
+  }
 });
 
 /* ================= 4. RETURNING USER LOOKUP ================= */
@@ -883,15 +904,20 @@ app.get('/api/registrations/lookup', generalLimiter, async (req, res) => {
     return res.status(400).json({ success: false, message: 'Vui lòng cung cấp chính xác MSSV, SĐT hoặc Mã Vé (tối thiểu 4 ký tự).' });
   }
 
-  const qClean = String(query).trim().toLowerCase();
-  const qUpper = String(query).trim().toUpperCase();
+  const rawQuery = String(query).trim();
+  const qClean = rawQuery.toLowerCase();
+  const qUpper = rawQuery.toUpperCase();
+  let qPhone = rawQuery.replace(/[\s\.\-\(\)]/g, '');
+  if (qPhone.startsWith('+84')) qPhone = '0' + qPhone.slice(3);
+  else if (qPhone.startsWith('84') && qPhone.length === 11) qPhone = '0' + qPhone.slice(2);
+  const phoneFilter = qPhone.length >= 9 ? `,personalPhone.eq.${qPhone}` : '';
 
   try {
     if (supabase) {
       const { data: foundRegs, error } = await supabase
         .from('registrations')
         .select('*')
-        .or(`mssv.ilike.${qUpper},personalPhone.eq.${qClean},gmail.ilike.${qClean},ticketCode.ilike.${qUpper},ticketToken.eq.${qUpper}`)
+        .or(`mssv.ilike.${qUpper},personalPhone.eq.${qClean},gmail.ilike.${qClean},ticketCode.ilike.${qUpper},ticketToken.eq.${qUpper}${phoneFilter}`)
         .limit(1);
 
       if (!error) {
@@ -920,7 +946,7 @@ app.get('/api/registrations/lookup', generalLimiter, async (req, res) => {
   const db = getDB();
   const reg = (db.registrations || []).find(r => 
     (r.mssv && r.mssv.toUpperCase() === qUpper) || 
-    (r.personalPhone && r.personalPhone === qClean) ||
+    (r.personalPhone && (r.personalPhone === qClean || (qPhone && r.personalPhone === qPhone))) ||
     (r.gmail && r.gmail.toLowerCase() === qClean) ||
     (r.ticketCode && r.ticketCode.toUpperCase() === qUpper) ||
     (r.ticketToken && r.ticketToken.toUpperCase() === qUpper)
