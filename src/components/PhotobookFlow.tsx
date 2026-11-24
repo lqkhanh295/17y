@@ -678,8 +678,12 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
 
                 {/* Minimalist Mascot Visual Hook */}
                 <div className="flex items-center gap-3.5 py-1">
-                  <div className="w-13 h-13 rounded-xs bg-csg-yellow border-2 border-csg-black flex items-center justify-center shadow-xs shrink-0">
-                    <FrogIcon size={26} className="text-csg-black" />
+                  <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xs bg-csg-yellow border-2 border-csg-black flex items-center justify-center shadow-xs shrink-0 p-1.5">
+                    <img 
+                      src="/images/coc_mascot.png" 
+                      alt="Cóc Áo Vàng" 
+                      className="w-full h-full object-contain"
+                    />
                   </div>
                   <div className="min-w-0">
                     <h3 className="font-display font-bold text-sm sm:text-base text-csg-black leading-snug">

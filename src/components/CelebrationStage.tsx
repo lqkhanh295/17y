@@ -189,36 +189,6 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
     return () => clearTimeout(timer);
   }, []);
 
-  // Daily Heart Quota System: 12 hearts per day per user ("1 ngày 12 thôi")
-  // Realtime multi-tap claps with optimistic UI + persistent Supabase sync
-  const MAX_DAILY_HEARTS = 12;
-
-  const getTodayString = () => {
-    const d = new Date();
-    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-  };
-
-  const getStoredDailyHeartsUsed = (): number => {
-    try {
-      const raw = localStorage.getItem('csg_daily_hearts');
-      if (!raw) return 0;
-      const parsed = JSON.parse(raw);
-      if (parsed.date === getTodayString()) {
-        return typeof parsed.used === 'number' ? parsed.used : 0;
-      }
-    } catch {}
-    return 0;
-  };
-
-  const storeDailyHeartsUsed = (used: number) => {
-    try {
-      localStorage.setItem('csg_daily_hearts', JSON.stringify({
-        date: getTodayString(),
-        used
-      }));
-    } catch {}
-  };
-
   const getInitialHearts = useCallback((id: string, name: string): number => {
     let hash = 0;
     const str = id + name;
@@ -237,10 +207,6 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
     return {};
   });
 
-  const [dailyHeartsRemaining, setDailyHeartsRemaining] = useState<number>(() => {
-    return Math.max(0, MAX_DAILY_HEARTS - getStoredDailyHeartsUsed());
-  });
-
   const [userHeartedWishIds, setUserHeartedWishIds] = useState<Record<string, boolean>>(() => {
     try {
       const saved = localStorage.getItem('csg_user_hearted_ids');
@@ -248,8 +214,6 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
     } catch {}
     return {};
   });
-
-  const [quotaToast, setQuotaToast] = useState<string | null>(null);
 
   // Sync initial hearts from real Supabase DB data when allCharacters loads
   useEffect(() => {
@@ -273,23 +237,12 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
       e.stopPropagation();
     }
 
-    if (dailyHeartsRemaining <= 0) {
-      setQuotaToast('Hôm nay bạn đã dùng hết 12 lượt tim rồi! Hãy quay lại vào ngày mai nhé 🐸');
-      setTimeout(() => setQuotaToast(null), 3500);
-      return;
-    }
-
-    // 1. Deduct 1 from daily quota
-    const newRemaining = dailyHeartsRemaining - 1;
-    setDailyHeartsRemaining(newRemaining);
-    storeDailyHeartsUsed(MAX_DAILY_HEARTS - newRemaining);
-
-    // 2. Play tactile audio chime
+    // 1. Play tactile audio chime
     if (soundEnabled) {
       audioService.playCelebrationChime();
     }
 
-    // 3. Optimistic heart count increment
+    // 2. Optimistic heart count increment
     setUserHeartedWishIds(prev => {
       const next = { ...prev, [targetId]: true };
       try {
@@ -310,7 +263,7 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
       return next;
     });
 
-    // 4. Frog jumps with joy on stage
+    // 3. Frog jumps with joy on stage
     setPositions(posPrev => {
       if (!posPrev[targetId]) return posPrev;
       return {
@@ -323,7 +276,7 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
       };
     });
 
-    // 5. Confetti hearts burst
+    // 4. Confetti hearts burst
     const originX = e ? e.clientX / window.innerWidth : 0.5;
     const originY = e ? e.clientY / window.innerHeight : 0.65;
     confetti({
@@ -333,7 +286,7 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
       colors: ['#F43F5E', '#FB7185', '#F4C542', '#FDA4AF']
     });
 
-    // 6. Direct sync to Supabase database (realtime cloud persistence)
+    // 5. Direct sync to Supabase database (realtime cloud persistence)
     apiClient.incrementWishHearts(targetId, 1).then((newServerCount: number | null) => {
       if (typeof newServerCount === 'number') {
         setHeartsCount(prev => ({
@@ -342,7 +295,7 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
         }));
       }
     });
-  }, [dailyHeartsRemaining, soundEnabled, allCharacters, getInitialHearts]);
+  }, [soundEnabled, allCharacters, getInitialHearts]);
 
   // Find the wish with the most hearts (Top 1)
   const topHeartedId = useMemo(() => {
@@ -743,24 +696,13 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
           </button>
         </div>
 
-        {/* Right: Daily Hearts Quota + Sổ Lời Chúc + Utilities + Close */}
+        {/* Right: Sổ Lời Chúc + Utilities + Close */}
         <div className="flex items-center gap-2 shrink-0">
-          {/* Daily Hearts Quota Indicator Pill */}
-          <div 
-            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-rose-950/70 border border-rose-500/40 text-rose-300 font-mono text-xs shadow-xs"
-            title={`Hôm nay bạn còn ${dailyHeartsRemaining}/12 lượt thả tim • Mỗi ngày được thả tối đa 12 tim`}
-          >
-            <HeartIcon size={13} className="text-rose-400 fill-rose-400 animate-pulse shrink-0" />
-            <span className="hidden lg:inline text-rose-200/80 font-sans text-[11px]">Hôm nay:</span>
-            <span className="font-bold text-rose-300">{dailyHeartsRemaining}/12</span>
-            <span className="hidden md:inline text-rose-300/80">tim</span>
-          </div>
-
           {/* Sổ Lời Chúc Drawer Trigger */}
           <button
             type="button"
             onClick={() => setIsWishDrawerOpen(true)}
-            className="px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/15 border border-white/15 text-white hover:text-amber-300 font-mono text-xs flex items-center gap-1.5 transition-all active:scale-95 shadow-xs"
+            className="px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/15 border border-white/15 text-white hover:text-amber-300 font-mono text-xs flex items-center gap-1.5 transition-all active:scale-95 shadow-xs cursor-pointer"
             title="Mở toàn bộ sổ lời chúc"
           >
             <BookOpenIcon size={14} className="text-amber-400" />
@@ -837,15 +779,6 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
           </div>
 
           <div className="flex items-center gap-1.5 shrink-0">
-            {/* Daily Hearts Quota Pill */}
-            <div 
-              className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-rose-950/70 border border-rose-500/40 text-rose-300 font-mono text-xs shadow-xs"
-              title={`Hôm nay bạn còn ${dailyHeartsRemaining}/12 lượt thả tim`}
-            >
-              <HeartIcon size={13} className="text-rose-400 fill-rose-400 animate-pulse shrink-0" />
-              <span className="font-bold text-rose-300">{dailyHeartsRemaining}/12</span>
-            </div>
-
             {/* Sổ Lời Chúc Drawer Trigger */}
             <button
               type="button"
@@ -1316,16 +1249,13 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
                         handleToggleHeart(c.id, e);
                       }}
                       className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full font-mono text-[9px] font-bold border transition-all active:scale-90 bg-rose-50 hover:bg-rose-100 text-rose-600 border-rose-200 shadow-xs cursor-pointer"
-                      title={dailyHeartsRemaining > 0 ? `Thả tim (+1) • Còn ${dailyHeartsRemaining}/12 tim hôm nay` : 'Đã hết 12 lượt tim hôm nay'}
+                      title="Thả tim cho lời chúc này"
                     >
                       <HeartIcon 
                         size={10} 
                         className="text-rose-500 fill-current animate-pulse" 
                       />
                       <span>{charHearts} tim</span>
-                      {dailyHeartsRemaining > 0 && (
-                        <span className="text-[8px] px-1 bg-rose-200/60 text-rose-800 rounded-full font-semibold">+1</span>
-                      )}
                     </button>
                   </div>
 
@@ -1455,40 +1385,27 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
           </div>
 
           {/* Action Footer */}
-          <div className="flex flex-col gap-2.5 pt-4">
-            <div className="flex items-center justify-between gap-3">
-              <button
-                type="button"
-                onClick={(e) => handleToggleHeart(activeCharacter.id, e)}
-                className="px-4 py-2.5 rounded-full border border-rose-300 bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-mono font-bold transition-all flex items-center gap-2 active:scale-95 shadow-sm hover:scale-105 cursor-pointer"
-                title={dailyHeartsRemaining > 0 ? `Bấm để thả tim (+1) • Còn ${dailyHeartsRemaining}/12 tim hôm nay` : 'Đã hết 12 lượt tim hôm nay'}
-              >
-                <HeartIcon size={15} className="text-rose-500 fill-current animate-pulse" />
-                <span>{charHearts} lượt tim</span>
-                {dailyHeartsRemaining > 0 && (
-                  <span className="text-[10px] px-1.5 py-0.2 bg-rose-200/70 text-rose-800 rounded-full font-semibold">+1</span>
-                )}
-              </button>
+          <div className="flex items-center justify-between gap-3 pt-4">
+            <button
+              type="button"
+              onClick={(e) => handleToggleHeart(activeCharacter.id, e)}
+              className="px-4 py-2.5 rounded-full border border-rose-300 bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-mono font-bold transition-all flex items-center gap-2 active:scale-95 shadow-sm hover:scale-105 cursor-pointer"
+              title="Bấm để thả tim cho lời chúc này"
+            >
+              <HeartIcon size={15} className="text-rose-500 fill-current animate-pulse" />
+              <span>{charHearts} lượt tim</span>
+            </button>
 
-              <button
-                type="button"
-                onClick={(e) => {
-                  triggerConfettiBlast(e);
-                }}
-                className="px-4 py-2.5 rounded-full bg-amber-500 hover:bg-amber-600 text-white font-mono font-bold text-xs flex items-center gap-1.5 transition-all shadow-sm active:scale-95"
-              >
-                <SparklesIcon size={14} />
-                <span>Chúc mừng</span>
-              </button>
-            </div>
-
-            {/* Daily Quota Indicator */}
-            <div className="text-center text-[11px] font-mono text-stone-500 flex items-center justify-center gap-1">
-              <span>Hôm nay bạn còn:</span>
-              <strong className={dailyHeartsRemaining > 0 ? 'text-rose-600 font-bold' : 'text-stone-400 font-bold'}>
-                {dailyHeartsRemaining}/12 lượt tim
-              </strong>
-            </div>
+            <button
+              type="button"
+              onClick={(e) => {
+                triggerConfettiBlast(e);
+              }}
+              className="px-4 py-2.5 rounded-full bg-amber-500 hover:bg-amber-600 text-white font-mono font-bold text-xs flex items-center gap-1.5 transition-all shadow-sm active:scale-95 cursor-pointer"
+            >
+              <SparklesIcon size={14} />
+              <span>Chúc mừng</span>
+            </button>
           </div>
         </div>
       </div>,
@@ -1531,11 +1448,6 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
                 <div className="flex items-center gap-2 mt-0.5 flex-wrap">
                   <span className="text-[11px] font-mono text-amber-300/80">
                     {allCharacters.length} lời chúc
-                  </span>
-                  <span className="text-white/30 text-[10px]">•</span>
-                  <span className="inline-flex items-center gap-1 text-[10px] font-mono text-rose-300 bg-rose-950/60 px-2 py-0.5 rounded-full border border-rose-500/30">
-                    <HeartIcon size={10} className="text-rose-400 fill-rose-400" />
-                    <span>Còn {dailyHeartsRemaining}/12 tim hôm nay</span>
                   </span>
                 </div>
               </div>
@@ -1650,18 +1562,11 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
                     <button
                       type="button"
                       onClick={(e) => handleToggleHeart(c.id, e)}
-                      className={`flex items-center gap-1.5 px-3 py-1 min-h-[30px] rounded-full border text-[11px] font-mono font-bold transition-all active:scale-95 cursor-pointer ${
-                        dailyHeartsRemaining > 0
-                          ? 'border-rose-500/40 bg-rose-950/50 hover:bg-rose-900/80 text-rose-300 shadow-xs'
-                          : 'border-white/10 bg-black/30 text-white/40 cursor-not-allowed'
-                      }`}
-                      title={dailyHeartsRemaining > 0 ? `Bấm để thả tim (+1) • Còn ${dailyHeartsRemaining}/12 tim hôm nay` : 'Đã hết 12 lượt tim hôm nay'}
+                      className="flex items-center gap-1.5 px-3 py-1 min-h-[30px] rounded-full border border-rose-500/40 bg-rose-950/50 hover:bg-rose-900/80 text-rose-300 shadow-xs text-[11px] font-mono font-bold transition-all active:scale-95 cursor-pointer"
+                      title="Bấm để thả tim cho lời chúc này"
                     >
                       <HeartIcon size={13} className="text-rose-400 fill-rose-400" />
                       <span>{charHearts} tim</span>
-                      {dailyHeartsRemaining > 0 && (
-                        <span className="text-[9px] text-rose-300/90 font-mono font-semibold">+1</span>
-                      )}
                     </button>
 
                     <button
