@@ -848,15 +848,24 @@ app.post('/api/registrations', generalLimiter, async (req, res) => {
       console.error('Supabase wish/character insert error:', err);
     }
 
-    const db = getDB();
-    db.wishes = [wishObj, ...(db.wishes || [])];
-    db.characters = [charObj, ...(db.characters || [])];
-    saveDB(db);
+    try {
+      const db = getDB();
+      db.wishes = [wishObj, ...(db.wishes || [])];
+      db.characters = [charObj, ...(db.characters || [])];
+      saveDB(db);
+    } catch (backupErr) {
+      console.error('Local wish backup error:', backupErr);
+    }
   }
 
   // Local backup
-  db.registrations = [newReg, ...(db.registrations || [])];
-  saveDB(db);
+  try {
+    const db = getDB();
+    db.registrations = [newReg, ...(db.registrations || [])];
+    saveDB(db);
+  } catch (backupErr) {
+    console.error('Local registration backup error:', backupErr);
+  }
 
   return res.json({
     success: true,
