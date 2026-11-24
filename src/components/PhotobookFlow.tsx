@@ -146,7 +146,7 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
                   </span>
                 </div>
                 <p className="text-[11px] text-csg-black/75 font-body pt-0.5 max-w-[62%] leading-relaxed">
-                  Một màu áo vàng, ngập tràn hoa hướng dương và những nụ cười ngày hội ngộ tụi mình bên nhau.
+                  Đằng sau mỗi thành quả là những con người đã dành một phần tuổi trẻ để xây dựng Cóc Sài Gòn. Đại hội là dịp để những đóng góp ấy được trân trọng và ghi nhận.
                 </p>
               </div>
 
@@ -188,14 +188,14 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
                 </div>
                 <div className="pt-2.5 flex items-baseline justify-between font-mono text-xs">
                   <span className="font-bold text-csg-black uppercase text-[11px]">
-                    02. SAIGON TALK — NHỮNG ĐÊM ONLINE
+                    02. SAIGON TALK - DẤU ẤN MÙA GIÃN CÁCH
                   </span>
                   <span className="text-csg-black/50 text-[10px] shrink-0">
                     Mùa giãn cách 2021
                   </span>
                 </div>
                 <p className="text-[11px] text-csg-black/75 font-body pt-0.5 leading-relaxed">
-                  Dù chỉ nhìn nhau qua màn hình máy tính, ngọn lửa của tụi mình chưa một lần nguội lạnh.
+                  Giữa những biến động của đại dịch, các thế hệ thành viên vẫn nỗ lực duy trì hoạt động, để hành trình của Cóc Sài Gòn không dừng lại ngay cả trong những giai đoạn khó khăn nhất.
                 </p>
               </div>
             </div>
@@ -228,14 +228,14 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
                 loading="lazy"
               />
             </div>
-            <div className="pt-3 flex flex-col sm:flex-row sm:items-center justify-between gap-1 font-mono text-xs">
+            <div className="pt-3 flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 font-mono text-xs">
               <span className="font-bold text-csg-black uppercase text-xs">
-                03. CỜ CÓC BAY Ở PO KLONG GARAI
-              </span>
-              <span className="text-csg-black/60 text-[11px]">
-                Chuyến đi xa cùng nhau, lá cờ CLB giương cao giữa nắng gió miền Trung.
+                03. CÓC SÀI GÒN - HÀNH TRÌNH ĐẾN PO KLONG GARAI
               </span>
             </div>
+            <p className="text-[11px] text-csg-black/75 font-body pt-1 leading-relaxed">
+              Những chuyến đi đưa chúng ta đến nhiều vùng đất mới. Và trong hành trình ấy, những người đồng đội cũng dần trở thành những người thân thuộc.
+            </p>
           </div>
 
           {/* Paired Heritage Discovery Row */}
@@ -257,14 +257,14 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
               </div>
               <div className="pt-2 flex items-baseline justify-between font-mono text-xs">
                 <span className="font-bold text-csg-black uppercase text-[11px]">
-                  04. NĂM MÙA THỔI NẾN (7TH — 11TH)
+                  04. NHỮNG MÙA SINH NHẬT CÓC SÀI GÒN (7TH - 11TH)
                 </span>
-                <span className="text-csg-black/50 text-[10px]">
-                  2016 — 2020
+                <span className="text-csg-black/50 text-[10px] shrink-0">
+                  2016 - 2020
                 </span>
               </div>
-              <p className="text-[11px] text-csg-black/75 font-body line-clamp-1 pt-0.5">
-                Từng chiếc bánh kem qua từng năm tháng — mỗi mùa sinh nhật là thêm một lứa Cóc trưởng thành.
+              <p className="text-[11px] text-csg-black/75 font-body pt-0.5 leading-relaxed">
+                Mỗi mùa sinh nhật là một lần nhìn lại. Những gương mặt có thể đổi thay, nhưng tình cảm và tâm huyết dành cho Cóc Sài Gòn vẫn được các thế hệ gìn giữ.
               </p>
             </div>
 
@@ -286,14 +286,14 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
                 </div>
                 <div className="pt-2.5 flex items-baseline justify-between font-mono text-xs">
                   <span className="font-bold text-csg-black uppercase text-[11px]">
-                    05. ĐÀ LẠT SƯƠNG MÙ & SẮC ÁO VÀNG
+                    05. DẤU CHÂN CÓC SÀI GÒN TẠI ĐÀ LẠT
                   </span>
-                  <span className="text-csg-black/50 text-[10px]">
-                    Lâm Viên
+                  <span className="text-csg-black/50 text-[10px] shrink-0">
+                    Cao nguyên Lâm Viên
                   </span>
                 </div>
                 <p className="text-[11px] text-csg-black/75 font-body pt-0.5 leading-relaxed">
-                  Giữa cái lạnh cao nguyên, tụi mình đứng cạnh nhau là thấy ấm ran cả lòng.
+                  Có những tình bạn bắt đầu từ công việc, nhưng được vun đắp qua những chuyến đi và trở thành một phần đáng nhớ trong những năm tháng đại học.
                 </p>
               </div>
             </div>
@@ -329,14 +329,11 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
               </div>
               <div className="pt-2.5 flex items-baseline justify-between font-mono text-xs">
                 <span className="font-bold text-csg-black uppercase text-[11px]">
-                  06. ĐÊM HỘI TRƯỜNG VỌNG TIẾN
-                </span>
-                <span className="text-csg-black/50 text-[10px]">
-                  Đại hội 2022
+                  06. ĐẠI HỘI VỌNG TIẾN 2022
                 </span>
               </div>
               <p className="text-[11px] text-csg-black/75 font-body pt-0.5 leading-relaxed">
-                Ánh đèn bừng sáng, tiếng hò reo và những cánh tay giơ cao hòa chung một nhịp đập tuổi trẻ.
+                Những nỗ lực được ghi nhận, những thành quả được trân trọng. Mỗi kỳ Đại hội cũng là dịp để thế hệ hôm nay tiếp nhận niềm tin và trách nhiệm từ những người đi trước.
               </p>
             </div>
 
@@ -358,14 +355,11 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
                 </div>
                 <div className="pt-2.5 flex items-baseline justify-between font-mono text-xs">
                   <span className="font-bold text-csg-black uppercase text-[11px]">
-                    07. GIÓ BIỂN VÀ NỤ CƯỜI THANH XUÂN
-                  </span>
-                  <span className="text-csg-black/50 text-[10px]">
-                    Bờ kè đá xanh
+                    07. NHỮNG CHUYẾN ĐI CÙNG CÓC SÀI GÒN
                   </span>
                 </div>
                 <p className="text-[11px] text-csg-black/75 font-body pt-0.5 leading-relaxed">
-                  Ngồi bên bờ kè đón gió biển, cười nói giòn tan những ngày tháng đôi mươi rực rỡ.
+                  Sau này, có lẽ điều chúng ta nhớ không chỉ là những dự án đã thực hiện, mà còn là những chuyến đi và những người đã từng ở bên cạnh mình.
                 </p>
               </div>
             </div>
@@ -397,14 +391,14 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
                 loading="lazy"
               />
             </div>
-            <div className="pt-3 flex flex-col sm:flex-row sm:items-center justify-between gap-1 font-mono text-xs border-t border-csg-black/15 mt-3">
+            <div className="pt-3 flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 font-mono text-xs border-t border-csg-black/15 mt-3">
               <span className="font-bold text-csg-black uppercase text-xs">
-                08. MƯỜI BẢY NĂM TRỌN MỘT MÁI NHÀ
-              </span>
-              <span className="text-csg-black/60 text-[11px]">
-                Bao thế hệ Cóc đã đi qua, nhưng mỗi lần nhìn lại, tụi mình vẫn là một gia đình.
+                08. CÓC SÀI GÒN - 17 NĂM TIẾP NỐI
               </span>
             </div>
+            <p className="text-[11px] text-csg-black/75 font-body pt-1 leading-relaxed">
+              17 năm được vun đắp bởi nhiều thế hệ. Có người đến, có người trưởng thành và rời đi, nhưng những giá trị vẫn được tiếp nối. Đó là cách Cóc Sài Gòn trở thành một gia đình và hơn cả một câu lạc bộ.
+            </p>
           </div>
         </section>
 
@@ -412,19 +406,22 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
 
 
       {/* ========================================================================= */}
-      {/* MOBILE ART DIRECTION (Compact, cohesive cards without dead space)         */}
+      {/* MOBILE ART DIRECTION (Continuous Editorial Flow for 8 Stories)            */}
       {/* ========================================================================= */}
       <div className="block md:hidden space-y-6">
 
-        {/* Mobile Item 1: Song Hành with Overlay */}
+        {/* 01. ĐẠI HỘI SONG HÀNH 2023 */}
         <div className="space-y-2">
-          <div className="font-mono text-[10px] text-csg-black/60 uppercase font-bold tracking-wider">
-            01 & 02. ĐẠI HỘI SONG HÀNH & HOA HƯỚNG DƯƠNG
+          <div className="flex items-baseline justify-between font-mono text-[10px]">
+            <span className="text-csg-black uppercase font-bold tracking-wider">
+              01. ĐẠI HỘI SONG HÀNH 2023
+            </span>
+            <span className="text-csg-black/50 text-[10px]">Tháng 10.2023</span>
           </div>
           <div className="relative">
             <div
               onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.cover)}
-              className="paper-sheet p-1.5 pb-2.5 cursor-pointer shadow-sm active:scale-95"
+              className="paper-sheet p-2 pb-3 cursor-pointer shadow-sm active:scale-95"
             >
               <img
                 src={PHOTOBOOK_IMAGES.cover.src}
@@ -432,14 +429,14 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
                 className="w-full aspect-[16/10] object-cover"
                 loading="lazy"
               />
-              <p className="pt-1.5 font-mono text-[10px] text-csg-black/75 truncate font-bold">
-                {PHOTOBOOK_IMAGES.cover.alt}
+              <p className="pt-2 font-body text-[11px] text-csg-black/75 leading-relaxed max-w-[62%]">
+                Đằng sau mỗi thành quả là những con người đã dành một phần tuổi trẻ để xây dựng Cóc Sài Gòn. Đại hội là dịp để những đóng góp ấy được trân trọng và ghi nhận.
               </p>
             </div>
 
             <div
               onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.coverOffset)}
-              className="absolute -bottom-3 right-2 w-[42%] z-10 cursor-pointer shadow-poster-sm rotate-2 bg-white p-1 pb-2 border border-csg-black"
+              className="absolute -bottom-2 right-2 w-[38%] z-10 cursor-pointer shadow-poster-sm rotate-2 bg-white p-1 pb-2 border-2 border-csg-black"
             >
               <img
                 src={PHOTOBOOK_IMAGES.coverOffset.src}
@@ -454,133 +451,146 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
           </div>
         </div>
 
-        {/* Mobile Item 2: 2-Column Discovery Grid (SaiGon Talk & Camera) */}
-        <div className="grid grid-cols-2 gap-2.5 pt-2">
-          <div
-            onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.workspace)}
-            className="paper-sheet p-1.5 pb-2 cursor-pointer shadow-sm active:scale-95"
-          >
-            <img
-              src={PHOTOBOOK_IMAGES.workspace.src}
-              alt={PHOTOBOOK_IMAGES.workspace.alt}
-              className="w-full aspect-square object-cover"
-              loading="lazy"
-            />
-            <div className="pt-1 font-mono text-[9px] text-csg-black/80 truncate font-bold">
-              SaiGon Talk online
-            </div>
+        {/* 02. SAIGON TALK - DẤU ẤN MÙA GIÃN CÁCH */}
+        <div
+          onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.workspace)}
+          className="paper-sheet p-2 pb-3 cursor-pointer shadow-sm active:scale-95 space-y-2"
+        >
+          <div className="flex items-baseline justify-between font-mono text-[10px]">
+            <span className="text-csg-black uppercase font-bold tracking-wider">
+              02. SAIGON TALK - DẤU ẤN MÙA GIÃN CÁCH
+            </span>
+            <span className="text-csg-black/50 text-[10px] shrink-0">Mùa giãn cách 2021</span>
           </div>
-
-          <div
-            onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.camera)}
-            className="paper-sheet p-1.5 pb-2 cursor-pointer shadow-sm active:scale-95"
-          >
-            <img
-              src={PHOTOBOOK_IMAGES.camera.src}
-              alt={PHOTOBOOK_IMAGES.camera.alt}
-              className="w-full aspect-square object-cover"
-              loading="lazy"
-            />
-            <div className="pt-1 font-mono text-[9px] text-csg-black/80 truncate font-bold">
-              5 Mùa thổi nến
-            </div>
-          </div>
+          <img
+            src={PHOTOBOOK_IMAGES.workspace.src}
+            alt={PHOTOBOOK_IMAGES.workspace.alt}
+            className="w-full aspect-[16/10] object-cover"
+            loading="lazy"
+          />
+          <p className="font-body text-[11px] text-csg-black/75 leading-relaxed">
+            Giữa những biến động của đại dịch, các thế hệ thành viên vẫn nỗ lực duy trì hoạt động, để hành trình của Cóc Sài Gòn không dừng lại ngay cả trong những giai đoạn khó khăn nhất.
+          </p>
         </div>
 
-        {/* Mobile Item 3: Cinematic Panorama Breakout */}
-        <div className="space-y-1">
-          <div className="font-mono text-[10px] text-csg-black/60 uppercase font-bold tracking-wider">
-            03. CỜ CÓC TẠI PO KLONG GARAI
+        {/* 03. CÓC SÀI GÒN - HÀNH TRÌNH ĐẾN PO KLONG GARAI */}
+        <div
+          onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.beachPanoramic)}
+          className="paper-sheet p-2 pb-3 cursor-pointer shadow-sm active:scale-95 space-y-2"
+        >
+          <div className="font-mono text-[10px] text-csg-black uppercase font-bold tracking-wider">
+            03. CÓC SÀI GÒN - HÀNH TRÌNH ĐẾN PO KLONG GARAI
           </div>
-          <div
-            onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.beachPanoramic)}
-            className="paper-sheet p-1.5 pb-2.5 cursor-pointer shadow-sm active:scale-95"
-          >
-            <img
-              src={PHOTOBOOK_IMAGES.beachPanoramic.src}
-              alt={PHOTOBOOK_IMAGES.beachPanoramic.alt}
-              className="w-full aspect-[21/9] object-cover"
-              loading="lazy"
-            />
-            <p className="pt-1.5 font-mono text-[10px] text-csg-black/75 truncate font-bold">
-              {PHOTOBOOK_IMAGES.beachPanoramic.alt}
-            </p>
-          </div>
+          <img
+            src={PHOTOBOOK_IMAGES.beachPanoramic.src}
+            alt={PHOTOBOOK_IMAGES.beachPanoramic.alt}
+            className="w-full aspect-[21/9] object-cover"
+            loading="lazy"
+          />
+          <p className="font-body text-[11px] text-csg-black/75 leading-relaxed">
+            Những chuyến đi đưa chúng ta đến nhiều vùng đất mới. Và trong hành trình ấy, những người đồng đội cũng dần trở thành những người thân thuộc.
+          </p>
         </div>
 
-        {/* Mobile Item 4: 2-Column Discovery Grid (Lâm Viên & Biển Xanh) */}
-        <div className="grid grid-cols-2 gap-2.5">
-          <div
-            onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.bonfire)}
-            className="paper-sheet p-1.5 pb-2 cursor-pointer shadow-sm active:scale-95"
-          >
-            <img
-              src={PHOTOBOOK_IMAGES.bonfire.src}
-              alt={PHOTOBOOK_IMAGES.bonfire.alt}
-              className="w-full aspect-square object-cover"
-              loading="lazy"
-            />
-            <div className="pt-1 font-mono text-[9px] text-csg-black/80 truncate font-bold">
-              Đà Lạt sương mù
-            </div>
+        {/* 04. NHỮNG MÙA SINH NHẬT CÓC SÀI GÒN (7TH - 11TH) */}
+        <div
+          onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.camera)}
+          className="paper-sheet p-2 pb-3 cursor-pointer shadow-sm active:scale-95 space-y-2"
+        >
+          <div className="flex items-baseline justify-between font-mono text-[10px]">
+            <span className="text-csg-black uppercase font-bold tracking-wider">
+              04. NHỮNG MÙA SINH NHẬT CÓC SÀI GÒN (7TH - 11TH)
+            </span>
+            <span className="text-csg-black/50 text-[10px] shrink-0">2016 - 2020</span>
           </div>
-
-          <div
-            onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.celebrationToast)}
-            className="paper-sheet p-1.5 pb-2 cursor-pointer shadow-sm active:scale-95"
-          >
-            <img
-              src={PHOTOBOOK_IMAGES.celebrationToast.src}
-              alt={PHOTOBOOK_IMAGES.celebrationToast.alt}
-              className="w-full aspect-square object-cover"
-              loading="lazy"
-            />
-            <div className="pt-1 font-mono text-[9px] text-csg-black/80 truncate font-bold">
-              Gió biển thanh xuân
-            </div>
-          </div>
+          <img
+            src={PHOTOBOOK_IMAGES.camera.src}
+            alt={PHOTOBOOK_IMAGES.camera.alt}
+            className="w-full aspect-[4/3] object-cover"
+            loading="lazy"
+          />
+          <p className="font-body text-[11px] text-csg-black/75 leading-relaxed">
+            Mỗi mùa sinh nhật là một lần nhìn lại. Những gương mặt có thể đổi thay, nhưng tình cảm và tâm huyết dành cho Cóc Sài Gòn vẫn được các thế hệ gìn giữ.
+          </p>
         </div>
 
-        {/* Mobile Item 5: Stage Concert Energy */}
-        <div className="space-y-1">
-          <div className="font-mono text-[10px] text-csg-black/60 uppercase font-bold tracking-wider">
-            06. ĐÊM HỘI TRƯỜNG VỌNG TIẾN
+        {/* 05. DẤU CHÂN CÓC SÀI GÒN TẠI ĐÀ LẠT */}
+        <div
+          onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.bonfire)}
+          className="paper-sheet p-2 pb-3 cursor-pointer shadow-sm active:scale-95 space-y-2"
+        >
+          <div className="flex items-baseline justify-between font-mono text-[10px]">
+            <span className="text-csg-black uppercase font-bold tracking-wider">
+              05. DẤU CHÂN CÓC SÀI GÒN TẠI ĐÀ LẠT
+            </span>
+            <span className="text-csg-black/50 text-[10px] shrink-0">Cao nguyên Lâm Viên</span>
           </div>
-          <div
-            onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.stage)}
-            className="paper-sheet p-1.5 pb-2.5 cursor-pointer shadow-sm active:scale-95"
-          >
-            <img
-              src={PHOTOBOOK_IMAGES.stage.src}
-              alt={PHOTOBOOK_IMAGES.stage.alt}
-              className="w-full aspect-[16/10] object-cover"
-              loading="lazy"
-            />
-            <p className="pt-1.5 font-mono text-[10px] text-csg-black/75 truncate font-bold">
-              {PHOTOBOOK_IMAGES.stage.alt}
-            </p>
-          </div>
+          <img
+            src={PHOTOBOOK_IMAGES.bonfire.src}
+            alt={PHOTOBOOK_IMAGES.bonfire.alt}
+            className="w-full aspect-[16/10] object-cover"
+            loading="lazy"
+          />
+          <p className="font-body text-[11px] text-csg-black/75 leading-relaxed">
+            Có những tình bạn bắt đầu từ công việc, nhưng được vun đắp qua những chuyến đi và trở thành một phần đáng nhớ trong những năm tháng đại học.
+          </p>
         </div>
 
-        {/* Mobile Item 6: Climax Monument Centerpiece */}
-        <div className="space-y-1">
-          <div className="font-mono text-[10px] text-csg-black/60 uppercase font-bold tracking-wider">
-            08. ĐẠI GIA ĐÌNH CÓC GIỮA RỪNG THÔNG
+        {/* 06. ĐẠI HỘI VỌNG TIẾN 2022 */}
+        <div
+          onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.stage)}
+          className="paper-sheet p-2 pb-3 cursor-pointer shadow-sm active:scale-95 space-y-2"
+        >
+          <div className="font-mono text-[10px] text-csg-black uppercase font-bold tracking-wider">
+            06. ĐẠI HỘI VỌNG TIẾN 2022
           </div>
-          <div
-            onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.gatheringCrowd)}
-            className="paper-sheet p-1.5 pb-2.5 cursor-pointer shadow-sm active:scale-95"
-          >
-            <img
-              src={PHOTOBOOK_IMAGES.gatheringCrowd.src}
-              alt={PHOTOBOOK_IMAGES.gatheringCrowd.alt}
-              className="w-full aspect-[16/9] object-cover"
-              loading="lazy"
-            />
-            <p className="pt-1.5 font-mono text-[10px] text-csg-black/75 truncate font-bold">
-              {PHOTOBOOK_IMAGES.gatheringCrowd.alt}
-            </p>
+          <img
+            src={PHOTOBOOK_IMAGES.stage.src}
+            alt={PHOTOBOOK_IMAGES.stage.alt}
+            className="w-full aspect-[16/10] object-cover"
+            loading="lazy"
+          />
+          <p className="font-body text-[11px] text-csg-black/75 leading-relaxed">
+            Những nỗ lực được ghi nhận, những thành quả được trân trọng. Mỗi kỳ Đại hội cũng là dịp để thế hệ hôm nay tiếp nhận niềm tin và trách nhiệm từ những người đi trước.
+          </p>
+        </div>
+
+        {/* 07. NHỮNG CHUYẾN ĐI CÙNG CÓC SÀI GÒN */}
+        <div
+          onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.celebrationToast)}
+          className="paper-sheet p-2 pb-3 cursor-pointer shadow-sm active:scale-95 space-y-2"
+        >
+          <div className="font-mono text-[10px] text-csg-black uppercase font-bold tracking-wider">
+            07. NHỮNG CHUYẾN ĐI CÙNG CÓC SÀI GÒN
           </div>
+          <img
+            src={PHOTOBOOK_IMAGES.celebrationToast.src}
+            alt={PHOTOBOOK_IMAGES.celebrationToast.alt}
+            className="w-full aspect-[16/10] object-cover"
+            loading="lazy"
+          />
+          <p className="font-body text-[11px] text-csg-black/75 leading-relaxed">
+            Sau này, có lẽ điều chúng ta nhớ không chỉ là những dự án đã thực hiện, mà còn là những chuyến đi và những người đã từng ở bên cạnh mình.
+          </p>
+        </div>
+
+        {/* 08. CÓC SÀI GÒN - 17 NĂM TIẾP NỐI */}
+        <div
+          onClick={() => setSelectedPhoto(PHOTOBOOK_IMAGES.gatheringCrowd)}
+          className="paper-sheet p-2 pb-3 cursor-pointer shadow-sm active:scale-95 space-y-2"
+        >
+          <div className="font-mono text-[10px] text-csg-black uppercase font-bold tracking-wider">
+            08. CÓC SÀI GÒN - 17 NĂM TIẾP NỐI
+          </div>
+          <img
+            src={PHOTOBOOK_IMAGES.gatheringCrowd.src}
+            alt={PHOTOBOOK_IMAGES.gatheringCrowd.alt}
+            className="w-full aspect-[16/9] object-cover"
+            loading="lazy"
+          />
+          <p className="font-body text-[11px] text-csg-black/75 leading-relaxed">
+            17 năm được vun đắp bởi nhiều thế hệ. Có người đến, có người trưởng thành và rời đi, nhưng những giá trị vẫn được tiếp nối. Đó là cách Cóc Sài Gòn trở thành một gia đình và hơn cả một câu lạc bộ.
+          </p>
         </div>
 
       </div>
@@ -755,9 +765,17 @@ export const PhotobookFlow: React.FC<PhotobookFlowProps> = ({
             />
 
             {/* Inscription Description */}
-            <p className="text-white/80 font-mono text-xs text-center pt-3 px-4 max-w-2xl">
-              {selectedPhoto.alt}
-            </p>
+            <div className="text-center pt-3 px-4 max-w-2xl space-y-1">
+              <div className="font-mono text-xs sm:text-sm text-csg-yellow font-bold uppercase tracking-wider">
+                {selectedPhoto.title || selectedPhoto.alt}
+                {selectedPhoto.sub && <span className="text-white/60 text-xs font-normal ml-2 font-mono">({selectedPhoto.sub})</span>}
+              </div>
+              {selectedPhoto.description && (
+                <p className="text-white/85 font-body text-xs sm:text-sm leading-relaxed max-w-xl mx-auto">
+                  {selectedPhoto.description}
+                </p>
+              )}
+            </div>
 
             {/* Bottom Controls */}
             <div className="w-full max-w-xs mt-3 flex items-center justify-between text-xs font-mono text-white/70">

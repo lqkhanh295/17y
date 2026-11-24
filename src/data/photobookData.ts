@@ -11,6 +11,9 @@ export interface PhotobookImage {
   id: string;
   src: string;
   alt: string;
+  title?: string;
+  sub?: string;
+  description?: string;
   aspectRatio?: 'panoramic' | 'landscape' | 'portrait' | 'square';
 }
 
@@ -18,55 +21,78 @@ export const PHOTOBOOK_IMAGES: Record<string, PhotobookImage> = {
   cover: {
     id: 'photo-cover',
     src: '/images/csg/IMG_9688.JPG',
-    alt: 'Đại hội Song Hành 2023 — Rực rỡ sắc vàng và hoa hướng dương',
+    alt: '01. ĐẠI HỘI SONG HÀNH 2023',
+    title: '01. ĐẠI HỘI SONG HÀNH 2023',
+    sub: 'Tháng 10.2023',
+    description: 'Đằng sau mỗi thành quả là những con người đã dành một phần tuổi trẻ để xây dựng Cóc Sài Gòn. Đại hội là dịp để những đóng góp ấy được trân trọng và ghi nhận.',
     aspectRatio: 'landscape'
   },
   coverOffset: {
     id: 'photo-cover-offset',
     src: '/images/csg/IMG_9689.JPG',
-    alt: 'Những đóa hướng dương và nụ cười rạng rỡ ngày Song Hành',
+    alt: 'Hoa hướng dương ngày Song Hành',
+    title: 'Nụ cười hướng dương',
+    sub: 'Tháng 10.2023',
+    description: 'Nụ cười rạng rỡ và sắc vàng hướng dương của ngày hội ngộ Song Hành.',
     aspectRatio: 'portrait'
   },
   camera: {
     id: 'photo-camera',
     src: '/images/csg/IMG_9692.JPG',
-    alt: 'Năm mùa sinh nhật đáng nhớ — Từ 7th đến 11th Birthday của Cóc Sài Gòn',
+    alt: '04. NHỮNG MÙA SINH NHẬT CÓC SÀI GÒN (7TH - 11TH)',
+    title: '04. NHỮNG MÙA SINH NHẬT CÓC SÀI GÒN (7TH - 11TH)',
+    sub: '2016 - 2020',
+    description: 'Mỗi mùa sinh nhật là một lần nhìn lại. Những gương mặt có thể đổi thay, nhưng tình cảm và tâm huyết dành cho Cóc Sài Gòn vẫn được các thế hệ gìn giữ.',
     aspectRatio: 'portrait'
   },
   workspace: {
     id: 'photo-workspace',
     src: '/images/csg/IMG_9682.JPG',
-    alt: 'Những đêm họp SaiGon Talk — Kết nối các thế hệ Cóc Sài Gòn trong mùa cách ly',
+    alt: '02. SAIGON TALK - DẤU ẤN MÙA GIÃN CÁCH',
+    title: '02. SAIGON TALK - DẤU ẤN MÙA GIÃN CÁCH',
+    sub: 'Mùa giãn cách 2021',
+    description: 'Giữa những biến động của đại dịch, các thế hệ thành viên vẫn nỗ lực duy trì hoạt động, để hành trình của Cóc Sài Gòn không dừng lại ngay cả trong những giai đoạn khó khăn nhất.',
     aspectRatio: 'landscape'
   },
   beachPanoramic: {
     id: 'photo-beach',
     src: '/images/csg/IMG_9696.JPG',
-    alt: 'Lá cờ Cóc Sài Gòn tung bay giữa nắng gió Tháp Chàm Po Klong Garai',
+    alt: '03. CÓC SÀI GÒN - HÀNH TRÌNH ĐẾN PO KLONG GARAI',
+    title: '03. CÓC SÀI GÒN - HÀNH TRÌNH ĐẾN PO KLONG GARAI',
+    description: 'Những chuyến đi đưa chúng ta đến nhiều vùng đất mới. Và trong hành trình ấy, những người đồng đội cũng dần trở thành những người thân thuộc.',
     aspectRatio: 'panoramic'
   },
   bonfire: {
     id: 'photo-bonfire',
     src: '/images/csg/IMG_9697.JPG',
-    alt: 'Sắc áo vàng Cóc Sài Gòn tại Quảng trường Lâm Viên — Đà Lạt sương mù',
+    alt: '05. DẤU CHÂN CÓC SÀI GÒN TẠI ĐÀ LẠT',
+    title: '05. DẤU CHÂN CÓC SÀI GÒN TẠI ĐÀ LẠT',
+    sub: 'Cao nguyên Lâm Viên',
+    description: 'Có những tình bạn bắt đầu từ công việc, nhưng được vun đắp qua những chuyến đi và trở thành một phần đáng nhớ trong những năm tháng đại học.',
     aspectRatio: 'square'
   },
   stage: {
     id: 'photo-stage',
     src: '/images/csg/IMG_9686.PNG',
-    alt: 'Đêm Đại hội Vọng Tiến — Bùng cháy nhiệt huyết tuổi trẻ Cóc Sài Gòn',
+    alt: '06. ĐẠI HỘI VỌNG TIẾN 2022',
+    title: '06. ĐẠI HỘI VỌNG TIẾN 2022',
+    description: 'Những nỗ lực được ghi nhận, những thành quả được trân trọng. Mỗi kỳ Đại hội cũng là dịp để thế hệ hôm nay tiếp nhận niềm tin và trách nhiệm từ những người đi trước.',
     aspectRatio: 'landscape'
   },
   celebrationToast: {
     id: 'photo-toast',
     src: '/images/csg/IMG_9699.JPG',
-    alt: 'Nụ cười thanh xuân đón gió biển bên bờ kè đá xanh',
+    alt: '07. NHỮNG CHUYẾN ĐI CÙNG CÓC SÀI GÒN',
+    title: '07. NHỮNG CHUYẾN ĐI CÙNG CÓC SÀI GÒN',
+    description: 'Sau này, có lẽ điều chúng ta nhớ không chỉ là những dự án đã thực hiện, mà còn là những chuyến đi và những người đã từng ở bên cạnh mình.',
     aspectRatio: 'landscape'
   },
   gatheringCrowd: {
     id: 'photo-crowd',
     src: '/images/csg/IMG_9698.JPG',
-    alt: 'Đại gia đình Cóc Sài Gòn tề tựu giữa rừng thông — 17 năm trọn một hành trình',
+    alt: '08. CÓC SÀI GÒN - 17 NĂM TIẾP NỐI',
+    title: '08. CÓC SÀI GÒN - 17 NĂM TIẾP NỐI',
+    description: '17 năm được vun đắp bởi nhiều thế hệ. Có người đến, có người trưởng thành và rời đi, nhưng những giá trị vẫn được tiếp nối. Đó là cách Cóc Sài Gòn trở thành một gia đình và hơn cả một câu lạc bộ.',
     aspectRatio: 'landscape'
   }
 };
