@@ -268,16 +268,16 @@ export const App: React.FC = () => {
 
   return (
     <div className="relative min-h-screen bg-csg-paper bg-paper-texture text-csg-black flex flex-col selection:bg-csg-yellow selection:text-csg-black font-body">
-      
+
       {/* Cinematic 35mm Analog Film Opening */}
       {showCinematicIntro && (
-        <CinematicFilmOpening 
+        <CinematicFilmOpening
           onComplete={() => {
             setShowCinematicIntro(false);
             if (typeof window !== 'undefined') {
               window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
             }
-          }} 
+          }}
         />
       )}
 
@@ -289,16 +289,16 @@ export const App: React.FC = () => {
         <div className="max-w-[1360px] mx-auto px-4 sm:px-8 h-14 sm:h-16 flex items-center justify-between">
           {/* Identity */}
           <a href="/" onClick={(e) => { e.preventDefault(); closeModals(); }} className="flex items-center gap-2.5 group min-h-[44px] shrink-0" title="Trang chủ Cóc Sài Gòn 17 Năm">
-            <img 
-              src="/images/csg_logo.png" 
-              alt="Cóc Sài Gòn" 
-              className="h-8 sm:h-9 w-auto object-contain transition-transform group-hover:scale-105" 
+            <img
+              src="/images/csg_logo.png"
+              alt="Cóc Sài Gòn"
+              className="h-8 sm:h-9 w-auto object-contain transition-transform group-hover:scale-105"
             />
             <span className="font-editorial italic font-normal text-csg-red text-base sm:text-lg whitespace-nowrap">
               17 năm
             </span>
             <span className="hidden md:inline font-mono text-[10px] text-csg-black/40 uppercase tracking-widest pl-2 border-l border-csg-black/15 ml-1">
-              Photobook • 2009 — 2026
+              2009 — 2026
             </span>
           </a>
 
@@ -393,7 +393,7 @@ export const App: React.FC = () => {
       <PaymentLookupModal
         isOpen={isLookupOpen}
         onClose={closeModals}
-        onPaymentSuccess={() => {}}
+        onPaymentSuccess={() => { }}
       />
 
       <AdminDashboard
