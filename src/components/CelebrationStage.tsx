@@ -177,16 +177,11 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [activeSpeakerId, setActiveSpeakerId] = useState<string | null>(null);
 
-  // Initial stillness: Frogs do NOT move immediately on entering stage
-  const canRoamRef = useRef(false);
+  // Live stage roaming state: Start roaming immediately upon entering
+  const canRoamRef = useRef(true);
 
   useEffect(() => {
-    // Keep frogs standing in place for initial 3.5s before active roaming begins
-    canRoamRef.current = false;
-    const timer = setTimeout(() => {
-      canRoamRef.current = true;
-    }, 3500);
-    return () => clearTimeout(timer);
+    canRoamRef.current = true;
   }, []);
 
   const getInitialHearts = useCallback((id: string, name: string): number => {
@@ -416,7 +411,7 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
           isHopping: false,
           isCelebrating: false,
           celebrateTicks: 0,
-          idleTicks: 6 + Math.floor(Math.random() * 25) // staggered initial pause
+          idleTicks: Math.floor(Math.random() * 6) // Start hopping immediately with organic natural stagger
         };
       });
 
