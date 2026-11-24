@@ -1274,12 +1274,28 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
           );
         })}
 
-        {/* Empty Search State */}
+        {/* Empty Search or Empty Stage State */}
         {filtered.length === 0 && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center z-10">
-            <SearchIcon size={36} className="text-[#20231F]/40 mb-2" />
-            <p className="font-display font-bold text-[#20231F] text-sm">Không tìm thấy Cóc nào khớp với từ khóa</p>
-            <p className="text-xs text-[#20231F]/60 font-mono mt-1">Hãy thử xóa bộ lọc hoặc tìm tên khác bạn nhé.</p>
+          <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center z-10 pointer-events-none">
+            {searchTerm ? (
+              <>
+                <SearchIcon size={36} className="text-[#20231F]/40 mb-2 mx-auto" />
+                <p className="font-display font-bold text-[#20231F] text-sm">Không tìm thấy Cóc nào khớp với từ khóa</p>
+                <p className="text-xs text-[#20231F]/60 font-mono mt-1">Hãy thử xóa bộ lọc hoặc tìm tên khác bạn nhé.</p>
+              </>
+            ) : (
+              <div className="max-w-md bg-[#F4EEDF]/90 backdrop-blur-sm border-2 border-[#20231F] p-5 rounded shadow-poster text-center pointer-events-auto">
+                <div className="w-12 h-12 mx-auto mb-3 bg-[#F4C542] border-2 border-[#20231F] rounded flex items-center justify-center shadow-xs">
+                  <img src="/images/coc_mascot.png" alt="Cóc Sài Gòn" className="w-8 h-8 object-contain" />
+                </div>
+                <h3 className="font-display font-extrabold text-[#20231F] text-base uppercase tracking-wider">
+                  SÂN KHẤU CÓC ĐÃ SẴN SÀNG!
+                </h3>
+                <p className="text-xs text-[#20231F]/70 font-body mt-1.5 leading-relaxed">
+                  Sân khấu kết nối realtime trực tiếp. Hãy đăng ký tham dự và gửi lời chúc để chú Cóc của bạn xuất hiện nhảy múa ngay tại đây!
+                </p>
+              </div>
+            )}
           </div>
         )}
 
