@@ -400,18 +400,19 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
         const speed = 0.20 + (idx % 4) * 0.04;
         const scale = 0.88 + ((initialY - 64) / 18) * 0.26;
 
+        const initialIdle = (idx % 6) * 4 + Math.floor(Math.random() * 4); // 0 to 24 ticks (0 to 1.4s staggered start)
         next[c.id] = {
           x: initialX,
           y: initialY,
           targetX: initialX,
           targetY: initialY,
           dir: initialDir,
-          speed: 0.36 + (idx % 4) * 0.05,
+          speed: 0.38 + (idx % 4) * 0.05,
           scale,
           isHopping: false,
           isCelebrating: false,
           celebrateTicks: 0,
-          idleTicks: Math.floor(Math.random() * 6) // Start hopping immediately with organic natural stagger
+          idleTicks: initialIdle
         };
       });
 
@@ -433,13 +434,6 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
       setPositions(prev => {
         const next: { [id: string]: FrogMotionState } = { ...prev };
         let hasChanges = false;
-
-        // Limit concurrent hops to preserve battery and 60fps on mobile
-        let currentHoppingCount = 0;
-        Object.keys(next).forEach(k => {
-          if (next[k]?.isHopping) currentHoppingCount++;
-        });
-        const maxConcurrentHops = isMobile ? 2 : 4;
 
         Object.keys(next).forEach(id => {
           const frog = next[id];
@@ -468,28 +462,31 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
           }
 
           if (isHopping) {
-            const distX = Math.abs(targetX - x);
-            const distY = Math.abs(targetY - y);
+            const dx = targetX - x;
+            const dy = targetY - y;
+            const distX = Math.abs(dx);
+            const distY = Math.abs(dy);
 
             if (distX < 0.6 && distY < 0.6) {
               // Arrived at destination! Settle into IDLE
               x = targetX;
               y = targetY;
               isHopping = false;
-              // Rest for 1.5s - 3.8s (25 to 65 ticks)
-              idleTicks = 25 + Math.floor(Math.random() * 40);
+              // Rest for 1.0s - 2.2s (16 to 36 ticks @ 60ms)
+              idleTicks = 16 + Math.floor(Math.random() * 20);
               // 40% chance to flip direction to look around while resting
               if (Math.random() < 0.4) {
                 dir = -dir;
               }
             } else {
-              // Advance horizontally
+              // Advance horizontally with guaranteed vector direction towards target
+              const moveDir = dx >= 0 ? 1 : -1;
+              dir = moveDir;
               const stepX = Math.min(speed, distX);
-              x += dir * stepX;
+              x += moveDir * stepX;
 
               // Advance vertically towards target lane
-              const distToY = targetY - y;
-              const stepY = Math.sign(distToY) * Math.min(0.22, Math.abs(distToY));
+              const stepY = Math.sign(dy) * Math.min(0.25, distY);
               y += stepY;
 
               // Dynamically adjust scale based on depth perspective
@@ -497,25 +494,19 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
             }
             hasChanges = true;
           } else {
-            // Idle state countdown: wait for canRoamRef to allow free roaming
+            // Idle state countdown
             if (!canRoamRef.current) {
               return;
             }
             idleTicks -= 1;
             if (idleTicks <= 0) {
-              // Throttle: don't start new hop if max frogs are already in motion
-              if (currentHoppingCount >= maxConcurrentHops) {
-                idleTicks = 12 + Math.floor(Math.random() * 20);
-                return;
-              }
-
               // Pick a new destination spot on stage to hop toward
-              const travelDistance = 10 + Math.random() * 18;
+              const travelDistance = 10 + Math.random() * 18; // 10% to 28% of stage width
               let newDir = dir;
 
-              if (x < 18) {
+              if (x < 22) {
                 newDir = 1;
-              } else if (x > 82) {
+              } else if (x > 78) {
                 newDir = -1;
               } else {
                 newDir = Math.random() > 0.5 ? 1 : -1;
@@ -524,25 +515,19 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
               let nextX = x + newDir * travelDistance;
               nextX = Math.max(12, Math.min(88, nextX));
 
-              // Collision avoidance: prevent clumping and overlapping name tags
-              let candidateX = nextX;
-              const isColliding = Object.entries(next).some(([otherId, otherFrog]) => {
-                if (otherId === id) return false;
-                return Math.abs(otherFrog.targetX - candidateX) < 8;
-              });
-              if (isColliding) {
-                candidateX = candidateX > 50 ? Math.max(12, candidateX - 12) : Math.min(88, candidateX + 12);
+              // Ensure a clear minimum jump distance so it never stalls on tiny movement
+              if (Math.abs(nextX - x) < 6) {
+                nextX = x > 50 ? Math.max(12, x - 12) : Math.min(88, x + 12);
               }
 
               // Snap to 3 clean depth tiers (66%, 72%, 78%) to maintain vertical hierarchy
               const nextY = 66 + (Math.floor(Math.random() * 3)) * 6;
 
-              targetX = candidateX;
+              targetX = nextX;
               targetY = nextY;
               dir = targetX >= x ? 1 : -1;
-              speed = 0.36 + Math.random() * 0.18; // dynamic, energetic hop speed!
+              speed = 0.38 + Math.random() * 0.16;
               isHopping = true;
-              currentHoppingCount++;
               hasChanges = true;
             }
           }
