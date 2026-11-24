@@ -61,6 +61,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
   const [emergencyPhone, setEmergencyPhone] = useState('');
   const [allergies, setAllergies] = useState<string[]>([]);
   const [allergyNote, setAllergyNote] = useState('');
+  const [stayOvernight, setStayOvernight] = useState<boolean | null>(null);
   const [wishes, setWishes] = useState('');
   const [isPublicConsent, setIsPublicConsent] = useState(true);
   const [infoErrors, setInfoErrors] = useState<{ [key: string]: string }>({});
@@ -269,6 +270,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
     if (!gmail.includes('@')) errors.gmail = 'Vui lòng nhập địa chỉ Gmail hợp lệ.';
     if (!phone || phone.length < 9) errors.phone = 'Vui lòng nhập số điện thoại cá nhân.';
     if (!emergencyPhone || emergencyPhone.length < 9) errors.emergencyPhone = 'Vui lòng nhập SĐT người thân đón về khi say tiệc.';
+    if (stayOvernight === null) errors.stayOvernight = 'Vui lòng chọn bạn có đăng ký suất "ngủ lại" cùng anh em không nhé!';
 
     setInfoErrors(errors);
     return Object.keys(errors).length === 0;
@@ -403,6 +405,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
         emergencyPhone,
         allergies,
         allergyNote,
+        stayOvernight: stayOvernight === true,
         plan,
         paymentPlan: plan,
         receiptImage: finalReceipt,
@@ -1017,6 +1020,90 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                       className="w-full px-3.5 py-2.5 min-h-[44px] rounded-lg bg-white border border-[#20231F] text-base sm:text-xs text-[#20231F]"
                     />
                   </div>
+
+                  {/* Suất ngủ lại cùng anh em */}
+                  <div className="pt-3 border-t border-[#20231F]/15 space-y-1.5">
+                    <label className="block text-[11px] font-bold text-[#20231F] uppercase tracking-wide">
+                      ĐĂNG KÝ SUẤT "NGỦ LẠI" CÙNG ANH EM *
+                    </label>
+                    <p className="text-[11px] font-body text-[#20231F]/75 leading-relaxed">
+                      Vì sau tiệc còn tiết mục "trà đá tâm sự" xuyên đêm hơi tốn thời gian, BTC có hỗ trợ sẵn chỗ nghỉ qua đêm cho các thành viên ở xa hoặc muốn chơi tới sáng.
+                    </p>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setStayOvernight(true);
+                          if (infoErrors.stayOvernight) {
+                            setInfoErrors(prev => {
+                              const next = { ...prev };
+                              delete next.stayOvernight;
+                              return next;
+                            });
+                          }
+                        }}
+                        className={`p-3 rounded-sm border-2 text-left transition-all flex items-center gap-3 cursor-pointer select-none active:scale-[0.98] ${
+                          stayOvernight === true
+                            ? 'bg-[#F4C542] border-[#20231F] shadow-poster-sm text-[#20231F] font-bold'
+                            : 'bg-white border-[#20231F]/30 hover:border-[#20231F] text-[#20231F]/80 hover:bg-[#F4EEDF]/40'
+                        }`}
+                      >
+                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                          stayOvernight === true ? 'border-[#20231F] bg-[#20231F]' : 'border-[#20231F]/40 bg-white'
+                        }`}>
+                          {stayOvernight === true && <div className="w-2 h-2 rounded-full bg-[#F4C542]" />}
+                        </div>
+                        <div className="min-w-0">
+                          <span className="text-xs sm:text-[13px] font-bold block leading-snug">
+                            Có nè ⛺
+                          </span>
+                          <span className="text-[10px] font-mono text-[#20231F]/65 block mt-0.5">
+                            Ở lại tâm sự xuyên đêm cùng anh em
+                          </span>
+                        </div>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setStayOvernight(false);
+                          if (infoErrors.stayOvernight) {
+                            setInfoErrors(prev => {
+                              const next = { ...prev };
+                              delete next.stayOvernight;
+                              return next;
+                            });
+                          }
+                        }}
+                        className={`p-3 rounded-sm border-2 text-left transition-all flex items-center gap-3 cursor-pointer select-none active:scale-[0.98] ${
+                          stayOvernight === false
+                            ? 'bg-[#EAE4D6] border-[#20231F] shadow-poster-sm text-[#20231F] font-bold'
+                            : 'bg-white border-[#20231F]/30 hover:border-[#20231F] text-[#20231F]/80 hover:bg-[#F4EEDF]/40'
+                        }`}
+                      >
+                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                          stayOvernight === false ? 'border-[#20231F] bg-[#20231F]' : 'border-[#20231F]/40 bg-white'
+                        }`}>
+                          {stayOvernight === false && <div className="w-2 h-2 rounded-full bg-white" />}
+                        </div>
+                        <div className="min-w-0">
+                          <span className="text-xs sm:text-[13px] font-bold block leading-snug">
+                            Hum âu, mình sợ bị gank 🏃‍♂️
+                          </span>
+                          <span className="text-[10px] font-mono text-[#20231F]/65 block mt-0.5">
+                            Tiệc xong mình xin phép về trước
+                          </span>
+                        </div>
+                      </button>
+                    </div>
+
+                    {infoErrors.stayOvernight && (
+                      <p className="text-[10px] text-[#B94D35] font-bold mt-1">
+                        {infoErrors.stayOvernight}
+                      </p>
+                    )}
+                  </div>
                 </div>
 
                 {/* Block 3: A Little Note (Birthday Wish) */}
@@ -1388,9 +1475,12 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                 {/* Contact Review */}
                 <div className="p-3 sm:p-3.5 rounded-sm bg-white border-2 border-[#20231F] flex items-center justify-between gap-2.5">
                   <div className="space-y-0.5 min-w-0 flex-1">
-                    <span className="text-[10px] font-mono text-[#20231F]/60 uppercase block">Thông tin liên lạc</span>
+                    <span className="text-[10px] font-mono text-[#20231F]/60 uppercase block">Thông tin liên lạc & lưu trú</span>
                     <p className="text-[11px] sm:text-xs truncate">Gmail: <span className="font-mono font-bold">{gmail}</span></p>
                     <p className="text-[11px] sm:text-xs truncate">SĐT: <span className="font-mono font-bold">{phone}</span> • Người thân: <span className="font-mono font-bold text-[#B94D35]">{emergencyPhone}</span></p>
+                    <p className="text-[11px] sm:text-xs">
+                      Suất ngủ lại: <span className={`font-mono font-bold ${stayOvernight ? 'text-[#3D6B45]' : 'text-[#B94D35]'}`}>{stayOvernight ? 'Có nè ⛺ (ở lại xuyên đêm)' : 'Hum âu, sợ bị gank (về trong đêm)'}</span>
+                    </p>
                     {allergies.length > 0 && (
                       <p className="text-[11px] sm:text-xs text-[#B94D35] truncate">Dị ứng: {allergies.join(', ')} {allergyNote ? `(${allergyNote})` : ''}</p>
                     )}

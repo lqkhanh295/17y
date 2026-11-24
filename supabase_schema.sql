@@ -41,6 +41,7 @@ CREATE TABLE IF NOT EXISTS public.registrations (
     "emergencyPhone" TEXT,
     "allergies" JSONB DEFAULT '[]'::jsonb,
     "allergyNote" TEXT DEFAULT '',
+    "stayOvernight" BOOLEAN DEFAULT FALSE,
     "wishes" TEXT DEFAULT '',
     "package" TEXT,
     "totalRequired" NUMERIC DEFAULT 0,

@@ -46,6 +46,7 @@ export interface RegistrationRecord {
   emergencyPhone: string;
   allergies: string[];
   allergyNote: string;
+  stayOvernight?: boolean;
   wishes: string;
   isPublicConsent?: boolean;
   

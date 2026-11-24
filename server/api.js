@@ -620,7 +620,8 @@ app.post('/api/registrations', generalLimiter, async (req, res) => {
     plan,
     receiptImage,
     wishes,
-    isPublicConsent
+    isPublicConsent,
+    stayOvernight
   } = req.body;
 
   if (!fullName || !mssv || !gmail || !personalPhone || !emergencyPhone || !receiptImage) {
@@ -779,6 +780,7 @@ app.post('/api/registrations', generalLimiter, async (req, res) => {
     emergencyPhone: emergencyPhone.trim(),
     allergies: Array.isArray(allergies) ? allergies : [],
     allergyNote: sanitizeText(allergyNote || ''),
+    stayOvernight: stayOvernight === true || stayOvernight === 'true' || stayOvernight === 'YES',
     package: role === 'GUEST' ? 'GUEST' : (isHighTier ? 'ALUMNI' : 'ACTIVE'),
     totalRequired,
     paidAmount,
@@ -1762,9 +1764,9 @@ app.get('/api/admin/export', requireAdminAuth, async (req, res) => {
     }
   }
 
-  const headers = ['Mã ĐK,Họ Tên,MSSV,Vai Trò,Gmail,SĐT,SĐT Khẩn Cấp,Dị Ứng,Tổng Phí,Đã Đóng,Còn Thiếu,Trạng Thái,Đã Duyệt 100%,Mã Vé'];
+  const headers = ['Mã ĐK,Họ Tên,MSSV,Vai Trò,Gmail,SĐT,SĐT Khẩn Cấp,Dị Ứng,Ngủ Lại Qua Đêm,Tổng Phí,Đã Đóng,Còn Thiếu,Trạng Thái,Đã Duyệt 100%,Mã Vé'];
   const rows = registrations.map(r => 
-    `"${r.id}","${r.fullName}","${r.mssv}","${r.role}","${r.gmail}","${r.personalPhone}","${r.emergencyPhone}","${(r.allergies || []).join('; ')}",${r.totalRequired},${r.paidAmount},${r.remainingAmount},"${r.paymentStatus || r.status}","${r.isApproved100 ? 'YES' : 'NO'}","${r.ticketCode}"`
+    `"${r.id}","${r.fullName}","${r.mssv}","${r.role}","${r.gmail}","${r.personalPhone}","${r.emergencyPhone}","${(r.allergies || []).join('; ')}","${r.stayOvernight ? 'CÓ (Ngủ lại)' : 'KHÔNG (Về trong đêm)'}",${r.totalRequired},${r.paidAmount},${r.remainingAmount},"${r.paymentStatus || r.status}","${r.isApproved100 ? 'YES' : 'NO'}","${r.ticketCode}"`
   );
 
   const csv = '\uFEFF' + [headers, ...rows].join('\n');

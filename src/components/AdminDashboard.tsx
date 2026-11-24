@@ -412,9 +412,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
   // Export CSV
   const handleExportCSV = () => {
-    const headers = ['Mã ĐK,Họ Tên,MSSV,Vai Trò,Gmail,SĐT,SĐT Khẩn Cấp,Dị Ứng,Gói Đăng Ký,Tổng Phí,Đã Đóng,Còn Lại,Đã Duyệt 100%,Mã Vé,Ngày Tạo'];
+    const headers = ['Mã ĐK,Họ Tên,MSSV,Vai Trò,Gmail,SĐT,SĐT Khẩn Cấp,Dị Ứng,Suất Ngủ Lại,Gói Đăng Ký,Tổng Phí,Đã Đóng,Còn Lại,Đã Duyệt 100%,Mã Vé,Ngày Tạo'];
     const rows = registrations.map(r => 
-      `"${r.id}","${r.fullName}","${r.mssv}","${r.role}","${r.gmail}","${r.personalPhone}","${r.emergencyPhone}","${r.allergies?.join('; ') || ''}","${r.plan}",${r.totalRequired},${r.paidAmount},${r.remainingAmount},"${r.isApproved100 ? 'YES' : 'NO'}","${r.ticketCode}","${r.createdAt}"`
+      `"${r.id}","${r.fullName}","${r.mssv}","${r.role}","${r.gmail}","${r.personalPhone}","${r.emergencyPhone}","${r.allergies?.join('; ') || ''}","${r.stayOvernight ? 'CÓ (Ngủ lại)' : 'KHÔNG (Về trong đêm)'}","${r.plan}",${r.totalRequired},${r.paidAmount},${r.remainingAmount},"${r.isApproved100 ? 'YES' : 'NO'}","${r.ticketCode}","${r.createdAt}"`
     );
     const csvContent = 'data:text/csv;charset=utf-8,\uFEFF' + [headers, ...rows].join('\n');
     const encodedUri = encodeURI(csvContent);
@@ -858,6 +858,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                                 <td className="py-2.5 px-3 text-[11px]">
                                   <div>SĐT: <span className="font-mono">{r.personalPhone}</span></div>
                                   <div className="text-[#A8A8A8]">Rước: <span className="font-mono text-[#D94C2B]">{r.emergencyPhone}</span></div>
+                                  <div className="mt-0.5">
+                                    {r.stayOvernight ? (
+                                      <span className="inline-flex items-center px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-amber-400/20 text-amber-300 border border-amber-400/40">⛺ Ngủ lại</span>
+                                    ) : (
+                                      <span className="text-[10px] text-[#A8A8A8]/60 font-mono">Về trong đêm</span>
+                                    )}
+                                  </div>
                                 </td>
                                 <td className="py-2.5 px-3">
                                   <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${
@@ -1085,6 +1092,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                             <p className="text-[#A8A8A8]">Gmail nhận vé: <span className="font-mono text-white">{currentReviewRecord.gmail}</span></p>
                             <p className="text-[#A8A8A8]">SĐT: <span className="font-mono text-white">{currentReviewRecord.personalPhone}</span></p>
                             <p className="text-[#A8A8A8]">SĐT người thân đón về: <span className="font-mono text-[#D94C2B] font-bold">{currentReviewRecord.emergencyPhone}</span></p>
+                            <p className="text-[#A8A8A8]">
+                              Suất ngủ lại: <span className={`font-mono font-bold ${currentReviewRecord.stayOvernight ? 'text-amber-400' : 'text-stone-400'}`}>
+                                {currentReviewRecord.stayOvernight ? 'Có nè ⛺ (ở lại xuyên đêm cùng anh em)' : 'Hum âu, sợ bị gank (về trong đêm)'}
+                              </span>
+                            </p>
                             {currentReviewRecord.allergies?.length > 0 && (
                               <p className="text-[#D94C2B]">Dị ứng: {currentReviewRecord.allergies.join(', ')}</p>
                             )}
