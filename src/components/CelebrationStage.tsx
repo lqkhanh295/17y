@@ -1385,26 +1385,15 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
           </div>
 
           {/* Action Footer */}
-          <div className="flex items-center justify-between gap-3 pt-4">
+          <div className="flex items-center justify-center pt-4">
             <button
               type="button"
               onClick={(e) => handleToggleHeart(activeCharacter.id, e)}
-              className="px-4 py-2.5 rounded-full border border-rose-300 bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-mono font-bold transition-all flex items-center gap-2 active:scale-95 shadow-sm hover:scale-105 cursor-pointer"
+              className="px-5 py-2.5 rounded-full border border-rose-300 bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-mono font-bold transition-all flex items-center gap-2 active:scale-95 shadow-sm hover:scale-105 cursor-pointer"
               title="Bấm để thả tim cho lời chúc này"
             >
               <HeartIcon size={15} className="text-rose-500 fill-current animate-pulse" />
               <span>{charHearts} lượt tim</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={(e) => {
-                triggerConfettiBlast(e);
-              }}
-              className="px-4 py-2.5 rounded-full bg-amber-500 hover:bg-amber-600 text-white font-mono font-bold text-xs flex items-center gap-1.5 transition-all shadow-sm active:scale-95 cursor-pointer"
-            >
-              <SparklesIcon size={14} />
-              <span>Chúc mừng</span>
             </button>
           </div>
         </div>
