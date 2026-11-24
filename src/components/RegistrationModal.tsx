@@ -1056,7 +1056,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                         </div>
                         <div className="min-w-0">
                           <span className="text-xs sm:text-[13px] font-bold block leading-snug">
-                            Có nè ⛺
+                            Có nè
                           </span>
                           <span className="text-[10px] font-mono text-[#20231F]/65 block mt-0.5">
                             Ở lại tâm sự xuyên đêm cùng anh em
@@ -1089,7 +1089,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                         </div>
                         <div className="min-w-0">
                           <span className="text-xs sm:text-[13px] font-bold block leading-snug">
-                            Hum âu, mình sợ bị gank 🏃‍♂️
+                            Hum âu, mình sợ bị gank
                           </span>
                           <span className="text-[10px] font-mono text-[#20231F]/65 block mt-0.5">
                             Tiệc xong mình xin phép về trước
@@ -1479,7 +1479,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                     <p className="text-[11px] sm:text-xs truncate">Gmail: <span className="font-mono font-bold">{gmail}</span></p>
                     <p className="text-[11px] sm:text-xs truncate">SĐT: <span className="font-mono font-bold">{phone}</span> • Người thân: <span className="font-mono font-bold text-[#B94D35]">{emergencyPhone}</span></p>
                     <p className="text-[11px] sm:text-xs">
-                      Suất ngủ lại: <span className={`font-mono font-bold ${stayOvernight ? 'text-[#3D6B45]' : 'text-[#B94D35]'}`}>{stayOvernight ? 'Có nè ⛺ (ở lại xuyên đêm)' : 'Hum âu, sợ bị gank (về trong đêm)'}</span>
+                      Suất ngủ lại: <span className={`font-mono font-bold ${stayOvernight ? 'text-[#3D6B45]' : 'text-[#B94D35]'}`}>{stayOvernight ? 'Có nè (ở lại xuyên đêm)' : 'Hum âu, mình sợ bị gank (về trong đêm)'}</span>
                     </p>
                     {allergies.length > 0 && (
                       <p className="text-[11px] sm:text-xs text-[#B94D35] truncate">Dị ứng: {allergies.join(', ')} {allergyNote ? `(${allergyNote})` : ''}</p>

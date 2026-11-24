@@ -860,7 +860,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                                   <div className="text-[#A8A8A8]">Rước: <span className="font-mono text-[#D94C2B]">{r.emergencyPhone}</span></div>
                                   <div className="mt-0.5">
                                     {r.stayOvernight ? (
-                                      <span className="inline-flex items-center px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-amber-400/20 text-amber-300 border border-amber-400/40">⛺ Ngủ lại</span>
+                                      <span className="inline-flex items-center px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-amber-400/20 text-amber-300 border border-amber-400/40">Ngủ lại</span>
                                     ) : (
                                       <span className="text-[10px] text-[#A8A8A8]/60 font-mono">Về trong đêm</span>
                                     )}
@@ -1094,7 +1094,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                             <p className="text-[#A8A8A8]">SĐT người thân đón về: <span className="font-mono text-[#D94C2B] font-bold">{currentReviewRecord.emergencyPhone}</span></p>
                             <p className="text-[#A8A8A8]">
                               Suất ngủ lại: <span className={`font-mono font-bold ${currentReviewRecord.stayOvernight ? 'text-amber-400' : 'text-stone-400'}`}>
-                                {currentReviewRecord.stayOvernight ? 'Có nè ⛺ (ở lại xuyên đêm cùng anh em)' : 'Hum âu, sợ bị gank (về trong đêm)'}
+                                {currentReviewRecord.stayOvernight ? 'Có nè (ở lại xuyên đêm cùng anh em)' : 'Hum âu, mình sợ bị gank (về trong đêm)'}
                               </span>
                             </p>
                             {currentReviewRecord.allergies?.length > 0 && (
