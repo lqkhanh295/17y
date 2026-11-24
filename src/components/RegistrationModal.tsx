@@ -488,8 +488,8 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
         {/* Header Bar */}
         <div className="flex items-center justify-between px-4 sm:px-6 py-3 border-b-2 border-[#20231F] bg-[#FFFFFF] shrink-0">
           <div className="flex items-center gap-3">
-            <span className="w-10 h-10 rounded-sm bg-[#F4C542] border-2 border-[#20231F] flex items-center justify-center shadow-poster-sm shrink-0">
-              <FrogIcon size={22} />
+            <span className="w-10 h-10 rounded-sm bg-[#F4C542] border-2 border-[#20231F] flex items-center justify-center shadow-poster-sm shrink-0 p-1.5">
+              <img src="/images/coc_mascot.png" alt="Cóc Sài Gòn" className="w-full h-full object-contain" />
             </span>
             <div>
               <div className="flex items-center gap-2">

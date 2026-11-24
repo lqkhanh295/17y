@@ -115,8 +115,8 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
         {/* Content Body */}
         <div className="p-5 sm:p-6 space-y-4">
           <div className="flex items-start gap-3">
-            <div className="p-2.5 bg-csg-paper border border-csg-ink/30 rounded shadow-sm shrink-0">
-              <FrogIcon size={26} className="text-csg-ink" />
+            <div className="w-11 h-11 p-1 bg-csg-paper border border-csg-ink/30 rounded shadow-sm shrink-0 flex items-center justify-center">
+              <img src="/images/coc_mascot.png" alt="Cóc Sài Gòn" className="w-7 h-7 object-contain" />
             </div>
             <div>
               <h3
