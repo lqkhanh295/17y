@@ -89,7 +89,7 @@ export const PHOTOBOOK_IMAGES: Record<string, PhotobookImage> = {
   },
   gatheringCrowd: {
     id: 'photo-crowd',
-    src: '/images/csg/IMG_9698.JPG',
+    src: '/images/csg/THU09096_1.JPG',
     alt: '08. CÓC SÀI GÒN - 17 NĂM TIẾP NỐI',
     title: '08. CÓC SÀI GÒN - 17 NĂM TIẾP NỐI',
     description: '17 năm được vun đắp bởi nhiều thế hệ. Có người đến, có người trưởng thành và rời đi, nhưng những giá trị vẫn được tiếp nối. Đó là cách Cóc Sài Gòn trở thành một gia đình và hơn cả một câu lạc bộ.',
