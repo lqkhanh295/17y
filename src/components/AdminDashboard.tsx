@@ -308,6 +308,26 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     }
   };
 
+  // Delete registration permanently
+  const handleDeleteRegistration = async (id: string, name: string) => {
+    if (!window.confirm(`Bạn có chắc chắn muốn xóa vĩnh viễn hồ sơ đăng ký của "${name}"?\n\nThao tác này sẽ xóa hoàn toàn vé khỏi cơ sở dữ liệu Supabase để bạn có thể test đăng ký lại.`)) {
+      return;
+    }
+    try {
+      const ok = await apiClient.deleteRegistration(id);
+      if (ok) {
+        setRegistrations(prev => prev.filter(r => r.id !== id));
+        if (selectedReviewId === id) setSelectedReviewId(null);
+        setToast({ type: 'success', message: `Đã xóa vĩnh viễn hồ sơ của ${name} khỏi Supabase!` });
+      } else {
+        setToast({ type: 'error', message: 'Không thể xóa hồ sơ. Vui lòng thử lại.' });
+      }
+    } catch (err: unknown) {
+      const error = err as Error;
+      setToast({ type: 'error', message: 'Lỗi khi xóa: ' + error.message });
+    }
+  };
+
   // On-site Ticket Check-in
   const handleCheckInTicket = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -897,6 +917,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                                     >
                                       Chi tiết
                                     </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => handleDeleteRegistration(r.id, r.fullName)}
+                                      title="Xóa vĩnh viễn hồ sơ này khỏi cơ sở dữ liệu"
+                                      className="p-1.5 rounded-lg bg-[#222222] hover:bg-red-950/60 border border-[#383838] hover:border-red-500/50 text-[#888888] hover:text-red-400 transition-colors"
+                                    >
+                                      <CloseIcon size={13} />
+                                    </button>
                                   </div>
                                 </td>
                               </tr>
@@ -1173,6 +1201,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                             <span>Thêm vào Google Calendar (12/12)</span>
                             <ArrowUpRightIcon size={12} />
                           </a>
+
+                          {/* Delete permanently from database */}
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteRegistration(currentReviewRecord.id, currentReviewRecord.fullName)}
+                            className="w-full py-2 rounded-lg bg-red-950/20 hover:bg-red-950/50 border border-red-500/30 hover:border-red-500/60 text-xs font-bold text-red-400 flex items-center justify-center gap-1.5 transition-colors"
+                            title="Xóa hoàn toàn hồ sơ đăng ký này để cho phép đăng ký lại từ đầu"
+                          >
+                            <CloseIcon size={14} />
+                            <span>XÓA VĨNH VIỄN HỒ SƠ NÀY KHỎI HỆ THỐNG</span>
+                          </button>
                         </div>
                       )}
                     </div>

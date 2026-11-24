@@ -55,7 +55,7 @@ export function generateEmailContent(
   /* ================= TEMPLATE 1: DEPOSIT ALUMNI (KHỚP 100% MẪU BTC) ================= */
   if (templateType === 'DEPOSIT_ALUMNI') {
     const subject = `[CÓC SÀI GÒN] XÁC NHẬN THANH TOÁN PHÍ THAM DỰ SINH NHẬT CÓC SÀI GÒN 17 TUỔI`;
-    
+
     const html = `
 <div style="font-family: 'Times New Roman', Times, serif; font-size: 16px; line-height: 1.6; color: #111111; max-width: 650px; margin: 0 auto; padding: 24px 16px;">
   <p style="margin: 0 0 16px 0;">Thân gửi <strong>${safeFullName}</strong>,</p>
@@ -119,7 +119,7 @@ BAN TỔ CHỨC SINH NHẬT CÓC SÀI GÒN 17 TUỔI`;
   /* ================= TEMPLATE 2: DEPOSIT ACTIVE (KHỚP 100% MẪU BTC) ================= */
   if (templateType === 'DEPOSIT_ACTIVE') {
     const subject = `[CÓC SÀI GÒN] XÁC NHẬN THANH TOÁN PHÍ THAM DỰ SINH NHẬT CÓC SÀI GÒN 17 TUỔI`;
-    
+
     const html = `
 <div style="font-family: 'Times New Roman', Times, serif; font-size: 16px; line-height: 1.6; color: #111111; max-width: 650px; margin: 0 auto; padding: 24px 16px;">
   <p style="margin: 0 0 16px 0;">Thân gửi <strong>${safeFullName}</strong>,</p>
@@ -182,7 +182,7 @@ BAN TỔ CHỨC SINH NHẬT CÓC SÀI GÒN 17 TUỔI`;
 
   /* ================= TEMPLATE 3: FULL 100% (KHỚP 100% MẪU BTC) ================= */
   const subject = `[CÓC SÀI GÒN] XÁC NHẬN ĐĂNG KÝ THÀNH CÔNG – SINH NHẬT CÓC SÀI GÒN 17 TUỔI`;
-  
+
   const html = `
 <div style="font-family: 'Times New Roman', Times, serif; font-size: 16px; line-height: 1.6; color: #111111; max-width: 650px; margin: 0 auto; padding: 24px 16px;">
   <p style="margin: 0 0 16px 0;">Thân gửi <strong>${safeFullName}</strong>,</p>

@@ -1508,6 +1508,49 @@ app.put('/api/admin/registrations/:id/reject', requireAdminAuth, async (req, res
   return res.json({ success: true, data: reg, message: 'Đã từ chối biên lai và cập nhật trạng thái trên Supabase.' });
 });
 
+// Admin Delete Registration (Permanent Delete)
+app.delete('/api/admin/registrations/:id', requireAdminAuth, async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    let reg = null;
+    if (supabase) {
+      const { data } = await supabase.from('registrations').select('*').eq('id', id).maybeSingle();
+      if (data) reg = data;
+
+      // Delete from registrations
+      await supabase.from('registrations').delete().eq('id', id);
+
+      if (reg) {
+        // Also clean up associated mascot characters and wishes
+        await Promise.allSettled([
+          supabase.from('characters').delete().eq('registrationId', id),
+          supabase.from('wishes').delete().eq('registrationId', id)
+        ]);
+
+        // Audit log
+        await supabase.from('audit_logs').insert({
+          id: 'log-' + Date.now(),
+          action: 'DELETE_REGISTRATION',
+          targetId: id,
+          adminUser: req.adminUser || 'BTC_Admin',
+          details: `Xóa vĩnh viễn hồ sơ của ${reg.fullName} (${reg.mssv || 'N/A'}) - Mã vé: ${reg.ticketCode}`,
+          timestamp: new Date().toISOString()
+        });
+      }
+    }
+
+    const db = getDB();
+    db.registrations = (db.registrations || []).filter(r => r.id !== id);
+    saveDB(db);
+
+    return res.json({ success: true, message: 'Đã xóa vĩnh viễn hồ sơ đăng ký khỏi cơ sở dữ liệu.' });
+  } catch (err) {
+    console.error('Delete registration error:', err);
+    return res.status(500).json({ success: false, message: 'Lỗi khi xóa hồ sơ: ' + err.message });
+  }
+});
+
 // Admin Ticket Check-in Endpoint
 app.post('/api/admin/tickets/checkin', requireAdminAuth, async (req, res) => {
   const { tokenOrCode, adminUser } = req.body;

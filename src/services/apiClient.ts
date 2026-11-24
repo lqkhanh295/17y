@@ -818,6 +818,25 @@ export const apiClient = {
     throw new Error('Không thể từ chối biên lai thanh toán.');
   },
 
+  async deleteRegistration(id: string): Promise<boolean> {
+    const res = await safeFetchJson<{ success: boolean; message?: string }>(
+      `${API_BASE}/admin/registrations/${id}`,
+      {
+        method: 'DELETE',
+        headers: getAdminAuthHeaders()
+      }
+    );
+    if (res && res.success) return true;
+
+    // Direct Supabase fallback
+    try {
+      const { error } = await supabase.from('registrations').delete().eq('id', id);
+      return !error;
+    } catch {
+      return false;
+    }
+  },
+
   async syncGoogleSheets(): Promise<{ success: boolean; message: string }> {
     const res = await safeFetchJson<{ success: boolean; message?: string }>(`${API_BASE}/admin/sheets/sync`, {
       method: 'POST',
