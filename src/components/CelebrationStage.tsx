@@ -1358,8 +1358,8 @@ export const CelebrationStage: React.FC<CelebrationStageProps> = ({
           </div>
 
           {/* The Commemorative Wish */}
-          <div className="relative py-4 px-3 sm:px-4 my-2 text-center border-y border-stone-100">
-            <p className="font-editorial italic text-base sm:text-lg text-stone-800 leading-relaxed">
+          <div className="relative py-4 px-3 sm:px-4 my-2 text-center border-y border-stone-100 max-h-[45vh] overflow-y-auto">
+            <p className="font-editorial italic text-base sm:text-lg text-stone-800 leading-relaxed whitespace-pre-line">
               "{activeCharacter.wish}"
             </p>
           </div>

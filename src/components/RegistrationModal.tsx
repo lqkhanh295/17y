@@ -1121,14 +1121,22 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                       3. LỜI CHÚC GỬI CÓC SÀI GÒN
                     </h4>
                     <span className="text-[10px] font-mono text-[#20231F]/60">
-                      {wishes.length} / 250 ký tự
+                      {wishes.trim() ? wishes.trim().split(/\s+/).length : 0} / 200 từ
                     </span>
                   </div>
                   <textarea
-                    rows={3}
-                    maxLength={250}
+                    rows={4}
                     value={wishes}
-                    onChange={(e) => setWishes(e.target.value)}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      const words = val.trim().split(/\s+/);
+                      if (val.trim() && words.length > 200) {
+                        const truncated = val.match(/^\s*(?:\S+\s+){0,199}\S+/)?.[0] ?? words.slice(0, 200).join(' ');
+                        setWishes(truncated);
+                      } else {
+                        setWishes(val);
+                      }
+                    }}
                     placeholder="Gửi một lời chúc mừng sinh nhật 17 năm tới CLB. Lời chúc sẽ xuất hiện cùng chú Cóc Áo Vàng đại diện của bạn trên Sân Khấu Kỷ Niệm!"
                     className="w-full px-3.5 py-2.5 min-h-[80px] rounded-lg bg-[#F4EEDF] border border-[#20231F] text-base sm:text-xs text-[#20231F] font-body focus:outline-none focus:ring-1 focus:ring-[#F4C542] leading-relaxed"
                   />
