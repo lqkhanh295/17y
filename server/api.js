@@ -219,15 +219,20 @@ function deduplicateByMssv(list) {
   return result;
 }
 
-// Helper: Sanitize text (Escape HTML)
+// Helper: Sanitize plain text for storage (normalize line endings & strip control chars only).
+// HTML escaping is intentionally handled at output time (React JSX auto-escapes text nodes,
+// and emailService.escapeHtml escapes HTML email templates) so quotes, "<3", "&", and emojis render cleanly.
 function sanitizeText(str) {
   if (!str) return '';
   return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
+    .replace(/\r\n/g, '\n')
+    .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, '')
+    .trim();
+}
+
+function escapeCsvCell(val) {
+  const s = String(val ?? '');
+  return `"${s.replace(/"/g, '""')}"`;
 }
 
 // Helper: Mask sensitive phone numbers for public lookup
@@ -780,12 +785,13 @@ app.post('/api/registrations', generalLimiter, async (req, res) => {
       status: 'PENDING'
     };
 
+    const sanitizedFullName = sanitizeText(fullName);
     const sanitizedWish = sanitizeText(wishes || '');
 
     const newReg = {
       id: regId,
       memberId: memberId || 'custom',
-      fullName: sanitizeText(fullName),
+      fullName: sanitizedFullName,
       mssv: cleanMssv,
       role: role || (isHighTier ? (role === 'GUEST' ? 'GUEST' : 'ALUMNI') : 'ACTIVE'),
       honorific: honorific || 'Bạn',
@@ -833,7 +839,7 @@ app.post('/api/registrations', generalLimiter, async (req, res) => {
     const wishObj = {
       id: 'w-' + Date.now(),
       registrationId: regId,
-      authorName: `${honorific || ''} ${fullName}`.trim(),
+      authorName: `${honorific || ''} ${sanitizedFullName}`.trim(),
       role: role || (isHighTier ? (role === 'GUEST' ? 'GUEST' : 'ALUMNI') : 'ACTIVE'),
       content: displayWish,
       isPublic: isPublicConsent !== false,
@@ -844,7 +850,7 @@ app.post('/api/registrations', generalLimiter, async (req, res) => {
     const charObj = {
       id: 'char-' + Date.now(),
       registrationId: regId,
-      name: fullName,
+      name: sanitizedFullName,
       honorific: honorific || 'Bạn',
       role: role || (isHighTier ? (role === 'GUEST' ? 'GUEST' : 'ALUMNI') : 'ACTIVE'),
       wish: displayWish,
@@ -1792,7 +1798,23 @@ app.get('/api/admin/export', requireAdminAuth, async (req, res) => {
 
   const headers = ['Mã ĐK,Họ Tên,MSSV,Vai Trò,Gmail,SĐT,SĐT Khẩn Cấp,Dị Ứng,Ngủ Lại Qua Đêm,Tổng Phí,Đã Đóng,Còn Thiếu,Trạng Thái,Đã Duyệt 100%,Mã Vé'];
   const rows = registrations.map(r => 
-    `"${r.id}","${r.fullName}","${r.mssv}","${r.role}","${r.gmail}","${r.personalPhone}","${r.emergencyPhone}","${(r.allergies || []).join('; ')}","${r.stayOvernight ? 'CÓ (Ngủ lại)' : 'KHÔNG (Về trong đêm)'}",${r.totalRequired},${r.paidAmount},${r.remainingAmount},"${r.paymentStatus || r.status}","${r.isApproved100 ? 'YES' : 'NO'}","${r.ticketCode}"`
+    [
+      escapeCsvCell(r.id),
+      escapeCsvCell(r.fullName),
+      escapeCsvCell(r.mssv),
+      escapeCsvCell(r.role),
+      escapeCsvCell(r.gmail),
+      escapeCsvCell(r.personalPhone),
+      escapeCsvCell(r.emergencyPhone),
+      escapeCsvCell((r.allergies || []).join('; ')),
+      escapeCsvCell(r.stayOvernight ? 'CÓ (Ngủ lại)' : 'KHÔNG (Về trong đêm)'),
+      r.totalRequired,
+      r.paidAmount,
+      r.remainingAmount,
+      escapeCsvCell(r.paymentStatus || r.status),
+      escapeCsvCell(r.isApproved100 ? 'YES' : 'NO'),
+      escapeCsvCell(r.ticketCode)
+    ].join(',')
   );
 
   const csv = '\uFEFF' + [headers, ...rows].join('\n');

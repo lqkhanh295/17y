@@ -443,9 +443,8 @@ async function runTests() {
   // --- SUITE 5: Wishes, Unicode & Stage Characters ---
   console.log('\n--- SUITE 5: Wishes, Unicode & Stage Characters ---');
 
-  await testCase('Vietnamese accented text + Emojis in wish -> Saved intact', async () => {
-    const wishText = 'Chúc Cóc Sài Gòn sinh nhật 17 năm rực rỡ, bùng cháy & mãi đỉnh! 🐸🎉🎂';
-    const expectedWish = 'Chúc Cóc Sài Gòn sinh nhật 17 năm rực rỡ, bùng cháy &amp; mãi đỉnh! 🐸🎉🎂';
+  await testCase('Vietnamese accented text, quotes, "<3", "&" + Emojis in wish -> Saved intact without HTML entity mangling', async () => {
+    const wishText = 'Chúc "nhà Cóc" sinh nhật 17 năm rực rỡ, bùng cháy & mãi đỉnh <3 🐸🎉🎂';
     const res = await postReg({
       fullName: 'Nguyễn Phương Thảo',
       mssv: 'EDGE25',
@@ -458,26 +457,29 @@ async function runTests() {
       receiptImage: VALID_JPEG_BASE64
     });
     assert(res.status === 200, `Expected 200, got ${res.status}`);
-    assert(res.body.data.wishes === expectedWish, `Wish mismatch: ${res.body.data.wishes}`);
+    assert(res.body.data.wishes === wishText, `Wish mismatch: ${res.body.data.wishes}`);
 
     // Verify in Supabase registrations table
     const { data: dbReg } = await supabase.from('registrations').select('wishes').eq('id', res.body.data.id).single();
-    assert(dbReg && dbReg.wishes === expectedWish, `Supabase registrations.wishes mismatch`);
+    assert(dbReg && dbReg.wishes === wishText, `Supabase registrations.wishes mismatch`);
 
     // Verify character and wish created in characters & wishes table
     const { data: dbChar } = await supabase.from('characters').select('*').eq('registrationId', res.body.data.id);
     assert(dbChar && dbChar.length > 0, 'No character created for registrant on stage');
+    assert(dbChar[0].wish === wishText, `Character wish mismatch: ${dbChar[0].wish}`);
     if (dbChar[0]?.id) createdCharIds.push(dbChar[0].id);
 
     const { data: dbWish } = await supabase.from('wishes').select('*').eq('registrationId', res.body.data.id);
     assert(dbWish && dbWish.length > 0, 'No wish record created in wishes table');
+    assert(dbWish[0].content === wishText, `Wish table content mismatch: ${dbWish[0].content}`);
     if (dbWish[0]?.id) createdWishIds.push(dbWish[0].id);
   });
 
-  await testCase('HTML injection in wish "<script>alert(1)</script>" -> Escaped cleanly', async () => {
-    const rawWish = '<script>alert("hack")</script><b>Bold Wish</b>';
+  await testCase('Control chars in wish stripped while preserving multiline & punctuation', async () => {
+    const rawWish = 'Dòng 1\x00\x07\r\n"Dòng 2" <3 & \'CSG\'';
+    const expectedWish = 'Dòng 1\n"Dòng 2" <3 & \'CSG\'';
     const res = await postReg({
-      fullName: 'XSS Test User',
+      fullName: 'Sanitize Control Test User',
       mssv: 'EDGE26',
       role: 'ACTIVE',
       gmail: 'edge26@csg.com',
@@ -488,8 +490,8 @@ async function runTests() {
       receiptImage: VALID_JPEG_BASE64
     });
     assert(res.status === 200, `Expected 200, got ${res.status}`);
-    assert(!res.body.data.wishes.includes('<script>'), 'Unescaped <script> found in stored wish');
-    assert(res.body.data.wishes.includes('&lt;script&gt;'), 'Expected escaped HTML entities');
+    assert(res.body.data.wishes === expectedWish, `Expected ${JSON.stringify(expectedWish)}, got ${JSON.stringify(res.body.data.wishes)}`);
+    assert(!res.body.data.wishes.includes('&quot;') && !res.body.data.wishes.includes('&lt;'), 'HTML entities should not be stored in DB');
   });
 
   await testCase('Empty wish "" -> Registrant still gets mascot frog on stage with joyful default wish', async () => {

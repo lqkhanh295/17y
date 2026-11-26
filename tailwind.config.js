@@ -37,14 +37,14 @@ export default {
         }
       },
       fontFamily: {
-        // Vietnamese-optimized typography system
-        sans: ['"Be Vietnam Pro"', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'sans-serif'],
-        display: ['"Be Vietnam Pro"', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'sans-serif'],
-        body: ['"Be Vietnam Pro"', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'sans-serif'],
-        serif: ['"Playfair Display"', '"Lora"', 'Georgia', 'serif'],
-        editorial: ['"Playfair Display"', '"Lora"', 'Georgia', 'serif'],
+        // Vietnamese-optimized typography system with system emoji fallback
+        sans: ['"Be Vietnam Pro"', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', '"Apple Color Emoji"', '"Segoe UI Emoji"', '"Noto Color Emoji"', 'sans-serif'],
+        display: ['"Be Vietnam Pro"', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', '"Apple Color Emoji"', '"Segoe UI Emoji"', '"Noto Color Emoji"', 'sans-serif'],
+        body: ['"Be Vietnam Pro"', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', '"Apple Color Emoji"', '"Segoe UI Emoji"', '"Noto Color Emoji"', 'sans-serif'],
+        serif: ['"Playfair Display"', '"Lora"', 'Georgia', '"Apple Color Emoji"', '"Segoe UI Emoji"', '"Noto Color Emoji"', 'serif'],
+        editorial: ['"Playfair Display"', '"Lora"', 'Georgia', '"Apple Color Emoji"', '"Segoe UI Emoji"', '"Noto Color Emoji"', 'serif'],
         mono: ['"IBM Plex Mono"', 'monospace'],
-        handwriting: ['"Patrick Hand"', '"Dancing Script"', 'cursive'],
+        handwriting: ['"Patrick Hand"', '"Dancing Script"', '"Apple Color Emoji"', '"Segoe UI Emoji"', '"Noto Color Emoji"', 'cursive'],
       },
       boxShadow: {
         'poster': '4px 4px 0px #20231F',
